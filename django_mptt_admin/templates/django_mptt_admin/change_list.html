@@ -1,0 +1,49 @@
+{% extends 'admin/change_list.html' %}
+{% load admin_static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "django_mptt_admin/jqtree.css" %}">
+    <style>
+        #changelist {
+            border: none;
+        }
+        #tree {
+            margin-left: 1em;
+        }
+        ul.jqtree-tree .jqtree-toggler {
+            top: 10%;
+        }
+    </style>
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        this.jQuery = django.jQuery;
+    </script>
+    <script src="{% static "django_mptt_admin/tree.jquery.js" %}"></script>
+    <script>
+        jQuery(function() {
+            var tree_data = {{ tree_data|safe }};
+
+            var $tree = jQuery('#tree');
+            $tree.tree({
+                data: tree_data,
+                autoOpen: 0
+            });
+
+            $tree.bind('tree.click', function(e) {
+                window.location.href = e.node.url;
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block search %}{% endblock %}
+
+{% block result_list %}
+    <div id="tree"></div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}

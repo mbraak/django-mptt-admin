@@ -1,0 +1,3 @@
+include LICENSE.rst
+recursive-include mptt_admin/templates *
+recursive-include mptt_admin/static *

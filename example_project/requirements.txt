@@ -1,0 +1,2 @@
+https://www.djangoproject.com/download/1.5c1/tarball/
+django-mptt==0.5.5
