@@ -38,9 +38,11 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         )
 
         context = dict(
+            title=change_list.title,
             cl=change_list,
             app_label=self.model._meta.app_label,
             media=self.media,
+            has_add_permission=self.has_add_permission(request),
             tree_data=self.get_tree_data_as_json(change_list),
         )
 
