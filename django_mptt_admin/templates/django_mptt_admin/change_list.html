@@ -9,7 +9,7 @@
             border: none;
         }
         #tree {
-            margin-left: 1em;
+            margin: 1em 0 1em 1em;
         }
         ul.jqtree-tree .jqtree-toggler {
             top: 10%;
@@ -46,4 +46,4 @@
     <div id="tree"></div>
 {% endblock %}
 
-{% block pagination %}{% endblock %}
+{% block pagination %}{{ cl.query_set.count }} {{ cl.opts.verbose_name_plural }}{% endblock %}
