@@ -10,3 +10,6 @@ class Country(MPTTModel):
     code = models.CharField(max_length=2, blank=True, null=True)
     name = models.CharField(max_length=50, blank=True, null=True)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+
+    def __unicode__(self):
+        return self.name or self.code or ''
