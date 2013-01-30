@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList
 
-from util import get_tree_from_mptt
+from util import get_tree_from_queryset
 
 
 class MPTTChangeList(ChangeList):
@@ -57,5 +57,5 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             node_info['url'] = change_list.url_for_result(node)
 
         return json.dumps(
-            get_tree_from_mptt(change_list.query_set, handle_create_node)
+            get_tree_from_queryset(change_list.query_set, handle_create_node)
         )

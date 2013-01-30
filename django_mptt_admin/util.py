@@ -1,4 +1,4 @@
-def get_tree_from_mptt(queryset, on_create_node=None):
+def get_tree_from_queryset(queryset, on_create_node=None):
     """
     Return tree data that is suitable for jqTree.
     The queryset must be sorted by 'tree_id' and 'left' fields.
@@ -6,7 +6,6 @@ def get_tree_from_mptt(queryset, on_create_node=None):
     data = []
     node_dict = dict()
 
-    is_first = True
     for node in queryset:
         node_info = dict(
             label=unicode(node),
@@ -15,7 +14,7 @@ def get_tree_from_mptt(queryset, on_create_node=None):
         if on_create_node:
             on_create_node(node, node_info)
 
-        if is_first:
+        if node.level == 0:
             data.append(node_info)
         else:
             parent_info = node_dict.get(node.parent_id)
