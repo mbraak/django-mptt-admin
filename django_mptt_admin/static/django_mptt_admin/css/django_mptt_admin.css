@@ -1,0 +1,14 @@
+#changelist {
+    border: none;
+}
+#tree {
+    margin: 1em 0 1em 1em;
+}
+ul.jqtree-tree .jqtree-toggler {
+    top: 10%;
+}
+
+#tree .edit {
+    margin-left: 0.5em;
+    vertical-align: middle;
+}

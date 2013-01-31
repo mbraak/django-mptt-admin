@@ -3,18 +3,8 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static "django_mptt_admin/jqtree.css" %}">
-    <style>
-        #changelist {
-            border: none;
-        }
-        #tree {
-            margin: 1em 0 1em 1em;
-        }
-        ul.jqtree-tree .jqtree-toggler {
-            top: 10%;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static "django_mptt_admin/css/jqtree.css" %}">
+    <link rel="stylesheet" href="{% static "django_mptt_admin/css/django_mptt_admin.css" %}">
 {% endblock %}
 
 {% block extrahead %}
@@ -22,9 +12,9 @@
     <script>
         this.jQuery = django.jQuery;
     </script>
-    <script src="{% static "django_mptt_admin/jquery.cookie.js" %}"></script>
-    <script src="{% static "django_mptt_admin/tree.jquery.js" %}"></script>
-    <script src="{% static "django_mptt_admin/django_mptt_admin.js" %}"></script>
+    <script src="{% static "django_mptt_admin/js/jquery.cookie.js" %}"></script>
+    <script src="{% static "django_mptt_admin/js/tree.jquery.js" %}"></script>
+    <script src="{% static "django_mptt_admin/js/django_mptt_admin.js" %}"></script>
     <script>
         jQuery(function() {
             var tree_data = {{ tree_data|safe }};

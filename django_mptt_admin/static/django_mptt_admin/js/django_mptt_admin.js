@@ -1,15 +1,15 @@
 function initTree($tree, tree_data) {
+    function createLi(node, $li) {
+        var $title = $li.find('.jqtree-title');
+        $title.after('<a href="'+ node.url +'" class="edit">(edit)</a>');
+    }
+
     $tree.tree({
         data: tree_data,
         autoOpen: 0,
-        dragAndDrop: true
+        dragAndDrop: true,
+        onCreateLi: createLi
     });
-
-    /*
-    $tree.bind('tree.click', function(e) {
-        window.location.href = e.node.url;
-    });
-    */
 
     $tree.bind('tree.move', function(e) {
         var info = e.move_info;
