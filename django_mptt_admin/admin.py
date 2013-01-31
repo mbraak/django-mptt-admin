@@ -26,6 +26,8 @@ class MPTTChangeList(ChangeList):
 
 
 class DjangoMpttAdmin(admin.ModelAdmin):
+    tree_auto_open = 0
+
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         if not self.has_change_permission(request, None):
@@ -50,6 +52,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             media=self.media,
             has_add_permission=self.has_add_permission(request),
             tree_data=self.get_tree_data_as_json(change_list),
+            tree_auto_open=self.get_tree_auto_open()
         )
 
         return TemplateResponse(
@@ -126,3 +129,9 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             raise Exception('Unknown position')
 
         return HttpResponse()
+
+    def get_tree_auto_open(self):
+        if self.tree_auto_open == False:
+            return 'false'
+        else:
+            return str(self.tree_auto_open)

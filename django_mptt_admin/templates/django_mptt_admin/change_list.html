@@ -18,8 +18,9 @@
     <script>
         jQuery(function() {
             var tree_data = {{ tree_data|safe }};
+            var auto_open = {{ tree_auto_open }};
 
-            initTree(jQuery('#tree'), tree_data);
+            initTree(jQuery('#tree'), tree_data, auto_open);
         });
     </script>
 {% endblock %}

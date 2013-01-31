@@ -1,4 +1,4 @@
-function initTree($tree, tree_data) {
+function initTree($tree, tree_data, auto_open) {
     function createLi(node, $li) {
         var $title = $li.find('.jqtree-title');
         $title.after('<a href="'+ node.url +'" class="edit">(edit)</a>');
@@ -6,7 +6,7 @@ function initTree($tree, tree_data) {
 
     $tree.tree({
         data: tree_data,
-        autoOpen: 0,
+        autoOpen: auto_open,
         dragAndDrop: true,
         onCreateLi: createLi
     });
