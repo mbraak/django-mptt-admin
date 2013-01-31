@@ -12,3 +12,12 @@ ul.jqtree-tree .jqtree-toggler {
     margin-left: 0.5em;
     vertical-align: middle;
 }
+
+.jqtree-tree .jqtree-loading > div .jqtree-title:after {
+    content: url(spinner.gif);
+    margin-left: 8px;
+}
+
+#tree.jqtree-loading:after {
+    content: url(spinner.gif);
+}

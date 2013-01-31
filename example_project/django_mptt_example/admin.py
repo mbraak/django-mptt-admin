@@ -6,7 +6,7 @@ from models import Country
 
 
 class CountryAdmin(DjangoMpttAdmin):
-    pass
+    tree_auto_open = 0
 
 
 admin.site.register(Country, CountryAdmin)

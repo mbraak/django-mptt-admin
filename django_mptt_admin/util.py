@@ -1,23 +1,43 @@
-def get_tree_from_queryset(queryset, on_create_node=None):
+import json
+
+
+def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
     """
     Return tree data that is suitable for jqTree.
     The queryset must be sorted by 'tree_id' and 'left' fields.
     """
+    pk_attname = queryset.model._meta.pk.attname
+
+    def serialize_id(pk):
+        if isinstance(pk, int) or isinstance(pk, basestring):
+            return pk
+        else:
+            return str(pk)
+
     data = []
     node_dict = dict()
+    min_level = None
 
-    for node in queryset:
+    for instance in queryset:
+        if min_level == None:
+            min_level = instance.level
+
+        pk = serialize_id(getattr(instance, pk_attname))
         node_info = dict(
-            label=unicode(node),
-            id=node.id
+            label=unicode(instance),
+            id=pk
         )
         if on_create_node:
-            on_create_node(node, node_info)
+            on_create_node(instance, node_info)
 
-        if node.level == 0:
+        if instance.level == max_level and not instance.is_leaf_node():
+            node_info['load_on_demand'] = True
+
+        if instance.level == min_level:
             data.append(node_info)
         else:
-            parent_info = node_dict.get(node.parent_id)
+            parent_id = serialize_id(instance.parent_id)
+            parent_info = node_dict.get(parent_id)
 
             # Check for corner case: parent is deleted.
             if parent_info:
@@ -26,6 +46,24 @@ def get_tree_from_queryset(queryset, on_create_node=None):
 
                 parent_info['children'].append(node_info)
 
-        node_dict[node.id] = node_info
+        node_dict[pk] = node_info
 
     return data
+
+
+def get_javascript_value(value):
+    """
+    Get javascript value for python value.
+
+    >>> get_javascript_value(True)
+    true
+    >>> get_javascript_value(10)
+    10
+    """
+    if isinstance(value, bool):
+        if value:
+            return 'true'
+        else:
+            return 'false'
+    else:
+        return json.dumps(value)

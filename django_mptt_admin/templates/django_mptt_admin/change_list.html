@@ -9,18 +9,15 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <script>
-        this.jQuery = django.jQuery;
-    </script>
+    <script src="{% static "django_mptt_admin/js/jquery-1.9.0.min.js" %}"></script>
     <script src="{% static "django_mptt_admin/js/jquery.cookie.js" %}"></script>
     <script src="{% static "django_mptt_admin/js/tree.jquery.js" %}"></script>
     <script src="{% static "django_mptt_admin/js/django_mptt_admin.js" %}"></script>
     <script>
         jQuery(function() {
-            var tree_data = {{ tree_data|safe }};
             var auto_open = {{ tree_auto_open }};
 
-            initTree(jQuery('#tree'), tree_data, auto_open);
+            initTree(jQuery('#tree'), auto_open);
         });
     </script>
 {% endblock %}
@@ -28,7 +25,7 @@
 {% block search %}{% endblock %}
 
 {% block result_list %}
-    <div id="tree"></div>
+    <div id="tree" data-url="{{ tree_json_url }}"></div>
 {% endblock %}
 
-{% block pagination %}{{ cl.query_set.count }} {{ cl.opts.verbose_name_plural }}{% endblock %}
+{% block pagination %}{% endblock %}
