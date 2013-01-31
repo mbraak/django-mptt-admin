@@ -27,6 +27,5 @@ def get_tree_from_queryset(queryset, on_create_node=None):
                 parent_info['children'].append(node_info)
 
         node_dict[node.id] = node_info
-        is_first = False
 
     return data

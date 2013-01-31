@@ -22,20 +22,14 @@
     <script>
         this.jQuery = django.jQuery;
     </script>
+    <script src="{% static "django_mptt_admin/jquery.cookie.js" %}"></script>
     <script src="{% static "django_mptt_admin/tree.jquery.js" %}"></script>
+    <script src="{% static "django_mptt_admin/django_mptt_admin.js" %}"></script>
     <script>
         jQuery(function() {
             var tree_data = {{ tree_data|safe }};
 
-            var $tree = jQuery('#tree');
-            $tree.tree({
-                data: tree_data,
-                autoOpen: 0
-            });
-
-            $tree.bind('tree.click', function(e) {
-                window.location.href = e.node.url;
-            });
+            initTree(jQuery('#tree'), tree_data);
         });
     </script>
 {% endblock %}
