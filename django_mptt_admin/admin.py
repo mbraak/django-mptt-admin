@@ -102,13 +102,16 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         list_display_links = self.get_list_display_links(request, list_display)
         list_filter = self.get_list_filter(request)
 
-        return ChangeList(
+        changelist = ChangeList(
             request, self.model, list_display,
             list_display_links, list_filter, self.date_hierarchy,
             self.search_fields, self.list_select_related,
             self.list_per_page, self.list_max_show_all, self.list_editable,
             self
         )
+
+        changelist.has_filters = False
+        return changelist
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
