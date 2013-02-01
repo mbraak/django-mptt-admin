@@ -29,3 +29,10 @@
 {% endblock %}
 
 {% block pagination %}{% endblock %}
+
+{% block object-tools-items %}
+    {{ block.super }}
+    <li>
+        <a href="{{ grid_url }}">Grid view</a>
+    </li>
+{% endblock %}

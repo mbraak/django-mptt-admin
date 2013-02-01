@@ -17,6 +17,8 @@ class DjangoMpttAdmin(admin.ModelAdmin):
     tree_auto_open = 1
     tree_load_on_demand = 1
 
+    change_list_template = 'django_mptt_admin/grid_view.html'
+
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         if not self.has_change_permission(request, None):
@@ -31,7 +33,8 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             media=self.media,
             has_add_permission=self.has_add_permission(request),
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
-            tree_json_url=self.get_admin_url('tree_json')
+            tree_json_url=self.get_admin_url('tree_json'),
+            grid_url=self.get_admin_url('grid'),
         )
 
         return TemplateResponse(
@@ -65,6 +68,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
 
         add_url(r'^(.+)/move/$', 'move', self.move_view)
         add_url(r'^tree_json/$', 'tree_json', self.tree_json_view)
+        add_url(r'^grid/$', 'grid', self.grid_view)
         return urlpatterns
 
     @csrf_protect_m
@@ -150,3 +154,9 @@ class DjangoMpttAdmin(admin.ModelAdmin):
 
         tree_data = self.get_tree_data(qs, max_level)
         return util.JsonResponse(tree_data)
+
+    def grid_view(self, request):
+        return super(DjangoMpttAdmin, self).changelist_view(
+            request,
+            dict(tree_url=self.get_admin_url('changelist'))
+        )
