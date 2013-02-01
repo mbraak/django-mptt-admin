@@ -1,4 +1,5 @@
 import json
+from django.http import HttpResponse
 
 
 def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
@@ -9,7 +10,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
     pk_attname = queryset.model._meta.pk.attname
 
     def serialize_id(pk):
-        if isinstance(pk, int) or isinstance(pk, basestring):
+        if isinstance(pk, (int, long, basestring)):
             return pk
         else:
             return str(pk)
@@ -67,3 +68,12 @@ def get_javascript_value(value):
             return 'false'
     else:
         return json.dumps(value)
+
+
+class JsonResponse(HttpResponse):
+    def __init__(self, data, status=None):
+        super(JsonResponse, self).__init__(
+            json.dumps(data),
+            'application/json',
+            status
+        )

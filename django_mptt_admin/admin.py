@@ -1,9 +1,7 @@
-import json
 from functools import update_wrapper
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.conf.urls import url
 from django.db import transaction
@@ -93,8 +91,8 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         else:
             raise Exception('Unknown position')
 
-        return HttpResponse(
-            json.dumps(dict(success=True))
+        return util.JsonResponse(
+            dict(success=True)
         )
 
     def get_change_list(self, request):
@@ -123,7 +121,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             current_app=self.admin_site.name
         )
 
-    def get_tree_data_as_json(self, qs, max_level):
+    def get_tree_data(self, qs, max_level):
         pk_attname = self.model._meta.pk.attname
 
         def handle_create_node(instance, node_info):
@@ -134,9 +132,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
                 move_url=self.get_admin_url('move', (quote(pk),))
             )
 
-        return json.dumps(
-            util.get_tree_from_queryset(qs, handle_create_node, max_level)
-        )
+        return util.get_tree_from_queryset(qs, handle_create_node, max_level)
 
     def tree_json_view(self, request):
         node_id = request.GET.get('node')
@@ -152,8 +148,5 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             if isinstance(max_level, int):
                 qs = qs.filter(level__lte=max_level)
 
-        tree_data = self.get_tree_data_as_json(qs, max_level)
-
-        return HttpResponse(
-            json.dumps(tree_data)
-        )
+        tree_data = self.get_tree_data(qs, max_level)
+        return util.JsonResponse(tree_data)
