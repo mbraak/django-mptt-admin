@@ -22,7 +22,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         if not self.has_change_permission(request, None):
-            raise PermissionDenied
+            raise PermissionDenied()
 
         change_list = self.get_change_list(request)
 

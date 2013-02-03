@@ -1,4 +1,5 @@
 import json
+
 from django.http import HttpResponse
 
 
@@ -13,6 +14,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
         if isinstance(pk, (int, long, basestring)):
             return pk
         else:
+            # Nb. special case for uuid field
             return str(pk)
 
     data = []

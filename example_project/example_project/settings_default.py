@@ -22,7 +22,7 @@ DATABASES = dict(
     )
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     # Project app
     'django_mptt_example',
 
@@ -37,9 +37,23 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-)
+]
 
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'example_project.urls'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# django jenkins settings
+try:
+    import django_jenkins
+    INSTALLED_APPS.append('django_jenkins')
+except ImportError:
+    pass
+
+PROJECT_APPS = ['django_mptt_admin', 'django_mptt_example']
+
+JENKINS_TASKS = (
+    'django_jenkins.tasks.with_coverage',
+    'django_jenkins.tasks.django_tests',
+)

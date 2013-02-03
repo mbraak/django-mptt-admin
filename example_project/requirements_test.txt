@@ -1,0 +1,11 @@
+cssselect==0.7.1  # needed by pyquery
+coverage==3.6  # needed by django-jenkins
+django-jenkins==0.14.0
+django-webtest==1.5.6
+logilab-astng==0.24.1  # needed by pylint
+logilab-common==0.59.0  # needed by pylint
+lxml==3.1beta1  # needed by pyquery
+pylint==0.26.0  # needed by django-jenkins
+PyQuery==1.2.3  # needed by webtest
+WebOb==1.2.3  # needed by webtest
+webtest==1.4.3  # needed by django-webtest
