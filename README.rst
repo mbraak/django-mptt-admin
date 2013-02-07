@@ -1,5 +1,5 @@
-.. image:: https://secure.travis-ci.org/mbraak/django_mptt_admin.png
-  :target: http://travis-ci.org/mbraak/django_mptt_admin
+.. image:: https://secure.travis-ci.org/leukeleu/django-mptt-admin.png
+  :target: https://travis-ci.org/leukeleu/django-mptt-admin
 
 =================
 Django Mptt Admin
