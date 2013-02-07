@@ -797,6 +797,7 @@
             onIsMoveHandle: null,
             onCanMove: null,
             onCanMoveTo: null,
+            onLoadFailed: null,
             autoEscape: true,
             dataUrl: null,
             slide: true,
@@ -883,6 +884,12 @@
                     if (on_finished) {
                         return on_finished();
                     }
+                },
+                error: function(response) {
+                    removeLoadingClass();
+                    if (_this.options.onLoadFailed) {
+                        return _this.options.onLoadFailed(response);
+                    }
                 }
             });
         };
@@ -958,8 +965,8 @@
             if (slide == null) {
                 slide = true;
             }
-            node.load_on_demand = false;
             return this.loadDataFromUrl(this._getDataUrlInfo(node), node, function() {
+                node.load_on_demand = false;
                 return _this._openNode(node, slide, on_finished);
             });
         };
