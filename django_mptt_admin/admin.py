@@ -3,12 +3,17 @@ from functools import update_wrapper
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
-from django.conf.urls import url
 from django.db import transaction
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.util import unquote, quote
+
+try:
+    from django.conf.urls import url
+except:
+    # Django 1.3
+    from django.conf.urls.defaults import url
 
 import util
 
@@ -100,20 +105,24 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         )
 
     def get_change_list(self, request):
-        list_display = self.get_list_display(request)
-        list_display_links = self.get_list_display_links(request, list_display)
-        list_filter = self.get_list_filter(request)
-
-        changelist = ChangeList(
-            request, self.model, list_display,
-            list_display_links, list_filter, self.date_hierarchy,
-            self.search_fields, self.list_select_related,
-            self.list_per_page, self.list_max_show_all, self.list_editable,
-            self
+        kwargs = dict(
+            request=request,
+            model=self.model,
+            list_display=(),
+            list_display_links=(),
+            list_filter=(),
+            date_hierarchy=None,
+            search_fields=(),
+            list_select_related=(),
+            list_per_page=100,
+            list_editable=(),
+            model_admin=self
         )
 
-        changelist.has_filters = False
-        return changelist
+        if util.get_short_django_version() >= (1, 4):
+            kwargs['list_max_show_all'] = 200
+
+        return ChangeList(**kwargs)
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
