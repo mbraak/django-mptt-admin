@@ -13,3 +13,6 @@ class Country(MPTTModel):
 
     def __unicode__(self):
         return self.name or self.code or ''
+
+    def __str__(self):
+        return self.__unicode__()

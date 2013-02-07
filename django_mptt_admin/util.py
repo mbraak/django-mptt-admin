@@ -1,5 +1,7 @@
 import json
 
+import six
+
 import django
 from django.http import HttpResponse
 
@@ -12,7 +14,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
     pk_attname = queryset.model._meta.pk.attname
 
     def serialize_id(pk):
-        if isinstance(pk, (int, long, basestring)):
+        if isinstance(pk, six.integer_types + six.string_types):
             return pk
         else:
             # Nb. special case for uuid field
@@ -28,7 +30,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
 
         pk = serialize_id(getattr(instance, pk_attname))
         node_info = dict(
-            label=unicode(instance),
+            label=six.text_type(instance),
             id=pk
         )
         if on_create_node:

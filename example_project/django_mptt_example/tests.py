@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 
 from django_webtest import WebTest
 
-from models import Country
+from .models import Country
 
 
 class DjangoMpttAdminWebTests(WebTest):
@@ -17,7 +17,7 @@ class DjangoMpttAdminWebTests(WebTest):
         self.admin = User.objects.create_superuser(USERNAME, 'admin@admin.com', PASSWORD)
         self.login(USERNAME, PASSWORD)
 
-    def test_todo(self):
+    def test_tree_view(self):
         # - get countries admin page
         countries_page = self.app.get('/django_mptt_example/country/')
 

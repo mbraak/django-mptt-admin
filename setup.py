@@ -12,4 +12,5 @@ setup(
     zip_safe=False,
     author='Marco Braak',
     author_email='mbraak@ridethepony.nl',
+    install_requires=['six==1.2.0'],
 )

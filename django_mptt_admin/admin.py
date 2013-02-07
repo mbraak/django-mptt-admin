@@ -15,7 +15,7 @@ except:
     # Django 1.3
     from django.conf.urls.defaults import url
 
-import util
+from . import util
 
 
 class DjangoMpttAdmin(admin.ModelAdmin):
