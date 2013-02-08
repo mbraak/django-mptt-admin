@@ -13,4 +13,6 @@ setup(
     author='Marco Braak',
     author_email='mbraak@ridethepony.nl',
     install_requires=['six==1.2.0'],
+    description='Django-mptt-admin provides a nice Django Admin interface for Mptt models',
+    long_description=open('README.rst').read(),
 )
