@@ -1,7 +1,8 @@
 language: python
 python:
-  - "2.6"
-  - "2.7"
+  - 2.6
+  - 2.7
+  - 3.3
 env:
   - DJANGO_VERSION=1.3.5
   - DJANGO_VERSION=1.4.3
@@ -15,3 +16,9 @@ script:
   - cd example_project
   - mkdir -p reports
   - python manage.py jenkins
+matrix:
+  exclude:
+    - python: 3.3
+      env: DJANGO_VERSION=1.3.5
+    - python: 3.3
+      env: DJANGO_VERSION=1.4.3
