@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 
 from django_webtest import WebTest
 
+from django_mptt_admin.util import get_short_django_version
+
 from .models import Country
 
 
@@ -49,8 +51,14 @@ class DjangoMpttAdminWebTests(WebTest):
         # - get grid page
         grid_page = self.app.get('/django_mptt_example/country/grid/')
 
-        # get first row
-        first_row = grid_page.pyquery('#result_list tbody tr').eq(0)
+        # get row with 'Africa'
+        if get_short_django_version() <= (1, 3):
+            # In Django 1.3 the first row is 'Root', the second is 'Africa'
+            row_index = 1
+        else:
+            row_index = 0
+
+        first_row = grid_page.pyquery('#result_list tbody tr').eq(row_index)
 
         # 'name' column
         self.assertEqual(first_row.find('td').eq(1).text(), 'Africa')
