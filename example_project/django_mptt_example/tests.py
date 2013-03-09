@@ -45,6 +45,24 @@ class DjangoMpttAdminWebTests(WebTest):
             )
         )
 
+    def test_grid_view(self):
+        # - get grid page
+        grid_page = self.app.get('/django_mptt_example/country/grid/')
+
+        # get first row
+        first_row = grid_page.pyquery('#result_list tbody tr').eq(0)
+
+        # 'name' column
+        self.assertEqual(first_row.find('td').eq(1).text(), 'Africa')
+
+        # 'code' column
+        self.assertEqual(first_row.find('th').text(), '(None)')
+
+        # link to edit page
+        africa_id = Country.objects.get(name='Africa').id
+
+        self.assertEqual(first_row.find('a').attr('href'), '/django_mptt_example/country/%d/' % africa_id)
+
     def login(self, username, password):
         form = self.app.get('/').form
 
