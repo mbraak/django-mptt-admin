@@ -29,7 +29,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         if not self.has_change_permission(request, None):
             raise PermissionDenied()
 
-        change_list = self.get_change_list(request)
+        change_list = self.get_change_list_for_tree(request)
 
         context = dict(
             title=change_list.title,
@@ -104,7 +104,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             dict(success=True)
         )
 
-    def get_change_list(self, request):
+    def get_change_list_for_tree(self, request):
         kwargs = dict(
             request=request,
             model=self.model,
@@ -123,6 +123,12 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             kwargs['list_max_show_all'] = 200
 
         return ChangeList(**kwargs)
+
+    def get_changelist(self, request, **kwargs):
+        if util.get_short_django_version() >= (1, 5):
+            return super(DjangoMpttAdmin, self).get_changelist(request, **kwargs)
+        else:
+            return FixedChangeList
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
@@ -168,4 +174,18 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         return super(DjangoMpttAdmin, self).changelist_view(
             request,
             dict(tree_url=self.get_admin_url('changelist'))
+        )
+
+
+class FixedChangeList(ChangeList):
+    """
+    Fix issue 1: the changelist must have a correct link to the edit page
+    """
+    def url_for_result(self, result):
+        pk = getattr(result, self.pk_attname)
+
+        return reverse(
+            'admin:%s_%s_change' % (self.opts.app_label, self.opts.module_name),
+            args=[quote(pk)],
+            current_app=self.model_admin.admin_site.name
         )
