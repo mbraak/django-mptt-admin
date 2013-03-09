@@ -157,7 +157,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         else:
             max_level = self.tree_load_on_demand
 
-            qs = self.queryset(request)
+            qs = self.model._default_manager.get_query_set()
             if isinstance(max_level, int):
                 qs = qs.filter(level__lte=max_level)
 
