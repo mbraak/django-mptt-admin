@@ -1,5 +1,5 @@
 beautifulsoup4==4.1.3  # needed by webtest
-cssselect==0.7.1  # needed by pyquery
+cssselect==0.8  # needed by pyquery
 coverage==3.6  # needed by django-jenkins
 django-jenkins==0.14.0
 git+git://github.com/mbraak/django-webtest.git@django1.6
@@ -10,4 +10,4 @@ pylint==0.27.0  # needed by django-jenkins
 PyQuery==1.2.4  # needed by webtest
 waitress==0.8.2  # needed by webtest
 WebOb==1.2.3  # needed by webtest
-WebTest==2.0.1
+WebTest==2.0.2
