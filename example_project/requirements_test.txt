@@ -10,4 +10,4 @@ pylint==0.27.0  # needed by django-jenkins
 PyQuery==1.2.4  # needed by webtest
 waitress==0.8.2  # needed by webtest
 WebOb==1.2.3  # needed by webtest
-WebTest==2.0.2
+WebTest==2.0.3
