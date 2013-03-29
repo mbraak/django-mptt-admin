@@ -14,7 +14,7 @@ install:
   - python setup.py install
 script:
   - cd example_project
-  - python manage.py python manage.py test django_mptt_example
+  - python manage.py test django_mptt_example
   - coverage run --source=django_mptt_admin,django_mptt_example manage.py test django_mptt_example
   - coverage report -m
 after_success:
