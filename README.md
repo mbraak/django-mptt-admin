@@ -1,5 +1,7 @@
 [![Travis Status](https://secure.travis-ci.org/leukeleu/django-mptt-admin.png)](http://travis-ci.org/leukeleu/django-mptt-admin)
 
+[![Coverage Status](https://coveralls.io/repos/leukeleu/django-mptt-admin/badge.png?branch=master)](https://coveralls.io/r/leukeleu/django-mptt-admin)
+
 Django Mptt Admin
 =================
 
