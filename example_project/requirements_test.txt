@@ -2,8 +2,8 @@ beautifulsoup4==4.1.3  # needed by webtest
 cssselect==0.8  # needed by pyquery
 coverage==3.6
 git+git://github.com/mbraak/django-webtest.git@django1.6
-lxml==3.1.0  # needed by pyquery
+lxml==3.1.1  # needed by pyquery
 PyQuery==1.2.4  # needed by webtest
 waitress==0.8.2  # needed by webtest
 WebOb==1.2.3  # needed by webtest
-WebTest==2.0.3
+WebTest==2.0.4
