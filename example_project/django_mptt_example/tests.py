@@ -71,6 +71,25 @@ class DjangoMpttAdminWebTests(WebTest):
 
         self.assertEqual(first_row.find('a').attr('href'), '/django_mptt_example/country/%d/' % africa_id)
 
+    def test_move_view(self):
+        # setup
+        bouvet_island = Country.objects.get(code='BV')
+        oceania = Country.objects.get(name='Oceania')
+
+        # - move Bouvet Island under Oceania
+        countries_page = self.app.get('/django_mptt_example/country/')
+        csrf_token = countries_page.form['csrfmiddlewaretoken'].value
+
+        response = self.app.post(
+            '/django_mptt_example/country/%d/move/' % bouvet_island.id,
+            dict(
+                csrfmiddlewaretoken=csrf_token,
+                target_id=oceania.id,
+                position='inside',
+            )
+        )
+        self.assertEqual(response.json, dict(success=True))
+
     def login(self, username, password):
         form = self.app.get('/').form
 
