@@ -1,0 +1,2 @@
+coverage run --source=django_mptt_admin,django_mptt_example manage.py test django_mptt_example
+coverage report
