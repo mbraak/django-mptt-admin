@@ -5,7 +5,7 @@
 Django Mptt Admin
 =================
 
-*Django-mptt-admin* provides a nice Django Admin interface for Mptt models. The source is available on https://github.com/leukeleu/django-mptt-admin.
+*Django-mptt-admin* provides a nice Django Admin interface for Mptt models. The source is available on [https://github.com/leukeleu/django-mptt-admin](https://github.com/leukeleu/django-mptt-admin). It uses the [jqTree](http://mbraak.github.io/jqTree/) library.
 
 ![Screenshot](https://raw.github.com/leukeleu/django-mptt-admin/master/screenshot.png)
 
