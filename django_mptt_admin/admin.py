@@ -8,12 +8,7 @@ from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.util import unquote, quote
-
-try:
-    from django.conf.urls import url
-except:
-    # Django 1.3
-    from django.conf.urls.defaults import url
+from django.conf.urls import url
 
 from . import util
 
@@ -116,11 +111,9 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             list_select_related=(),
             list_per_page=100,
             list_editable=(),
-            model_admin=self
+            model_admin=self,
+            list_max_show_all=200,
         )
-
-        if util.get_short_django_version() >= (1, 4):
-            kwargs['list_max_show_all'] = 200
 
         return ChangeList(**kwargs)
 
