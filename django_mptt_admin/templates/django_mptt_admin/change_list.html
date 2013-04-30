@@ -1,17 +1,18 @@
 {% extends 'admin/change_list.html' %}
+{% load staticfiles %}
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{{ STATIC_URL }}django_mptt_admin/css/jqtree.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}django_mptt_admin/css/django_mptt_admin.css">
+    <link rel="stylesheet" href="{% static "django_mptt_admin/css/jqtree.css" %}">
+    <link rel="stylesheet" href="{% static "django_mptt_admin/css/django_mptt_admin.css" %}">
 {% endblock %}
 
 {% block extrahead %}
     {{ block.super }}
-    <script src="{{ STATIC_URL }}django_mptt_admin/js/jquery-1.9.1.min.js"></script>
-    <script src="{{ STATIC_URL }}django_mptt_admin/js/jquery.cookie.js"></script>
-    <script src="{{ STATIC_URL }}django_mptt_admin/js/tree.jquery.js"></script>
-    <script src="{{ STATIC_URL }}django_mptt_admin/js/django_mptt_admin.js"></script>
+    <script src="{% static "django_mptt_admin/js/jquery-1.9.1.min.js" %}"></script>
+    <script src="{% static "django_mptt_admin/js/jquery.cookie.js" %}"></script>
+    <script src="{% static "django_mptt_admin/js/tree.jquery.js" %}"></script>
+    <script src="{% static "django_mptt_admin/js/django_mptt_admin.js" %}"></script>
     <script>
         jQuery(function() {
             var auto_open = {{ tree_auto_open }};
