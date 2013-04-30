@@ -14,6 +14,10 @@ Requirements
 
 The package is tested with Django 1.4.5 and 1.5.1, and Mptt 0.5.5. Also with Python 2.6 and 2.7.
 
+* This version is not compatible with Django 1.3. Please use django-mptt-admin 0.1.2 for Django 1.3 support.
+
+* There is experimental support for Python 3. This works with Django 1.5+ and with the *update-things* branch of django-mptt.
+
 Installation
 ------------
 
@@ -38,3 +42,26 @@ Use the DjangoMpttAdmin class in admin.py:
         pass
 
     admin.site.register(Country, CountryAdmin)
+
+Changelog
+---------
+
+**0.1.3** (development version)
+
+*This version drops support for Django 1.3.7*
+
+* Issue 2: Posting a screenshot in the readme would be really useful (thanks to Andy Baker)
+* Issue 3: Use static templatetag for CDN-compatible file paths (thanks to Alex Holmes)
+* Added [Coveralls](https://coveralls.io/r/leukeleu/django-mptt-admin) support
+
+**0.1.2** (march 12 2013)
+
+* Issue 1: Grid view doesn't link correctly to object change pages (thanks to Kris Fields)
+
+**0.1.1** (februari 25 2013)
+
+* Added experimental Python 3 support
+
+**0.1** (februari 7 2013)
+
+* Initial version
