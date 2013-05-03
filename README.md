@@ -46,7 +46,7 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
-**0.1.3** (development version)
+**0.1.3** (may 2 2013)
 
 *This version drops support for Django 1.3.7*
 
