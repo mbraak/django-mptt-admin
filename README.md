@@ -2,6 +2,10 @@
 
 [![Coverage Status](https://coveralls.io/repos/leukeleu/django-mptt-admin/badge.png?branch=master)](https://coveralls.io/r/leukeleu/django-mptt-admin)
 
+[![Downloads](https://pypip.in/d/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
+
+[![Downloads](https://pypip.in/v/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
+
 Django Mptt Admin
 =================
 
