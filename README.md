@@ -20,7 +20,7 @@ The package is tested with Django 1.4.5 and 1.5.1, and Mptt 0.5.5. Also with Pyt
 
 * This version is not compatible with Django 1.3. Please use django-mptt-admin 0.1.2 for Django 1.3 support.
 
-* There is experimental support for Python 3. This works with Django 1.5+ and with the *update-things* branch of django-mptt.
+* There is experimental support for Python 3. This works with Django 1.5+ and with the development version of django-mptt.
 
 Installation
 ------------

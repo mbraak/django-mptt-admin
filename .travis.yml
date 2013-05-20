@@ -8,7 +8,7 @@ env:
   - DJANGO_VERSION=1.5.1
 install:
   - pip install Django==$DJANGO_VERSION
-  - "if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then pip install git+git://github.com/django-mptt/django-mptt.git@update-things; else pip install django-mptt==0.5.5; fi"
+  - "if [[ $TRAVIS_PYTHON_VERSION == '3.3' ]]; then pip install git+git://github.com/django-mptt/django-mptt.git; else pip install django-mptt==0.5.5; fi"
   - pip install -r example_project/requirements_test.txt
   - python setup.py install
 script:
