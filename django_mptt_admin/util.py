@@ -28,10 +28,10 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
         if min_level == None:
             min_level = instance.level
 
-        pk = serialize_id(getattr(instance, pk_attname))
+        pk = getattr(instance, pk_attname)
         node_info = dict(
             label=six.text_type(instance),
-            id=pk
+            id=serialize_id(pk)
         )
         if on_create_node:
             on_create_node(instance, node_info)
@@ -42,7 +42,8 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
         if instance.level == min_level:
             data.append(node_info)
         else:
-            parent_id = serialize_id(instance.parent_id)
+            # NB: Use parent.id instead of parent_id for consistent values for uuid
+            parent_id = instance.parent.id
             parent_info = node_dict.get(parent_id)
 
             # Check for corner case: parent is deleted.
