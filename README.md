@@ -50,6 +50,10 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
+**0.1.4** (august 8 2013)
+
+* Issue 5: Support for uuid ids
+
 **0.1.3** (may 2 2013)
 
 *This version drops support for Django 1.3.7*
