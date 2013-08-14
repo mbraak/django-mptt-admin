@@ -55,15 +55,15 @@ class DjangoMpttAdminWebTests(WebTest):
         first_row = grid_page.pyquery('#result_list tbody tr').eq(row_index)
 
         # 'name' column
-        self.assertEqual(first_row.find('td').eq(1).text(), 'Africa')
+        self.assertEqual(first_row.find('td').eq(1).text(), 'Afghanistan')
 
         # 'code' column
-        self.assertEqual(first_row.find('th').text(), '(None)')
+        self.assertEqual(first_row.find('th').text(), 'AF')
 
         # link to edit page
-        africa_id = Country.objects.get(name='Africa').id
+        afghanistan_id = Country.objects.get(name='Afghanistan').id
 
-        self.assertEqual(first_row.find('a').attr('href'), '/django_mptt_example/country/%d/' % africa_id)
+        self.assertEqual(first_row.find('a').attr('href'), '/django_mptt_example/country/%d/' % afghanistan_id)
 
     def test_move_view(self):
         # setup
