@@ -160,6 +160,8 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             if isinstance(max_level, int):
                 qs = qs.filter(level__lte=max_level)
 
+        qs = qs.order_by('lft')
+
         tree_data = self.get_tree_data(qs, max_level)
         return util.JsonResponse(tree_data)
 
