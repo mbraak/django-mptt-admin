@@ -1,4 +1,4 @@
-beautifulsoup4==4.3.0  # needed by webtest
+beautifulsoup4==4.3.1  # needed by webtest
 cssselect==0.8  # needed by pyquery
 coverage==3.6
 django-mptt==0.6.0
