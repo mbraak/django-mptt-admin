@@ -1,5 +1,6 @@
 function initTree($tree, auto_open) {
     function createLi(node, $li) {
+        // Create edit link
         var $title = $li.find('.jqtree-title');
         $title.after('<a href="'+ node.url +'" class="edit">(edit)</a>');
     }
@@ -22,6 +23,7 @@ function initTree($tree, auto_open) {
             url: info.moved_node.move_url,
             data: data,
             beforeSend: function(xhr, settings) {
+                // Set Django csrf token
                 var csrftoken = jQuery.cookie('csrftoken');
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
