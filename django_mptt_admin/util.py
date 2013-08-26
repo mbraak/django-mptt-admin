@@ -20,8 +20,17 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
             # Nb. special case for uuid field
             return str(pk)
 
-    data = []
+    # Result tree
+    tree = []
+
+    # Dict of all nodes; used for building the tree
+    # - key is node id
+    # - value is node info (label, id)
     node_dict = dict()
+
+    # The lowest level of the tree; used for building the tree
+    # - Initial value is None; set later
+    # - For the whole tree this is 0, for a subtree this is higher
     min_level = None
 
     for instance in queryset:
@@ -36,14 +45,19 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
         if on_create_node:
             on_create_node(instance, node_info)
 
-        if instance.level == max_level and not instance.is_leaf_node():
+        if max_level != None and not instance.is_leaf_node():
+            # If there is a maximum level and this node has children, then initially set property 'load_on_demand' to true.
             node_info['load_on_demand'] = True
 
         if instance.level == min_level:
-            data.append(node_info)
+            # This is the lowest level. Skip finding a parent.
+            # Add node to the tree
+            tree.append(node_info)
         else:
             # NB: Use parent.id instead of parent_id for consistent values for uuid
             parent_id = instance.parent.id
+
+            # Get parent from node dict
             parent_info = node_dict.get(parent_id)
 
             # Check for corner case: parent is deleted.
@@ -51,11 +65,17 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
                 if not 'children' in parent_info:
                     parent_info['children'] = []
 
+                # Add node to the tree
                 parent_info['children'].append(node_info)
 
+                # If there is a maximum level, then reset property 'load_on_demand' for parent
+                if max_level != None:
+                    parent_info['load_on_demand'] = False
+
+        # Update node dict
         node_dict[pk] = node_info
 
-    return data
+    return tree
 
 
 def get_javascript_value(value):
