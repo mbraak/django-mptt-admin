@@ -8,7 +8,8 @@ function initTree($tree, auto_open) {
     $tree.tree({
         autoOpen: auto_open,
         dragAndDrop: true,
-        onCreateLi: createLi
+        onCreateLi: createLi,
+        saveState: $tree.data('save_state')
     });
 
     $tree.bind('tree.move', function(e) {

@@ -150,17 +150,17 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         node_id = request.GET.get('node')
 
         if node_id:
-            node = self.get_object(request, node_id)
+            node = self.model.objects.get(id=node_id)
             max_level = node.level + 1
-            qs = node.get_descendants().filter(level__lte=max_level)
         else:
             max_level = self.tree_load_on_demand
 
-            qs = self.model._default_manager.get_query_set()
-            if isinstance(max_level, int):
-                qs = qs.filter(level__lte=max_level)
-
-        qs = qs.order_by('lft')
+        qs = util.get_tree_queryset(
+            model=self.model,
+            node_id=node_id,
+            selected_node_id=request.GET.get('selected_node'),
+            max_level=max_level,
+        )
 
         tree_data = self.get_tree_data(qs, max_level)
         return util.JsonResponse(tree_data)

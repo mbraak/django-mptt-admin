@@ -25,7 +25,7 @@
 {% block search %}{% endblock %}
 
 {% block result_list %}
-    <div id="tree" data-url="{{ tree_json_url }}"></div>
+    <div id="tree" data-url="{{ tree_json_url }}" data-save_state="{{ app_label }}_{{ cl.opts.module_name }}"></div>
 {% endblock %}
 
 {% block pagination %}{% endblock %}

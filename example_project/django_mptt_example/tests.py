@@ -20,10 +20,20 @@ class DjangoMpttAdminWebTests(WebTest):
     def test_tree_view(self):
         # - get countries admin page
         countries_page = self.app.get('/django_mptt_example/country/')
+        tree_element = countries_page.pyquery('#tree')
 
-        # - load json
-        json_url = countries_page.pyquery('#tree').attr('data-url')
-        json_data = self.app.get(json_url).json
+        # check savestate key
+        self.assertEqual(tree_element.attr('data-save_state'), 'django_mptt_example_country')
+
+        # check url
+        json_url = tree_element.attr('data-url')
+        self.assertEqual(json_url, '/django_mptt_example/country/tree_json/')
+
+    def test_load_json(self):
+        base_url = '/django_mptt_example/country/tree_json/'
+
+        # -- load json
+        json_data = self.app.get(base_url).json
 
         self.assertEqual(len(json_data), 1)
 
@@ -44,6 +54,34 @@ class DjangoMpttAdminWebTests(WebTest):
                 load_on_demand=True,
             )
         )
+
+        # no children loaded beyond level 1
+        self.assertFalse(hasattr(africa, 'children'))
+
+        # -- load json with node 'Netherlands' selected
+        netherlands_id = Country.objects.get(name='Netherlands').id
+
+        json_data = self.app.get(
+            '%s?selected_node=%d' % (base_url, netherlands_id)
+        ).json
+
+        root = json_data[0]
+
+        africa = root['children'][0]
+        self.assertEqual(africa['label'], 'Africa')
+        self.assertFalse(hasattr(africa, 'children'))
+        self.assertTrue(africa['load_on_demand'])
+
+        europe = root['children'][3]
+        self.assertEqual(europe['label'], 'Europe')
+
+        self.assertEqual(len(europe['children']), 50)
+
+        # -- load subtree
+        json_data = self.app.get('%s?node=%d' % (base_url, africa_id)).json
+
+        self.assertEqual(len(json_data), 58)
+        self.assertEqual(json_data[0]['label'], 'Algeria')
 
     def test_grid_view(self):
         # - get grid page

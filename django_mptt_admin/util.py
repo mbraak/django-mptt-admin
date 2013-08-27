@@ -4,6 +4,7 @@ import six
 
 import django
 from django.http import HttpResponse
+from django.db.models import Q
 
 
 def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
@@ -76,6 +77,35 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
         node_dict[pk] = node_info
 
     return tree
+
+
+def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None, include_root=True):
+    if node_id:
+        node = model.objects.get(id=node_id)
+        max_level = node.level + 1
+        qs = node.get_descendants().filter(level__lte=max_level)
+    else:
+        qs = model._default_manager.get_query_set()
+
+        if isinstance(max_level, int):
+            max_level_filter = Q(level__lte=max_level)
+
+            if selected_node_id:
+                selected_node = model._default_manager.get(id=selected_node_id)
+            else:
+                selected_node = None
+
+            if not (selected_node and selected_node.level > max_level):
+                qs = qs.filter(max_level_filter)
+            else:
+                qs_parents = selected_node.get_ancestors(include_self=True)
+                parents_filter = Q(parent__in=qs_parents)
+                qs = qs.filter(max_level_filter | parents_filter)
+
+        if not include_root:
+            qs = qs.exclude(level=0)
+
+    return qs.order_by('lft')
 
 
 def get_javascript_value(value):
