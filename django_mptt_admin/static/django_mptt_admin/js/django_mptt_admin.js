@@ -9,7 +9,8 @@ function initTree($tree, auto_open) {
         autoOpen: auto_open,
         dragAndDrop: true,
         onCreateLi: createLi,
-        saveState: $tree.data('save_state')
+        saveState: $tree.data('save_state'),
+        useContextMenu: false
     });
 
     $tree.bind('tree.move', function(e) {
