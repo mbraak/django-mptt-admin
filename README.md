@@ -50,6 +50,11 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
+**0.1.5** (august 27 2013)
+
+* Issue 6: save the tree state
+* Issue 7: do not handle the right mouse click
+
 **0.1.4** (august 8 2013)
 
 * Issue 5: Support for uuid ids
