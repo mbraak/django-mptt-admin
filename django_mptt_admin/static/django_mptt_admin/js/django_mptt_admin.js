@@ -24,12 +24,17 @@ function initTree($tree, auto_open) {
         });
     }
 
+    function handleLoadFailed(response) {
+        $tree.html('Error while loading the data from the server.');
+    }
+
     $tree.tree({
         autoOpen: auto_open,
         dragAndDrop: true,
         onCreateLi: createLi,
         saveState: $tree.data('save_state'),
-        useContextMenu: false
+        useContextMenu: false,
+        onLoadFailed: handleLoadFailed
     });
 
     $tree.bind('tree.move', handleMove);
