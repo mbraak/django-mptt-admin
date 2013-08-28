@@ -5,15 +5,7 @@ function initTree($tree, auto_open) {
         $title.after('<a href="'+ node.url +'" class="edit">(edit)</a>');
     }
 
-    $tree.tree({
-        autoOpen: auto_open,
-        dragAndDrop: true,
-        onCreateLi: createLi,
-        saveState: $tree.data('save_state'),
-        useContextMenu: false
-    });
-
-    $tree.bind('tree.move', function(e) {
+    function handleMove(e) {
         var info = e.move_info;
         var data = {
             target_id: info.target_node.id,
@@ -30,5 +22,15 @@ function initTree($tree, auto_open) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             }
         });
+    }
+
+    $tree.tree({
+        autoOpen: auto_open,
+        dragAndDrop: true,
+        onCreateLi: createLi,
+        saveState: $tree.data('save_state'),
+        useContextMenu: false
     });
+
+    $tree.bind('tree.move', handleMove);
 }
