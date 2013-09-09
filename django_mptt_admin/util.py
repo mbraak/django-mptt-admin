@@ -90,10 +90,12 @@ def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None
         if isinstance(max_level, int):
             max_level_filter = Q(level__lte=max_level)
 
+            selected_node = None
             if selected_node_id:
-                selected_node = model._default_manager.get(id=selected_node_id)
-            else:
-                selected_node = None
+                selected_node_qs = model._default_manager.filter(pk=selected_node_id)
+
+                if selected_node_qs.exists():
+                    selected_node = selected_node_qs.get()
 
             if not (selected_node and selected_node.level > max_level):
                 qs = qs.filter(max_level_filter)

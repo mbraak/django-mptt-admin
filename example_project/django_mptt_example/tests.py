@@ -83,6 +83,9 @@ class DjangoMpttAdminWebTests(WebTest):
         self.assertEqual(len(json_data), 58)
         self.assertEqual(json_data[0]['label'], 'Algeria')
 
+        # -- issue 8; selected node does not exist
+        self.app.get('%s?selected_node=9999999' % base_url)
+
     def test_grid_view(self):
         # - get grid page
         grid_page = self.app.get('/django_mptt_example/country/grid/')
