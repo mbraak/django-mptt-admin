@@ -107,7 +107,7 @@ def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None
         if not include_root:
             qs = qs.exclude(level=0)
 
-    return qs.order_by('lft')
+    return qs.order_by('lft').order_by('tree_id')
 
 
 def get_javascript_value(value):
