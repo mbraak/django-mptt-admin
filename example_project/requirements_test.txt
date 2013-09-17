@@ -7,4 +7,4 @@ lxml==3.2.3  # needed by pyquery
 PyQuery==1.2.4  # needed by webtest
 waitress==0.8.7  # needed by webtest
 WebOb==1.2.3  # needed by webtest
-WebTest==2.0.7
+WebTest==2.0.8
