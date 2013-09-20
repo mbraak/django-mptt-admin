@@ -16,6 +16,7 @@ from . import util
 class DjangoMpttAdmin(admin.ModelAdmin):
     tree_auto_open = 1
     tree_load_on_demand = 1
+    trigger_save_after_move = False
 
     change_list_template = 'django_mptt_admin/grid_view.html'
 
@@ -94,6 +95,9 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             instance.move_to(target_instance)
         else:
             raise Exception('Unknown position')
+
+        if self.trigger_save_after_move:
+            instance.save()
 
         return util.JsonResponse(
             dict(success=True)
