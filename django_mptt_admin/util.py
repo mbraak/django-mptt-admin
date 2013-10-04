@@ -35,7 +35,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
     min_level = None
 
     for instance in queryset:
-        if min_level == None:
+        if min_level is None:
             min_level = instance.level
 
         pk = getattr(instance, pk_attname)
@@ -46,7 +46,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
         if on_create_node:
             on_create_node(instance, node_info)
 
-        if max_level != None and not instance.is_leaf_node():
+        if max_level is not None and not instance.is_leaf_node():
             # If there is a maximum level and this node has children, then initially set property 'load_on_demand' to true.
             node_info['load_on_demand'] = True
 
@@ -70,7 +70,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
                 parent_info['children'].append(node_info)
 
                 # If there is a maximum level, then reset property 'load_on_demand' for parent
-                if max_level != None:
+                if max_level is not None:
                     parent_info['load_on_demand'] = False
 
         # Update node dict

@@ -4,6 +4,7 @@ from django.contrib import admin
 
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^', include(admin.site.urls)),
 )
