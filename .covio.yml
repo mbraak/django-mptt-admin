@@ -1,3 +1,3 @@
 violations:
-  pep8: pep8 . --exclude='*migrations*','docs' --ignore=E501
-  sloccount: sloccount .
+  pep8: pep8 . --exclude='*migrations*','docs','build' --ignore=E501
+  sloccount: sloccount django_mptt_admin
