@@ -24,6 +24,7 @@ after_success:
   - pip install -r requirements_coveralls.txt
   - coveralls
   - pip install coviolations_app
+  - cd ..
   - covio
 matrix:
   exclude:
