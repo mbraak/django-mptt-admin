@@ -16,9 +16,15 @@ script:
   - python manage.py test django_mptt_example
   - coverage run --source=django_mptt_admin,django_mptt_example manage.py test django_mptt_example
   - coverage report -m
+before_install:
+  - pip install pep8
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq sloccount
 after_success:
   - pip install -r requirements_coveralls.txt
   - coveralls
+  - pip install coviolations_app
+  - covio
 matrix:
   exclude:
     - python: 3.3
