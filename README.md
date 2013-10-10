@@ -50,7 +50,7 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
-**development version**
+**0.1.6** (october 10 2013)
 
 * Issue 8: removing node from the tree causes the tree view to crash
 
