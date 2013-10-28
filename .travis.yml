@@ -4,8 +4,8 @@ python:
   - 2.7
   - 3.3
 env:
-  - DJANGO=Django==1.4.8
-  - DJANGO=Django==1.5.4
+  - DJANGO=Django==1.4.9
+  - DJANGO=Django==1.5.5
   - DJANGO=https://www.djangoproject.com/download/1.6b4/tarball/
 install:
   - pip install $DJANGO
@@ -23,13 +23,13 @@ before_install:
 after_success:
   - pip install -r requirements_coveralls.txt
   - coveralls
-  - pip install coviolations_app
+  - pip install coviolations_app==0.18
   - cd ..
   - covio
 matrix:
   exclude:
     - python: 3.3
-      env: DJANGO=Django==1.4.8
+      env: DJANGO=Django==1.4.9
 branches:
   only:
     - master
