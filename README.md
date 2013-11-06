@@ -82,3 +82,6 @@ Changelog
 **0.1** (februari 7 2013)
 
 * Initial version
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/leukeleu/django-mptt-admin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
