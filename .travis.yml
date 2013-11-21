@@ -9,7 +9,9 @@ env:
   - DJANGO=Django==1.6
 install:
   - pip install $DJANGO
+  - pip install -r example_project/requirements.txt
   - pip install -r example_project/requirements_test.txt
+  - pip install -r example_project/requirements_travis.txt
   - python setup.py install
 script:
   - cd example_project
@@ -17,13 +19,10 @@ script:
   - coverage run --source=django_mptt_admin,django_mptt_example manage.py test django_mptt_example
   - coverage report -m
 before_install:
-  - pip install pep8 pip-tools
   - sudo apt-get update -qq
   - sudo apt-get install -qq sloccount
 after_success:
-  - pip install -r requirements_coveralls.txt
   - coveralls
-  - pip install coviolations_app==0.19
   - cd ..
   - covio
 matrix:
