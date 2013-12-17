@@ -37,7 +37,9 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             tree_json_url=self.get_admin_url('tree_json'),
             grid_url=self.get_admin_url('grid'),
         )
-        context.update(extra_context)
+
+        if extra_context:
+            context.update(extra_context)
 
         return TemplateResponse(
             request,
