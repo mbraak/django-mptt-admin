@@ -26,3 +26,8 @@ ul.jqtree-tree .jqtree-toggler {
 .jqtree-tree ul.jqtree_common {
     margin-top: 0;
 }
+
+.mptt-admin-error {
+    color: red;
+    margin-left: 8px;
+}

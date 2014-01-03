@@ -1,4 +1,6 @@
 function initTree($tree, auto_open) {
+    var error_node = null;
+
     function createLi(node, $li) {
         // Create edit link
         var $title = $li.find('.jqtree-title');
@@ -12,6 +14,10 @@ function initTree($tree, auto_open) {
             position: info.position
         };
 
+        removeErrorMessage();
+
+        e.preventDefault();
+
         jQuery.ajax({
             type: 'POST',
             url: info.moved_node.move_url,
@@ -20,8 +26,24 @@ function initTree($tree, auto_open) {
                 // Set Django csrf token
                 var csrftoken = jQuery.cookie('csrftoken');
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function() {
+                info.do_move();
+            },
+            error: function() {
+                var $node = $(info.moved_node.element).find('.jqtree-element');
+                $node.append('<span class="mptt-admin-error">move failed</span>');
+
+                error_node = info.moved_node;
             }
         });
+
+        function removeErrorMessage() {
+            if (error_node) {
+                $(error_node.element).find('.mptt-admin-error').remove();
+                error_node = null;
+            }
+        }
     }
 
     function handleLoadFailed(response) {
