@@ -86,7 +86,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         if request.method != 'POST':
             raise SuspiciousOperation()
 
-        target_id = int(request.POST['target_id'])
+        target_id = request.POST['target_id']
         position = request.POST['position']
         target_instance = self.get_object(request, target_id)
 
