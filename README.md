@@ -49,6 +49,12 @@ Use the DjangoMpttAdmin class in admin.py:
 
 Changelog
 ---------
+
+**development version**
+
+* Issue 17: handle error when moving node
+* Issue 18: do not use inline javascript
+
 **0.1.7** (january 3 2014)
 
 * Issue 16: moving a node fails if the node id is a uuid
