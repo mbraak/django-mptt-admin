@@ -49,6 +49,9 @@ Use the DjangoMpttAdmin class in admin.py:
 
 Changelog
 ---------
+**0.1.7** (january 3 2014)
+
+* Issue 16: moving a node fails if the node id is a uuid
 
 **0.1.6** (october 10 2013)
 
