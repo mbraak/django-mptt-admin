@@ -61,3 +61,10 @@ function initTree($tree, auto_open) {
 
     $tree.bind('tree.move', handleMove);
 }
+
+jQuery(function() {
+    var $tree = jQuery('#tree');
+    var auto_open = $tree.data('auto_open');
+
+    initTree($tree, auto_open);
+});
