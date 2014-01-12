@@ -8,6 +8,8 @@
 
 [![Violations](https://coviolations.io/projects/leukeleu/django-mptt-admin/badge/?)](http://coviolations.io/projects/leukeleu/django-mptt-admin/)
 
+[![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master)
+
 Django Mptt Admin
 =================
 
