@@ -15,4 +15,13 @@ setup(
     install_requires=['django-mptt', 'six'],
     description='Django-mptt-admin provides a nice Django Admin interface for Mptt models',
     long_description=open('README.md').read(),
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Framework :: Django",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.3",
+    ]
 )
