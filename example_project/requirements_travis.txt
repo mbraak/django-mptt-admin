@@ -5,5 +5,5 @@ pep8==1.4.6
 pip-tools==0.3.4
 PyGithub==1.23.0
 PyYAML==3.10
-requests==2.1.0
+requests==2.2.0
 sh==1.09
