@@ -3,7 +3,6 @@ from functools import update_wrapper
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
-from django.db import transaction
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList
@@ -30,6 +29,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         context = dict(
             title=change_list.title,
             app_label=self.model._meta.app_label,
+            model_name=util.get_model_name(self.model),
             cl=change_list,
             media=self.media,
             has_add_permission=self.has_add_permission(request),
@@ -64,7 +64,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
                     wrap(view),
                     name='%s_%s_%s' % (
                         self.model._meta.app_label,
-                        self.model._meta.module_name,
+                        util.get_model_name(self.model),
                         url_name
                     )
                 )
@@ -76,7 +76,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         return urlpatterns
 
     @csrf_protect_m
-    @transaction.commit_on_success
+    @util.django_atomic()
     def move_view(self, request, object_id):
         instance = self.get_object(request, unquote(object_id))
 
@@ -132,7 +132,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
-        url_name = 'admin:%s_%s_%s' % (opts.app_label, opts.module_name, name)
+        url_name = 'admin:%s_%s_%s' % (opts.app_label, util.get_model_name(self.model), name)
 
         return reverse(
             url_name,

@@ -5,6 +5,7 @@ import six
 import django
 from django.http import HttpResponse
 from django.db.models import Q
+from django.db import transaction
 
 
 def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
@@ -85,7 +86,7 @@ def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None
         max_level = node.level + 1
         qs = node.get_descendants().filter(level__lte=max_level)
     else:
-        qs = model._default_manager.get_query_set()
+        qs = model._default_manager.all()
 
         if isinstance(max_level, int):
             max_level_filter = Q(level__lte=max_level)
@@ -143,3 +144,17 @@ def get_short_django_version():
     E.g. (1, 5)
     """
     return django.VERSION[0:2]
+
+
+def django_atomic():
+    if get_short_django_version() >= (1, 6):
+        return transaction.atomic
+    else:
+        return transaction.commit_on_success
+
+
+def get_model_name(model):
+    if get_short_django_version() >= (1, 6):
+        return model._meta.model_name
+    else:
+        return model._meta.module_name
