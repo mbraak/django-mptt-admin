@@ -56,6 +56,7 @@ Changelog
 
 * Issue 17: handle error when moving node
 * Issue 18: do not use inline javascript
+* Issue 19: support Django 1.7 alpha
 
 **0.1.7** (january 3 2014)
 
