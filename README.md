@@ -52,7 +52,7 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
-**development version**
+**0.1.8** (februari 2 2014)
 
 * Issue 17: handle error when moving node
 * Issue 18: do not use inline javascript
