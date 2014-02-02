@@ -20,7 +20,7 @@ Django Mptt Admin
 Requirements
 ------------
 
-The package is tested with Django 1.4 - 1.6, and Mptt 0.6.0. Also with Python 2.6, 2.7 and 3.3.
+The package is tested with Django 1.4 - 1.7alpha, and Mptt 0.6.0. Also with Python 2.6, 2.7 and 3.3.
 
 * This version is not compatible with Django 1.3. Please use django-mptt-admin 0.1.2 for Django 1.3 support.
 
