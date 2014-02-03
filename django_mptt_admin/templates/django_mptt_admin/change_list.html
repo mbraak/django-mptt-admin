@@ -3,21 +3,21 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'django_mptt_admin/css/jqtree.css' %}">
-    <link rel="stylesheet" href="{% static 'django_mptt_admin/css/django_mptt_admin.css' %}">
+    <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.css' %}">
+    <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.css' %}">
 {% endblock %}
 
 {% block extrahead %}
     {{ block.super }}
     <!--[if lt IE 9]>
-        <script src="{% static 'django_mptt_admin/js/jquery-1.10.2.min.js' %}"></script>
+        <script src="{% static 'django_mptt_admin/jquery-1.11.0.min.js' %}"></script>
     <![endif]-->
     <!--[if gte IE 9]><!-->
-        <script src="{% static 'django_mptt_admin/js/jquery-2.0.3.min.js' %}"></script>
+        <script src="{% static 'django_mptt_admin/jquery/jquery.min.js' %}"></script>
     <!--<![endif]-->
-    <script src="{% static 'django_mptt_admin/js/jquery.cookie.js' %}"></script>
-    <script src="{% static 'django_mptt_admin/js/tree.jquery.js' %}"></script>
-    <script src="{% static 'django_mptt_admin/js/django_mptt_admin.js' %}"></script>
+    <script src="{% static 'django_mptt_admin/jquery-cookie/jquery.cookie.js' %}"></script>
+    <script src="{% static 'django_mptt_admin/jqtree/tree.jquery.js' %}"></script>
+    <script src="{% static 'django_mptt_admin/django_mptt_admin.js' %}"></script>
 {% endblock %}
 
 {% block search %}{% endblock %}
