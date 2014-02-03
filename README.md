@@ -1,14 +1,6 @@
-[![Travis Status](https://secure.travis-ci.org/leukeleu/django-mptt-admin.png)](http://travis-ci.org/leukeleu/django-mptt-admin)
-
-[![Coverage Status](https://coveralls.io/repos/leukeleu/django-mptt-admin/badge.png?branch=master)](https://coveralls.io/r/leukeleu/django-mptt-admin)
-
-[![Downloads](https://pypip.in/d/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
-
-[![Version](https://pypip.in/v/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
+[![Travis Status](https://secure.travis-ci.org/leukeleu/django-mptt-admin.png)](http://travis-ci.org/leukeleu/django-mptt-admin) [![Coverage Status](https://coveralls.io/repos/leukeleu/django-mptt-admin/badge.png?branch=master)](https://coveralls.io/r/leukeleu/django-mptt-admin) [![Downloads](https://pypip.in/d/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Version](https://pypip.in/v/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master) [![Wheel Status](https://pypip.in/wheel/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Egg Status](https://pypip.in/egg/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![License](https://pypip.in/license/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
 
 [![Violations](https://coviolations.io/projects/leukeleu/django-mptt-admin/badge/?)](http://coviolations.io/projects/leukeleu/django-mptt-admin/)
-
-[![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master)
 
 Django Mptt Admin
 =================
