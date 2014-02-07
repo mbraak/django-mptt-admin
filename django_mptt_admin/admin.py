@@ -38,6 +38,10 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             grid_url=self.get_admin_url('grid'),
         )
 
+        # Django 1.7
+        if hasattr(self.admin_site, 'each_context'):
+            context.update(self.admin_site.each_context())
+
         if extra_context:
             context.update(extra_context)
 
