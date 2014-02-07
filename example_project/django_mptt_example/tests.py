@@ -126,7 +126,8 @@ class DjangoMpttAdminWebTests(WebTest):
         self.assertEqual(response.json, dict(success=True))
 
     def login(self, username, password):
-        form = self.app.get('/').form
+        login_page = self.app.get('/', auto_follow=True)
+        form = login_page.form
 
         form['username'] = username
         form['password'] = password
