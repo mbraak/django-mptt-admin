@@ -44,6 +44,9 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
+**development**
+* Issue 25: update jqtree to 0.20.0
+
 **0.1.8** (februari 2 2014)
 
 * Issue 17: handle error when moving node
