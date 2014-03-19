@@ -3,7 +3,7 @@ coviolations_app==0.24
 docopt==0.6.1
 pep8==1.4.6
 pip-tools==0.3.4
-PyGithub==1.23.0
+PyGithub==1.24.1
 PyYAML==3.10
 requests==2.2.1
 sh==1.09
