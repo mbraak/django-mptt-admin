@@ -1,6 +1,6 @@
 beautifulsoup4==4.3.2  # needed by webtest
 cssselect==0.9.1  # needed by pyquery
-django-webtest==1.7.6
+django-webtest==1.7.7
 lxml==3.3.3  # needed by pyquery
 pyquery==1.2.8  # needed by webtest
 waitress==0.8.8  # needed by webtest
