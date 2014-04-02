@@ -64,7 +64,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
 
             # Check for corner case: parent is deleted.
             if parent_info:
-                if not 'children' in parent_info:
+                if 'children' not in parent_info:
                     parent_info['children'] = []
 
                 # Add node to the tree
