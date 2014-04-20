@@ -1,4 +1,4 @@
-[![Travis Status](https://secure.travis-ci.org/leukeleu/django-mptt-admin.png)](http://travis-ci.org/leukeleu/django-mptt-admin) [![Coverage Status](https://coveralls.io/repos/leukeleu/django-mptt-admin/badge.png?branch=master)](https://coveralls.io/r/leukeleu/django-mptt-admin) [![Downloads](https://pypip.in/d/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Version](https://pypip.in/v/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master) [![Wheel Status](https://pypip.in/wheel/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Egg Status](https://pypip.in/egg/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![License](https://pypip.in/license/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
+[![Build Status](https://travis-ci.org/leukeleu/django-mptt-admin.svg?branch=master)](https://travis-ci.org/leukeleu/django-mptt-admin) [![Coverage Status](https://coveralls.io/repos/leukeleu/django-mptt-admin/badge.png?branch=master)](https://coveralls.io/r/leukeleu/django-mptt-admin) [![Downloads](https://pypip.in/d/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Version](https://pypip.in/v/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master) [![Wheel Status](https://pypip.in/wheel/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Egg Status](https://pypip.in/egg/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![License](https://pypip.in/license/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
 
 [![Violations](https://coviolations.io/projects/leukeleu/django-mptt-admin/badge/?)](http://coviolations.io/projects/leukeleu/django-mptt-admin/)
 
@@ -12,7 +12,7 @@ Django Mptt Admin
 Requirements
 ------------
 
-The package is tested with Django 1.4 - 1.7alpha, and Mptt 0.6.0. Also with Python 2.6, 2.7 and 3.3.
+The package is tested with Django 1.4 - 1.7beta, and Mptt 0.6.0. Also with Python 2.6, 2.7 and 3.3.
 
 * This version is not compatible with Django 1.3. Please use django-mptt-admin 0.1.2 for Django 1.3 support.
 
