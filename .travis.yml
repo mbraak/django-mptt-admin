@@ -4,7 +4,7 @@ python:
   - 2.7
   - 3.3
 env:
-  - DJANGO=Django==1.4.10
+  - DJANGO=Django==1.4.11
   - DJANGO=Django==1.5.5
   - DJANGO=Django==1.6.3
   - DJANGO=https://www.djangoproject.com/download/1.7b2/tarball/
@@ -29,7 +29,7 @@ matrix:
     - python: 2.6
       env: DJANGO=https://www.djangoproject.com/download/1.7b2/tarball/
     - python: 3.3
-      env: DJANGO=Django==1.4.10
+      env: DJANGO=Django==1.4.11
 branches:
   only:
     - master
