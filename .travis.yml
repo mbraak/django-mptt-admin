@@ -27,7 +27,7 @@ after_success:
 matrix:
   exclude:
     - python: 2.6
-      env: https://www.djangoproject.com/m/releases/1.7/Django-1.7b4.tar.gz
+      env: DJANGO=https://www.djangoproject.com/m/releases/1.7/Django-1.7b4.tar.gz
     - python: 3.3
       env: DJANGO=Django==1.4.13
 branches:
