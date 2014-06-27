@@ -8,7 +8,7 @@ env:
   - DJANGO=Django==1.4.13
   - DJANGO=Django==1.5.8
   - DJANGO=Django==1.6.5
-  - DJANGO=https://www.djangoproject.com/m/releases/1.7/Django-1.7b4.tar.gz
+  - DJANGO=https://www.djangoproject.com/download/1.7c1/tarball/
 install:
   - pip install $DJANGO
   - pip install -r example_project/requirements.txt
@@ -30,7 +30,7 @@ after_success:
 matrix:
   exclude:
     - python: 2.6
-      env: DJANGO=https://www.djangoproject.com/m/releases/1.7/Django-1.7b4.tar.gz
+      env: https://www.djangoproject.com/download/1.7c1/tarball/
     - python: 3.3
       env: DJANGO=Django==1.4.13
     - python: 3.4
