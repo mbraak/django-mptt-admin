@@ -30,9 +30,7 @@ after_success:
 matrix:
   exclude:
     - python: 2.6
-      env: https://www.djangoproject.com/download/1.7c1/tarball/
-    - python: 2.7
-      env: https://www.djangoproject.com/download/1.7c1/tarball/
+      env: DJANGO=https://www.djangoproject.com/download/1.7c1/tarball/
     - python: 3.3
       env: DJANGO=Django==1.4.13
     - python: 3.4
