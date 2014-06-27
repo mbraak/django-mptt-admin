@@ -1,7 +1,6 @@
 import os
 import sys
 
-
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 sys.path.append(
@@ -43,19 +42,5 @@ STATIC_URL = '/static/'
 ROOT_URLCONF = 'example_project.urls'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-# django jenkins settings
-try:
-    import django_jenkins
-    INSTALLED_APPS.append('django_jenkins')
-except ImportError:
-    pass
-
-PROJECT_APPS = ['django_mptt_admin', 'django_mptt_example']
-
-JENKINS_TASKS = (
-    'django_jenkins.tasks.with_coverage',
-    'django_jenkins.tasks.django_tests',
-)
 
 SECRET_KEY = 'secret'
