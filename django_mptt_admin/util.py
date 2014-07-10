@@ -82,7 +82,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
 
 def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None, include_root=True):
     if node_id:
-        node = model.objects.get(id=node_id)
+        node = model.objects.get(pk=node_id)
         max_level = node.level + 1
         qs = node.get_descendants().filter(level__lte=max_level)
     else:

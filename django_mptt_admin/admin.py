@@ -161,7 +161,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         node_id = request.GET.get('node')
 
         if node_id:
-            node = self.model.objects.get(id=node_id)
+            node = self.model.objects.get(pk=node_id)
             max_level = node.level + 1
         else:
             max_level = self.tree_load_on_demand
