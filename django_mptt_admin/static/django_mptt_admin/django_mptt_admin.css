@@ -14,13 +14,13 @@ ul.jqtree-tree .jqtree-toggler {
 }
 
 .jqtree-tree .jqtree-loading > div .edit:after {
-    content: url(css/spinner.gif);
+    content: url(spinner.gif);
     margin-left: 8px;
     position: absolute;
 }
 
 #tree.jqtree-loading:after {
-    content: url(css/spinner.gif);
+    content: url(spinner.gif);
 }
 
 .jqtree-tree ul.jqtree_common {
