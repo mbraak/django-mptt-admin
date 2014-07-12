@@ -12,7 +12,7 @@ Django Mptt Admin
 Requirements
 ------------
 
-The package is tested with Django 1.4 - 1.7beta, and Mptt 0.6.0. Also with Python 2.6, 2.7 and 3.3.
+The package is tested with Django (1.4 - 1.7), and Mptt (0.6.0, 0.6.1). Also with Python 2.6, 2.7 and 3.3, 3.4.
 
 * This version is not compatible with Django 1.3. Please use django-mptt-admin 0.1.2 for Django 1.3 support.
 
@@ -44,8 +44,11 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
-**development**
-* Issue 25: update jqtree to 0.20.0
+**0.1.9**
+
+* Issue 25: update jqtree to 0.21.0
+* Issue 28: fixing problems related to working with model's pk-field, named other than "id" (thanks to Igor Gai)
+* Issue 29: fix path to spinner.gif (thanks to Igor Gai)
 
 **0.1.8** (februari 2 2014)
 
