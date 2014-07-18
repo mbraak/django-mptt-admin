@@ -44,7 +44,7 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
-**0.1.9**
+**0.1.9** (july 12 2014)
 
 * Issue 25: update jqtree to 0.21.0
 * Issue 28: fixing problems related to working with model's pk-field, named other than "id" (thanks to Igor Gai)
