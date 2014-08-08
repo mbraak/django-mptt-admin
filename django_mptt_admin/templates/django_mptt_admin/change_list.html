@@ -1,5 +1,5 @@
 {% extends 'admin/change_list.html' %}
-{% load staticfiles %}
+{% load staticfiles i18n %}
 
 {% block extrastyle %}
     {{ block.super }}
@@ -36,6 +36,6 @@
 {% block object-tools-items %}
     {{ block.super }}
     <li>
-        <a href="{{ grid_url }}">Grid view</a>
+        <a href="{{ grid_url }}">{% trans "Grid view" %}</a>
     </li>
 {% endblock %}
