@@ -44,6 +44,10 @@ Use the DjangoMpttAdmin class in admin.py:
 Changelog
 ---------
 
+**development version**
+
+* Issue 31: added autoescape option
+
 **0.1.9** (july 12 2014)
 
 * Issue 25: update jqtree to 0.21.0
