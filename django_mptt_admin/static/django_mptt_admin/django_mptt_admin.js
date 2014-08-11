@@ -1,4 +1,4 @@
-function initTree($tree, auto_open) {
+function initTree($tree, autoopen, autoescape) {
     var error_node = null;
 
     function createLi(node, $li) {
@@ -51,7 +51,8 @@ function initTree($tree, auto_open) {
     }
 
     $tree.tree({
-        autoOpen: auto_open,
+        autoOpen: autoopen,
+        autoEscape: autoescape,
         dragAndDrop: true,
         onCreateLi: createLi,
         saveState: $tree.data('save_state'),
@@ -64,7 +65,8 @@ function initTree($tree, auto_open) {
 
 jQuery(function() {
     var $tree = jQuery('#tree');
-    var auto_open = $tree.data('auto_open');
+    var autoopen = $tree.data('auto_open');
+    var autoescape = $tree.data('autoescape');
 
-    initTree($tree, auto_open);
+    initTree($tree, autoopen, autoescape);
 });
