@@ -41,6 +41,28 @@ Use the DjangoMpttAdmin class in admin.py:
 
     admin.site.register(Country, CountryAdmin)
 
+Options
+-------
+
+**tree_auto_open**
+
+Auto-open node. Default value is 1.
+
+Values:
+* **True**: autopen all nodes
+* **False**: do not autoopen
+* **integer**: autopen until this level
+
+**tree_load_on_demand**
+
+Load on demand (True / False). Default is True.
+
+**autoescape**
+
+Autoescape (True / False). Default is True.
+
+Autoescape titles in tree.
+
 Changelog
 ---------
 
@@ -98,4 +120,3 @@ Changelog
 * Initial version
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/leukeleu/django-mptt-admin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
