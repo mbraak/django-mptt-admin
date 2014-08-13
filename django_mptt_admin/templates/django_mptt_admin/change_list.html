@@ -15,6 +15,7 @@
     <!--[if gte IE 9]><!-->
         <script src="{% static 'django_mptt_admin/jquery/dist/jquery.min.js' %}"></script>
     <!--<![endif]-->
+    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
     <script src="{% static 'django_mptt_admin/jquery-cookie/jquery.cookie.js' %}"></script>
     <script src="{% static 'django_mptt_admin/jqtree/tree.jquery.js' %}"></script>
     <script src="{% static 'django_mptt_admin/django_mptt_admin.js' %}"></script>
@@ -28,6 +29,7 @@
         data-url="{{ tree_json_url }}"
         data-save_state="{{ app_label }}_{{ model_name }}"
         data-auto_open="{{ tree_auto_open }}"
+        data-autoescape="{{ autoescape }}"
     ></div>
 {% endblock %}
 

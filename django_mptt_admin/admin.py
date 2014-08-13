@@ -17,6 +17,9 @@ class DjangoMpttAdmin(admin.ModelAdmin):
     tree_load_on_demand = 1
     trigger_save_after_move = False
 
+    # Autoescape the tree data; default is True
+    autoescape = True
+
     change_list_template = 'django_mptt_admin/grid_view.html'
 
     @csrf_protect_m
@@ -36,6 +39,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
             tree_json_url=self.get_admin_url('tree_json'),
             grid_url=self.get_admin_url('grid'),
+            autoescape=util.get_javascript_value(self.autoescape)
         )
 
         # Django 1.7
