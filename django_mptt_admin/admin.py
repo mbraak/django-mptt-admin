@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
+from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.util import unquote, quote
 from django.conf.urls import url
@@ -24,6 +25,10 @@ class DjangoMpttAdmin(admin.ModelAdmin):
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
+        is_popup = IS_POPUP_VAR in request.REQUEST
+        if is_popup:
+            return super(DjangoMpttAdmin, self).changelist_view(request, extra_context=extra_context)
+
         if not self.has_change_permission(request, None):
             raise PermissionDenied()
 
