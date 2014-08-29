@@ -69,6 +69,7 @@ Changelog
 **development version**
 
 * Issue 31: added autoescape option
+* Issue 34: use the default change list in popup mode
 
 **0.1.9** (july 12 2014)
 
@@ -118,5 +119,3 @@ Changelog
 **0.1** (februari 7 2013)
 
 * Initial version
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/leukeleu/django-mptt-admin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
