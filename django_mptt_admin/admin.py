@@ -5,12 +5,17 @@ from django.core.urlresolvers import reverse
 from django.template.response import TemplateResponse
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
-from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.admin.util import unquote, quote
 from django.conf.urls import url
 
 from . import util
+
+try:
+    from django.contrib.admin.options import IS_POPUP_VAR
+except ImportError:
+    # Django 1.4 and 1.5
+    from django.contrib.admin.views.main import IS_POPUP_VAR
 
 
 class DjangoMpttAdmin(admin.ModelAdmin):
