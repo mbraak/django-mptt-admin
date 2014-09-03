@@ -1,37 +1,42 @@
-[![Build Status](https://travis-ci.org/leukeleu/django-mptt-admin.svg?branch=master)](https://travis-ci.org/leukeleu/django-mptt-admin) [![Coverage Status](https://coveralls.io/repos/leukeleu/django-mptt-admin/badge.png?branch=master)](https://coveralls.io/r/leukeleu/django-mptt-admin) [![Downloads](https://pypip.in/d/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Version](https://pypip.in/v/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master) [![Wheel Status](https://pypip.in/wheel/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![Egg Status](https://pypip.in/egg/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/) [![License](https://pypip.in/license/django-mptt-admin/badge.png)](https://pypi.python.org/pypi/django-mptt-admin/)
+[![Build Status](https://travis-ci.org/leukeleu/django-mptt-admin.svg?branch=master)](https://travis-ci.org/leukeleu/django-mptt-admin) [![Version](https://pypip.in/version/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)[![Development Status](https://pypip.in/status/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
-[![Violations](https://coviolations.io/projects/leukeleu/django-mptt-admin/badge/?)](http://coviolations.io/projects/leukeleu/django-mptt-admin/)
+[![Coverage Status](https://img.shields.io/coveralls/leukeleu/django-mptt-admin.svg)](https://coveralls.io/r/leukeleu/django-mptt-admin?branch=master) [![Downloads](https://pypip.in/download/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Wheel Status](https://pypip.in/format/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master)
+
+[![License](https://pypip.in/license/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Supported Python versions](https://pypip.in/py_versions/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Supported Python implementations](https://pypip.in/implementation/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
 Django Mptt Admin
 =================
 
-*Django-mptt-admin* provides a nice Django Admin interface for Mptt models. The source is available on [https://github.com/leukeleu/django-mptt-admin](https://github.com/leukeleu/django-mptt-admin). It uses the [jqTree](http://mbraak.github.io/jqTree/) library.
+*Django-mptt-admin* provides a nice Django Admin interface for [django-mptt models](http://django-mptt.github.io/django-mptt/). The source is available on [https://github.com/leukeleu/django-mptt-admin](https://github.com/leukeleu/django-mptt-admin). It uses the [jqTree](http://mbraak.github.io/jqTree/) library.
 
 ![Screenshot](https://raw.github.com/leukeleu/django-mptt-admin/master/screenshot.png)
 
 Requirements
 ------------
 
-The package is tested with Django (1.4 - 1.7), and Mptt (0.6.0, 0.6.1). Also with Python 2.6, 2.7 and 3.3, 3.4.
-
-* This version is not compatible with Django 1.3. Please use django-mptt-admin 0.1.2 for Django 1.3 support.
+The package is tested with Django (1.4 - 1.7), and django-mptt (0.6.0, 0.6.1). Also with Python 2.6, 2.7, 3.3 and 3.4.
 
 Installation
 ------------
 
 Install the package:
 
-    $ pip install django_mptt_admin
+```
+$ pip install django_mptt_admin
+```
 
 Add **django_mptt_admin** to your installed apps in **settings.py**.
 
-    INSTALLED_APPS = (
-        ..
-        'django_mptt_admin',
-    )
+```python
+  INSTALLED_APPS = (
+      ..
+      'django_mptt_admin',
+  )
+```
 
 Use the DjangoMpttAdmin class in admin.py:
 
+```python
     from django.contrib import admin
     from django_mptt_admin.admin import DjangoMpttAdmin
     from models import Country
@@ -40,6 +45,7 @@ Use the DjangoMpttAdmin class in admin.py:
         pass
 
     admin.site.register(Country, CountryAdmin)
+```
 
 Options
 -------
