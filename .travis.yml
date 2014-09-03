@@ -4,6 +4,7 @@ python:
   - 2.7
   - 3.3
   - 3.4
+  - pypy
 env:
   - DJANGO=Django==1.4.15
   - DJANGO=Django==1.5.10
@@ -35,6 +36,12 @@ matrix:
       env: DJANGO=Django==1.4.15
     - python: 3.4
       env: DJANGO=Django==1.4.15
+    - python: pypy
+      env: DJANGO=Django==1.4.15
+    - python: pypy
+      env: DJANGO=Django==1.5.10
+    - python: pypy
+      env: DJANGO=Django==1.6.7
 branches:
   only:
     - master
