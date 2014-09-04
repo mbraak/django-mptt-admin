@@ -88,7 +88,10 @@ def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None
     else:
         qs = model._default_manager.all()
 
-        if isinstance(max_level, int):
+        if max_level == True:
+            max_level = 1
+
+        if isinstance(max_level, int) and max_level != False:
             max_level_filter = Q(level__lte=max_level)
 
             selected_node = None
