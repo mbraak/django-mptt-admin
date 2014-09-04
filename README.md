@@ -61,7 +61,11 @@ Values:
 
 **tree_load_on_demand**
 
-Load on demand (True / False). Default is True.
+Load on demand (True / False / level). Default is True.
+
+* **True**: load nodes on demand
+* **False**: do not load nodes on demand
+* **int**: load nodes on demand until this level
 
 **autoescape**
 
