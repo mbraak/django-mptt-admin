@@ -79,7 +79,7 @@ Changelog
 **development version**
 
 * Issue 31: added autoescape option
-* Issue 34: use the default change list in popup mode
+* Issue 34: use the default change list in popup mode (thanks to hstanev)
 * Issue 36: the option tree_load_on_demand = False does not work
 
 **0.1.9** (july 12 2014)
