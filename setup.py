@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 
-version = '0.1.9'
+version = '0.1.9.1'
 
 setup(
     name='django-mptt-admin',
