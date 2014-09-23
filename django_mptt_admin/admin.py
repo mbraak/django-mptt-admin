@@ -114,6 +114,13 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         position = request.POST['position']
         target_instance = self.get_object(request, target_id)
 
+        self.do_move(instance, position, target_instance)
+
+        return util.JsonResponse(
+            dict(success=True)
+        )
+
+    def do_move(self, instance, position, target_instance):
         if position == 'before':
             instance.move_to(target_instance, 'left')
         elif position == 'after':
@@ -125,10 +132,6 @@ class DjangoMpttAdmin(admin.ModelAdmin):
 
         if self.trigger_save_after_move:
             instance.save()
-
-        return util.JsonResponse(
-            dict(success=True)
-        )
 
     def get_change_list_for_tree(self, request):
         kwargs = dict(
