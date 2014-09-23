@@ -24,7 +24,7 @@ except ImportError:
     from django.contrib.admin.views.main import IS_POPUP_VAR
 
 
-class DjangoMpttAdmin(admin.ModelAdmin):
+class DjangoMpttAdminMixin(object):
     tree_auto_open = 1
     tree_load_on_demand = 1
     trigger_save_after_move = False
@@ -38,7 +38,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         is_popup = IS_POPUP_VAR in request.GET
         if is_popup:
-            return super(DjangoMpttAdmin, self).changelist_view(request, extra_context=extra_context)
+            return super(DjangoMpttAdminMixin, self).changelist_view(request, extra_context=extra_context)
 
         if not self.has_change_permission(request, None):
             raise PermissionDenied()
@@ -77,7 +77,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        urlpatterns = super(DjangoMpttAdmin, self).get_urls()
+        urlpatterns = super(DjangoMpttAdminMixin, self).get_urls()
 
         def add_url(regex, url_name, view):
             # Prepend url to list so it has preference before 'change' url
@@ -153,7 +153,7 @@ class DjangoMpttAdmin(admin.ModelAdmin):
 
     def get_changelist(self, request, **kwargs):
         if util.get_short_django_version() >= (1, 5):
-            return super(DjangoMpttAdmin, self).get_changelist(request, **kwargs)
+            return super(DjangoMpttAdminMixin, self).get_changelist(request, **kwargs)
         else:
             return FixedChangeList
 
@@ -200,10 +200,14 @@ class DjangoMpttAdmin(admin.ModelAdmin):
         return util.JsonResponse(tree_data)
 
     def grid_view(self, request):
-        return super(DjangoMpttAdmin, self).changelist_view(
+        return super(DjangoMpttAdminMixin, self).changelist_view(
             request,
             dict(tree_url=self.get_admin_url('changelist'))
         )
+
+
+class DjangoMpttAdmin(DjangoMpttAdminMixin, admin.ModelAdmin):
+    pass
 
 
 class FixedChangeList(ChangeList):
