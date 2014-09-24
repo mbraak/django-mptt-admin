@@ -1,9 +1,11 @@
-beautifulsoup4==4.3.2  # required by webtest
 coverage==3.7.1
-cssselect==0.9.1  # required by pyquery
+
+# django-webtest
 django-webtest==1.7.7
-lxml==3.4.0  # required by pyquery
-pyquery==1.2.9  # required by webtest
-waitress==0.8.9  # required by webtest
-WebOb==1.4  # required by webtest
-WebTest==2.0.15
+beautifulsoup4==4.3.2
+cssselect==0.9.1
+lxml==3.4.0
+pyquery==1.2.9
+waitress==0.8.9
+WebOb==1.4
+WebTest==2.0.16
