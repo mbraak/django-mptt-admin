@@ -76,7 +76,7 @@ Autoescape titles in tree.
 Changelog
 ---------
 
-**development version**
+**0.1.10** (september 24 2014)
 
 * Issue 31: added autoescape option
 * Issue 34: use the default change list in popup mode (thanks to hstanev)
