@@ -76,6 +76,10 @@ Autoescape titles in tree.
 Changelog
 ---------
 
+**development version**
+
+* Issue 40: use jqtree 0.22.0
+
 **0.1.10** (september 24 2014)
 
 * Issue 31: added autoescape option

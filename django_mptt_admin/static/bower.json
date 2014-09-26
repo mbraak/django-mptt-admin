@@ -3,6 +3,6 @@
     "dependencies": {
         "jquery": "2.1.1",
         "jquery-cookie": "v1.4.1",
-        "jqtree": "0.21.0"
+        "jqtree": "0.22.0"
     }
 }
