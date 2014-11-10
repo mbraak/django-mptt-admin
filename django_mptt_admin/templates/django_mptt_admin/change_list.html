@@ -1,10 +1,16 @@
 {% extends 'admin/change_list.html' %}
+{% load i18n %}
 {% load staticfiles %}
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.css' %}">
-    <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.css' %}">
+    {% if LANGUAGE_BIDI %}
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.rtl.css' %}">
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.rtl.css' %}">
+    {% else %}
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.css' %}">
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.css' %}">
+    {%  endif %}
 {% endblock %}
 
 {% block extrahead %}
@@ -29,6 +35,10 @@
         data-save_state="{{ app_label }}_{{ model_name }}"
         data-auto_open="{{ tree_auto_open }}"
         data-autoescape="{{ autoescape }}"
+        data-label-edit="{% trans "edit" %}"
+        data-label-move-failed="{% trans "move failed" %}"
+        data-label-error="{% trans "Error while loading the data from the server" %}"
+        data-rtl="{{ LANGUAGE_BIDI|yesno:'1,' }}"
     ></div>
 {% endblock %}
 
@@ -37,6 +47,6 @@
 {% block object-tools-items %}
     {{ block.super }}
     <li>
-        <a href="{{ grid_url }}">Grid view</a>
+        <a href="{{ grid_url }}">{% trans "Grid view" %}</a>
     </li>
 {% endblock %}

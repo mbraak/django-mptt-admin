@@ -1,0 +1,33 @@
+#changelist {
+    border: none;
+}
+#tree {
+    margin: 1em 1em 1em 0;
+}
+ul.jqtree-tree .jqtree-toggler {
+    top: 10%;
+}
+
+#tree .edit {
+    margin-right: 0.5em;
+    vertical-align: middle;
+}
+
+.jqtree-tree .jqtree-loading > div .edit:after {
+    content: url(spinner.gif);
+    margin-right: 8px;
+    position: absolute;
+}
+
+#tree.jqtree-loading:after {
+    content: url(spinner.gif);
+}
+
+.jqtree-tree ul.jqtree_common {
+    margin-top: 0;
+}
+
+.mptt-admin-error {
+    color: red;
+    margin-right: 8px;
+}
