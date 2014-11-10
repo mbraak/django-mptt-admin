@@ -57,7 +57,9 @@ function initTree($tree, autoopen, autoescape) {
         onCreateLi: createLi,
         saveState: $tree.data('save_state'),
         useContextMenu: false,
-        onLoadFailed: handleLoadFailed
+        onLoadFailed: handleLoadFailed,
+        closedIcon: $tree.data('rtl') == '1' ? '&#x25c0;' : '&#x25bc'
+
     });
 
     $tree.bind('tree.move', handleMove);
