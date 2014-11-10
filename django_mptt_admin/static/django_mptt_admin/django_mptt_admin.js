@@ -4,7 +4,7 @@ function initTree($tree, autoopen, autoescape) {
     function createLi(node, $li) {
         // Create edit link
         var $title = $li.find('.jqtree-title');
-        $title.after('<a href="'+ node.url +'" class="edit">(edit)</a>');
+        $title.after('<a href="'+ node.url +'" class="edit">('+ $tree.data('label-edit') +')</a>');
     }
 
     function handleMove(e) {
@@ -32,7 +32,7 @@ function initTree($tree, autoopen, autoescape) {
             },
             error: function() {
                 var $node = $(info.moved_node.element).find('.jqtree-element');
-                $node.append('<span class="mptt-admin-error">move failed</span>');
+                $node.append('<span class="mptt-admin-error">'+ $tree.data('label-move-failed') +'</span>');
 
                 error_node = info.moved_node;
             }
@@ -47,7 +47,7 @@ function initTree($tree, autoopen, autoescape) {
     }
 
     function handleLoadFailed(response) {
-        $tree.html('Error while loading the data from the server.');
+        $tree.html($tree.data('label-error'));
     }
 
     $tree.tree({
