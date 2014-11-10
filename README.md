@@ -79,6 +79,7 @@ Changelog
 **development version**
 
 * Issue 40: use jqtree 0.22.0
+* Issue 45: added i18n support and Hebrew translation (thanks to Udi Oron)
 
 **0.1.10** (september 24 2014)
 
