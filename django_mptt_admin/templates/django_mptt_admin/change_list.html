@@ -3,8 +3,13 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.css' %}">
-    <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.css' %}">
+    {% if LANGUAGE_BIDI %}
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.rtl.css' %}">
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.rtl.css' %}">
+    {% else %}
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.css' %}">
+        <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.css' %}">
+    {%  endif %}
 {% endblock %}
 
 {% block extrahead %}
