@@ -196,6 +196,8 @@ class DjangoMpttAdminMixin(object):
             max_level=max_level,
         )
 
+        qs = self.filter_tree_queryset(qs)
+
         tree_data = self.get_tree_data(qs, max_level)
         return util.JsonResponse(tree_data)
 
@@ -204,6 +206,12 @@ class DjangoMpttAdminMixin(object):
             request,
             dict(tree_url=self.get_admin_url('changelist'))
         )
+
+    def filter_tree_queryset(self, queryset):
+        """
+        Override 'filter_tree_queryset' to filter the queryset for the tree.
+        """
+        return queryset
 
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, admin.ModelAdmin):

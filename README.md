@@ -73,6 +73,16 @@ Autoescape (True / False). Default is True.
 
 Autoescape titles in tree.
 
+**filter_tree_queryset**
+
+Override the **filter_tree_queryset** method to filter the queyset for the tree.
+
+```python
+class CountryAdmin(DjangoMpttAdmin):
+  def filter_tree_queryset(self, queryset):
+    return queryset.filter(name='abc')
+```
+
 Changelog
 ---------
 
@@ -80,6 +90,7 @@ Changelog
 
 * Issue 40: use jqtree 0.22.0
 * Issue 45: added i18n support and Hebrew translation (thanks to Udi Oron)
+* Issue 47: added filter_tree_queryset method
 
 **0.1.10** (september 24 2014)
 
