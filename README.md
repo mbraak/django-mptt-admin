@@ -1,15 +1,15 @@
-[![Build Status](https://travis-ci.org/leukeleu/django-mptt-admin.svg?branch=master)](https://travis-ci.org/leukeleu/django-mptt-admin) [![Version](https://pypip.in/version/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Development Status](https://pypip.in/status/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
+[![Build Status](https://travis-ci.org/mbraak/django-mptt-admin.svg?branch=master)](https://travis-ci.org/mbraak/django-mptt-admin) [![Version](https://pypip.in/version/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Development Status](https://pypip.in/status/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
-[![Coverage Status](https://img.shields.io/coveralls/leukeleu/django-mptt-admin.svg)](https://coveralls.io/r/leukeleu/django-mptt-admin?branch=master) [![Downloads](https://pypip.in/download/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Format](https://pypip.in/format/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/leukeleu/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/leukeleu/django-mptt-admin/requirements/?branch=master)
+[![Coverage Status](https://img.shields.io/coveralls/mbraak/django-mptt-admin.svg)](https://coveralls.io/r/mbraak/django-mptt-admin?branch=master) [![Downloads](https://pypip.in/download/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Format](https://pypip.in/format/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/mbraak/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/mbraak/django-mptt-admin/requirements/?branch=master)
 
 [![License](https://pypip.in/license/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Supported Python versions](https://pypip.in/py_versions/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Supported Python implementations](https://pypip.in/implementation/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
 Django Mptt Admin
 =================
 
-*Django-mptt-admin* provides a nice Django Admin interface for [django-mptt models](http://django-mptt.github.io/django-mptt/). The source is available on [https://github.com/leukeleu/django-mptt-admin](https://github.com/leukeleu/django-mptt-admin). It uses the [jqTree](http://mbraak.github.io/jqTree/) library.
+*Django-mptt-admin* provides a nice Django Admin interface for [django-mptt models](http://django-mptt.github.io/django-mptt/). The source is available on [https://github.com/mbraak/django-mptt-admin](https://github.com/mbraak/django-mptt-admin). It uses the [jqTree](http://mbraak.github.io/jqTree/) library.
 
-![Screenshot](https://raw.github.com/leukeleu/django-mptt-admin/master/screenshot.png)
+![Screenshot](https://raw.github.com/mbraak/django-mptt-admin/master/screenshot.png)
 
 Requirements
 ------------
@@ -133,7 +133,7 @@ Changelog
 
 * Issue 2: Posting a screenshot in the readme would be really useful (thanks to Andy Baker)
 * Issue 3: Use static templatetag for CDN-compatible file paths (thanks to Alex Holmes)
-* Added [Coveralls](https://coveralls.io/r/leukeleu/django-mptt-admin) support
+* Added [Coveralls](https://coveralls.io/r/mbraak/django-mptt-admin) support
 
 **0.1.2** (march 12 2013)
 

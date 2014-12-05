@@ -15,7 +15,7 @@ setup(
     install_requires=['django-mptt', 'six'],
     description='Django-mptt-admin provides a nice Django Admin interface for Mptt models',
     long_description=open('README.md').read(),
-    url='https://github.com/leukeleu/django-mptt-admin',
+    url='https://github.com/mbraak/django-mptt-admin',
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
