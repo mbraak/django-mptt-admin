@@ -88,7 +88,9 @@ Changelog
 
 **development version**
 
-* Issue 40: use jqtree 0.22.0
+* Issue 23: fixed save-state for load-on-demand
+* Issue 35: fixed auto-open for load-on-demand
+* Issue 40: use jqtree 1.0.0
 * Issue 45: added i18n support and Hebrew translation (thanks to Udi Oron)
 * Issue 47: added filter_tree_queryset method
 
