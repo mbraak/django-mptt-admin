@@ -58,25 +58,6 @@ class DjangoMpttAdminWebTests(WebTest):
         # no children loaded beyond level 1
         self.assertFalse(hasattr(africa, 'children'))
 
-        # -- load json with node 'Netherlands' selected
-        netherlands_id = Country.objects.get(name='Netherlands').id
-
-        json_data = self.app.get(
-            '%s?selected_node=%d' % (base_url, netherlands_id)
-        ).json
-
-        root = json_data[0]
-
-        africa = root['children'][0]
-        self.assertEqual(africa['label'], 'Africa')
-        self.assertFalse(hasattr(africa, 'children'))
-        self.assertTrue(africa['load_on_demand'])
-
-        europe = root['children'][3]
-        self.assertEqual(europe['label'], 'Europe')
-
-        self.assertEqual(len(europe['children']), 50)
-
         # -- load subtree
         json_data = self.app.get('%s?node=%d' % (base_url, africa_id)).json
 

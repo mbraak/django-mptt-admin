@@ -192,7 +192,6 @@ class DjangoMpttAdminMixin(object):
         qs = util.get_tree_queryset(
             model=self.model,
             node_id=node_id,
-            selected_node_id=request.GET.get('selected_node'),
             max_level=max_level,
         )
 

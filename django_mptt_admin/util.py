@@ -4,7 +4,6 @@ import six
 
 import django
 from django.http import HttpResponse
-from django.db.models import Q
 from django.db import transaction
 
 
@@ -80,7 +79,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
     return tree
 
 
-def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None, include_root=True):
+def get_tree_queryset(model, node_id=None, max_level=None, include_root=True):
     if node_id:
         node = model.objects.get(pk=node_id)
         max_level = node.level + 1
@@ -92,21 +91,7 @@ def get_tree_queryset(model, node_id=None, selected_node_id=None, max_level=None
             max_level = 1
 
         if isinstance(max_level, int) and max_level is not False:
-            max_level_filter = Q(level__lte=max_level)
-
-            selected_node = None
-            if selected_node_id:
-                selected_node_qs = model._default_manager.filter(pk=selected_node_id)
-
-                if selected_node_qs.exists():
-                    selected_node = selected_node_qs.get()
-
-            if not (selected_node and selected_node.level > max_level):
-                qs = qs.filter(max_level_filter)
-            else:
-                qs_parents = selected_node.get_ancestors(include_self=True)
-                parents_filter = Q(parent__in=qs_parents)
-                qs = qs.filter(max_level_filter | parents_filter)
+            qs = qs.filter(level__lte=max_level)
 
         if not include_root:
             qs = qs.exclude(level=0)
