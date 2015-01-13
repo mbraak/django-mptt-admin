@@ -86,7 +86,7 @@ class CountryAdmin(DjangoMpttAdmin):
 Changelog
 ---------
 
-**0.2.0 (january 12 2015) **
+**0.2.0** (january 12 2015)
 
 * Issue 23: fixed save-state for load-on-demand
 * Issue 35: fixed auto-open for load-on-demand
