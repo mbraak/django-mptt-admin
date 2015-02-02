@@ -1,7 +1,9 @@
 import os
 import sys
 
+import django
 from django.conf import global_settings
+
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
@@ -23,9 +25,16 @@ DATABASES = dict(
     )
 )
 
+
+if django.VERSION[0:2] >= (1, 8):
+    example_app_name = 'django_mptt_example.apps.ExampleConfig'
+else:
+    example_app_name = 'django_mptt_example'
+
+
 INSTALLED_APPS = [
     # Project app
-    'django_mptt_example',
+    example_app_name,
 
     # Generic apps
     'mptt',

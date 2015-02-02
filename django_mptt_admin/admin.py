@@ -58,9 +58,12 @@ class DjangoMpttAdminMixin(object):
             autoescape=util.get_javascript_value(self.autoescape)
         )
 
-        # Django 1.7
-        if hasattr(self.admin_site, 'each_context'):
+        django_version = util.get_short_django_version()
+
+        if django_version == (1,7):
             context.update(self.admin_site.each_context())
+        elif django_version >= (1, 8):
+            context.update(self.admin_site.each_context(request))
 
         if extra_context:
             context.update(extra_context)
