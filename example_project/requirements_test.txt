@@ -4,7 +4,7 @@ coverage==3.7.1
 django-webtest==1.7.7
 beautifulsoup4==4.3.2
 cssselect==0.9.1
-lxml==3.4.1
+lxml==3.4.2
 pyquery==1.2.9
 waitress==0.8.9
 WebOb==1.4
