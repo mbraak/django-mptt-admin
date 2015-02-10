@@ -1,4 +1,0 @@
-violations:
-  pep8: pep8 . --exclude='*migrations*','docs','build' --ignore=E501
-  sloccount: sloccount django_mptt_admin
-  pip_review: pip-review
