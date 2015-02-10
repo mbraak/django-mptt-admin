@@ -18,9 +18,8 @@ install:
   - pip install -r example_project/requirements_travis.txt
   - python setup.py install
 script:
-  - cd example_project
-  - python manage.py test django_mptt_example
-  - coverage run --source=django_mptt_admin,django_mptt_example manage.py test django_mptt_example
+  - python example_project/manage.py test django_mptt_example
+  - coverage run --source=django_mptt_admin,django_mptt_example example_project/manage.py test django_mptt_example
   - coverage report
 before_install:
   - sudo apt-get update -qq
