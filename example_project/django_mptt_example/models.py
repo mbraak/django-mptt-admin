@@ -1,12 +1,14 @@
+from six import python_2_unicode_compatible
+
 from django.db import models
 
 from mptt.models import TreeForeignKey
 import mptt
 
-
 from django_mptt_admin.util import get_short_django_version
 
 
+@python_2_unicode_compatible
 class Country(models.Model):
     class Meta:
         verbose_name_plural = 'countries'
@@ -16,11 +18,8 @@ class Country(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
 
-    def __unicode__(self):
-        return self.name or self.code or ''
-
     def __str__(self):
-        return self.__unicode__()
+        return self.name or self.code or ''
 
 
 if get_short_django_version() < (1, 8):
