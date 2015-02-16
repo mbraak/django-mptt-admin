@@ -2,6 +2,12 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
+try:
+    from django.contrib.admin.options import IS_POPUP_VAR
+except ImportError:
+    # Django 1.4 and 1.5
+    from django.contrib.admin.views.main import IS_POPUP_VAR
+
 from django_webtest import WebTest
 
 from django_mptt_admin.util import get_tree_queryset, get_javascript_value
@@ -92,33 +98,95 @@ class DjangoMpttAdminWebTests(WebTest):
         self.assertEqual(first_row.find('a').attr('href'), '/django_mptt_example/country/%d/' % afghanistan_id)
 
     def test_move_view(self):
+        def get_continents():
+            return ','.join(c.name for c in Country.objects.filter(level=1).order_by('lft'))
+
+        def do_move(source_id, target_id, position):
+            countries_page = self.app.get('/django_mptt_example/country/')
+            csrf_token = countries_page.form['csrfmiddlewaretoken'].value
+
+            response = self.app.post(
+                '/django_mptt_example/country/%d/move/' % source_id,
+                dict(
+                    csrfmiddlewaretoken=csrf_token,
+                    target_id=target_id,
+                    position=position,
+                )
+            )
+            self.assertEqual(response.json, dict(success=True))
+
         # setup
         bouvet_island = Country.objects.get(code='BV')
         oceania = Country.objects.get(name='Oceania')
 
-        # - move Bouvet Island under Oceania
-        countries_page = self.app.get('/django_mptt_example/country/')
-        csrf_token = countries_page.form['csrfmiddlewaretoken'].value
+        self.assertEqual(bouvet_island.parent.name, 'Antarctica')
 
-        response = self.app.post(
-            '/django_mptt_example/country/%d/move/' % bouvet_island.id,
-            dict(
-                csrfmiddlewaretoken=csrf_token,
-                target_id=oceania.id,
-                position='inside',
+        # - move Bouvet Island under Oceania
+        do_move(bouvet_island.id, oceania.id, 'inside')
+
+        bouvet_island = Country.objects.get(code='BV')
+        self.assertEqual(bouvet_island.parent.name, 'Oceania')
+
+        # - move Antartica before Africa
+        self.assertEqual(get_continents(), 'Africa,Antarctica,Asia,Europe,North America,Oceania,South America')
+
+        do_move(
+            Country.objects.get(name='Antarctica', level=1).id,
+            Country.objects.get(name='Africa').id,
+            'before'
+        )
+
+        self.assertEqual(get_continents(), 'Antarctica,Africa,Asia,Europe,North America,Oceania,South America')
+
+        # move Antarctica after Europe
+        do_move(
+            Country.objects.get(name='Antarctica', level=1).id,
+            Country.objects.get(name='Europe').id,
+            'after'
+        )
+        self.assertEqual(get_continents(), 'Africa,Asia,Europe,Antarctica,North America,Oceania,South America')
+
+        # unknown position
+        self.assertRaisesMessage(
+            Exception,
+            'Unknown position',
+            lambda: do_move(
+                Country.objects.get(name='Antarctica', level=1).id,
+                Country.objects.get(name='Europe').id,
+                'unknown'
             )
         )
-        self.assertEqual(response.json, dict(success=True))
 
     def login(self, username, password):
-        login_page = self.app.get('/', auto_follow=True)
+        login_page = self.app.get('/login/')
         form = login_page.form
 
         form['username'] = username
         form['password'] = password
 
-        response = form.submit().follow()
-        self.assertEqual(response.context['user'].username, 'admin')
+        form.submit()
+
+        response = self.app.get('/')
+        self.assertEqual(response.context['user'].username, username)
+
+    def test_popup(self):
+        # popup must return grid view
+        grid_page = self.app.get('/django_mptt_example/country/?%s=true' % IS_POPUP_VAR)
+
+        first_row = grid_page.pyquery('#result_list tbody tr').eq(0)
+        self.assertEqual(first_row.find('td').eq(0).text(), 'Afghanistan')
+
+    def test_permissions(self):
+        # admin2 doesn't have access because he's no superuser
+        admin2 = User.objects.create_user('admin2', 'admin2@admin.nl', 'p')
+        admin2.is_staff = True
+        admin2.save()
+
+        self.app.get('/logout/')
+        self.login('admin2', 'p')
+
+        # tree view
+        self.app.get('/django_mptt_example/country/', status=403)
 
 
 class DjangoMpttAdminTestCase(TestCase):
