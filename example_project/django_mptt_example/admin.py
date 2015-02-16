@@ -10,5 +10,8 @@ class CountryAdmin(DjangoMpttAdmin):
     list_display = ('code', 'name')
     ordering = ('name',)
 
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
 
 admin.site.register(Country, CountryAdmin)
