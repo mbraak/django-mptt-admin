@@ -39,6 +39,8 @@ matrix:
       env: DJANGO=Django==1.5.12
     - python: pypy
       env: DJANGO=Django==1.6.10
+    - python: pypy
+      env: DJANGO=https://www.djangoproject.com/download/1.8b1/tarball/
 branches:
   only:
     - master
