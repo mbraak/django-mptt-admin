@@ -86,7 +86,7 @@ class CountryAdmin(DjangoMpttAdmin):
 Changelog
 ---------
 
-**0.2.1** (march 29 20115)
+**0.2.1** (march 29 2015)
 
 * Issue 65: support Django 1.8
 
