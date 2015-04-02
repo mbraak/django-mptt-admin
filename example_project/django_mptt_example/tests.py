@@ -1,7 +1,11 @@
 # coding=utf-8
+import os
+
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.core import serializers
+
 from django_webtest import WebTest
 
 from django_mptt_admin.util import get_tree_queryset, get_javascript_value, get_short_django_version
@@ -9,9 +13,15 @@ from django_mptt_admin.util import get_tree_queryset, get_javascript_value, get_
 from .models import Country
 
 
-class DjangoMpttAdminWebTests(WebTest):
-    fixtures = ['initial_data.json']
+def read_testdata():
+    fixture_filename = os.path.join(os.path.dirname(__file__), 'testdata/countries.json')
 
+    with open(fixture_filename) as f:
+        for obj in serializers.deserialize("json", f.read()):
+            obj.save()
+
+
+class DjangoMpttAdminWebTests(WebTest):
     def setUp(self):
         super(DjangoMpttAdminWebTests, self).setUp()
 
@@ -20,6 +30,8 @@ class DjangoMpttAdminWebTests(WebTest):
 
         self.admin = User.objects.create_superuser(USERNAME, 'admin@admin.com', PASSWORD)
         self.login(USERNAME, PASSWORD)
+
+        read_testdata()
 
     def test_tree_view(self):
         # - get countries admin page
@@ -195,7 +207,10 @@ class DjangoMpttAdminWebTests(WebTest):
 
 
 class DjangoMpttAdminTestCase(TestCase):
-    fixtures = ['initial_data.json']
+    def setUp(self):
+        super(DjangoMpttAdminTestCase, self).setUp()
+
+        read_testdata()
 
     def test_get_tree_queryset(self):
         # get default queryset
