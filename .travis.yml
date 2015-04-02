@@ -1,6 +1,5 @@
 language: python
 python:
-  - 2.6
   - 2.7
   - 3.3
   - 3.4
@@ -22,10 +21,6 @@ after_success:
   - coveralls
 matrix:
   exclude:
-    - python: 2.6
-      env: DJANGO=Django==1.7.7
-    - python: 2.6
-      env: DJANGO=Django==1.8
     - python: pypy
       env: DJANGO=Django==1.8
 branches:
