@@ -5,8 +5,6 @@ from django.db import models
 from mptt.models import TreeForeignKey
 import mptt
 
-from django_mptt_admin.util import get_short_django_version
-
 
 @python_2_unicode_compatible
 class Country(models.Model):
@@ -22,5 +20,4 @@ class Country(models.Model):
         return self.name or self.code or ''
 
 
-if get_short_django_version() < (1, 8):
-    mptt.register(Country)
+mptt.register(Country)

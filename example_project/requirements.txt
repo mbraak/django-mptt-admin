@@ -1,2 +1,2 @@
-django-mptt==0.6.1
+git+https://github.com/django-mptt/django-mptt.git@55e06f098fcfd010d191d89b8bc7b7687e8ea034#egg=django-mptt
 six==1.9.0
