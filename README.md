@@ -86,6 +86,11 @@ class CountryAdmin(DjangoMpttAdmin):
 Changelog
 ---------
 
+**dev version**
+
+* Drop support for Django 1.6 and older
+    ** Note that version 0.2.1 supports these versions.
+
 **0.2.1** (march 29 2015)
 
 * Issue 65: support Django 1.8
