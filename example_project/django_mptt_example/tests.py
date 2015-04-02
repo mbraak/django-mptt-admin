@@ -1,13 +1,7 @@
 # coding=utf-8
 from django.test import TestCase
 from django.contrib.auth.models import User
-
-try:
-    from django.contrib.admin.options import IS_POPUP_VAR
-except ImportError:
-    # Django 1.4 and 1.5
-    from django.contrib.admin.views.main import IS_POPUP_VAR
-
+from django.contrib.admin.options import IS_POPUP_VAR
 from django_webtest import WebTest
 
 from django_mptt_admin.util import get_tree_queryset, get_javascript_value

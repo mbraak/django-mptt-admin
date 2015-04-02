@@ -7,21 +7,11 @@ from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList
 from django.conf.urls import url
-
-try:
-    # Django >= 1.7
-    from django.contrib.admin.utils import unquote, quote
-except ImportError:
-    from django.contrib.admin.util import unquote, quote
-
+from django.contrib.admin.utils import unquote, quote
+from django.contrib.admin.options import IS_POPUP_VAR
+from django.db import transaction
 
 from . import util
-
-try:
-    from django.contrib.admin.options import IS_POPUP_VAR
-except ImportError:
-    # Django 1.4 and 1.5
-    from django.contrib.admin.views.main import IS_POPUP_VAR
 
 
 class DjangoMpttAdminMixin(object):
@@ -100,7 +90,7 @@ class DjangoMpttAdminMixin(object):
         return urlpatterns
 
     @csrf_protect_m
-    @util.django_atomic()
+    @transaction.atomic()
     def move_view(self, request, object_id):
         instance = self.get_object(request, unquote(object_id))
 
@@ -150,12 +140,6 @@ class DjangoMpttAdminMixin(object):
         )
 
         return ChangeList(**kwargs)
-
-    def get_changelist(self, request, **kwargs):
-        if util.get_short_django_version() >= (1, 5):
-            return super(DjangoMpttAdminMixin, self).get_changelist(request, **kwargs)
-        else:
-            return FixedChangeList
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
@@ -215,17 +199,3 @@ class DjangoMpttAdminMixin(object):
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, admin.ModelAdmin):
     pass
-
-
-class FixedChangeList(ChangeList):
-    """
-    Fix issue 1: the changelist must have a correct link to the edit page
-    """
-    def url_for_result(self, result):
-        pk = getattr(result, self.pk_attname)
-
-        return reverse(
-            'admin:%s_%s_change' % (self.opts.app_label, self.opts.module_name),
-            args=[quote(pk)],
-            current_app=self.model_admin.admin_site.name
-        )

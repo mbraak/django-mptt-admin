@@ -4,7 +4,6 @@ import six
 
 import django
 from django.http import HttpResponse
-from django.db import transaction
 
 
 def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
@@ -129,20 +128,10 @@ class JsonResponse(HttpResponse):
 def get_short_django_version():
     """
     Get first two numbers of Django version.
-    E.g. (1, 5)
+    E.g. (1, 8)
     """
     return django.VERSION[0:2]
 
 
-def django_atomic():
-    if get_short_django_version() >= (1, 6):
-        return transaction.atomic
-    else:
-        return transaction.commit_on_success
-
-
 def get_model_name(model):
-    if get_short_django_version() >= (1, 6):
-        return model._meta.model_name
-    else:
-        return model._meta.module_name
+    return model._meta.model_name
