@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.admin.options import IS_POPUP_VAR
 from django_webtest import WebTest
 
-from django_mptt_admin.util import get_tree_queryset, get_javascript_value
+from django_mptt_admin.util import get_tree_queryset, get_javascript_value, get_short_django_version
 
 from .models import Country
 
@@ -48,12 +48,18 @@ class DjangoMpttAdminWebTests(WebTest):
         africa_id = Country.objects.get(name='Africa').id
 
         africa = root['children'][0]
+
+        if get_short_django_version() >= (1, 9):
+            change_url = '/django_mptt_example/country/%d/change/' % africa_id
+        else:
+            change_url = '/django_mptt_example/country/%d/' % africa_id
+
         self.assertEqual(
             africa,
             dict(
                 label='Africa',
                 id=africa_id,
-                url='/django_mptt_example/country/%d/' % africa_id,
+                url=change_url,
                 move_url='/django_mptt_example/country/%d/move/' % africa_id,
                 load_on_demand=True,
             )
@@ -89,7 +95,12 @@ class DjangoMpttAdminWebTests(WebTest):
         # link to edit page
         afghanistan_id = Country.objects.get(name='Afghanistan').id
 
-        self.assertEqual(first_row.find('a').attr('href'), '/django_mptt_example/country/%d/' % afghanistan_id)
+        if get_short_django_version() >= (1, 9):
+            change_url = '/django_mptt_example/country/%d/change/' % afghanistan_id
+        else:
+            change_url = '/django_mptt_example/country/%d/' % afghanistan_id
+
+        self.assertEqual(first_row.find('a').attr('href'), change_url)
 
     def test_move_view(self):
         def get_continents():

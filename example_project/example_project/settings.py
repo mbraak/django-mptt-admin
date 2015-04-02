@@ -1,7 +1,6 @@
 import os
 import sys
 
-import django
 from django.conf import global_settings
 
 
@@ -26,15 +25,9 @@ DATABASES = dict(
 )
 
 
-if django.VERSION[0:2] >= (1, 8):
-    example_app_name = 'django_mptt_example.apps.ExampleConfig'
-else:
-    example_app_name = 'django_mptt_example'
-
-
 INSTALLED_APPS = [
     # Project app
-    example_app_name,
+    'django_mptt_example',
 
     # Generic apps
     'mptt',
@@ -67,3 +60,23 @@ ROOT_URLCONF = 'example_project.urls'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 SECRET_KEY = 'secret'
+
+# django.contrib.auth.context_processors.auth
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages"
+            ]
+        }
+    },
+]
