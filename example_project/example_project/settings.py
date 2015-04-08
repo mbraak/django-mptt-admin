@@ -61,8 +61,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 SECRET_KEY = 'secret'
 
-# django.contrib.auth.context_processors.auth
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
