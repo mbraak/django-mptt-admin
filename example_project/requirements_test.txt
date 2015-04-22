@@ -1,7 +1,7 @@
 coverage==3.7.1
 
 # django-webtest
-git+https://github.com/mbraak/django-webtest.git@1.7.7.1#egg=django-webtest
+django-webtest==1.7.8
 beautifulsoup4==4.3.2
 cssselect==0.9.1
 lxml==3.4.2
