@@ -22,6 +22,9 @@ class DjangoMpttAdminMixin(object):
     # Autoescape the tree data; default is True
     autoescape = True
 
+    # useContextMenu option for the tree; default is False
+    use_context_menu = False
+
     change_list_template = 'django_mptt_admin/grid_view.html'
 
     @csrf_protect_m
@@ -45,7 +48,8 @@ class DjangoMpttAdminMixin(object):
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
             tree_json_url=self.get_admin_url('tree_json'),
             grid_url=self.get_admin_url('grid'),
-            autoescape=util.get_javascript_value(self.autoescape)
+            autoescape=util.get_javascript_value(self.autoescape),
+            use_context_menu=util.get_javascript_value(self.use_context_menu)
         )
 
         django_version = util.get_short_django_version()
