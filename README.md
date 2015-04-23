@@ -83,6 +83,13 @@ class CountryAdmin(DjangoMpttAdmin):
     return queryset.filter(name='abc')
 ```
 
+**use_context_menu**
+
+True / False. Default is False.
+
+"useContextMenu" option for tree.
+
+
 Changelog
 ---------
 
