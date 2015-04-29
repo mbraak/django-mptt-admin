@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/mbraak/django-mptt-admin.svg?branch=master)](https://travis-ci.org/mbraak/django-mptt-admin) [![Version](https://pypip.in/version/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Development Status](https://pypip.in/status/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
+[![Build Status](https://travis-ci.org/mbraak/django-mptt-admin.svg?branch=master)](https://travis-ci.org/mbraak/django-mptt-admin) [![Version](https://badge.fury.io/py/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
-[![Coverage Status](https://img.shields.io/coveralls/mbraak/django-mptt-admin.svg)](https://coveralls.io/r/mbraak/django-mptt-admin?branch=master) [![Downloads](https://pypip.in/download/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Format](https://pypip.in/format/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/mbraak/django-mptt-admin/requirements.png?branch=master)](https://requires.io/github/mbraak/django-mptt-admin/requirements/?branch=master)
+[![Coverage Status](https://img.shields.io/coveralls/mbraak/django-mptt-admin.svg)](https://coveralls.io/r/mbraak/django-mptt-admin?branch=master) [![Downloads](https://img.shields.io/pypi/dm/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)  [![Requirements Status](https://img.shields.io/requires/github/celery/celery.svg)](https://requires.io/github/mbraak/django-mptt-admin/requirements/?branch=master)
 
-[![License](https://pypip.in/license/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Supported Python versions](https://pypip.in/py_versions/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Supported Python implementations](https://pypip.in/implementation/django-mptt-admin/badge.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
+[![License](https://img.shields.io/pypi/l/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
 Django Mptt Admin
 =================
