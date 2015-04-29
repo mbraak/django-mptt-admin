@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/mbraak/django-mptt-admin.svg?branch=master)](https://travis-ci.org/mbraak/django-mptt-admin) [![Version](https://badge.fury.io/py/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
-[![Coverage Status](https://img.shields.io/coveralls/mbraak/django-mptt-admin.svg)](https://coveralls.io/r/mbraak/django-mptt-admin?branch=master) [![Downloads](https://img.shields.io/pypi/dm/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)  [![Requirements Status](https://img.shields.io/requires/github/celery/celery.svg)](https://requires.io/github/mbraak/django-mptt-admin/requirements/?branch=master)
+[![Coverage Status](https://img.shields.io/coveralls/mbraak/django-mptt-admin.svg)](https://coveralls.io/r/mbraak/django-mptt-admin?branch=master) [![Downloads](https://img.shields.io/pypi/dm/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/) [![Requirements Status](https://requires.io/github/mbraak/django-mptt-admin/requirements.svg?branch=master)](https://requires.io/github/mbraak/django-mptt-admin/requirements/?branch=master)
 
 [![License](https://img.shields.io/pypi/l/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
