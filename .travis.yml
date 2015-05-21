@@ -6,7 +6,7 @@ python:
   - pypy
 env:
   - DJANGO=Django==1.7.8
-  - DJANGO=Django==1.8.1
+  - DJANGO=Django==1.8.2
 install:
   - pip install $DJANGO
   - pip install -r example_project/requirements.txt
@@ -22,7 +22,7 @@ after_success:
 matrix:
   exclude:
     - python: pypy
-      env: DJANGO=Django==1.8.1
+      env: DJANGO=Django==1.8.2
 branches:
   only:
     - master
