@@ -99,6 +99,7 @@ Changelog
 * Issue 68: drop support for Django 1.6 and older
     * Note that version 0.2.1 supports these versions.
 * Issue 71: added use_context_menu option (thanks to ITCase)
+* Issue 75: added Russian translation (thanks to Mike Silonov)
 
 **0.2.1** (march 29 2015)
 
