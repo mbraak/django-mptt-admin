@@ -95,7 +95,7 @@ Changelog
 
 **dev version**
 
-* Issue 67: update jqtree to 1.1.0
+* Issue 67: update jqtree to 1.2.1
 * Issue 68: drop support for Django 1.6 and older
     * Note that version 0.2.1 supports these versions.
 * Issue 71: added use_context_menu option (thanks to ITCase)
