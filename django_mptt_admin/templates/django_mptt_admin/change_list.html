@@ -4,13 +4,8 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    {% if LANGUAGE_BIDI %}
-        <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.rtl.css' %}">
-        <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.rtl.css' %}">
-    {% else %}
-        <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.css' %}">
-        <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.css' %}">
-    {%  endif %}
+    <link rel="stylesheet" href="{% static 'django_mptt_admin/jqtree/jqtree.css' %}">
+    <link rel="stylesheet" href="{% static 'django_mptt_admin/django_mptt_admin.css' %}">
 {% endblock %}
 
 {% block extrahead %}
@@ -38,7 +33,9 @@
         data-label-edit="{% trans "edit" %}"
         data-label-move-failed="{% trans "move failed" %}"
         data-label-error="{% trans "Error while loading the data from the server" %}"
-        data-rtl="{{ LANGUAGE_BIDI|yesno:'1,' }}"
+        {% if LANGUAGE_BIDI %}
+            data-rtl
+        {% endif %}
         data-use_context_menu="{{ use_context_menu }}"
     ></div>
 {% endblock %}
