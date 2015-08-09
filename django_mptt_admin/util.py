@@ -3,7 +3,6 @@ import json
 import six
 
 import django
-from django.http import HttpResponse
 
 
 def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
@@ -116,15 +115,6 @@ def get_javascript_value(value):
         return json.dumps(value)
 
 
-class JsonResponse(HttpResponse):
-    def __init__(self, data, status=None):
-        super(JsonResponse, self).__init__(
-            json.dumps(data),
-            'application/json',
-            status
-        )
-
-
 def get_short_django_version():
     """
     Get first two numbers of Django version.
@@ -134,4 +124,10 @@ def get_short_django_version():
 
 
 def get_model_name(model):
+    """
+    Get the name of a Django model
+
+    >>> get_model_name(Country)
+    country
+    """
     return model._meta.model_name

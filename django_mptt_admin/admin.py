@@ -2,6 +2,7 @@ from functools import update_wrapper
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import reverse
+from django.http import JsonResponse
 from django.template.response import TemplateResponse
 from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
@@ -110,7 +111,7 @@ class DjangoMpttAdminMixin(object):
 
         self.do_move(instance, position, target_instance)
 
-        return util.JsonResponse(
+        return JsonResponse(
             dict(success=True)
         )
 
@@ -186,7 +187,9 @@ class DjangoMpttAdminMixin(object):
         qs = self.filter_tree_queryset(qs)
 
         tree_data = self.get_tree_data(qs, max_level)
-        return util.JsonResponse(tree_data)
+
+        # Set safe to False because the data is a list instead of a dict
+        return JsonResponse(tree_data, safe=False)
 
     def grid_view(self, request):
         return super(DjangoMpttAdminMixin, self).changelist_view(
