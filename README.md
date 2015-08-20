@@ -100,6 +100,7 @@ Changelog
     * Note that version 0.2.1 supports these versions.
 * Issue 71: added use_context_menu option (thanks to ITCase)
 * Issue 75: added Russian translation (thanks to Mike Silonov)
+* Issue 80: fix wrong url resolving with multiple admin sites (thanks to Hubert Bielenia)
 
 **0.2.1** (march 29 2015)
 
