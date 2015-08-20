@@ -30,6 +30,7 @@ class DjangoMpttAdminMixin(object):
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
+        request.current_app = self.admin_site.name
         is_popup = IS_POPUP_VAR in request.GET
         if is_popup:
             return super(DjangoMpttAdminMixin, self).changelist_view(request, extra_context=extra_context)
@@ -97,6 +98,7 @@ class DjangoMpttAdminMixin(object):
     @csrf_protect_m
     @transaction.atomic()
     def move_view(self, request, object_id):
+        request.current_app = self.admin_site.name
         instance = self.get_object(request, unquote(object_id))
 
         if not self.has_change_permission(request, instance):
@@ -129,6 +131,7 @@ class DjangoMpttAdminMixin(object):
             instance.save()
 
     def get_change_list_for_tree(self, request):
+        request.current_app = self.admin_site.name
         kwargs = dict(
             request=request,
             model=self.model,
@@ -170,6 +173,7 @@ class DjangoMpttAdminMixin(object):
         return util.get_tree_from_queryset(qs, handle_create_node, max_level)
 
     def tree_json_view(self, request):
+        request.current_app = self.admin_site.name
         node_id = request.GET.get('node')
 
         if node_id:
@@ -192,6 +196,7 @@ class DjangoMpttAdminMixin(object):
         return JsonResponse(tree_data, safe=False)
 
     def grid_view(self, request):
+        request.current_app = self.admin_site.name
         return super(DjangoMpttAdminMixin, self).changelist_view(
             request,
             dict(tree_url=self.get_admin_url('changelist'))
