@@ -93,7 +93,7 @@ True / False. Default is False.
 Changelog
 ---------
 
-**dev version**
+**0.3.0** (august 21 2015)
 
 * Issue 67: update jqtree to 1.2.1
 * Issue 68: drop support for Django 1.6 and older
