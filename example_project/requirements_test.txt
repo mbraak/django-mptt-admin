@@ -1,3 +1,5 @@
+pathlib==1.0.1
+
 # django-webtest
 django-webtest==1.7.8
 beautifulsoup4==4.4.0

@@ -1,14 +1,13 @@
-import os
 import sys
+
+from pathlib import Path
 
 from django.conf import global_settings
 
 
-BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+BASE_DIR = Path(__file__).parent.parent.resolve()
 
-sys.path.append(
-    os.path.join(os.path.dirname(BASE_DIR))
-)
+sys.path.append(str(BASE_DIR.parent))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -57,7 +56,7 @@ if authentication_middleware not in MIDDLEWARE_CLASSES:
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'example_project.urls'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = str(BASE_DIR.joinpath('static'))
 
 SECRET_KEY = 'secret'
 
