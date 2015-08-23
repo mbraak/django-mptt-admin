@@ -10,7 +10,6 @@ BASE_DIR = Path(__file__).parent.parent.resolve()
 sys.path.append(str(BASE_DIR.parent))
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 DATABASES = dict(
     default=dict(
@@ -65,6 +64,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
         'OPTIONS': {
+            'debug': DEBUG,
             'context_processors': [
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.debug",
