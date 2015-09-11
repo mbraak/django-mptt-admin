@@ -27,6 +27,7 @@ class DjangoMpttAdminMixin(object):
     use_context_menu = False
 
     change_list_template = 'django_mptt_admin/grid_view.html'
+    change_tree_template=  'django_mptt_admin/change_list.html'
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
@@ -53,6 +54,8 @@ class DjangoMpttAdminMixin(object):
             autoescape=util.get_javascript_value(self.autoescape),
             use_context_menu=util.get_javascript_value(self.use_context_menu)
         )
+        if extra_context:
+            context.update(extra_context)
 
         django_version = util.get_short_django_version()
 
@@ -63,7 +66,7 @@ class DjangoMpttAdminMixin(object):
 
         return TemplateResponse(
             request,
-            'django_mptt_admin/change_list.html',
+            self.change_tree_template,
             context
         )
 
@@ -195,12 +198,12 @@ class DjangoMpttAdminMixin(object):
         # Set safe to False because the data is a list instead of a dict
         return JsonResponse(tree_data, safe=False)
 
-    def grid_view(self, request):
+    def grid_view(self, request, extra_context=None):
         request.current_app = self.admin_site.name
-        return super(DjangoMpttAdminMixin, self).changelist_view(
-            request,
-            dict(tree_url=self.get_admin_url('changelist'))
-        )
+        context = dict(tree_url=self.get_admin_url('changelist'))
+        if extra_context:
+            context.update(extra_context)
+        return super(DjangoMpttAdminMixin, self).changelist_view(request,context)
 
     def filter_tree_queryset(self, queryset):
         """
