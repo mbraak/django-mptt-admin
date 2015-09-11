@@ -93,6 +93,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**dev**
+
+* Issue 82: make admin views easily extendable (thanks to Vsevolod Novikov)
+
 **0.3.0** (august 21 2015)
 
 * Issue 67: update jqtree to 1.2.1
