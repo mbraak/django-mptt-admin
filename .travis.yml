@@ -24,6 +24,8 @@ matrix:
   exclude:
     - python: pypy
       env: DJANGO=Django==1.8.4
+    - python: 3.5
+      env: DJANGO=Django==1.7.10
 branches:
   only:
     - master
