@@ -2,7 +2,7 @@ pathlib==1.0.1
 
 # django-webtest
 django-webtest==1.7.8
-beautifulsoup4==4.4.0
+beautifulsoup4==4.4.1
 cssselect==0.9.1
 lxml==3.4.4
 pyquery==1.2.9
