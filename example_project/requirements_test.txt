@@ -8,4 +8,4 @@ lxml==3.4.4
 pyquery==1.2.9
 waitress==0.8.10
 WebOb==1.5.1
-WebTest==2.0.19
+WebTest==2.0.20
