@@ -53,6 +53,7 @@ function initTree($tree, autoopen, autoescape) {
     $tree.tree({
         autoOpen: autoopen,
         autoEscape: autoescape,
+        buttonLeft: false,
         dragAndDrop: true,
         onCreateLi: createLi,
         saveState: $tree.data('save_state'),
