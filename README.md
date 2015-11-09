@@ -96,6 +96,7 @@ Changelog
 **dev**
 
 * Issue 82: make admin views easily extendable (thanks to Vsevolod Novikov)
+* Issue 93: flat styling
 
 **0.3.0** (august 21 2015)
 
