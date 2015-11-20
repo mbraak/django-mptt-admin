@@ -4,7 +4,6 @@ python:
   - 2.7
   - 3.4
   - 3.5
-  - pypy
 env:
   - DJANGO=Django==1.7.10
   - DJANGO=Django==1.8.6
@@ -23,10 +22,6 @@ after_success:
   - coveralls
 matrix:
   exclude:
-    - python: pypy
-      env: DJANGO=Django==1.8.6
-    - python: pypy
-      env: DJANGO=https://www.djangoproject.com/download/1.9rc1/tarball/
     - python: 3.5
       env: DJANGO=Django==1.7.10
 branches:
