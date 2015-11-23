@@ -2,7 +2,7 @@
     border: none;
 }
 #tree {
-    margin: 1em 0 1em 0;
+    padding: 1em 0 1em 0;
 }
 ul.jqtree-tree .jqtree-toggler {
     top: 10%;
