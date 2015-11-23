@@ -99,6 +99,7 @@ Changelog
 * Issue 93: flat styling
 * Issue 95: update jqtree to 1.3.0
 * Issue 96: cannot move to the top of the tree
+* Issue 97: support Django 1.9
 
 **0.3.0** (august 21 2015)
 
