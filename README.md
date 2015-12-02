@@ -93,7 +93,7 @@ True / False. Default is False.
 Changelog
 ---------
 
-**dev**
+**0.3.1** (december 2 2015)
 
 * Issue 82: make admin views easily extendable (thanks to Vsevolod Novikov)
 * Issue 93: flat styling
