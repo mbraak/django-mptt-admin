@@ -57,12 +57,7 @@ class DjangoMpttAdminMixin(object):
         if extra_context:
             context.update(extra_context)
 
-        django_version = util.get_short_django_version()
-
-        if django_version == (1, 7):
-            context.update(self.admin_site.each_context())
-        elif django_version >= (1, 8):
-            context.update(self.admin_site.each_context(request))
+        context.update(self.admin_site.each_context(request))
 
         return TemplateResponse(
             request,
