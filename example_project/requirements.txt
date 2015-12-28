@@ -1,2 +1,2 @@
-https://github.com/django-mptt/django-mptt/archive/master.zip
+django-mptt==0.8.0
 six==1.10.0
