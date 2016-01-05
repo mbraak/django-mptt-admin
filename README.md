@@ -96,6 +96,7 @@ Changelog
 **dev**
 
 * Issue 105: added Turkish translation (thanks to Tagmat)
+* Issue 106: use the same colors as the Django admin
 
 **0.3.1** (december 2 2015)
 
