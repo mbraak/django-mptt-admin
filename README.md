@@ -93,6 +93,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**dev**
+
+* Issue 105: added Turkish translation (thanks to Tagmat)
+
 **0.3.1** (december 2 2015)
 
 * Issue 82: make admin views easily extendable (thanks to Vsevolod Novikov)
