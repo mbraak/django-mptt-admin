@@ -1,0 +1,33 @@
+sgid ""
+msgstr ""
+"Project-Id-Version: djnago-mptt-admin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-05 06:00+0300\n"
+"PO-Revision-Date: 2015-01-05 06:00+0300\n"
+"Last-Translator: Emir Tagmat <emir@tagmat.net>\n"
+"Language-Team: \n"
+"Language: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: templates/django_mptt_admin/change_list.html:38
+msgid "edit"
+msgstr "düzenle"
+
+#: templates/django_mptt_admin/change_list.html:39
+msgid "move failed"
+msgstr "taşıma başarısız"
+
+#: templates/django_mptt_admin/change_list.html:40
+msgid "Error while loading the data from the server"
+msgstr "Veri sunucudan yüklenirken hata oluştu"
+
+#: templates/django_mptt_admin/change_list.html:51
+msgid "Grid view"
+msgstr "Tablo görünümü"
+
+#: templates/django_mptt_admin/grid_view.html:7
+msgid "Tree view"
+msgstr "Ağaç görünümü"
