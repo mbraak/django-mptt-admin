@@ -1,4 +1,4 @@
-sgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: djnago-mptt-admin\n"
 "Report-Msgid-Bugs-To: \n"
