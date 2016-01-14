@@ -22,7 +22,7 @@ Installation
 Install the package:
 
 ```
-$ pip install django_mptt_admin
+$ pip install django-mptt-admin
 ```
 
 Add **django_mptt_admin** to your installed apps in **settings.py**.
