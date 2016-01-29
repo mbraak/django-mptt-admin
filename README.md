@@ -22,7 +22,7 @@ Installation
 Install the package:
 
 ```
-$ pip install django_mptt_admin
+$ pip install django-mptt-admin
 ```
 
 Add **django_mptt_admin** to your installed apps in **settings.py**.
@@ -92,6 +92,13 @@ True / False. Default is False.
 
 Changelog
 ---------
+
+**0.3.2** (january 29 2016)
+
+* Issue 103: use jquery from django admin itself
+* Issue 105: added Turkish translation (thanks to Tagmat)
+* Issue 106: use the same colors as the Django admin
+* Issue 109: include locale files in package
 
 **0.3.1** (december 2 2015)
 

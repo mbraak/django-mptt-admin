@@ -33,16 +33,32 @@ ul.jqtree-tree .jqtree-toggler {
 }
 
 .block-style ul.jqtree-tree {
-  margin-left: 0; }
-  .block-style ul.jqtree-tree ul.jqtree_common {
-    margin-left: 2em; }
-  .block-style ul.jqtree-tree .jqtree-element {
+    margin-left: 0;
+}
+
+.block-style ul.jqtree-tree ul.jqtree_common {
+    margin-left: 2em;
+}
+
+.block-style ul.jqtree-tree .jqtree-element {
     margin-bottom: 8px;
-    background-color: #ddd;
-    padding: 8px; }
-    .block-style ul.jqtree-tree .jqtree-element .jqtree-title {
-      margin-left: 0; }
-  .block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element,
-  .block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
-    background: #97BDD6;
-    text-shadow: none; }
+    background-color: #eee;
+    padding: 8px;
+}
+
+.block-style ul.jqtree-tree .jqtree-element .jqtree-title {
+    margin-left: 0;
+}
+
+.block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element {
+    background: #79aec8;
+    text-shadow: none;
+}
+
+.block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element .jqtree-title {
+    color: #fff;
+}
+
+.block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element .edit {
+    color: #c4dce8;
+}

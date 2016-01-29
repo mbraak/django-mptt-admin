@@ -2,12 +2,11 @@ from six import python_2_unicode_compatible
 
 from django.db import models
 
-from mptt.models import TreeForeignKey
-import mptt
+from mptt.models import TreeForeignKey, MPTTModel
 
 
 @python_2_unicode_compatible
-class Country(models.Model):
+class Country(MPTTModel):
     class Meta:
         verbose_name_plural = 'countries'
         app_label = 'django_mptt_example'
@@ -18,6 +17,3 @@ class Country(models.Model):
 
     def __str__(self):
         return self.name or self.code or ''
-
-
-mptt.register(Country)
