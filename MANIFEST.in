@@ -2,3 +2,4 @@ include LICENSE.rst
 include README.md
 recursive-include django_mptt_admin/templates *
 recursive-include django_mptt_admin/static *
+recursive-include django_mptt_admin/locale *

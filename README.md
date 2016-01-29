@@ -98,6 +98,7 @@ Changelog
 * Issue 103: use jquery from django admin itself
 * Issue 105: added Turkish translation (thanks to Tagmat)
 * Issue 106: use the same colors as the Django admin
+* Issue 109: include locale files in package
 
 **0.3.1** (december 2 2015)
 
