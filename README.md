@@ -93,7 +93,7 @@ True / False. Default is False.
 Changelog
 ---------
 
-**dev**
+**0.3.2**
 
 * Issue 103: use jquery from django admin itself
 * Issue 105: added Turkish translation (thanks to Tagmat)
