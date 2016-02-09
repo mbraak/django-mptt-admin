@@ -1,2 +1,1 @@
-django-mptt==0.8.0
 six==1.10.0
