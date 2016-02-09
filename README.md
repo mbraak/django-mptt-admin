@@ -93,6 +93,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**development version**
+
+* Issue 112: correctly override media (thanks to Generalov)
+
 **0.3.2** (january 29 2016)
 
 * Issue 103: use jquery from django admin itself
