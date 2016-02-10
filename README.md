@@ -14,7 +14,7 @@ Django Mptt Admin
 Requirements
 ------------
 
-The package is tested with Django (1.7 - 1.9), and django-mptt (0.7.x). Also with Python 2.7, 3.3-3.5.
+The package is tested with Django (1.7 - 1.9), and django-mptt (0.7.x and higher). Also with Python 2.7, 3.3-3.5.
 
 Installation
 ------------
@@ -93,7 +93,7 @@ True / False. Default is False.
 Changelog
 ---------
 
-**development version**
+**0.3.3** (february 10 2016)
 
 * Issue 112: correctly override media (thanks to Generalov)
 
