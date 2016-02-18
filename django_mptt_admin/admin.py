@@ -11,7 +11,6 @@ from django.conf.urls import url
 from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.db import transaction
-from django import forms
 
 from . import util
 
@@ -96,27 +95,25 @@ class DjangoMpttAdminMixin(object):
 
     @property
     def media(self):
-        def get_jquery_url():
-            if util.get_short_django_version() >= (1,9):
-                return 'admin/js/vendor/jquery/jquery.min.js'
-            else:
-                return 'admin/js/jquery.min.js'
+        media = super(DjangoMpttAdminMixin, self).media
 
-        js = (
-            get_jquery_url(),
+        media.add_js([
+            'django_mptt_admin/jquery_namespace.js',
             'django_mptt_admin/jquery-cookie/jquery.cookie.js',
             'django_mptt_admin/jqtree/tree.jquery.js',
             'django_mptt_admin/django_mptt_admin.js',
-        )
+        ])
 
-        css = dict(
-            all=(
-                'django_mptt_admin/jqtree/jqtree.css',
-                'django_mptt_admin/django_mptt_admin.css',
+        media.add_css(
+            dict(
+                all=(
+                    'django_mptt_admin/jqtree/jqtree.css',
+                    'django_mptt_admin/django_mptt_admin.css',
+                )
             )
         )
 
-        return forms.Media(js=js, css=css)
+        return media
 
     @csrf_protect_m
     @transaction.atomic()

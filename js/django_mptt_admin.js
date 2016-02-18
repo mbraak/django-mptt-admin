@@ -1,20 +1,18 @@
-"use strict";
-
 /* global jQuery */
 
 function initTree($tree, autoopen, autoescape) {
-    var error_node = null;
+    let error_node = null;
 
     function createLi(node, $li) {
         // Create edit link
-        var $title = $li.find(".jqtree-title");
+        const $title = $li.find(".jqtree-title");
 
-        $title.after("<a href=\"" + node.url + "\" class=\"edit\">(" + $tree.data("label-edit") + ")</a>");
+        $title.after(`<a href="${node.url}" class="edit">(${$tree.data("label-edit")})</a>`);
     }
 
     function handleMove(e) {
-        var info = e.move_info;
-        var data = {
+        const info = e.move_info;
+        const data = {
             target_id: info.target_node.id,
             position: info.position
         };
@@ -26,18 +24,18 @@ function initTree($tree, autoopen, autoescape) {
         jQuery.ajax({
             type: "POST",
             url: info.moved_node.move_url,
-            data: data,
-            beforeSend: function beforeSend(xhr) {
+            data,
+            beforeSend: xhr => {
                 // Set Django csrf token
-                var csrftoken = jQuery.cookie("csrftoken");
+                const csrftoken = jQuery.cookie("csrftoken");
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
-            success: function success() {
+            success: () => {
                 info.do_move();
             },
-            error: function error() {
-                var $node = jQuery(info.moved_node.element).find(".jqtree-element");
-                $node.append("<span class=\"mptt-admin-error\">" + $tree.data("label-move-failed") + "</span>");
+            error: () => {
+                const $node = jQuery(info.moved_node.element).find(".jqtree-element");
+                $node.append(`<span class="mptt-admin-error">${$tree.data("label-move-failed")}</span>`);
 
                 error_node = info.moved_node;
             }
@@ -70,10 +68,10 @@ function initTree($tree, autoopen, autoescape) {
     $tree.bind("tree.move", handleMove);
 }
 
-jQuery(function () {
-    var $tree = jQuery("#tree");
-    var autoopen = $tree.data("auto_open");
-    var autoescape = $tree.data("autoescape");
+jQuery(() => {
+    const $tree = jQuery("#tree");
+    const autoopen = $tree.data("auto_open");
+    const autoescape = $tree.data("autoescape");
 
     initTree($tree, autoopen, autoescape);
 });

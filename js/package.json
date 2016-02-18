@@ -1,0 +1,29 @@
+{
+  "name": "django-mptt-admin",
+  "version": "1.0.0",
+  "description": "[![Build Status](https://travis-ci.org/mbraak/django-mptt-admin.svg?branch=master)](https://travis-ci.org/mbraak/django-mptt-admin) [![Version](https://badge.fury.io/py/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "eslint django_mptt_admin.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbraak/django-mptt-admin.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/mbraak/django-mptt-admin/issues"
+  },
+  "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
+  "devDependencies": {
+    "babel-eslint": "^4.1.8",
+    "babel-preset-es2015": "^6.5.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^5.0.1",
+    "eslint-plugin-react": "^3.16.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2"
+  }
+}
