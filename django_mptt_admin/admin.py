@@ -50,6 +50,7 @@ class DjangoMpttAdminMixin(object):
             has_add_permission=self.has_add_permission(request),
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
             tree_json_url=self.get_admin_url('tree_json'),
+            insert_at_url=self.get_admin_url('add'),
             grid_url=self.get_admin_url('grid'),
             autoescape=util.get_javascript_value(self.autoescape),
             use_context_menu=util.get_javascript_value(self.use_context_menu)
@@ -232,6 +233,21 @@ class DjangoMpttAdminMixin(object):
         Override 'filter_tree_queryset' to filter the queryset for the tree.
         """
         return queryset
+
+
+    def get_changeform_initial_data(self, request):
+        initial_data = super(DjangoMpttAdminMixin,
+                             self).get_changeform_initial_data(request=request)
+
+        if 'insert_at' in request.GET:
+            initial_data[self.get_insert_at_field()] = request.GET.get(
+                'insert_at')
+
+        return initial_data
+
+    def get_insert_at_field(self):
+        return 'parent'
+
 
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, admin.ModelAdmin):
