@@ -2,7 +2,7 @@
 
 /* global jQuery */
 
-function initTree($tree, autoopen, autoescape) {
+function initTree($tree, autoopen, autoescape, rtl) {
     var error_node = null;
 
     function createLi(node, $li) {
@@ -58,13 +58,13 @@ function initTree($tree, autoopen, autoescape) {
     $tree.tree({
         autoOpen: autoopen,
         autoEscape: autoescape,
-        buttonLeft: false,
+        buttonLeft: !rtl,
         dragAndDrop: true,
         onCreateLi: createLi,
         saveState: $tree.data("save_state"),
         useContextMenu: $tree.data("use_context_menu"),
         onLoadFailed: handleLoadFailed,
-        closedIcon: $tree.data("rtl") === "1" ? "&#x25c0;" : "&#x25ba;"
+        closedIcon: rtl ? "&#x25c0;" : "&#x25ba;"
     });
 
     $tree.bind("tree.move", handleMove);
@@ -74,6 +74,7 @@ jQuery(function () {
     var $tree = jQuery("#tree");
     var autoopen = $tree.data("auto_open");
     var autoescape = $tree.data("autoescape");
+    var rtl = $tree.data("rtl") === "1";
 
-    initTree($tree, autoopen, autoescape);
+    initTree($tree, autoopen, autoescape, rtl);
 });
