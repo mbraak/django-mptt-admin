@@ -8,9 +8,14 @@ ul.jqtree-tree .jqtree-toggler {
     top: 10%;
 }
 
-#tree .edit {
+.jqtree-tree .edit {
     margin-left: 0.5em;
     vertical-align: middle;
+}
+
+.jqtree-tree.jqtree-rtl .edit {
+    margin-left: 0;
+    margin-right: 0.5em;
 }
 
 .jqtree-tree .jqtree-loading > div .edit:after {
@@ -34,10 +39,16 @@ ul.jqtree-tree .jqtree-toggler {
 
 .block-style ul.jqtree-tree {
     margin-left: 0;
+    margin-right: 0;
 }
 
 .block-style ul.jqtree-tree ul.jqtree_common {
     margin-left: 2em;
+}
+
+.block-style ul.jqtree-tree.jqtree-rtl ul.jqtree_common {
+    margin-left: 0;
+    margin-right: 2em;
 }
 
 .block-style ul.jqtree-tree .jqtree-element {

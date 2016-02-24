@@ -96,6 +96,7 @@ Changelog
 **development version**
 
 * Issue 115: implemented 'add' button (thanks to Andrew Dodd)
+* Issue 116: fix layout for right-to-left-languages
 
 **0.3.3** (february 10 2016)
 
