@@ -1,6 +1,6 @@
 "use strict";
 
-/* global jQuery */
+/* global jQuery, gettext */
 
 function initTree($tree, autoopen, autoescape, rtl) {
     var error_node = null;
@@ -9,7 +9,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
         // Create edit link
         var $title = $li.find(".jqtree-title");
 
-        $title.after("<a href=\"" + node.url + "\" class=\"edit\">(" + $tree.data("label-edit") + ")</a>", "<a href=\"" + $tree.data("insert_at_url") + "?insert_at=" + node.id + "\" class=\"edit\">(" + $tree.data("label-add") + ")</a>");
+        $title.after("<a href=\"" + node.url + "\" class=\"edit\">" + gettext("edit") + "</a>", "<a href=\"" + $tree.data("insert_at_url") + "?insert_at=" + node.id + "\" class=\"edit\">" + gettext("add") + "</a>");
     }
 
     function handleMove(e) {
@@ -37,7 +37,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
             },
             error: function error() {
                 var $node = jQuery(info.moved_node.element).find(".jqtree-element");
-                $node.append("<span class=\"mptt-admin-error\">" + $tree.data("label-move-failed") + "</span>");
+                $node.append("<span class=\"mptt-admin-error\">" + gettext("move failed") + "</span>");
 
                 error_node = info.moved_node;
             }
@@ -52,7 +52,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
     }
 
     function handleLoadFailed() {
-        $tree.html($tree.data("label-error"));
+        $tree.html(gettext("Error while loading the data from the server"));
     }
 
     $tree.tree({
