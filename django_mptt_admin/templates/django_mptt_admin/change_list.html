@@ -1,6 +1,11 @@
 {% extends 'admin/change_list.html' %}
 {% load i18n %}
 
+{% block extrastyle %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{ jsi18n_url }}"></script>
+{% endblock %}
+
 {% block search %}{% endblock %}
 
 {% block result_list %}
@@ -12,10 +17,6 @@
         data-save_state="{{ app_label }}_{{ model_name }}"
         data-auto_open="{{ tree_auto_open }}"
         data-autoescape="{{ autoescape }}"
-        data-label-add="{% trans "add" %}"
-        data-label-edit="{% trans "edit" %}"
-        data-label-move-failed="{% trans "move failed" %}"
-        data-label-error="{% trans "Error while loading the data from the server" %}"
         {% if LANGUAGE_BIDI %}
             data-rtl
         {% endif %}

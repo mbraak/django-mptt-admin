@@ -1,4 +1,4 @@
-/* global jQuery */
+/* global jQuery, gettext */
 
 function initTree($tree, autoopen, autoescape, rtl) {
     let error_node = null;
@@ -8,8 +8,8 @@ function initTree($tree, autoopen, autoescape, rtl) {
         const $title = $li.find(".jqtree-title");
 
         $title.after(
-            `<a href="${node.url}" class="edit">(${$tree.data("label-edit")})</a>`,
-            `<a href="${$tree.data("insert_at_url")}?insert_at=${node.id}" class="edit">(${$tree.data("label-add")})</a>`
+            `<a href="${node.url}" class="edit">${gettext("edit")}</a>`,
+            `<a href="${$tree.data("insert_at_url")}?insert_at=${node.id}" class="edit">${gettext("add")}</a>`
         );
     }
 
@@ -38,7 +38,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
             },
             error: () => {
                 const $node = jQuery(info.moved_node.element).find(".jqtree-element");
-                $node.append(`<span class="mptt-admin-error">${$tree.data("label-move-failed")}</span>`);
+                $node.append(`<span class="mptt-admin-error">${gettext("move failed")}</span>`);
 
                 error_node = info.moved_node;
             }
@@ -53,7 +53,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
     }
 
     function handleLoadFailed() {
-        $tree.html($tree.data("label-error"));
+        $tree.html(gettext("Error while loading the data from the server"));
     }
 
     $tree.tree({
