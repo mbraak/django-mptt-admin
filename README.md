@@ -93,6 +93,11 @@ True / False. Default is False.
 Changelog
 ---------
 
+**development version**
+
+* Issue 115: implemented 'add' button (thanks to Andrew Dodd)
+* Issue 116: fix block-style layout for right-to-left-languages
+
 **0.3.3** (february 10 2016)
 
 * Issue 112: correctly override media (thanks to Generalov)

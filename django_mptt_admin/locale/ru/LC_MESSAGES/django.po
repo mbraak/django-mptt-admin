@@ -17,6 +17,9 @@ msgstr ""
 msgid "edit"
 msgstr "редактировать"
 
+msgid "add"
+msgstr "Добавить"
+
 #: templates/django_mptt_admin/change_list.html:39
 msgid "move failed"
 msgstr "не удалось переместить"

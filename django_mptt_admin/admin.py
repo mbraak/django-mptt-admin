@@ -1,5 +1,6 @@
 from functools import update_wrapper
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
@@ -50,9 +51,11 @@ class DjangoMpttAdminMixin(object):
             has_add_permission=self.has_add_permission(request),
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
             tree_json_url=self.get_admin_url('tree_json'),
+            insert_at_url=self.get_admin_url('add'),
             grid_url=self.get_admin_url('grid'),
             autoescape=util.get_javascript_value(self.autoescape),
-            use_context_menu=util.get_javascript_value(self.use_context_menu)
+            use_context_menu=util.get_javascript_value(self.use_context_menu),
+            jsi18n_url=self.get_admin_url('jsi18n')
         )
         if extra_context:
             context.update(extra_context)
@@ -66,32 +69,29 @@ class DjangoMpttAdminMixin(object):
         )
 
     def get_urls(self):
-        def wrap(view):
+        def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
-                return self.admin_site.admin_view(view)(*args, **kwargs)
+                return self.admin_site.admin_view(view, cacheable)(*args, **kwargs)
             return update_wrapper(wrapper, view)
 
-        urlpatterns = super(DjangoMpttAdminMixin, self).get_urls()
-
-        def add_url(regex, url_name, view):
-            # Prepend url to list so it has preference before 'change' url
-            urlpatterns.insert(
-                0,
-                url(
-                    regex,
-                    wrap(view),
-                    name='%s_%s_%s' % (
-                        self.model._meta.app_label,
-                        util.get_model_name(self.model),
-                        url_name
-                    )
+        def create_url(regex, url_name, view, cacheable=False):
+            return url(
+                regex,
+                wrap(view, cacheable),
+                name='%s_%s_%s' % (
+                    self.model._meta.app_label,
+                    util.get_model_name(self.model),
+                    url_name
                 )
             )
 
-        add_url(r'^(.+)/move/$', 'move', self.move_view)
-        add_url(r'^tree_json/$', 'tree_json', self.tree_json_view)
-        add_url(r'^grid/$', 'grid', self.grid_view)
-        return urlpatterns
+        # prepend new urls to existing urls
+        return [
+            create_url(r'^(.+)/move/$', 'move', self.move_view),
+            create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
+            create_url(r'^grid/$', 'grid', self.grid_view),
+            create_url(r'^jsi18n/$', 'jsi18n', self.i18n_javascript, cacheable=True)
+        ] + super(DjangoMpttAdminMixin, self).get_urls()
 
     @property
     def media(self):
@@ -227,6 +227,25 @@ class DjangoMpttAdminMixin(object):
         Override 'filter_tree_queryset' to filter the queryset for the tree.
         """
         return queryset
+
+    def get_changeform_initial_data(self, request):
+        initial_data = super(DjangoMpttAdminMixin,self).get_changeform_initial_data(request=request)
+
+        if 'insert_at' in request.GET:
+            initial_data[self.get_insert_at_field()] = request.GET.get('insert_at')
+
+        return initial_data
+
+    def get_insert_at_field(self):
+        return 'parent'
+
+    def i18n_javascript(self, request):
+        if settings.USE_I18N:
+            from django.views.i18n import javascript_catalog
+        else:
+            from django.views.i18n import null_javascript_catalog as javascript_catalog
+
+        return javascript_catalog(request, domain='django', packages=['django_mptt_admin'])
 
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, admin.ModelAdmin):
