@@ -8,8 +8,8 @@ function initTree($tree, autoopen, autoescape, rtl) {
         const $title = $li.find(".jqtree-title");
 
         $title.after(
-            `<a href="${node.url}" class="edit">${gettext("edit")}</a>`,
-            `<a href="${$tree.data("insert_at_url")}?insert_at=${node.id}" class="edit">${gettext("add")}</a>`
+            `<a href="${node.url}" class="edit">(${gettext("edit")})</a>`,
+            `<a href="${$tree.data("insert_at_url")}?insert_at=${node.id}" class="edit">(${gettext("add")})</a>`
         );
     }
 

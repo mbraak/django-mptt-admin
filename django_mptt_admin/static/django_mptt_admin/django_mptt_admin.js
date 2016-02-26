@@ -10,7 +10,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
         // Create edit link
         var $title = $li.find(".jqtree-title");
 
-        $title.after("<a href=\"" + node.url + "\" class=\"edit\">" + gettext("edit") + "</a>", "<a href=\"" + $tree.data("insert_at_url") + "?insert_at=" + node.id + "\" class=\"edit\">" + gettext("add") + "</a>");
+        $title.after("<a href=\"" + node.url + "\" class=\"edit\">(" + gettext("edit") + ")</a>", "<a href=\"" + $tree.data("insert_at_url") + "?insert_at=" + node.id + "\" class=\"edit\">(" + gettext("add") + ")</a>");
     }
 
     function handleMove(e) {
