@@ -19,6 +19,9 @@
     position: absolute; }
   #tree ul.jqtree-tree ul.jqtree_common {
     margin-top: 0; }
+  #tree ul.jqtree-tree.jqtree-rtl .edit {
+    margin-left: 0;
+    margin-right: 0.5em; }
   #tree.block-style ul.jqtree-tree {
     margin-left: 0;
     margin-right: 0; }
@@ -31,6 +34,8 @@
       #tree.block-style ul.jqtree-tree .jqtree-element .jqtree-title {
         margin-left: 0;
         margin-right: 0; }
+      #tree.block-style ul.jqtree-tree .jqtree-element .jqtree-toggler.jqtree-toggler-right {
+        margin-left: 1em; }
     #tree.block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element {
       background: #79aec8;
       text-shadow: none; }
@@ -38,9 +43,9 @@
         color: #fff; }
       #tree.block-style ul.jqtree-tree li.jqtree-selected > .jqtree-element .edit {
         color: #c4dce8; }
-    #tree.block-style ul.jqtree-tree.jqtree-rtl .edit {
-      margin-left: 0;
-      margin-right: 0.5em; }
     #tree.block-style ul.jqtree-tree.jqtree-rtl ul.jqtree_common {
       margin-left: 0;
       margin-right: 2em; }
+    #tree.block-style ul.jqtree-tree.jqtree-rtl .jqtree-toggler.jqtree-toggler-right {
+      margin-left: 0;
+      margin-right: 1em; }

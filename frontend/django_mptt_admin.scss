@@ -32,6 +32,13 @@
         ul.jqtree_common {
             margin-top: 0;
         }
+
+        &.jqtree-rtl {
+            .edit {
+                margin-left: 0;
+                margin-right: 0.5em;
+            }
+        }
     }
 
     &.block-style {
@@ -52,6 +59,10 @@
                     margin-left: 0;
                     margin-right: 0;
                 }
+
+                .jqtree-toggler.jqtree-toggler-right {
+                    margin-left: 1em;
+                }
             }
 
             li.jqtree-selected > .jqtree-element {
@@ -68,14 +79,14 @@
             }
 
             &.jqtree-rtl {
-                .edit {
-                    margin-left: 0;
-                    margin-right: 0.5em;
-                }
-
                 ul.jqtree_common {
                     margin-left: 0;
                     margin-right: 2em;
+                }
+
+                .jqtree-toggler.jqtree-toggler-right {
+                    margin-left: 0;
+                    margin-right: 1em;
                 }
             }
         }
