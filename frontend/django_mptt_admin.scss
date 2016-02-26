@@ -23,10 +23,10 @@
             vertical-align: middle;
         }
 
-        .jqtree-loading > div .edit:after {
+        .jqtree-loading > div .jqtree-toggler:after {
             content: url(spinner.gif);
             margin-left: 8px;
-            position: absolute;
+            vertical-align: middle;
         }
 
         ul.jqtree_common {
