@@ -1,3 +1,4 @@
+/* This file is generated */
 "use strict";
 
 /* global jQuery, gettext */
