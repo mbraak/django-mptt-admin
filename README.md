@@ -97,6 +97,7 @@ Changelog
 
 * Issue 115: implemented 'add' button (thanks to Andrew Dodd)
 * Issue 116: fix block-style layout for right-to-left-languages
+* Issue 119: display transparent loading image
 
 **0.3.3** (february 10 2016)
 
