@@ -106,6 +106,7 @@ class DjangoMpttAdminMixin(object):
             'django_mptt_admin/jquery_namespace.js',
             'django_mptt_admin/jquery-cookie/jquery.cookie.js',
             'django_mptt_admin/jqtree/tree.jquery.js',
+            'django_mptt_admin/spin.js/spin.js',
             'django_mptt_admin/django_mptt_admin.js',
         ])
 

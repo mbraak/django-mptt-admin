@@ -8,7 +8,7 @@ const banner = "/* This file is generated */\n";
 
 
 gulp.task("js", () =>
-    gulp.src("*.js")
+    gulp.src("django_mptt_admin.js")
         .pipe(babel())
         .pipe(header(banner))
         .pipe(gulp.dest("../django_mptt_admin/static/django_mptt_admin/"))

@@ -4,8 +4,6 @@
 
 #tree {
   padding: 1em 0 1em 0; }
-  #tree.jqtree-loading:after {
-    content: url(spinner.gif); }
   #tree .mptt-admin-error {
     color: red;
     margin-left: 8px; }
@@ -13,10 +11,6 @@
     top: 10%; }
   #tree ul.jqtree-tree .edit {
     margin-left: 0.5em;
-    vertical-align: middle; }
-  #tree ul.jqtree-tree .jqtree-loading > div .jqtree-toggler:after {
-    content: url(spinner.gif);
-    margin-left: 8px;
     vertical-align: middle; }
   #tree ul.jqtree-tree ul.jqtree_common {
     margin-top: 0; }
