@@ -99,15 +99,12 @@ class DjangoMpttAdminMixin(object):
 
         media.add_js([
             'django_mptt_admin/jquery_namespace.js',
-            'django_mptt_admin/jquery-cookie/jquery.cookie.js',
-            'django_mptt_admin/jqtree/tree.jquery.js',
             'django_mptt_admin/django_mptt_admin.js',
         ])
 
         media.add_css(
             dict(
                 all=(
-                    'django_mptt_admin/jqtree/jqtree.css',
                     'django_mptt_admin/django_mptt_admin.css',
                 )
             )

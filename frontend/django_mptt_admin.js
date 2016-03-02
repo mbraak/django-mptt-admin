@@ -1,5 +1,10 @@
 /* global jQuery, gettext */
 
+require("jquery.cookie");
+require("jqtree");
+const Spinner = require("spin");
+
+
 function initTree($tree, autoopen, autoescape, rtl) {
     let error_node = null;
 
@@ -8,8 +13,8 @@ function initTree($tree, autoopen, autoescape, rtl) {
         const $title = $li.find(".jqtree-title");
 
         $title.after(
-            `<a href="${node.url}" class="edit">${gettext("edit")}</a>`,
-            `<a href="${$tree.data("insert_at_url")}?insert_at=${node.id}" class="edit">${gettext("add")}</a>`
+            `<a href="${node.url}" class="edit">(${gettext("edit")})</a>`,
+            `<a href="${$tree.data("insert_at_url")}?insert_at=${node.id}" class="edit">(${gettext("add")})</a>`
         );
     }
 
@@ -56,6 +61,42 @@ function initTree($tree, autoopen, autoescape, rtl) {
         $tree.html(gettext("Error while loading the data from the server"));
     }
 
+    const spinners = {};
+
+    function handleLoading(is_loading, node, $el) {
+        function getNodeId() {
+            if (!node) {
+                return "__root__";
+            }
+            else {
+                return node.id;
+            }
+        }
+
+        function getContainer() {
+            if (node) {
+                return $el.find(".jqtree-element")[0];
+            }
+            else {
+                return $el[0];
+            }
+        }
+
+        const node_id = getNodeId();
+
+        if (is_loading) {
+            spinners[node_id] = new Spinner().spin(getContainer());
+        }
+        else {
+            const spinner = spinners[node_id];
+
+            if (spinner) {
+                spinner.stop();
+                spinners[node_id] = null;
+            }
+        }
+    }
+
     $tree.tree({
         autoOpen: autoopen,
         autoEscape: autoescape,
@@ -65,7 +106,8 @@ function initTree($tree, autoopen, autoescape, rtl) {
         saveState: $tree.data("save_state"),
         useContextMenu: $tree.data("use_context_menu"),
         onLoadFailed: handleLoadFailed,
-        closedIcon: rtl ? "&#x25c0;" : "&#x25ba;"
+        closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
+        onLoading: handleLoading
     });
 
     $tree.bind("tree.move", handleMove);

@@ -1,7 +1,0 @@
-{
-    "name": "django_mptt_admin",
-    "dependencies": {
-        "jquery-cookie": "v1.4.1",
-        "jqtree": "1.3.0"
-    }
-}
