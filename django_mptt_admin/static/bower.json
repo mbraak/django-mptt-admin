@@ -1,8 +1,0 @@
-{
-    "name": "django_mptt_admin",
-    "dependencies": {
-        "jquery-cookie": "v1.4.1",
-        "jqtree": "fe258b015faf6bb9e98522cc5b76f2cb59547dae",
-        "spin.js": "2.3.2"
-    }
-}

@@ -25,7 +25,14 @@
     "eslint-plugin-react": "^4.1.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-browser": "^1.1.1",
     "gulp-header": "^1.7.1",
-    "gulp-sass": "^2.2.0"
+    "gulp-sass": "^2.2.0",
+    "gulp-uglify": "^1.5.3"
+  },
+  "dependencies": {
+    "jqtree": "git://github.com/mbraak/jqTree.git#fbe7bb879071f13f7e113839d1b93a3e2ceb31bc",
+    "jquery.cookie": "^1.4.1",
+    "spin": "0.0.1"
   }
 }

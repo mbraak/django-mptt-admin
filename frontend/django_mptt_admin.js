@@ -1,4 +1,9 @@
-/* global jQuery, gettext, Spinner */
+/* global jQuery, gettext */
+
+require("jquery.cookie");
+require("jqtree");
+const Spinner = require("spin");
+
 
 function initTree($tree, autoopen, autoescape, rtl) {
     let error_node = null;
