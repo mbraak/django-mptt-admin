@@ -7,5 +7,5 @@ cssselect==0.9.1
 lxml==3.5.0
 pyquery==1.2.11
 waitress==0.8.10
-WebOb==1.5.1
+WebOb==1.6.0
 WebTest==2.0.20
