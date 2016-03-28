@@ -1,8 +1,8 @@
 /* global jQuery, gettext */
 
-require("jquery.cookie");
 require("jqtree");
 const Spinner = require("spin");
+const cookie = require("cookie");
 
 
 function initTree($tree, autoopen, autoescape, rtl) {
@@ -35,7 +35,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
             data,
             beforeSend: xhr => {
                 // Set Django csrf token
-                const csrftoken = jQuery.cookie("csrftoken");
+                const csrftoken = cookie.parse(document.cookie).csrftoken;
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
             success: () => {
