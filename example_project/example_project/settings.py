@@ -51,8 +51,6 @@ ROOT_URLCONF = 'example_project.urls'
 
 STATIC_ROOT = str(BASE_DIR.joinpath('static'))
 
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-
 SECRET_KEY = 'secret'
 
 TEMPLATES = [
