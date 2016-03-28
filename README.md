@@ -93,7 +93,7 @@ True / False. Default is False.
 Changelog
 ---------
 
-**development version**
+**0.3.5** (march 28 2016)
 
 * Issue 126: add missing jqtree-circle.png (thanks to Generalov)
 
