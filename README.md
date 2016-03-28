@@ -93,6 +93,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**development version**
+
+* Issue 126: add missing jqtree-circle.png (thanks to Generalov)
+
 **0.3.4** (march 25 2016)
 
 * Issue 115: implemented 'add' button (thanks to Andrew Dodd)
