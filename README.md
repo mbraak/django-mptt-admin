@@ -93,6 +93,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**0.3.6** (march 28 2016)
+
+* Issue 125: fix jQuery.cookie (thanks to Patrick Colmant)
+
 **0.3.5** (march 28 2016)
 
 * Issue 126: add missing jqtree-circle.png (thanks to Generalov)
