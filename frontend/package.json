@@ -1,7 +1,7 @@
 {
   "name": "django-mptt-admin",
   "version": "1.0.0",
-  "description": "[![Build Status](https://travis-ci.org/mbraak/django-mptt-admin.svg?branch=master)](https://travis-ci.org/mbraak/django-mptt-admin) [![Version](https://badge.fury.io/py/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)",
+  "description": "Frontend code for django-mptt-admin",
   "main": "index.js",
   "scripts": {
     "test": "eslint django_mptt_admin.js"
