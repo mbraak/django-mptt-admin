@@ -5,7 +5,7 @@ django-webtest==1.7.8
 beautifulsoup4==4.4.1
 cssselect==0.9.1
 lxml==3.6.0
-pyquery==1.2.11
+pyquery==1.2.13
 waitress==0.8.10
 WebOb==1.6.0
-WebTest==2.0.20
+WebTest==2.0.21
