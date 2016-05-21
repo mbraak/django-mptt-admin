@@ -5,13 +5,13 @@ from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
 from django.template.response import TemplateResponse
-from django.contrib import admin
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList
 from django.conf.urls import url
 from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.db import transaction
+from mptt.admin import MPTTModelAdmin
 
 from . import util
 
@@ -245,5 +245,5 @@ class DjangoMpttAdminMixin(object):
         return javascript_catalog(request, domain='django', packages=['django_mptt_admin'])
 
 
-class DjangoMpttAdmin(DjangoMpttAdminMixin, admin.ModelAdmin):
+class DjangoMpttAdmin(DjangoMpttAdminMixin, MPTTModelAdmin):
     pass

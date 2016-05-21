@@ -93,6 +93,11 @@ True / False. Default is False.
 Changelog
 ---------
 
+**development version**
+
+* Issue 132: use MPTTModelAdmin for DjangoMpttAdmin (thanks to Alex Tomkins)
+    * MPTTModelAdmin contains fixes for mass deletions and TreeForeignKey
+
 **0.3.6** (march 28 2016)
 
 * Issue 125: fix jQuery.cookie error (thanks to Patrick Colmant)

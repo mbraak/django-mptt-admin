@@ -1,8 +1,8 @@
 /* global jQuery, gettext */
 
-require("jqtree");
-const Spinner = require("spin");
-const cookie = require("cookie");
+import "jqtree";
+import Spinner from "spin";
+import cookie from "cookie";
 
 
 function initTree($tree, autoopen, autoescape, rtl) {
