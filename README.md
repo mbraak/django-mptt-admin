@@ -97,6 +97,7 @@ Changelog
 
 * Issue 132: use MPTTModelAdmin for DjangoMpttAdmin (thanks to Alex Tomkins)
     * MPTTModelAdmin contains fixes for mass deletions and TreeForeignKey
+* Issue 139: update to jqtree 1.3.3
 
 **0.3.6** (march 28 2016)
 
