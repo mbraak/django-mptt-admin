@@ -93,7 +93,7 @@ True / False. Default is False.
 Changelog
 ---------
 
-**development version**
+**0.3.7** (june 1 2016)
 
 * Issue 132: use MPTTModelAdmin for DjangoMpttAdmin (thanks to Alex Tomkins)
     * MPTTModelAdmin contains fixes for mass deletions and TreeForeignKey
