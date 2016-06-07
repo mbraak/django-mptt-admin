@@ -5,8 +5,7 @@ python:
   - 3.4
   - 3.5
 env:
-  - DJANGO=Django==1.8.13 django-mptt==0.8.4
-  - DJANGO=Django==1.9.6 django-mptt==0.8.4
+  - DJANGO=Django==1.9.7 django-mptt==0.8.4
   - DJANGO==https://www.djangoproject.com/download/1.10a1/tarball/ https://github.com/django-mptt/django-mptt/archive/master.zip
 install:
   - pip install $DJANGO
