@@ -1,6 +1,7 @@
 from functools import update_wrapper
 
 from django.conf import settings
+from django.contrib.admin.templatetags.admin_static import static
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse
@@ -103,14 +104,14 @@ class DjangoMpttAdminMixin(object):
         media = super(DjangoMpttAdminMixin, self).media
 
         media.add_js([
-            'django_mptt_admin/jquery_namespace.js',
-            'django_mptt_admin/django_mptt_admin.js',
+            static('django_mptt_admin/jquery_namespace.js'),
+            static('django_mptt_admin/django_mptt_admin.js'),
         ])
 
         media.add_css(
             dict(
                 all=(
-                    'django_mptt_admin/django_mptt_admin.css',
+                    static('django_mptt_admin/django_mptt_admin.css'),
                 )
             )
         )
