@@ -1,3 +1,4 @@
+import os
 import sys
 
 from pathlib import Path
@@ -49,7 +50,9 @@ MIDDLEWARE_CLASSES = global_settings.MIDDLEWARE_CLASSES = [
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'example_project.urls'
 
-STATIC_ROOT = str(BASE_DIR.joinpath('static'))
+STATIC_ROOT = os.environ['STATIC_ROOT']
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 SECRET_KEY = 'secret'
 
