@@ -1,9 +1,12 @@
 # coding=utf-8
+import itertools
 import os
 
 from django.test import TestCase
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.staticfiles import finders
 from django.core import serializers
 
 from django_webtest import WebTest
@@ -204,6 +207,19 @@ class DjangoMpttAdminWebTests(WebTest):
 
         # tree view
         self.app.get('/django_mptt_example/country/', status=403)
+
+    def test_staticfiles(self):
+        # find all static media used for this page
+        countries_page = self.app.get('/django_mptt_example/country/')
+        media = countries_page.context['media']
+
+        static_urls = itertools.chain(media._js, *media._css.values())
+
+        # go through all the static files used for this page
+        for static_url in static_urls:
+            static_file = static_url.replace(settings.STATIC_URL, '', 1)
+            # must return None - a static file can't be found as it's been hashed already
+            self.assertIsNone(finders.find(static_file))
 
 
 class DjangoMpttAdminTestCase(TestCase):
