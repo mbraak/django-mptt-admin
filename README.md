@@ -93,6 +93,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**development**
+
+* Issue 142: use the Django admin static tag for CSS / Javascript (thanks to Alex Tomkins)
+
 **0.3.7** (june 1 2016)
 
 * Issue 132: use MPTTModelAdmin for DjangoMpttAdmin (thanks to Alex Tomkins)
