@@ -96,6 +96,7 @@ Changelog
 **development**
 
 * Issue 142: use the Django admin static tag for CSS / Javascript (thanks to Alex Tomkins)
+* Issue 143: update jqtree to 1.3.4
 
 **0.3.7** (june 1 2016)
 
