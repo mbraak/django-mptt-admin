@@ -23,7 +23,7 @@ after_success:
 matrix:
   exclude:
     - python: 3.5
-      env: DJANGO=Django==1.7.11
+      env: DJANGO="Django==1.7.11 django-mptt==0.7.4"
 branches:
   only:
     - master
