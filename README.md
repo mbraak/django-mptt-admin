@@ -93,7 +93,7 @@ True / False. Default is False.
 Changelog
 ---------
 
-**development**
+**0.3.8** (july 27 2016)
 
 * Issue 142: use the Django admin static tag for CSS / Javascript (thanks to Alex Tomkins)
 * Issue 143: update jqtree to 1.3.4
