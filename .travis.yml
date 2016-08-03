@@ -6,7 +6,7 @@ python:
   - 3.5
 env:
   - DJANGO=Django==1.9.8
-  - DJANGO==https://www.djangoproject.com/download/1.10rc1/tarball/
+  - DJANGO==Django==1.10
 install:
   - pip install $DJANGO
   - pip install -r example_project/requirements.txt
