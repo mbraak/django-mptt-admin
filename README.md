@@ -14,7 +14,7 @@ Django Mptt Admin
 Requirements
 ------------
 
-The package is tested with Django (1.8 - 1.9), and django-mptt (0.7.x and higher). Also with Python 2.7, 3.3-3.5.
+The package is tested with Django (1.8 - 1.10), and django-mptt (0.7.x and higher). Also with Python 2.7, 3.3-3.5.
 
 Installation
 ------------
