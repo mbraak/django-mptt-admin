@@ -93,6 +93,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**development**
+
+* Issue 152: Django 1.10 support
+
 **0.3.8** (july 27 2016)
 
 * Issue 142: use the Django admin static tag for CSS / Javascript (thanks to Alex Tomkins)
