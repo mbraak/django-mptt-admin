@@ -16,6 +16,8 @@ Requirements
 
 The package is tested with Django (1.8 - 1.10), and django-mptt (0.7.x and higher). Also with Python 2.7, 3.3-3.5.
 
+Note that version 0.3.8 also supports Django 1.7.
+
 Installation
 ------------
 
