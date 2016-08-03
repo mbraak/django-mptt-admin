@@ -95,9 +95,10 @@ True / False. Default is False.
 Changelog
 ---------
 
-**development**
+**0.4.0** (august 3 2016)
 
-* Issue 152: Django 1.10 support
+* Issue 152: Django 1.10 support.
+    * Drop support for Django 1.7
 
 **0.3.8** (july 27 2016)
 
