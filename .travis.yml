@@ -20,6 +20,3 @@ script:
   - coverage report
 after_success:
   - coveralls
-branches:
-  only:
-    - master
