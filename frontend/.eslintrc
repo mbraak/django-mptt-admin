@@ -5,6 +5,7 @@
         "browser": true
     },
     "rules": {
+        "arrow-parens": 0,
         "brace-style": 0,
         "camelcase": 0,
         "comma-dangle": 0,
