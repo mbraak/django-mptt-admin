@@ -98,6 +98,7 @@ Changelog
 **development**
 
 * Issue 162: Add request parameter to filter_tree_queryset signature (thanks to Max Perreault)
+* Issue 163: Update to jqtree 1.3.5
 
 **0.4.0** (august 3 2016)
 
