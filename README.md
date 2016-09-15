@@ -95,6 +95,10 @@ True / False. Default is False.
 Changelog
 ---------
 
+**development**
+
+* Issue 162: Add request parameter to filter_tree_queryset signature (thanks to Max Perreault)
+
 **0.4.0** (august 3 2016)
 
 * Issue 152: Django 1.10 support.
