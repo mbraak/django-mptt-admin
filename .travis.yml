@@ -5,9 +5,9 @@ python:
   - 3.4
   - 3.5
 env:
-  - DJANGO="Django==1.8.14 django-mptt==0.8.5"
-  - DJANGO="Django==1.9.9 django-mptt==0.8.5"
-  - DJANGO="Django==1.10 https://github.com/matthiask/django-mptt/archive/mk/nomagic.zip"
+  - DJANGO="Django==1.8.15 django-mptt==0.8.5"
+  - DJANGO="Django==1.9.10 django-mptt==0.8.5"
+  - DJANGO="Django==1.10.2 https://github.com/matthiask/django-mptt/archive/mk/nomagic.zip"
   - DJANGO="https://github.com/django/django/archive/master.tar.gz https://github.com/matthiask/django-mptt/archive/mk/nomagic.zip"
 install:
   - pip install $DJANGO

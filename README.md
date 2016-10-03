@@ -95,6 +95,11 @@ True / False. Default is False.
 Changelog
 ---------
 
+**0.4.1** (september 21 2016)
+
+* Issue 162: Add request parameter to filter_tree_queryset signature (thanks to Max Perreault)
+* Issue 163: Update to jqtree 1.3.5
+
 **0.4.0** (august 3 2016)
 
 * Issue 152: Django 1.10 support.
