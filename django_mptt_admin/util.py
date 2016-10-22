@@ -2,8 +2,6 @@ import json
 
 import six
 
-import django
-
 
 def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
     """
@@ -116,14 +114,6 @@ def get_javascript_value(value):
             return 'false'
     else:
         return json.dumps(value)
-
-
-def get_short_django_version():
-    """
-    Get first two numbers of Django version.
-    E.g. (1, 8)
-    """
-    return django.VERSION[0:2]
 
 
 def get_model_name(model):
