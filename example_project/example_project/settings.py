@@ -2,7 +2,7 @@ import sys
 
 from pathlib import Path
 
-from django.conf import global_settings
+import django
 
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
@@ -40,11 +40,18 @@ INSTALLED_APPS = [
     'django.contrib.admin',
 ]
 
-MIDDLEWARE_CLASSES = global_settings.MIDDLEWARE_CLASSES = [
+
+MIDDLEWARE = (
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-]
+)
+
+if django.VERSION[0:2] <= (1, 9):
+    MIDDLEWARE_CLASSES = MIDDLEWARE
 
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'example_project.urls'
