@@ -5,12 +5,16 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.core import serializers
+import django
 
 from django_webtest import WebTest
 
-from django_mptt_admin.util import get_tree_queryset, get_javascript_value, get_short_django_version
+from django_mptt_admin.util import get_tree_queryset, get_javascript_value
 
 from .models import Country
+
+
+short_django_version = django.VERSION[0:2]
 
 
 def read_testdata():
@@ -61,7 +65,7 @@ class DjangoMpttAdminWebTests(WebTest):
 
         africa = root['children'][0]
 
-        if get_short_django_version() >= (1, 9):
+        if short_django_version >= (1, 9):
             change_url = '/django_mptt_example/country/%d/change/' % africa_id
         else:
             change_url = '/django_mptt_example/country/%d/' % africa_id
@@ -107,7 +111,7 @@ class DjangoMpttAdminWebTests(WebTest):
         # link to edit page
         afghanistan_id = Country.objects.get(name='Afghanistan').id
 
-        if get_short_django_version() >= (1, 9):
+        if short_django_version >= (1, 9):
             change_url = '/django_mptt_example/country/%d/change/' % afghanistan_id
         else:
             change_url = '/django_mptt_example/country/%d/' % afghanistan_id
