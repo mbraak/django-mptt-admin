@@ -262,16 +262,18 @@ class DjangoMpttAdmin(DjangoMpttAdminMixin, MPTTModelAdmin):
 
 
 class TreeChangeList(ChangeList):
-
     TREE_IGNORED_PARAMS = IGNORED_PARAMS + ('_', 'node', 'selected_node')
 
     def get_filters_params(self, params=None):
         if not params:
             params = self.params
+
         lookup_params = params.copy()
+
         for ignored in self.TREE_IGNORED_PARAMS:
             if ignored in lookup_params:
                 del lookup_params[ignored]
+
         return lookup_params
 
 
@@ -297,11 +299,12 @@ class FilterableDjangoMpttAdmin(DjangoMpttAdmin):
 
     def filter_tree_queryset(self, queryset, request):
         change_list = self.get_change_list_for_tree(request)
-        (self.filter_specs, self.has_filters, remaining_lookup_params,
-         filters_use_distinct) = change_list.get_filters(request)
+
+        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = change_list.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = queryset
+
         for filter_spec in self.filter_specs:
             new_qs = filter_spec.queryset(request, qs)
             if new_qs is not None:
