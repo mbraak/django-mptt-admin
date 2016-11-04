@@ -90,7 +90,7 @@ class DjangoMpttAdminMixin(object):
             return url(
                 regex,
                 wrap(view, cacheable),
-                name='%s_%s_%s' % (
+                name='{0!s}_{1!s}_{2!s}'.format(
                     self.model._meta.app_label,
                     util.get_model_name(self.model),
                     url_name
@@ -180,7 +180,7 @@ class DjangoMpttAdminMixin(object):
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
-        url_name = 'admin:%s_%s_%s' % (opts.app_label, util.get_model_name(self.model), name)
+        url_name = 'admin:{0!s}_{1!s}_{2!s}'.format(opts.app_label, util.get_model_name(self.model), name)
 
         return reverse(
             url_name,
