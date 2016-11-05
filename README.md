@@ -243,3 +243,5 @@ Changelog
 **0.1** (februari 7 2013)
 
 * Initial version
+
+[![Code Issues](https://www.quantifiedcode.com/api/v1/project/dd888e7a1804465798821f28717af384/badge.svg)](https://www.quantifiedcode.com/app/project/dd888e7a1804465798821f28717af384)
