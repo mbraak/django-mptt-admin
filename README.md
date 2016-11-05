@@ -113,6 +113,8 @@ Changelog
 **development version**
 
 * Issue 170: Added FilterableDjangoMpttAdmin (thanks to Riccardo Magliocchetti)
+* Issue 172: Update jqtree to 1.3.6
+* Issue 173: Move translations to djangojs domain
 
 **0.4.1** (september 21 2016)
 
