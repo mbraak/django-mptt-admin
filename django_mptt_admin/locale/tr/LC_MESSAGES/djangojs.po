@@ -12,8 +12,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "Grid view"
-msgstr "Tablo görünümü"
+msgid "edit"
+msgstr "düzenle"
 
-msgid "Tree view"
-msgstr "Ağaç görünümü"
+msgid "add"
+msgstr "ekle"
+
+msgid "move failed"
+msgstr "taşıma başarısız"
+
+msgid "Error while loading the data from the server"
+msgstr "Veri sunucudan yüklenirken hata oluştu"
