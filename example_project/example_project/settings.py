@@ -58,7 +58,7 @@ ROOT_URLCONF = 'example_project.urls'
 
 STATIC_ROOT = str(BASE_DIR.joinpath('static'))
 
-SECRET_KEY = 'secret'
+SECRET_KEY = 'test_key'
 
 TEMPLATES = [
     {
