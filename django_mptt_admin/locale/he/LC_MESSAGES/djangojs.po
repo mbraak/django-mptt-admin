@@ -12,8 +12,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.5.7\n"
 
-msgid "Grid view"
-msgstr "תצוגה טבלאית"
+msgid "edit"
+msgstr "עריכה"
 
-msgid "Tree view"
-msgstr "תצוגת עץ"
+msgid "add"
+msgstr "הוספה"
+
+msgid "move failed"
+msgstr "ההעברה נכשלה"
+
+msgid "Error while loading the data from the server"
+msgstr "שגיאה במהלך שליחת הנתונים לשרת"

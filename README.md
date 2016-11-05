@@ -92,8 +92,29 @@ True / False. Default is False.
 "useContextMenu" option for tree.
 
 
+Filters
+-------
+
+If you want to use filters, then you can inherit from FilterableDjangoMpttAdmin:
+
+```python
+from django_mptt_admin.admin import FilterableDjangoMpttAdmin
+
+class CountryAdmin(FilterableDjangoMpttAdmin):
+    list_filter = ('continent',)
+```
+
+Also see the example project for a complete continent filter.
+
+
 Changelog
 ---------
+
+**development version**
+
+* Issue 170: Added FilterableDjangoMpttAdmin (thanks to Riccardo Magliocchetti)
+* Issue 172: Update jqtree to 1.3.6
+* Issue 173: Move translations to djangojs domain
 
 **0.4.1** (september 21 2016)
 
@@ -224,3 +245,5 @@ Changelog
 **0.1** (februari 7 2013)
 
 * Initial version
+
+[![Code Issues](https://www.quantifiedcode.com/api/v1/project/dd888e7a1804465798821f28717af384/badge.svg)](https://www.quantifiedcode.com/app/project/dd888e7a1804465798821f28717af384)

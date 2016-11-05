@@ -2,11 +2,17 @@ from functools import update_wrapper
 
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_static import static
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import (
+    ImproperlyConfigured, PermissionDenied, SuspiciousOperation
+)
 from django.http import JsonResponse
 from django.template.response import TemplateResponse
-from django.contrib.admin.options import csrf_protect_m
-from django.contrib.admin.views.main import ChangeList
+from django.contrib.admin.options import (
+    csrf_protect_m, IncorrectLookupParameters
+)
+from django.contrib.admin.views.main import (
+    ChangeList, IGNORED_PARAMS
+)
 from django.conf.urls import url
 from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
@@ -84,7 +90,7 @@ class DjangoMpttAdminMixin(object):
             return url(
                 regex,
                 wrap(view, cacheable),
-                name='%s_%s_%s' % (
+                name='{0!s}_{1!s}_{2!s}'.format(
                     self.model._meta.app_label,
                     util.get_model_name(self.model),
                     url_name
@@ -174,7 +180,7 @@ class DjangoMpttAdminMixin(object):
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
-        url_name = 'admin:%s_%s_%s' % (opts.app_label, util.get_model_name(self.model), name)
+        url_name = 'admin:{0!s}_{1!s}_{2!s}'.format(opts.app_label, util.get_model_name(self.model), name)
 
         return reverse(
             url_name,
@@ -248,8 +254,77 @@ class DjangoMpttAdminMixin(object):
         else:
             from django.views.i18n import null_javascript_catalog as javascript_catalog
 
-        return javascript_catalog(request, domain='django', packages=['django_mptt_admin'])
+        return javascript_catalog(request, packages=['django_mptt_admin'])
 
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, MPTTModelAdmin):
     pass
+
+
+class TreeChangeList(ChangeList):
+    TREE_IGNORED_PARAMS = IGNORED_PARAMS + ('_', 'node', 'selected_node')
+
+    def get_filters_params(self, params=None):
+        if not params:
+            params = self.params
+
+        lookup_params = params.copy()
+
+        for ignored in self.TREE_IGNORED_PARAMS:
+            if ignored in lookup_params:
+                del lookup_params[ignored]
+
+        return lookup_params
+
+
+class FilterableDjangoMpttAdmin(DjangoMpttAdmin):
+    def get_change_list_for_tree(self, request):
+        request.current_app = self.admin_site.name
+        kwargs = dict(
+            request=request,
+            model=self.model,
+            list_display=(),
+            list_display_links=(),
+            list_filter=self.list_filter,
+            date_hierarchy=None,
+            search_fields=(),
+            list_select_related=(),
+            list_per_page=100,
+            list_editable=(),
+            model_admin=self,
+            list_max_show_all=200,
+        )
+
+        return TreeChangeList(**kwargs)
+
+    def filter_tree_queryset(self, queryset, request):
+        change_list = self.get_change_list_for_tree(request)
+
+        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = change_list.get_filters(request)
+
+        # Then, we let every list filter modify the queryset to its liking.
+        qs = queryset
+
+        for filter_spec in self.filter_specs:
+            new_qs = filter_spec.queryset(request, qs)
+            if new_qs is not None:
+                qs = new_qs
+
+        try:
+            # Finally, we apply the remaining lookup parameters from the query
+            # string (i.e. those that haven't already been processed by the
+            # filters).
+            qs = qs.filter(**remaining_lookup_params)
+        except (SuspiciousOperation, ImproperlyConfigured):
+            # Allow certain types of errors to be re-raised as-is so that the
+            # caller can treat them in a special way.
+            raise
+        except Exception as e:
+            # Every other error is caught with a naked except, because we don't
+            # have any other way of validating lookup parameters. They might be
+            # invalid if the keyword arguments are incorrect, or if the values
+            # are not in the correct type, so we might get FieldError,
+            # ValueError, ValidationError, or ?.
+            raise IncorrectLookupParameters(e)
+
+        return qs

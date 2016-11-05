@@ -1,5 +1,5 @@
 {% extends 'admin/change_list.html' %}
-{% load i18n %}
+{% load i18n admin_list %}
 
 {% block extrastyle %}
     {{ block.super }}
@@ -12,7 +12,7 @@
     <div
         id="tree"
         class="block-style"
-        data-url="{{ tree_json_url }}"
+        data-url="{{ tree_json_url }}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}"
         data-insert_at_url="{{ insert_at_url }}"
         data-save_state="{{ app_label }}_{{ model_name }}"
         data-auto_open="{{ tree_auto_open }}"
@@ -22,6 +22,15 @@
         {% endif %}
         data-use_context_menu="{{ use_context_menu }}"
     ></div>
+{% endblock %}
+
+{% block filters %}
+    {% if cl.has_filters %}
+        <div id="changelist-filter">
+          <h2>{% trans 'Filter' %}</h2>
+          {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block pagination %}{% endblock %}

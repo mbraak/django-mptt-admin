@@ -66,9 +66,9 @@ class DjangoMpttAdminWebTests(WebTest):
         africa = root['children'][0]
 
         if short_django_version >= (1, 9):
-            change_url = '/django_mptt_example/country/%d/change/' % africa_id
+            change_url = '/django_mptt_example/country/{0:d}/change/'.format(africa_id)
         else:
-            change_url = '/django_mptt_example/country/%d/' % africa_id
+            change_url = '/django_mptt_example/country/{0:d}/'.format(africa_id)
 
         self.assertEqual(
             africa,
@@ -76,7 +76,7 @@ class DjangoMpttAdminWebTests(WebTest):
                 label='Africa',
                 id=africa_id,
                 url=change_url,
-                move_url='/django_mptt_example/country/%d/move/' % africa_id,
+                move_url='/django_mptt_example/country/{0:d}/move/'.format(africa_id),
                 load_on_demand=True,
             )
         )
@@ -85,13 +85,13 @@ class DjangoMpttAdminWebTests(WebTest):
         self.assertFalse(hasattr(africa, 'children'))
 
         # -- load subtree
-        json_data = self.app.get('%s?node=%d' % (base_url, africa_id)).json
+        json_data = self.app.get('{0!s}?node={1:d}'.format(base_url, africa_id)).json
 
         self.assertEqual(len(json_data), 58)
         self.assertEqual(json_data[0]['label'], 'Algeria')
 
         # -- issue 8; selected node does not exist
-        self.app.get('%s?selected_node=9999999' % base_url)
+        self.app.get('{0!s}?selected_node=9999999'.format(base_url))
 
     def test_grid_view(self):
         # - get grid page
@@ -112,9 +112,9 @@ class DjangoMpttAdminWebTests(WebTest):
         afghanistan_id = Country.objects.get(name='Afghanistan').id
 
         if short_django_version >= (1, 9):
-            change_url = '/django_mptt_example/country/%d/change/' % afghanistan_id
+            change_url = '/django_mptt_example/country/{0:d}/change/'.format(afghanistan_id)
         else:
-            change_url = '/django_mptt_example/country/%d/' % afghanistan_id
+            change_url = '/django_mptt_example/country/{0:d}/'.format(afghanistan_id)
 
         self.assertEqual(first_row.find('a').attr('href'), change_url)
 
@@ -127,7 +127,7 @@ class DjangoMpttAdminWebTests(WebTest):
             csrf_token = countries_page.form['csrfmiddlewaretoken'].value
 
             response = self.app.post(
-                '/django_mptt_example/country/%d/move/' % source_id,
+                '/django_mptt_example/country/{0:d}/move/'.format(source_id),
                 dict(
                     csrfmiddlewaretoken=csrf_token,
                     target_id=target_id,
@@ -192,7 +192,7 @@ class DjangoMpttAdminWebTests(WebTest):
 
     def test_popup(self):
         # popup must return grid view
-        grid_page = self.app.get('/django_mptt_example/country/?%s=true' % IS_POPUP_VAR)
+        grid_page = self.app.get('/django_mptt_example/country/?{0!s}=true'.format(IS_POPUP_VAR))
 
         first_row = grid_page.pyquery('#result_list tbody tr').eq(0)
         self.assertEqual(first_row.find('td').eq(0).text(), 'Afghanistan')
