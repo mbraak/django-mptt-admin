@@ -5,9 +5,9 @@ python:
   - 3.4
   - 3.5
 env:
-  - DJANGO="Django==1.8.15"
-  - DJANGO="Django==1.9.10"
-  - DJANGO="Django==1.10.2"
+  - DJANGO="Django==1.8.16"
+  - DJANGO="Django==1.9.11"
+  - DJANGO="Django==1.10.3"
 install:
   - pip install $DJANGO
   - pip install -r example_project/requirements.txt
