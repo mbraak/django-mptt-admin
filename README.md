@@ -115,6 +115,8 @@ Changelog
 * Issue 170: Added FilterableDjangoMpttAdmin (thanks to Riccardo Magliocchetti)
 * Issue 172: Update jqtree to 1.3.6
 * Issue 173: Move translations to djangojs domain
+* Issue 174: Added French translations (thanks to Vhotz)
+* Issue 175: Fixed: can't move items in tree view with CSRF_COOKIE_HTTPONLY = True (thanks to Vhotz)
 
 **0.4.1** (september 21 2016)
 
