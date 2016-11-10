@@ -110,7 +110,7 @@ Also see the example project for a complete continent filter.
 Changelog
 ---------
 
-**development version**
+**0.4.2** (november 10 2016)
 
 * Issue 170: Added FilterableDjangoMpttAdmin (thanks to Riccardo Magliocchetti)
 * Issue 172: Update jqtree to 1.3.6
