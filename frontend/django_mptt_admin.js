@@ -35,7 +35,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
             data,
             beforeSend: xhr => {
                 // Set Django csrf token
-                const csrftoken = cookie.parse(document.cookie).csrftoken;
+                const csrftoken = cookie.parse(document.cookie).csrftoken || document.querySelector('[name="csrfmiddlewaretoken"]').value;
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
             success: () => {
