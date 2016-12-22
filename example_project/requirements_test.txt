@@ -1,5 +1,5 @@
 pathlib==1.0.1
-django-mptt==0.8.6
+django-mptt==0.8.7
 
 # django-webtest
 django-webtest==1.8.0
