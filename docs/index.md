@@ -84,6 +84,28 @@ True / False. Default is False.
 
 "useContextMenu" option for tree.
 
+**item_label_field_name**
+
+Define which field of the model should be the label for tree items.
+
+Possible values are:
+* string: name of the model field or model property method to use as tree items label
+* None (default): model unicode used ad tree item label
+
+Example:
+
+```
+class MyMpttModel(MPTTModel):
+    title = models.CharField(......
+
+    @property
+    def title_for_admin(self):
+          return '%s %s' % (self.pk, self.title)
+
+class MyMpttModelAdminClass(MPTTModelAdmin):
+    item_label_field_name = 'title_for_admin'
+```
+
 ## Filters
 
 If you want to use filters, then you can inherit from FilterableDjangoMpttAdmin:
@@ -102,6 +124,7 @@ Also see the example project for a complete continent filter.
 **development**
 
 * Issue 178: Added Hungarian translations (thanks to roodie)
+* Issue 182: Add option to configure node label (thanks to Claudio Bartolini)
 
 **0.4.2** (november 10 2016)
 
