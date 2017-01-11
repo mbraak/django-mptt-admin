@@ -103,11 +103,11 @@ class DjangoMpttAdminMixin(object):
 
         # prepend new urls to existing urls
         return [
-                   create_url(r'^(.+)/move/$', 'move', self.move_view),
-                   create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
-                   create_url(r'^grid/$', 'grid', self.grid_view),
-                   create_url(r'^jsi18n/$', 'jsi18n', self.i18n_javascript, cacheable=True)
-               ] + super(DjangoMpttAdminMixin, self).get_urls()
+           create_url(r'^(.+)/move/$', 'move', self.move_view),
+           create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
+           create_url(r'^grid/$', 'grid', self.grid_view),
+           create_url(r'^jsi18n/$', 'jsi18n', self.i18n_javascript, cacheable=True)
+       ] + super(DjangoMpttAdminMixin, self).get_urls()
 
     @property
     def media(self):
