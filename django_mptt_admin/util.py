@@ -35,7 +35,11 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_l
             min_level = instance.level
 
         pk = getattr(instance, pk_attname)
-        label = getattr(instance, item_label_field_name, six.text_type(instance))
+
+        if item_label_field_name:
+            label = getattr(instance, item_label_field_name)
+        else:
+            label = six.text_type(instance)
 
         node_info = dict(
             label=label,

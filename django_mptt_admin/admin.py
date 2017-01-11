@@ -43,7 +43,7 @@ class DjangoMpttAdminMixin(object):
     change_tree_template = 'django_mptt_admin/change_list.html'
 
     # define which field of the model should be the label for tree items
-    item_label_field_name = 'None'
+    item_label_field_name = None
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
