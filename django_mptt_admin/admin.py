@@ -49,7 +49,10 @@ class DjangoMpttAdminMixin(object):
     use_context_menu = False
 
     change_list_template = 'django_mptt_admin/grid_view.html'
-    change_tree_template=  'django_mptt_admin/change_list.html'
+    change_tree_template = 'django_mptt_admin/change_list.html'
+
+    # define which field of the model should be the label for tree items
+    item_label_field_name = None
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
@@ -93,6 +96,7 @@ class DjangoMpttAdminMixin(object):
         def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
                 return self.admin_site.admin_view(view, cacheable)(*args, **kwargs)
+
             return update_wrapper(wrapper, view)
 
         def create_url(regex, url_name, view, kwargs=None, cacheable=False):
@@ -118,11 +122,11 @@ class DjangoMpttAdminMixin(object):
 
         # prepend new urls to existing urls
         return [
-            create_url(r'^(.+)/move/$', 'move', self.move_view),
-            create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
-            create_url(r'^grid/$', 'grid', self.grid_view),
-            create_js_catalog_url()
-        ] + super(DjangoMpttAdminMixin, self).get_urls()
+           create_url(r'^(.+)/move/$', 'move', self.move_view),
+           create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
+           create_url(r'^grid/$', 'grid', self.grid_view),
+           create_js_catalog_url()
+       ] + super(DjangoMpttAdminMixin, self).get_urls()
 
     @property
     def media(self):
@@ -218,7 +222,7 @@ class DjangoMpttAdminMixin(object):
                 move_url=self.get_admin_url('move', (quote(pk),))
             )
 
-        return util.get_tree_from_queryset(qs, handle_create_node, max_level)
+        return util.get_tree_from_queryset(qs, handle_create_node, max_level, self.item_label_field_name)
 
     def tree_json_view(self, request):
         request.current_app = self.admin_site.name
@@ -248,7 +252,7 @@ class DjangoMpttAdminMixin(object):
         context = dict(tree_url=self.get_admin_url('changelist'))
         if extra_context:
             context.update(extra_context)
-        return super(DjangoMpttAdminMixin, self).changelist_view(request,context)
+        return super(DjangoMpttAdminMixin, self).changelist_view(request, context)
 
     def filter_tree_queryset(self, queryset, request):
         """
@@ -257,7 +261,7 @@ class DjangoMpttAdminMixin(object):
         return queryset
 
     def get_changeform_initial_data(self, request):
-        initial_data = super(DjangoMpttAdminMixin,self).get_changeform_initial_data(request=request)
+        initial_data = super(DjangoMpttAdminMixin, self).get_changeform_initial_data(request=request)
 
         if 'insert_at' in request.GET:
             initial_data[self.get_insert_at_field()] = request.GET.get('insert_at')
@@ -311,7 +315,8 @@ class FilterableDjangoMpttAdmin(DjangoMpttAdmin):
     def filter_tree_queryset(self, queryset, request):
         change_list = self.get_change_list_for_tree(request)
 
-        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = change_list.get_filters(request)
+        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = change_list.get_filters(
+            request)
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = queryset

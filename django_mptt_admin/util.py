@@ -3,7 +3,7 @@ import json
 import six
 
 
-def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
+def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_label_field_name=None):
     """
     Return tree data that is suitable for jqTree.
     The queryset must be sorted by 'tree_id' and 'left' fields.
@@ -35,8 +35,14 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None):
             min_level = instance.level
 
         pk = getattr(instance, pk_attname)
+
+        if item_label_field_name:
+            label = getattr(instance, item_label_field_name)
+        else:
+            label = six.text_type(instance)
+
         node_info = dict(
-            label=six.text_type(instance),
+            label=label,
             id=serialize_id(pk)
         )
         if on_create_node:
