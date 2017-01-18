@@ -121,7 +121,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**0.4.3** (january 18 2017)
 
 * Issue 178: Added Hungarian translations (thanks to roodie)
 * Issue 182: Add option to configure node label (thanks to Claudio Bartolini)
