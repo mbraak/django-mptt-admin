@@ -209,6 +209,28 @@ class DjangoMpttAdminWebTests(WebTest):
         # tree view
         self.app.get('/django_mptt_example/country/', status=403)
 
+    def test_filter(self):
+        # - tree view with all continents
+        countries_page = self.app.get('/django_mptt_example/country/')
+
+        self.assertEqual(
+            countries_page.pyquery('#changelist-filter li a').text(),
+            "All Africa Antarctica Asia Europe North America Oceania South America"
+        )
+
+        # - filter on 'Europe'
+        countries_page = self.app.get('/django_mptt_example/country/?continent=Europe')
+
+        json_url = countries_page.pyquery('#tree').attr('data-url')
+        self.assertEqual(json_url, '/django_mptt_example/country/tree_json/?continent=Europe')
+
+        json_data = self.app.get(json_url).json
+
+        self.assertEqual(len(json_data), 1)
+        root = json_data[0]
+        self.assertEqual(root['label'], 'Europe')
+        self.assertEqual(len(root['children']), 50)
+
 
 class DjangoMpttAdminTestCase(TestCase):
     def setUp(self):
