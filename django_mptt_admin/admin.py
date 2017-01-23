@@ -2,17 +2,11 @@ from functools import update_wrapper
 
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_static import static
-from django.core.exceptions import (
-    ImproperlyConfigured, PermissionDenied, SuspiciousOperation
-)
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import JsonResponse
 from django.template.response import TemplateResponse
-from django.contrib.admin.options import (
-    csrf_protect_m, IncorrectLookupParameters
-)
-from django.contrib.admin.views.main import (
-    ChangeList, IGNORED_PARAMS
-)
+from django.contrib.admin.options import csrf_protect_m
+from django.contrib.admin.views.main import ChangeList, IGNORED_PARAMS
 from django.conf.urls import url
 from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
@@ -44,6 +38,9 @@ class DjangoMpttAdminMixin(object):
 
     # define which field of the model should be the label for tree items
     item_label_field_name = None
+
+    # list and tree filter
+    list_filter = ()
 
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
@@ -170,7 +167,7 @@ class DjangoMpttAdminMixin(object):
             model=self.model,
             list_display=(),
             list_display_links=(),
-            list_filter=(),
+            list_filter=self.get_list_filter(request),
             date_hierarchy=None,
             search_fields=(),
             list_select_related=(),
@@ -180,7 +177,7 @@ class DjangoMpttAdminMixin(object):
             list_max_show_all=200,
         )
 
-        return ChangeList(**kwargs)
+        return TreeChangeList(**kwargs)
 
     def get_admin_url(self, name, args=None):
         opts = self.model._meta
@@ -215,12 +212,16 @@ class DjangoMpttAdminMixin(object):
         else:
             max_level = self.tree_load_on_demand
 
-        qs = util.get_tree_queryset(
+        root_queryset = util.get_tree_queryset(
             model=self.model,
             node_id=node_id,
             max_level=max_level,
         )
 
+        change_list = self.get_change_list_for_tree(request)
+        change_list.root_queryset = root_queryset
+
+        qs = change_list.get_queryset(request)
         qs = self.filter_tree_queryset(qs, request)
 
         tree_data = self.get_tree_data(qs, max_level)
@@ -280,56 +281,9 @@ class TreeChangeList(ChangeList):
 
         return lookup_params
 
+    def get_ordering(self, request, queryset):
+        return ()
+
 
 class FilterableDjangoMpttAdmin(DjangoMpttAdmin):
-    def get_change_list_for_tree(self, request):
-        request.current_app = self.admin_site.name
-        kwargs = dict(
-            request=request,
-            model=self.model,
-            list_display=(),
-            list_display_links=(),
-            list_filter=self.list_filter,
-            date_hierarchy=None,
-            search_fields=(),
-            list_select_related=(),
-            list_per_page=100,
-            list_editable=(),
-            model_admin=self,
-            list_max_show_all=200,
-        )
-
-        return TreeChangeList(**kwargs)
-
-    def filter_tree_queryset(self, queryset, request):
-        change_list = self.get_change_list_for_tree(request)
-
-        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = change_list.get_filters(
-            request)
-
-        # Then, we let every list filter modify the queryset to its liking.
-        qs = queryset
-
-        for filter_spec in self.filter_specs:
-            new_qs = filter_spec.queryset(request, qs)
-            if new_qs is not None:
-                qs = new_qs
-
-        try:
-            # Finally, we apply the remaining lookup parameters from the query
-            # string (i.e. those that haven't already been processed by the
-            # filters).
-            qs = qs.filter(**remaining_lookup_params)
-        except (SuspiciousOperation, ImproperlyConfigured):
-            # Allow certain types of errors to be re-raised as-is so that the
-            # caller can treat them in a special way.
-            raise
-        except Exception as e:
-            # Every other error is caught with a naked except, because we don't
-            # have any other way of validating lookup parameters. They might be
-            # invalid if the keyword arguments are incorrect, or if the values
-            # are not in the correct type, so we might get FieldError,
-            # ValueError, ValidationError, or ?.
-            raise IncorrectLookupParameters(e)
-
-        return qs
+    pass
