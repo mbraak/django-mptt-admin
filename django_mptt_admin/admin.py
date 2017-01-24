@@ -2,6 +2,7 @@ from functools import update_wrapper
 
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_static import static
+from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import JsonResponse
 from django.template.response import TemplateResponse
@@ -11,6 +12,7 @@ from django.conf.urls import url
 from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.db import transaction
+from django.utils.http import urlencode
 
 try:
     from django.urls import reverse
@@ -54,6 +56,26 @@ class DjangoMpttAdminMixin(object):
 
         change_list = self.get_change_list_for_tree(request)
 
+        preserved_filters = self.get_preserved_filters(request)
+
+        def get_admin_url_with_filters(name):
+            admin_url = self.get_admin_url(name)
+
+            if change_list.params:
+                return admin_url + change_list.get_query_string()
+            else:
+                return admin_url
+
+        def get_admin_url_with_preserved_filters(name):
+            return add_preserved_filters(
+                {'preserved_filters': preserved_filters, 'opts': self.model._meta},
+                self.get_admin_url(name)
+            )
+
+        grid_url = get_admin_url_with_filters('grid')
+        tree_json_url = get_admin_url_with_filters('tree_json')
+        insert_at_url = get_admin_url_with_preserved_filters('add')
+
         context = dict(
             title=change_list.title,
             app_label=self.model._meta.app_label,
@@ -61,13 +83,15 @@ class DjangoMpttAdminMixin(object):
             cl=change_list,
             media=self.media,
             has_add_permission=self.has_add_permission(request),
+            opts=change_list.opts,
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
-            tree_json_url=self.get_admin_url('tree_json'),
-            insert_at_url=self.get_admin_url('add'),
-            grid_url=self.get_admin_url('grid'),
+            tree_json_url=tree_json_url,
+            insert_at_url=insert_at_url,
+            grid_url=grid_url,
             autoescape=util.get_javascript_value(self.autoescape),
             use_context_menu=util.get_javascript_value(self.use_context_menu),
-            jsi18n_url=self.get_admin_url('jsi18n')
+            jsi18n_url=self.get_admin_url('jsi18n'),
+            preserved_filters=preserved_filters
         )
         if extra_context:
             context.update(extra_context)
@@ -189,14 +213,26 @@ class DjangoMpttAdminMixin(object):
             current_app=self.admin_site.name
         )
 
-    def get_tree_data(self, qs, max_level):
+    def get_tree_data(self, qs, max_level, filters_params):
         pk_attname = self.model._meta.pk.attname
+
+        preserved_filters = urlencode({'_changelist_filters': urlencode(filters_params)})
+
+        def add_preserved_filters_to_url(url):
+            return add_preserved_filters(
+                {'preserved_filters': preserved_filters, 'opts': self.model._meta},
+                url
+            )
 
         def handle_create_node(instance, node_info):
             pk = quote(getattr(instance, pk_attname))
 
+            node_url = add_preserved_filters_to_url(
+                self.get_admin_url('change', (quote(pk),))
+            )
+
             node_info.update(
-                url=self.get_admin_url('change', (quote(pk),)),
+                url=node_url,
                 move_url=self.get_admin_url('move', (quote(pk),))
             )
 
@@ -224,17 +260,49 @@ class DjangoMpttAdminMixin(object):
         qs = change_list.get_queryset(request)
         qs = self.filter_tree_queryset(qs, request)
 
-        tree_data = self.get_tree_data(qs, max_level)
+        tree_data = self.get_tree_data(qs, max_level, change_list.get_filters_params())
 
         # Set safe to False because the data is a list instead of a dict
         return JsonResponse(tree_data, safe=False)
 
     def grid_view(self, request, extra_context=None):
         request.current_app = self.admin_site.name
-        context = dict(tree_url=self.get_admin_url('changelist'))
+
+        preserved_filters = self.get_preserved_filters(request)
+
+        tree_url = add_preserved_filters(
+            {'preserved_filters': preserved_filters, 'opts': self.model._meta},
+            self.get_admin_url('changelist')
+        )
+
+        context = dict(tree_url=tree_url)
+
         if extra_context:
             context.update(extra_context)
         return super(DjangoMpttAdminMixin, self).changelist_view(request, context)
+
+    def get_preserved_filters(self, request):
+        """
+        Override `get_preserved_filters` to make sure that it returns the current filters for the grid view.
+        """
+        def must_return_current_filters():
+            match = request.resolver_match
+
+            if not self.preserve_filters or not match:
+                return False
+            else:
+                opts = self.model._meta
+                current_url = '%s:%s' % (match.app_name, match.url_name)
+                grid_url = 'admin:%s_%s_grid' % (opts.app_label, opts.model_name)
+
+                return current_url == grid_url
+
+        if must_return_current_filters():
+            # for the grid view return the current filters
+            preserved_filters = request.GET.urlencode()
+            return urlencode({'_changelist_filters': preserved_filters})
+        else:
+            return super(DjangoMpttAdminMixin, self).get_preserved_filters(request)
 
     def filter_tree_queryset(self, queryset, request):
         """

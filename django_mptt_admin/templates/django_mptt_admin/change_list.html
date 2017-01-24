@@ -12,7 +12,7 @@
     <div
         id="tree"
         class="block-style"
-        data-url="{{ tree_json_url }}{% if request.META.QUERY_STRING %}?{{ request.META.QUERY_STRING }}{% endif %}"
+        data-url="{{ tree_json_url }}"
         data-insert_at_url="{{ insert_at_url }}"
         data-save_state="{{ app_label }}_{{ model_name }}"
         data-auto_open="{{ tree_auto_open }}"

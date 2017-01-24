@@ -123,6 +123,7 @@ Also see the example project for a complete continent filter.
 
 **development version**
 
+* Issue #185: Support preserved filters (thanks to Riccardo Magliocchetti)
 * Issue #186: Move list_filter option to DjangoMpttAdmin class
 
 **0.4.3** (january 18 2017)
