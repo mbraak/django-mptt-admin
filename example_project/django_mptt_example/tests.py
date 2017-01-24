@@ -243,12 +243,12 @@ class DjangoMpttAdminWebTests(WebTest):
         if short_django_version >= (1, 9):
             self.assertEqual(
                 country_node['url'],
-                "/django_mptt_example/country/%s/change/?_changelist_filters=continent%%3DEurope" % country_node['id']
+                "/django_mptt_example/country/{0!s}/change/?_changelist_filters=continent%3DEurope".format(country_node['id'])
             )
         else:
             self.assertEqual(
                 country_node['url'],
-                "/django_mptt_example/country/%s/?_changelist_filters=continent%%3DEurope" % country_node['id']
+                "/django_mptt_example/country/{0!s}/?_changelist_filters=continent%3DEurope".format(country_node['id'])
             )
 
         # check urls
