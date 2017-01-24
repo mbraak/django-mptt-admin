@@ -3,18 +3,22 @@
 import "jqtree";
 import Spinner from "spin";
 import cookie from "cookie";
+import urljoin from "url-join";
 
 
 function initTree($tree, autoopen, autoescape, rtl) {
     let error_node = null;
+    const insert_at_url = $tree.data("insert_at_url");
 
     function createLi(node, $li) {
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
+        const insert_at_url_for_node = urljoin(insert_at_url, `?insert-at=${node.id}`);
+
         $title.after(
             `<a href="${node.url}" class="edit">(${gettext("edit")})</a>`,
-            `<a href="${$tree.data("insert_at_url")}?insert_at=${node.id}" class="edit">(${gettext("add")})</a>`
+            `<a href="${insert_at_url_for_node}" class="edit">(${gettext("add")})</a>`
         );
     }
 

@@ -108,18 +108,23 @@ class MyMpttModelAdminClass(MPTTModelAdmin):
 
 ## Filters
 
-If you want to use filters, then you can inherit from FilterableDjangoMpttAdmin:
+If you want to use filters, then you can set the `list_filter` option. See the [Django docs](https://docs.djangoproject.com/en/1.10/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_filter).
 
 ```python
-from django_mptt_admin.admin import FilterableDjangoMpttAdmin
+from django_mptt_admin.admin import DjangoMpttAdmin
 
-class CountryAdmin(FilterableDjangoMpttAdmin):
+class CountryAdmin(DjangoMpttAdmin):
     list_filter = ('continent',)
 ```
 
 Also see the example project for a complete continent filter.
 
 ## Changelog
+
+**development version**
+
+* Issue #185: Support preserved filters (thanks to Riccardo Magliocchetti)
+* Issue #186: Move list_filter option to DjangoMpttAdmin class
 
 **0.4.3** (january 18 2017)
 
