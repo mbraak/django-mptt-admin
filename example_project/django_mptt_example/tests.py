@@ -97,7 +97,7 @@ class DjangoMpttAdminWebTests(WebTest):
         # - get grid page
         grid_page = self.app.get('/django_mptt_example/country/grid/')
 
-        # get row with 'Africa'
+        # get first row
         row_index = 0
 
         first_row = grid_page.pyquery('#result_list tbody tr').eq(row_index)
