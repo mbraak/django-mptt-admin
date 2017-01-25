@@ -292,8 +292,8 @@ class DjangoMpttAdminMixin(object):
                 return False
             else:
                 opts = self.model._meta
-                current_url = '%s:%s' % (match.app_name, match.url_name)
-                grid_url = 'admin:%s_%s_grid' % (opts.app_label, opts.model_name)
+                current_url = '{0!s}:{1!s}'.format(match.app_name, match.url_name)
+                grid_url = 'admin:{0!s}_{1!s}_grid'.format(opts.app_label, opts.model_name)
 
                 return current_url == grid_url
 
