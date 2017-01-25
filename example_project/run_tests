@@ -1,1 +1,1 @@
-python manage.py test django_mptt_example
+PYTHONWARNINGS=default python manage.py test django_mptt_example
