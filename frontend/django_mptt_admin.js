@@ -14,7 +14,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
-        const insert_at_url_for_node = urljoin(insert_at_url, `?insert-at=${node.id}`);
+        const insert_at_url_for_node = urljoin(insert_at_url, `?insert_at=${node.id}`);
 
         $title.after(
             `<a href="${node.url}" class="edit">(${gettext("edit")})</a>`,
