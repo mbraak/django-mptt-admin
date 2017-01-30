@@ -91,7 +91,8 @@ class DjangoMpttAdminMixin(object):
             autoescape=util.get_javascript_value(self.autoescape),
             use_context_menu=util.get_javascript_value(self.use_context_menu),
             jsi18n_url=self.get_admin_url('jsi18n'),
-            preserved_filters=preserved_filters
+            preserved_filters=preserved_filters,
+            csrf_cookie_name=settings.CSRF_COOKIE_NAME
         )
         if extra_context:
             context.update(extra_context)
