@@ -121,9 +121,12 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**0.4.4** (january 30 2017)
+**development version**
 
 * Issue #188: Handle CSRF_COOKIE_NAME option
+
+**0.4.4** (january 30 2017)
+
 * Issue #185: Support preserved filters (thanks to Riccardo Magliocchetti)
 * Issue #186: Move list_filter option to DjangoMpttAdmin class
 
