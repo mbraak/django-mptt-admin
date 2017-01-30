@@ -49,6 +49,8 @@ class DjangoMpttAdminWebTests(WebTest):
         json_url = tree_element.attr('data-url')
         self.assertEqual(json_url, '/django_mptt_example/country/tree_json/')
 
+        self.assertEqual(tree_element.attr('data-csrf-cookie-name'), 'csrftoken')
+
     def test_load_json(self):
         base_url = '/django_mptt_example/country/tree_json/'
 
