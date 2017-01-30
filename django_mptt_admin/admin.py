@@ -81,6 +81,15 @@ class DjangoMpttAdminMixin(object):
                 self.get_admin_url(name)
             )
 
+        def get_csrf_cookie_name():
+            if django.VERSION[0:2] <= (1, 10):
+                return settings.CSRF_COOKIE_NAME
+            else:
+                if settings.CSRF_USE_SESSIONS:
+                    return ''
+                else:
+                    return settings.CSRF_COOKIE_NAME
+
         grid_url = get_admin_url_with_filters('grid')
         tree_json_url = get_admin_url_with_filters('tree_json')
         insert_at_url = get_admin_url_with_preserved_filters('add')
@@ -101,7 +110,7 @@ class DjangoMpttAdminMixin(object):
             use_context_menu=util.get_javascript_value(self.use_context_menu),
             jsi18n_url=self.get_admin_url('jsi18n'),
             preserved_filters=preserved_filters,
-            csrf_cookie_name=settings.CSRF_COOKIE_NAME
+            csrf_cookie_name=get_csrf_cookie_name()
         )
         if extra_context:
             context.update(extra_context)
