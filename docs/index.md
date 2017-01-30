@@ -121,7 +121,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development version**
+**0.4.4** (january 30 2017)
 
 * Issue #185: Support preserved filters (thanks to Riccardo Magliocchetti)
 * Issue #186: Move list_filter option to DjangoMpttAdmin class
