@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from django_mptt_admin.admin import FilterableDjangoMpttAdmin
+from django_mptt_admin.admin import DjangoMpttAdmin
 
 from .models import Country
 
@@ -25,7 +25,7 @@ class ContinentFilter(admin.SimpleListFilter):
             return continent.get_descendants(include_self=True)
 
 
-class CountryAdmin(FilterableDjangoMpttAdmin):
+class CountryAdmin(DjangoMpttAdmin):
     tree_auto_open = 0
     list_display = ('code', 'name')
     ordering = ('name',)

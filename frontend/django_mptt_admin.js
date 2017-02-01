@@ -6,7 +6,7 @@ import cookie from "cookie";
 import urljoin from "url-join";
 
 
-function initTree($tree, autoopen, autoescape, rtl) {
+function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
     let error_node = null;
     const insert_at_url = $tree.data("insert_at_url");
 
@@ -14,7 +14,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
-        const insert_at_url_for_node = urljoin(insert_at_url, `?insert-at=${node.id}`);
+        const insert_at_url_for_node = urljoin(insert_at_url, `?insert_at=${node.id}`);
 
         $title.after(
             `<a href="${node.url}" class="edit">(${gettext("edit")})</a>`,
@@ -39,7 +39,7 @@ function initTree($tree, autoopen, autoescape, rtl) {
             data,
             beforeSend: xhr => {
                 // Set Django csrf token
-                const csrftoken = cookie.parse(document.cookie).csrftoken || document.querySelector('[name="csrfmiddlewaretoken"]').value;
+                const csrftoken = cookie.parse(document.cookie)[csrf_cookie_name] || document.querySelector('[name="csrfmiddlewaretoken"]').value;
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
             },
             success: () => {
@@ -122,6 +122,7 @@ jQuery(() => {
     const autoopen = $tree.data("auto_open");
     const autoescape = $tree.data("autoescape");
     const rtl = $tree.data("rtl") === "1";
+    const csrf_cookie_name = $tree.data("csrf-cookie-name");
 
-    initTree($tree, autoopen, autoescape, rtl);
+    initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name);
 });

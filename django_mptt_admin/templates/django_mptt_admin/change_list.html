@@ -17,6 +17,7 @@
         data-save_state="{{ app_label }}_{{ model_name }}"
         data-auto_open="{{ tree_auto_open }}"
         data-autoescape="{{ autoescape }}"
+        data-csrf-cookie-name="{{ csrf_cookie_name }}"
         {% if LANGUAGE_BIDI %}
             data-rtl
         {% endif %}
