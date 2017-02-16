@@ -119,10 +119,13 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
 
 jQuery(() => {
     const $tree = jQuery("#tree");
-    const autoopen = $tree.data("auto_open");
-    const autoescape = $tree.data("autoescape");
-    const rtl = $tree.data("rtl") === "1";
-    const csrf_cookie_name = $tree.data("csrf-cookie-name");
 
-    initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name);
+    if ($tree.length) {
+      const autoopen = $tree.data("auto_open");
+      const autoescape = $tree.data("autoescape");
+      const rtl = $tree.data("rtl") === "1";
+      const csrf_cookie_name = $tree.data("csrf-cookie-name");
+
+      initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name);
+    }
 });
