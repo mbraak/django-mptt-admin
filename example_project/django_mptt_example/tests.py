@@ -25,6 +25,10 @@ def read_testdata():
             obj.save()
 
 
+SCRIPT_JS_NAMESPACE = 'script[src="/static/django_mptt_admin/jquery_namespace.js"]'
+SCRIPT_JS_DJANGO_MPTT_ADMIN = 'script[src="/static/django_mptt_admin/django_mptt_admin.js"]'
+
+
 class DjangoMpttAdminWebTests(WebTest):
     def setUp(self):
         super(DjangoMpttAdminWebTests, self).setUp()
@@ -50,6 +54,10 @@ class DjangoMpttAdminWebTests(WebTest):
         self.assertEqual(json_url, '/django_mptt_example/country/tree_json/')
 
         self.assertEqual(tree_element.attr('data-csrf-cookie-name'), 'csrftoken')
+
+        # check that js is included
+        self.assertEqual(len(countries_page.pyquery(SCRIPT_JS_NAMESPACE)), 1)
+        self.assertEqual(len(countries_page.pyquery(SCRIPT_JS_DJANGO_MPTT_ADMIN)), 1)
 
     def test_load_json(self):
         base_url = '/django_mptt_example/country/tree_json/'
@@ -119,6 +127,10 @@ class DjangoMpttAdminWebTests(WebTest):
             change_url = '/django_mptt_example/country/{0:d}/'.format(afghanistan_id)
 
         self.assertEqual(first_row.find('a').attr('href'), change_url)
+
+        # check that js is not included
+        self.assertEqual(len(grid_page.pyquery(SCRIPT_JS_NAMESPACE)), 0)
+        self.assertEqual(len(grid_page.pyquery(SCRIPT_JS_DJANGO_MPTT_ADMIN)), 0)
 
     def test_move_view(self):
         def get_continents():
