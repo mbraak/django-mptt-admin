@@ -99,7 +99,7 @@ class DjangoMpttAdminMixin(object):
             app_label=self.model._meta.app_label,
             model_name=util.get_model_name(self.model),
             cl=change_list,
-            media=self.media,
+            media=self.get_tree_media(),
             has_add_permission=self.has_add_permission(request),
             opts=change_list.opts,
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
@@ -159,8 +159,7 @@ class DjangoMpttAdminMixin(object):
            create_js_catalog_url()
        ] + super(DjangoMpttAdminMixin, self).get_urls()
 
-    @property
-    def media(self):
+    def get_tree_media(self):
         media = super(DjangoMpttAdminMixin, self).media
 
         media.add_js([
