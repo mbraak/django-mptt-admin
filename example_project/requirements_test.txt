@@ -2,7 +2,7 @@ pathlib==1.0.1
 django-mptt==0.8.7
 
 # django-webtest
-django-webtest==1.8.0
+django-webtest==1.9.1
 beautifulsoup4==4.5.3
 cssselect==1.0.1
 lxml==3.7.3
