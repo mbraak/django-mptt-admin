@@ -142,7 +142,7 @@ class DjangoMpttAdminWebTests(WebTest):
 
             response = self.app.post(
                 '/django_mptt_example/country/{0:d}/move/'.format(source_id),
-                dict(
+                params=dict(
                     csrfmiddlewaretoken=csrf_token,
                     target_id=target_id,
                     position=position,
