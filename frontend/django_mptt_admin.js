@@ -22,6 +22,23 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
         );
     }
 
+    function getCsrfToken() {
+      function getFromMiddleware() {
+        return document.querySelector('[name="csrfmiddlewaretoken"]').value;
+      }
+
+      function getFromCookie() {
+        if (!csrf_cookie_name) {
+          return null;
+        }
+        else {
+          return cookie.parse(document.cookie)[csrf_cookie_name];
+        }
+      }
+
+      return getFromCookie() || getFromMiddleware();
+    }
+
     function handleMove(e) {
         const info = e.move_info;
         const data = {
@@ -39,8 +56,7 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
             data,
             beforeSend: xhr => {
                 // Set Django csrf token
-                const csrftoken = cookie.parse(document.cookie)[csrf_cookie_name] || document.querySelector('[name="csrfmiddlewaretoken"]').value;
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
             },
             success: () => {
                 info.do_move();

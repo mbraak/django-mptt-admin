@@ -1,5 +1,6 @@
 from functools import update_wrapper
 
+import django
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -18,6 +19,14 @@ try:
     from django.urls import reverse
 except ImportError:
     from django.core.urlresolvers import reverse
+
+if django.VERSION[0:2] >= (1, 10):
+    from django.views.i18n import JavaScriptCatalog
+else:
+    if settings.USE_I18N:
+        from django.views.i18n import javascript_catalog
+    else:
+        from django.views.i18n import null_javascript_catalog as javascript_catalog
 
 from mptt.admin import MPTTModelAdmin
 
@@ -72,6 +81,15 @@ class DjangoMpttAdminMixin(object):
                 self.get_admin_url(name)
             )
 
+        def get_csrf_cookie_name():
+            if django.VERSION[0:2] <= (1, 10):
+                return settings.CSRF_COOKIE_NAME
+            else:
+                if settings.CSRF_USE_SESSIONS:
+                    return ''
+                else:
+                    return settings.CSRF_COOKIE_NAME
+
         grid_url = get_admin_url_with_filters('grid')
         tree_json_url = get_admin_url_with_filters('tree_json')
         insert_at_url = get_admin_url_with_preserved_filters('add')
@@ -92,7 +110,7 @@ class DjangoMpttAdminMixin(object):
             use_context_menu=util.get_javascript_value(self.use_context_menu),
             jsi18n_url=self.get_admin_url('jsi18n'),
             preserved_filters=preserved_filters,
-            csrf_cookie_name=settings.CSRF_COOKIE_NAME
+            csrf_cookie_name=get_csrf_cookie_name()
         )
         if extra_context:
             context.update(extra_context)
@@ -112,10 +130,11 @@ class DjangoMpttAdminMixin(object):
 
             return update_wrapper(wrapper, view)
 
-        def create_url(regex, url_name, view, cacheable=False):
+        def create_url(regex, url_name, view, kwargs=None, cacheable=False):
             return url(
                 regex,
                 wrap(view, cacheable),
+                kwargs=kwargs,
                 name='{0!s}_{1!s}_{2!s}'.format(
                     self.model._meta.app_label,
                     util.get_model_name(self.model),
@@ -123,12 +142,21 @@ class DjangoMpttAdminMixin(object):
                 )
             )
 
+        def create_js_catalog_url():
+            packages = ['django_mptt_admin']
+            url_pattern = r'^jsi18n/$'
+
+            if django.VERSION[0:2] <= (1, 9):
+                return create_url(url_pattern, 'jsi18n', javascript_catalog, kwargs=dict(packages=packages), cacheable=True)
+            else:
+                return create_url(url_pattern, 'jsi18n', JavaScriptCatalog.as_view(packages=packages), cacheable=True)
+
         # prepend new urls to existing urls
         return [
            create_url(r'^(.+)/move/$', 'move', self.move_view),
            create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
            create_url(r'^grid/$', 'grid', self.grid_view),
-           create_url(r'^jsi18n/$', 'jsi18n', self.i18n_javascript, cacheable=True)
+           create_js_catalog_url()
        ] + super(DjangoMpttAdminMixin, self).get_urls()
 
     def get_tree_media(self):
@@ -309,14 +337,6 @@ class DjangoMpttAdminMixin(object):
 
     def get_insert_at_field(self):
         return 'parent'
-
-    def i18n_javascript(self, request):
-        if settings.USE_I18N:
-            from django.views.i18n import javascript_catalog
-        else:
-            from django.views.i18n import null_javascript_catalog as javascript_catalog
-
-        return javascript_catalog(request, packages=['django_mptt_admin'])
 
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, MPTTModelAdmin):

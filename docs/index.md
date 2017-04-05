@@ -124,6 +124,7 @@ Also see the example project for a complete continent filter.
 **development version**
 
 * Issue #188: Handle CSRF_COOKIE_NAME option
+* Issue #189: Handle Django CSRF_USE_SESSIONS option (new option in Django 1.11)
 * Issue #191: Only initialize the tree on the tree page (thanks to Stanislav Zholudev)
 
 **0.4.4** (january 30 2017)
