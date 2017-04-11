@@ -9,7 +9,7 @@
 
 ## Requirements
 
-The package is tested with Django (1.8 - 1.10), and django-mptt (0.7.x and higher). Also with Python 2.7, 3.3-3.6.
+The package is tested with Django (1.8 - 1.11), and django-mptt (0.7.x and higher). Also with Python 2.7, 3.3-3.6.
 
 Note that version 0.3.8 also supports Django 1.7.
 
@@ -121,11 +121,12 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development version**
+**0.4.5 ** (april 5 2017)
 
 * Issue #188: Handle CSRF_COOKIE_NAME option
 * Issue #189: Handle Django CSRF_USE_SESSIONS option (new option in Django 1.11)
 * Issue #191: Only initialize the tree on the tree page (thanks to Stanislav Zholudev)
+* Issue #197: Support Django 1.11
 
 **0.4.4** (january 30 2017)
 
