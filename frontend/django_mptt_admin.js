@@ -17,8 +17,8 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
         const insert_at_url_for_node = urljoin(insert_at_url, `?insert_at=${node.id}`);
 
         $title.after(
-            `<a href="${node.url}" class="edit">(${gettext("edit")})</a>`,
-            `<a href="${insert_at_url_for_node}" class="edit">(${gettext("add")})</a>`
+            `<a href="${node.url}" class="edit" tabindex="-1">(${gettext("edit")})</a>`,
+            `<a href="${insert_at_url_for_node}" class="edit" tabindex="-1">(${gettext("add")})</a>`
         );
     }
 
