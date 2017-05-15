@@ -121,7 +121,12 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**0.4.5 ** (april 5 2017)
+**development version**
+
+* Issue #200: Upgrade to jqtree 1.4.0
+* Issue #201: Make 'edit' and 'add' buttons not focusable
+
+**0.4.5** (april 5 2017)
 
 * Issue #188: Handle CSRF_COOKIE_NAME option
 * Issue #189: Handle Django CSRF_USE_SESSIONS option (new option in Django 1.11)
