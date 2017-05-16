@@ -130,7 +130,7 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
         onLoading: handleLoading
     });
 
-    $tree.bind("tree.move", handleMove);
+    $tree.on("tree.move", handleMove);
 }
 
 jQuery(() => {
