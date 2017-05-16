@@ -117,6 +117,20 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
         }
     }
 
+    function handleSelect(e) {
+        const { node, deselected_node } = e;
+
+        if (deselected_node) {
+            // deselected node: remove tabindex
+            jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
+        }
+
+        if (node) {
+            // selected: add tabindex
+            jQuery(node.element).find(".edit").attr("tabindex", 0);
+        }
+    }
+
     $tree.tree({
         autoOpen: autoopen,
         autoEscape: autoescape,
@@ -131,6 +145,7 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
     });
 
     $tree.on("tree.move", handleMove);
+    $tree.on("tree.select", handleSelect);
 }
 
 jQuery(() => {
