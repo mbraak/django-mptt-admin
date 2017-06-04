@@ -3,22 +3,25 @@
 import "jqtree";
 import Spinner from "spin";
 import cookie from "cookie";
-import urljoin from "url-join";
+import URL from "url-parse";
+import qs from "querystringify";
 
 
 function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
     let error_node = null;
-    const insert_at_url = $tree.data("insert_at_url");
+    const insert_at_url = new URL($tree.data("insert_at_url"), true);
 
     function createLi(node, $li) {
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
-        const insert_at_url_for_node = urljoin(insert_at_url, `?insert_at=${node.id}`);
+        insert_at_url.query.insert_at = `${node.id}`;
+
+        const insert_url_string = urlToString(insert_at_url);
 
         $title.after(
             `<a href="${node.url}" class="edit" tabindex="-1">(${gettext("edit")})</a>`,
-            `<a href="${insert_at_url_for_node}" class="edit" tabindex="-1">(${gettext("add")})</a>`
+            `<a href="${insert_url_string}" class="edit" tabindex="-1">(${gettext("add")})</a>`
         );
     }
 
@@ -146,6 +149,26 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
 
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
+}
+
+function addQueryParam(path, key, value) {
+    const url = new URL(path, true);
+
+    url.query[key] = value;
+
+    return urlToString(url);
+}
+
+function urlToString(url) {
+    const querystring = qs.stringify(url.query);
+    const pathname = url.pathname;
+
+    if (!querystring) {
+        return pathname;
+    }
+    else {
+        return `${pathname}?${querystring}`;
+    }
 }
 
 jQuery(() => {
