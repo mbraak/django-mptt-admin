@@ -151,14 +151,6 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
     $tree.on("tree.select", handleSelect);
 }
 
-function addQueryParam(path, key, value) {
-    const url = new URL(path, true);
-
-    url.query[key] = value;
-
-    return urlToString(url);
-}
-
 function urlToString(url) {
     const querystring = qs.stringify(url.query);
     const pathname = url.pathname;
