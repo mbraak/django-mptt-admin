@@ -23,21 +23,22 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
     "eslint": "^3.19.0",
-    "eslint-config-airbnb": "^14.1.0",
+    "eslint-config-airbnb": "^15.0.1",
     "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^4.0.0",
-    "eslint-plugin-react": "^6.10.3",
+    "eslint-plugin-jsx-a11y": "^5.0.1",
+    "eslint-plugin-react": "^7.0.1",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-browser": "^3.0.4",
     "gulp-header": "^1.8.8",
     "gulp-sass": "^3.1.0",
-    "gulp-uglify": "^2.1.2"
+    "gulp-uglify": "^3.0.0"
   },
   "dependencies": {
     "cookie": "^0.3.1",
     "jqtree": "^1.4.0",
+    "querystringify": "^1.0.0",
     "spin": "0.0.1",
-    "url-join": "^2.0.0"
+    "url-parse": "^1.1.9"
   }
 }

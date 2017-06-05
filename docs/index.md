@@ -9,7 +9,7 @@
 
 ## Requirements
 
-The package is tested with Django (1.8 - 1.11), and django-mptt (0.7.x and higher). Also with Python 2.7, 3.3-3.6.
+The package is tested with Django (1.8 - 1.11), and django-mptt (0.8.x). Also with Python 2.7, 3.3-3.6.
 
 Note that version 0.3.8 also supports Django 1.7.
 
@@ -125,6 +125,7 @@ Also see the example project for a complete continent filter.
 
 * Issue #200: Upgrade to jqtree 1.4.0
 * Issue #201: Make 'edit' and 'add' buttons not focusable
+* Issue #203: 'Add' url path must end with '/'
 
 **0.4.5** (april 5 2017)
 

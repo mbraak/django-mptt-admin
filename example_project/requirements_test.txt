@@ -2,8 +2,8 @@ pathlib==1.0.1
 https://github.com/mbraak/django-mptt/archive/master.zip
 
 # django-webtest
-django-webtest==1.9.1
-beautifulsoup4==4.5.3
+django-webtest==1.9.2
+beautifulsoup4==4.6.0
 cssselect==1.0.1
 lxml==3.7.3
 pyquery==1.2.17
