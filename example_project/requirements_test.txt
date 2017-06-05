@@ -1,5 +1,5 @@
 pathlib==1.0.1
-https://github.com/mbraak/django-mptt/archive/master.zip
+https://github.com/django-mptt/django-mptt/archive/master.zip
 
 # django-webtest
 django-webtest==1.9.2
