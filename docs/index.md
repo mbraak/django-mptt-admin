@@ -121,9 +121,9 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development version**
+**0.4.6** (june 7 2017)
 
-* Issue #200: Upgrade to jqtree 1.4.0
+* Issue #200: Upgrade to jqtree 1.4.1
 * Issue #201: Make 'edit' and 'add' buttons not focusable
 * Issue #203: 'Add' url path must end with '/'
 
