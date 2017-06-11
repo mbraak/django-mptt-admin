@@ -11,7 +11,7 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
     let error_node = null;
     const insert_at_url = new URL($tree.data("insert_at_url"), true);
 
-    function createLi(node, $li) {
+    function createLi(node, $li, is_selected) {
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
@@ -19,9 +19,11 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
 
         const insert_url_string = urlToString(insert_at_url);
 
+        const tabindex = is_selected ? "0" : "-1";
+
         $title.after(
-            `<a href="${node.url}" class="edit" tabindex="-1">(${gettext("edit")})</a>`,
-            `<a href="${insert_url_string}" class="edit" tabindex="-1">(${gettext("add")})</a>`
+            `<a href="${node.url}" class="edit" tabindex="${tabindex}">(${gettext("edit")})</a>`,
+            `<a href="${insert_url_string}" class="edit" tabindex="${tabindex}">(${gettext("add")})</a>`
         );
     }
 
