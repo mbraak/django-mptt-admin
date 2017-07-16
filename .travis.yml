@@ -8,7 +8,7 @@ env:
   - DJANGO="Django==1.8.18"
   - DJANGO="Django==1.9.13"
   - DJANGO="Django==1.10.7"
-  - DJANGO="Django==1.11.2"
+  - DJANGO="Django==1.11.3"
   - DJANGO="https://github.com/django/django/archive/master.zip"
 install:
   - pip install $DJANGO
