@@ -14,6 +14,7 @@ from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.db import transaction
 from django.utils.http import urlencode
+from django.forms import Media
 
 try:
     from django.urls import reverse
@@ -160,22 +161,21 @@ class DjangoMpttAdminMixin(object):
        ] + super(DjangoMpttAdminMixin, self).get_urls()
 
     def get_tree_media(self):
-        media = super(DjangoMpttAdminMixin, self).media
+        admin_media = super(DjangoMpttAdminMixin, self).media
 
-        media.add_js([
+        js = [
             static('django_mptt_admin/jquery_namespace.js'),
             static('django_mptt_admin/django_mptt_admin.js'),
-        ])
-
-        media.add_css(
-            dict(
-                all=(
-                    static('django_mptt_admin/django_mptt_admin.css'),
-                )
+        ]
+        css = dict(
+            all=(
+                static('django_mptt_admin/django_mptt_admin.css'),
             )
         )
 
-        return media
+        tree_media = Media(js=js, css=css)
+
+        return admin_media + tree_media
 
     @csrf_protect_m
     @transaction.atomic()
