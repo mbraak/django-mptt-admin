@@ -13,5 +13,3 @@ Django Mptt Admin
 * Documentation is available on [https://pythonhosted.org/django-mptt-admin/](https://pythonhosted.org/django-mptt-admin/).
 
 ![Screenshot](https://raw.github.com/mbraak/django-mptt-admin/master/screenshot.png)
-
-[![Code Issues](https://www.quantifiedcode.com/api/v1/project/dd888e7a1804465798821f28717af384/badge.svg)](https://www.quantifiedcode.com/app/project/dd888e7a1804465798821f28717af384)
