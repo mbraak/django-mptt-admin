@@ -105,6 +105,8 @@ class DjangoMpttAdminMixin(object):
     # list and tree filter
     list_filter = ()
 
+    change_list_tree_class = TreeChangeList
+
     @csrf_protect_m
     def changelist_view(self, request, extra_context=None):
         request.current_app = self.admin_site.name
@@ -266,7 +268,7 @@ class DjangoMpttAdminMixin(object):
     def get_change_list_for_tree(self, request, node_id=None, max_level=None):
         request.current_app = self.admin_site.name
 
-        return TreeChangeList(
+        return self.change_list_tree_class(
             request=request,
             model=self.model,
             model_admin=self,
