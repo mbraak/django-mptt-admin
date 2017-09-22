@@ -121,6 +121,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development version**
+
+* Issue #211: Make ChangeList configurable using `change_list_tree_class` (thanks to Riccardo Magliocchetti)
+
 **0.4.6** (june 7 2017)
 
 * Issue #200: Upgrade to jqtree 1.4.1
