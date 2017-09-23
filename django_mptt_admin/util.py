@@ -59,8 +59,10 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_l
             # Add node to the tree
             tree.append(node_info)
         else:
-            # NB: Use parent.pk instead of parent_id for consistent values for uuid
-            parent_id = getattr(instance.parent, pk_attname)
+            # NB: use instance's local value for parent attribute - consistent values for uuid
+            parent_field = instance._meta.get_field(instance._mptt_meta.parent_attr)
+            parent_attname = parent_field.get_attname()
+            parent_id = getattr(instance, parent_attname)
 
             # Get parent from node dict
             parent_info = node_dict.get(parent_id)
