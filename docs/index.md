@@ -121,7 +121,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development version**
+**0.4.7** (september 29 2017)
 
 * Issue #212: Fix unsafe reference to instance.parent (thanks to John D'Ambrosio)
 * Issue #211: Make ChangeList configurable using `change_list_tree_class` (thanks to Riccardo Magliocchetti)
