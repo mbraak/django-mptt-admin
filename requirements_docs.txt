@@ -1,4 +1,4 @@
-mkdocs==0.17.1
+mkdocs==0.17.2
 click==6.7
 tornado==4.5.2
 Jinja2==2.10
