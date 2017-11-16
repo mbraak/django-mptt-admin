@@ -154,8 +154,8 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
 }
 
 function urlToString(url) {
-    const querystring = qs.stringify(url.query);
-    const pathname = url.pathname;
+    const { pathname, query } = url;
+    const querystring = qs.stringify(query);
 
     if (!querystring) {
         return pathname;
