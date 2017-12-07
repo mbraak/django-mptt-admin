@@ -9,6 +9,7 @@ env:
   - DJANGO="Django==1.9.13"
   - DJANGO="Django==1.10.8"
   - DJANGO="Django==1.11.7"
+  - DJANGO="https://www.djangoproject.com/download/2.0rc1/tarball/"
 install:
   - pip install $DJANGO
   - pip install -r example_project/requirements.txt
@@ -21,3 +22,7 @@ script:
   - coverage report
 after_success:
   - coveralls
+matrix:
+  exclude:
+  - python: 2.7
+    env: DJANGO="https://www.djangoproject.com/download/2.0rc1/tarball/"
