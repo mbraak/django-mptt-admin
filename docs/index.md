@@ -121,6 +121,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+* Issue #220: upgrade jqTree to 1.4.4
+
 **0.5.0** (december 7 2017)
 
 * Issue #217: Support Django 2.0
