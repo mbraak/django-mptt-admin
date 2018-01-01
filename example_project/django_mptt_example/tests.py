@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.admin.options import IS_POPUP_VAR
@@ -8,6 +9,7 @@ from django.core import serializers
 import django
 
 from django_webtest import WebTest
+from selenium.webdriver.phantomjs.webdriver import WebDriver
 
 from django_mptt_admin.util import get_tree_queryset, get_javascript_value
 
@@ -329,3 +331,62 @@ class DjangoMpttAdminTestCase(TestCase):
         self.assertEqual(get_javascript_value(True), 'true')
         self.assertEqual(get_javascript_value(False), 'false')
         self.assertEqual(get_javascript_value(10), '10')
+
+
+class DjangoMpttAdminLiveTestCase(StaticLiveServerTestCase):
+    USERNAME = 'admin'
+    PASSWORD = 'p'
+
+    @classmethod
+    def setUpClass(cls):
+        super(DjangoMpttAdminLiveTestCase, cls).setUpClass()
+
+        cls.selenium = WebDriver()
+        cls.selenium.implicitly_wait(10)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super(DjangoMpttAdminLiveTestCase, cls).tearDownClass()
+
+    def login(self):
+        selenium = self.selenium
+
+        selenium.get('%s%s' % (self.live_server_url, '/login/'))
+
+        selenium.find_element_by_name('username').send_keys(self.USERNAME)
+        selenium.find_element_by_name('password').send_keys(self.PASSWORD)
+        selenium.find_element_by_xpath('//input[@value="Log in"]').click()
+
+    def visit_countries_page(self):
+        selenium = self.selenium
+
+        selenium.get(self.live_server_url)
+        selenium.find_element_by_link_text('Countries').click()
+
+    def setUp(self):
+        super(DjangoMpttAdminLiveTestCase, self).setUp()
+
+        User.objects.create_superuser(self.USERNAME, 'admin@admin.com', self.PASSWORD)
+
+        read_testdata()
+
+        self.login()
+        self.visit_countries_page()
+
+    def test_show_tree(self):
+        selenium = self.selenium
+
+        self.assertEqual(
+            len(selenium.find_elements_by_class_name('jqtree-title')),
+            8
+        )
+
+    def test_select_node(self):
+        selenium = self.selenium
+
+        selenium.find_element_by_xpath("//span[contains(text(), 'Europe')]").click()
+
+        self.assertTrue(
+            selenium.find_element_by_class_name('jqtree-selected').text.startswith('Europe'),
+        )
