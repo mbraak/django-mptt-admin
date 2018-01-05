@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-from selenium.webdriver.phantomjs.webdriver import WebDriver
+from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium.webdriver.firefox.options import Options
 
 from .utils import read_testdata
 
@@ -10,11 +11,16 @@ class LiveTestCase(StaticLiveServerTestCase):
     USERNAME = 'admin'
     PASSWORD = 'p'
 
+    selenium = None
+
     @classmethod
     def setUpClass(cls):
         super(LiveTestCase, cls).setUpClass()
 
-        cls.selenium = WebDriver()
+        options = Options()
+        options.set_headless()
+
+        cls.selenium = WebDriver(options=options)
         cls.selenium.implicitly_wait(10)
 
     @classmethod
