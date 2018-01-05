@@ -4,8 +4,9 @@
   "description": "Frontend code for django-mptt-admin",
   "main": "index.js",
   "scripts": {
-    "build": "gulp",
-    "watch": "gulp watch",
+    "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack",
+    "sass": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/",
+    "webpack": "webpack",
     "test": "eslint django_mptt_admin.js"
   },
   "repository": {
@@ -20,24 +21,22 @@
   "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.2",
+    "babel-eslint": "^8.1.2",
+    "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.24.1",
-    "eslint": "^4.12.0",
+    "eslint": "^4.14.0",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.5.1",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.0",
-    "gulp-browser": "^3.0.4",
-    "gulp-header": "^1.8.8",
-    "gulp-sass": "^3.1.0",
-    "gulp-uglify": "^3.0.0"
+    "node-sass": "^4.7.2",
+    "uglifyjs-webpack-plugin": "^1.1.5",
+    "webpack": "^3.10.0"
   },
   "dependencies": {
     "cookie": "^0.3.1",
-    "jqtree": "^1.4.3",
+    "jqtree": "^1.4.4",
     "querystringify": "^1.0.0",
     "spin": "0.0.1",
     "url-parse": "^1.2.0"

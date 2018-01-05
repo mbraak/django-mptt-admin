@@ -1,28 +1,11 @@
-# coding=utf-8
-import os
-
-from django.test import TestCase
-from django.contrib.auth.models import User
 from django.contrib.admin.options import IS_POPUP_VAR
-from django.core import serializers
-import django
+from django.contrib.auth.models import User
 
 from django_webtest import WebTest
 
-from django_mptt_admin.util import get_tree_queryset, get_javascript_value
+from ..models import Country
 
-from .models import Country
-
-
-short_django_version = django.VERSION[0:2]
-
-
-def read_testdata():
-    fixture_filename = os.path.join(os.path.dirname(__file__), 'testdata/countries.json')
-
-    with open(fixture_filename) as f:
-        for obj in serializers.deserialize("json", f.read()):
-            obj.save()
+from .utils import read_testdata, short_django_version
 
 
 SCRIPT_JS_NAMESPACE = 'script[src="/static/django_mptt_admin/jquery_namespace.js"]'
@@ -292,40 +275,3 @@ class DjangoMpttAdminWebTests(WebTest):
             object_tool_buttons.eq(1).attr('href'),
             '/django_mptt_example/country/?continent=Europe'
         )
-
-
-class DjangoMpttAdminTestCase(TestCase):
-    def setUp(self):
-        super(DjangoMpttAdminTestCase, self).setUp()
-
-        read_testdata()
-
-    def test_get_tree_queryset(self):
-        # get default queryset
-        qs = get_tree_queryset(Country)
-        self.assertEqual(len(qs), 257)
-        self.assertEqual(qs[0].name, 'root')
-
-        # subtree
-        qs = get_tree_queryset(Country, node_id=Country.objects.get(name='Europe').id)
-        self.assertEqual(len(qs), 50)
-        self.assertEqual(qs[0].name, u'Åland Islands')
-
-        # max_level 1
-        qs = get_tree_queryset(Country, max_level=1)
-        self.assertEqual(len(qs), 8)
-        self.assertEqual(qs[0].name, 'root')
-
-        # max_level True
-        qs = get_tree_queryset(Country, max_level=True)
-        self.assertEqual(len(qs), 8)
-
-        # exclude root
-        qs = get_tree_queryset(Country, include_root=False)
-        self.assertEqual(len(qs), 256)
-        self.assertEqual(qs[0].name, 'Africa')
-
-    def test_get_javascript_value(self):
-        self.assertEqual(get_javascript_value(True), 'true')
-        self.assertEqual(get_javascript_value(False), 'false')
-        self.assertEqual(get_javascript_value(10), '10')
