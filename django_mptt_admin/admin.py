@@ -1,6 +1,5 @@
 from functools import update_wrapper
 
-import django
 from django.conf import settings
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -15,19 +14,8 @@ from django.contrib.admin.options import IS_POPUP_VAR
 from django.db import transaction
 from django.utils.http import urlencode
 from django.forms import Media
-
-try:
-    from django.urls import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
-
-if django.VERSION[0:2] >= (1, 10):
-    from django.views.i18n import JavaScriptCatalog
-else:
-    if settings.USE_I18N:
-        from django.views.i18n import javascript_catalog
-    else:
-        from django.views.i18n import null_javascript_catalog as javascript_catalog
+from django.urls import reverse
+from django.views.i18n import JavaScriptCatalog
 
 from mptt.admin import MPTTModelAdmin
 
@@ -136,13 +124,10 @@ class DjangoMpttAdminMixin(object):
             )
 
         def get_csrf_cookie_name():
-            if django.VERSION[0:2] <= (1, 10):
-                return settings.CSRF_COOKIE_NAME
+            if settings.CSRF_USE_SESSIONS:
+                return ''
             else:
-                if settings.CSRF_USE_SESSIONS:
-                    return ''
-                else:
-                    return settings.CSRF_COOKIE_NAME
+                return settings.CSRF_COOKIE_NAME
 
         grid_url = get_admin_url_with_filters('grid')
         tree_json_url = get_admin_url_with_filters('tree_json')
@@ -200,10 +185,7 @@ class DjangoMpttAdminMixin(object):
             packages = ['django_mptt_admin']
             url_pattern = r'^jsi18n/$'
 
-            if django.VERSION[0:2] <= (1, 9):
-                return create_url(url_pattern, 'jsi18n', javascript_catalog, kwargs=dict(packages=packages), cacheable=True)
-            else:
-                return create_url(url_pattern, 'jsi18n', JavaScriptCatalog.as_view(packages=packages), cacheable=True)
+            return create_url(url_pattern, 'jsi18n', JavaScriptCatalog.as_view(packages=packages), cacheable=True)
 
         # prepend new urls to existing urls
         return [

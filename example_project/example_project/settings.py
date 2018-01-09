@@ -52,9 +52,6 @@ MIDDLEWARE = [
 if django.VERSION[0:2] < (2, 0):
     MIDDLEWARE.append('django.contrib.auth.middleware.SessionAuthenticationMiddleware')
 
-if django.VERSION[0:2] <= (1, 9):
-    MIDDLEWARE_CLASSES = MIDDLEWARE
-
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'example_project.urls'
 

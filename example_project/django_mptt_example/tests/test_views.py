@@ -5,7 +5,7 @@ from django_webtest import WebTest
 
 from ..models import Country
 
-from .utils import read_testdata, short_django_version
+from .utils import read_testdata
 
 
 SCRIPT_JS_NAMESPACE = 'script[src="/static/django_mptt_admin/jquery_namespace.js"]'
@@ -58,10 +58,7 @@ class DjangoMpttAdminWebTests(WebTest):
 
         africa = root['children'][0]
 
-        if short_django_version >= (1, 9):
-            change_url = '/django_mptt_example/country/{0:d}/change/'.format(africa_id)
-        else:
-            change_url = '/django_mptt_example/country/{0:d}/'.format(africa_id)
+        change_url = '/django_mptt_example/country/{0:d}/change/'.format(africa_id)
 
         self.assertEqual(
             africa,
@@ -104,10 +101,7 @@ class DjangoMpttAdminWebTests(WebTest):
         # link to edit page
         afghanistan_id = Country.objects.get(name='Afghanistan').id
 
-        if short_django_version >= (1, 9):
-            change_url = '/django_mptt_example/country/{0:d}/change/'.format(afghanistan_id)
-        else:
-            change_url = '/django_mptt_example/country/{0:d}/'.format(afghanistan_id)
+        change_url = '/django_mptt_example/country/{0:d}/change/'.format(afghanistan_id)
 
         self.assertEqual(first_row.find('a').attr('href'), change_url)
 
@@ -237,16 +231,10 @@ class DjangoMpttAdminWebTests(WebTest):
 
         country_node = root['children'][0]
 
-        if short_django_version >= (1, 9):
-            self.assertEqual(
-                country_node['url'],
-                "/django_mptt_example/country/{0!s}/change/?_changelist_filters=continent%3DEurope".format(country_node['id'])
-            )
-        else:
-            self.assertEqual(
-                country_node['url'],
-                "/django_mptt_example/country/{0!s}/?_changelist_filters=continent%3DEurope".format(country_node['id'])
-            )
+        self.assertEqual(
+            country_node['url'],
+            "/django_mptt_example/country/{0!s}/change/?_changelist_filters=continent%3DEurope".format(country_node['id'])
+        )
 
         # check urls
         object_tool_buttons = countries_page.pyquery('.object-tools a')
