@@ -4,14 +4,11 @@ addons:
   firefox: latest
 python:
   - 2.7
-  - 3.5
   - 3.6
 env:
-  - DJANGO="Django==1.8.19" MOZ_HEADLESS=1
-  - DJANGO="Django==1.9.13" MOZ_HEADLESS=1
-  - DJANGO="Django==1.10.8" MOZ_HEADLESS=1
   - DJANGO="Django==1.11.14" MOZ_HEADLESS=1
   - DJANGO="Django==2.0.7" MOZ_HEADLESS=1
+  - DJANGO="https://github.com/django/django/archive/master.tar.gz" MOZ_HEADLESS=1
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz
   - mkdir geckodriver
@@ -33,3 +30,5 @@ matrix:
   exclude:
   - python: 2.7
     env: DJANGO="Django==2.0.7" MOZ_HEADLESS=1
+  - python: 2.7
+    env: DJANGO="https://github.com/django/django/archive/master.tar.gz" MOZ_HEADLESS=1
