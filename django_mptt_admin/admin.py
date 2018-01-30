@@ -1,7 +1,7 @@
 from functools import update_wrapper
 
 from django.conf import settings
-from django.contrib.admin.templatetags.admin_static import static
+from django.templatetags.static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import JsonResponse
