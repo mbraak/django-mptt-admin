@@ -16,6 +16,7 @@ from django.utils.http import urlencode
 from django.forms import Media
 from django.urls import reverse
 from django.views.i18n import JavaScriptCatalog
+import django
 
 from mptt.admin import MPTTModelAdmin
 
@@ -29,7 +30,7 @@ class TreeChangeList(ChangeList):
         self.node_id = node_id
         self.max_level = max_level
 
-        super(TreeChangeList, self).__init__(
+        params = dict(
             request=request,
             model=model,
             list_filter=list_filter,
@@ -43,6 +44,11 @@ class TreeChangeList(ChangeList):
             list_editable=(),
             list_max_show_all=200,
         )
+
+        if django.VERSION[0:2] >= (2, 1):
+            params['sortable_by'] = []
+
+        super(TreeChangeList, self).__init__(**params)
 
     def get_filters_params(self, params=None):
         if not params:
