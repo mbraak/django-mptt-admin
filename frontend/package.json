@@ -4,9 +4,9 @@
   "description": "Frontend code for django-mptt-admin",
   "main": "index.js",
   "scripts": {
-    "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack",
+    "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack --mode production",
     "sass": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/",
-    "webpack": "webpack",
+    "webpack": "webpack --mode production",
     "lint": "eslint django_mptt_admin.js"
   },
   "repository": {
@@ -22,17 +22,18 @@
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
-    "babel-loader": "^7.1.2",
+    "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.24.1",
-    "eslint": "^4.18.1",
+    "eslint": "^4.18.2",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
     "node-sass": "^4.7.2",
-    "uglifyjs-webpack-plugin": "^1.2.2",
-    "webpack": "^3.11.0"
+    "uglifyjs-webpack-plugin": "^1.2.3",
+    "webpack": "^4.1.0",
+    "webpack-cli": "^2.0.12"
   },
   "dependencies": {
     "cookie": "^0.3.1",
