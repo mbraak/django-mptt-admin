@@ -50,6 +50,9 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
             target_id: info.target_node.id,
             position: info.position
         };
+        const $el = jQuery(info.moved_node.element);
+
+        handleLoading(true, null, $el);
 
         removeErrorMessage();
 
@@ -65,9 +68,11 @@ function initTree($tree, autoopen, autoescape, rtl, csrf_cookie_name) {
             },
             success: () => {
                 info.do_move();
+                handleLoading(false, null, $el);
             },
             error: () => {
-                const $node = jQuery(info.moved_node.element).find(".jqtree-element");
+                handleLoading(false, null, $el);
+                const $node = $el.find(".jqtree-element");
                 $node.append(`<span class="mptt-admin-error">${gettext("move failed")}</span>`);
 
                 error_node = info.moved_node;
