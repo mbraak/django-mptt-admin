@@ -123,7 +123,8 @@ Also see the example project for a complete continent filter.
 
 **development**
 
-* Issue #220: upgrade jqTree to 1.4.4
+* Issue #220: upgrade jqTree to 1.4.5
+* Issue #224: add a spinner for the move action (thanks to Riccardo Magliocchetti) 
 
 **0.5.0** (december 7 2017)
 
