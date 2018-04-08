@@ -121,10 +121,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**0.5.1** (april 8 2018)
 
 * Issue #220: upgrade jqTree to 1.4.5
-* Issue #224: add a spinner for the move action (thanks to Riccardo Magliocchetti) 
+* Issue #224: add a spinner for the move action (thanks to Riccardo Magliocchetti)
 
 **0.5.0** (december 7 2017)
 
