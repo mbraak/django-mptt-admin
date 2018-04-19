@@ -9,5 +9,5 @@ lxml==4.2.1
 pyquery==1.4.0
 selenium==3.11.0
 waitress==1.1.0
-WebOb==1.7.4
+WebOb==1.8.1
 WebTest==2.0.29
