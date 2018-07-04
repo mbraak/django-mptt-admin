@@ -1,0 +1,16 @@
+{
+    "compileOnSave": false,
+    "exclude": ["node_modules"],
+    "compilerOptions": {
+        "moduleResolution": "node",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": false,
+        "strict": true
+    },
+    "files": ["django_mptt_admin.ts", "global.d.ts"]
+}

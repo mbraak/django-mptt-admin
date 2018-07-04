@@ -1,44 +1,40 @@
 {
-  "name": "django-mptt-admin",
-  "version": "1.0.0",
-  "description": "Frontend code for django-mptt-admin",
-  "main": "index.js",
-  "scripts": {
-    "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack --mode production",
-    "sass": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/",
-    "webpack": "webpack --mode production",
-    "lint": "eslint django_mptt_admin.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mbraak/django-mptt-admin.git"
-  },
-  "author": "",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/mbraak/django-mptt-admin/issues"
-  },
-  "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
-  "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.5",
-    "babel-loader": "^7.1.4",
-    "babel-preset-env": "^1.7.0",
-    "eslint": "^4.19.1",
-    "eslint-config-airbnb": "^17.0.0",
-    "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.10.0",
-    "node-sass": "^4.9.0",
-    "uglifyjs-webpack-plugin": "^1.2.7",
-    "webpack": "^4.12.2",
-    "webpack-cli": "^3.0.3"
-  },
-  "dependencies": {
-    "cookie": "^0.3.1",
-    "jqtree": "^1.4.7",
-    "querystringify": "^2.0.0",
-    "spin": "0.0.1",
-    "url-parse": "^1.4.1"
-  }
+    "name": "django-mptt-admin",
+    "version": "1.0.0",
+    "description": "Frontend code for django-mptt-admin",
+    "main": "index.js",
+    "scripts": {
+        "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack --mode development",
+        "sass": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/",
+        "webpack": "webpack --mode development",
+        "lint": "tslint django_mptt_admin.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/mbraak/django-mptt-admin.git"
+    },
+    "author": "",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/mbraak/django-mptt-admin/issues"
+    },
+    "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
+    "devDependencies": {
+        "@types/jquery": "^3.3.4",
+        "@types/querystringify": "^2.0.0",
+        "node-sass": "^4.9.3",
+        "ts-loader": "^4.4.2",
+        "tslint": "^5.10.0",
+        "typescript": "^3.0.1",
+        "uglifyjs-webpack-plugin": "^1.2.7",
+        "webpack": "^4.16.3",
+        "webpack-cli": "^3.1.0"
+    },
+    "dependencies": {
+        "cookie": "^0.3.1",
+        "jqtree": "^1.4.7",
+        "querystringify": "^2.0.0",
+        "spin.js": "^4.0.0",
+        "url-parse": "^1.4.3"
+    }
 }

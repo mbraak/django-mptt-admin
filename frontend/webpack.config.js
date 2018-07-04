@@ -6,28 +6,28 @@ const banner = "This file is generated\n";
 
 module.exports = {
     entry: {
-        "django_mptt_admin": ["./django_mptt_admin.js"],
+        django_mptt_admin: ["./django_mptt_admin.ts"]
     },
     output: {
-        path: path.resolve(__dirname, "../django_mptt_admin/static/django_mptt_admin/"),
+        path: path.resolve(
+            __dirname,
+            "../django_mptt_admin/static/django_mptt_admin/"
+        ),
         filename: "[name].js"
     },
     module: {
-            rules: [
-                {
-                    test: /\.js$/,
-                    exclude: /node_modules/,
-                    use: {
-                        loader: "babel-loader"
-                    }
+        rules: [
+            {
+                test: /\.ts$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: "ts-loader"
                 }
-            ]
-        },
-    externals: {
-        "jquery": "jQuery"
+            }
+        ]
     },
-    plugins: [
-        new UglifyJsPlugin(),
-        new webpack.BannerPlugin(banner)
-    ]
+    externals: {
+        jquery: "jQuery"
+    }
+    //plugins: [new UglifyJsPlugin(), new webpack.BannerPlugin(banner)]
 };
