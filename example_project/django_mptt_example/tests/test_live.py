@@ -18,7 +18,7 @@ class LiveTestCase(StaticLiveServerTestCase):
         super(LiveTestCase, cls).setUpClass()
 
         options = Options()
-        options.set_headless()
+        options.headless = True
 
         cls.selenium = WebDriver(options=options)
         cls.selenium.implicitly_wait(10)
