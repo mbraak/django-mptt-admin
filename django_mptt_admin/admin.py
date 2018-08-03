@@ -37,7 +37,7 @@ from . import util
 class TreeChangeList(ChangeList):
     TREE_IGNORED_PARAMS = IGNORED_PARAMS + ('_', 'node', 'selected_node')
 
-    def __init__(self, request, model, model_admin, list_filter, node_id, max_level):
+    def __init__(self, request, model, model_admin, list_filter, node_id, max_level, sortable_by=None):
         self.node_id = node_id
         self.max_level = max_level
 
@@ -54,6 +54,7 @@ class TreeChangeList(ChangeList):
             list_per_page=100,
             list_editable=(),
             list_max_show_all=200,
+            sortable_by=sortable_by
         )
 
     def get_filters_params(self, params=None):
