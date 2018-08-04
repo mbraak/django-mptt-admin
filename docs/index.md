@@ -9,7 +9,7 @@
 
 ## Requirements
 
-The package is tested with Django (1.11 - 2.0), and django-mptt (0.8.x). Also with Python 2.7, 3.5 - 3.6.
+The package is tested with Django (1.11 - 2.1), and django-mptt (0.9.x). Also with Python 2.7, 3.5 - 3.7.
 
 Note that version 0.5.0 also supports Django 1.8 - 1.10.
 
@@ -120,6 +120,11 @@ class CountryAdmin(DjangoMpttAdmin):
 Also see the example project for a complete continent filter.
 
 ## Changelog
+
+**0.6.0** (august 4 2018)
+
+* Issue #232: support Django 2.1
+* Issue #233: upgrade jqTree to 1.4.7
 
 **0.5.1** (april 8 2018)
 
