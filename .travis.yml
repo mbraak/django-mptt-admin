@@ -6,8 +6,8 @@ python:
   - 2.7
   - 3.6
 env:
-  - DJANGO="Django==1.11.14" MOZ_HEADLESS=1
-  - DJANGO="Django==2.0.7" MOZ_HEADLESS=1
+  - DJANGO="Django==1.11.15" MOZ_HEADLESS=1
+  - DJANGO="Django==2.0.8" MOZ_HEADLESS=1
   - DJANGO="Django==2.1" MOZ_HEADLESS=1
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz
@@ -29,6 +29,6 @@ after_success:
 matrix:
   exclude:
   - python: 2.7
-    env: DJANGO="Django==2.0.7" MOZ_HEADLESS=1
+    env: DJANGO="Django==2.0.8" MOZ_HEADLESS=1
   - python: 2.7
     env: DJANGO="Django==2.1" MOZ_HEADLESS=1
