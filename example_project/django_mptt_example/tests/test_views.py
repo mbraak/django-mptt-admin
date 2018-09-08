@@ -51,7 +51,7 @@ class DjangoMpttAdminWebTests(WebTest):
         self.assertEqual(len(json_data), 1)
 
         root = json_data[0]
-        self.assertEqual(root['label'], 'root')
+        self.assertEqual(root['name'], 'root')
         self.assertEqual(len(root['children']), 7)
 
         africa_id = Country.objects.get(name='Africa').id
@@ -63,7 +63,7 @@ class DjangoMpttAdminWebTests(WebTest):
         self.assertEqual(
             africa,
             dict(
-                label='Africa',
+                name='Africa',
                 id=africa_id,
                 url=change_url,
                 move_url='/django_mptt_example/country/{0:d}/move/'.format(africa_id),
@@ -78,7 +78,7 @@ class DjangoMpttAdminWebTests(WebTest):
         json_data = self.app.get('{0!s}?node={1:d}'.format(base_url, africa_id)).json
 
         self.assertEqual(len(json_data), 58)
-        self.assertEqual(json_data[0]['label'], 'Algeria')
+        self.assertEqual(json_data[0]['name'], 'Algeria')
 
         # -- issue 8; selected node does not exist
         self.app.get('{0!s}?selected_node=9999999'.format(base_url))
@@ -226,7 +226,7 @@ class DjangoMpttAdminWebTests(WebTest):
 
         self.assertEqual(len(json_data), 1)
         root = json_data[0]
-        self.assertEqual(root['label'], 'Europe')
+        self.assertEqual(root['name'], 'Europe')
         self.assertEqual(len(root['children']), 50)
 
         country_node = root['children'][0]

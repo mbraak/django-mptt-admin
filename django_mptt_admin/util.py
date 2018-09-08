@@ -43,7 +43,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_l
             label = six.text_type(instance)
 
         node_info = dict(
-            label=label,
+            name=label,
             id=serialize_id(pk)
         )
         if on_create_node:

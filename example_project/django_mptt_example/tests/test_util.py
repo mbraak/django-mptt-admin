@@ -46,21 +46,21 @@ class UtilTestCase(TestCase):
         tree = get_tree_from_queryset(get_tree_queryset(Country))
 
         root = tree[0]
-        self.assertEqual(root['label'], 'root')
+        self.assertEqual(root['name'], 'root')
 
         continents = root['children']
         self.assertEqual(len(continents), 7)
-        self.assertEqual(continents[0]['label'], 'Africa')
+        self.assertEqual(continents[0]['name'], 'Africa')
 
         african_countries = continents[0]['children']
-        self.assertEqual(african_countries[0]['label'], 'Algeria')
+        self.assertEqual(african_countries[0]['name'], 'Algeria')
 
         # format label
         tree = get_tree_from_queryset(get_tree_queryset(Country), item_label_field_name='code')
         root = tree[0]
         continents = root['children']
         african_countries = continents[0]['children']
-        self.assertEqual(african_countries[0]['label'], 'DZ')
+        self.assertEqual(african_countries[0]['name'], 'DZ')
 
     def test_get_javascript_value(self):
         self.assertEqual(get_javascript_value(True), 'true')
