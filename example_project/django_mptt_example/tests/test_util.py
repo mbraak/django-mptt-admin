@@ -3,7 +3,7 @@ from uuid import UUID
 
 from django.test import TestCase
 
-from django_mptt_admin.util import get_tree_queryset, get_javascript_value, serialize_id
+from django_mptt_admin.util import get_tree_queryset, get_tree_from_queryset, get_javascript_value, serialize_id
 
 from ..models import Country
 
@@ -40,6 +40,27 @@ class UtilTestCase(TestCase):
         qs = get_tree_queryset(Country, include_root=False)
         self.assertEqual(len(qs), 256)
         self.assertEqual(qs[0].name, 'Africa')
+
+
+    def test_get_tree_from_queryset(self):
+        tree = get_tree_from_queryset(get_tree_queryset(Country))
+
+        root = tree[0]
+        self.assertEqual(root['label'], 'root')
+
+        continents = root['children']
+        self.assertEqual(len(continents), 7)
+        self.assertEqual(continents[0]['label'], 'Africa')
+
+        african_countries = continents[0]['children']
+        self.assertEqual(african_countries[0]['label'], 'Algeria')
+
+        # format label
+        tree = get_tree_from_queryset(get_tree_queryset(Country), item_label_field_name='code')
+        root = tree[0]
+        continents = root['children']
+        african_countries = continents[0]['children']
+        self.assertEqual(african_countries[0]['label'], 'DZ')
 
     def test_get_javascript_value(self):
         self.assertEqual(get_javascript_value(True), 'true')
