@@ -1,7 +1,9 @@
 # coding=utf-8
+from uuid import UUID
+
 from django.test import TestCase
 
-from django_mptt_admin.util import get_tree_queryset, get_javascript_value
+from django_mptt_admin.util import get_tree_queryset, get_javascript_value, serialize_id
 
 from ..models import Country
 
@@ -43,3 +45,12 @@ class UtilTestCase(TestCase):
         self.assertEqual(get_javascript_value(True), 'true')
         self.assertEqual(get_javascript_value(False), 'false')
         self.assertEqual(get_javascript_value(10), '10')
+
+    def test_serialize_id(self):
+        self.assertEqual(serialize_id(10), 10)
+        self.assertEqual(serialize_id('10'), '10')
+
+        self.assertEqual(
+            serialize_id(UUID('7b6dd6ba55fb400ca0f59cde381c987f')),
+            '7b6dd6ba-55fb-400c-a0f5-9cde381c987f'
+        )

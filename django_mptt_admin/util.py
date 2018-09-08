@@ -3,19 +3,20 @@ import json
 import six
 
 
+def serialize_id(pk):
+    if isinstance(pk, six.integer_types + six.string_types):
+        return pk
+    else:
+        # Nb. special case for uuid field
+        return str(pk)
+
+
 def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_label_field_name=None):
     """
     Return tree data that is suitable for jqTree.
     The queryset must be sorted by 'tree_id' and 'left' fields.
     """
     pk_attname = queryset.model._meta.pk.attname
-
-    def serialize_id(pk):
-        if isinstance(pk, six.integer_types + six.string_types):
-            return pk
-        else:
-            # Nb. special case for uuid field
-            return str(pk)
 
     # Result tree
     tree = []
