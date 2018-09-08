@@ -32,9 +32,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_l
     min_level = None
 
     for instance in queryset:
-        if min_level is None:
-            min_level = instance.level
-        elif instance.level < min_level:
+        if min_level is None or instance.level < min_level:
             min_level = instance.level
 
         pk = getattr(instance, pk_attname)
