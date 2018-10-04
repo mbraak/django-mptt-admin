@@ -5,9 +5,9 @@ django-mptt==0.9.1
 django-webtest==1.9.3
 beautifulsoup4==4.6.3
 cssselect==1.0.3
-lxml==4.2.4
+lxml==4.2.5
 pyquery==1.4.0
-selenium==3.14.0
+selenium==3.14.1
 waitress==1.1.0
 WebOb==1.8.2
 WebTest==2.0.30
