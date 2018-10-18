@@ -2,13 +2,20 @@ language: python
 sudo: false
 addons:
   firefox: latest
-python:
-  - 2.7
-  - 3.6
-env:
-  - DJANGO="Django==1.11.16" MOZ_HEADLESS=1
-  - DJANGO="Django==2.0.9" MOZ_HEADLESS=1
-  - DJANGO="Django==2.1.2" MOZ_HEADLESS=1
+matrix:
+  include:
+    - python: 2.7
+      env: DJANGO="Django==1.11.16" MOZ_HEADLESS=1
+    - python: 3.6
+      env: DJANGO="Django==1.11.16" MOZ_HEADLESS=1
+    - python: 3.7
+      env: DJANGO="Django==2.0.9" MOZ_HEADLESS=1
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: DJANGO="Django==2.1.2" MOZ_HEADLESS=1
+      dist: xenial
+      sudo: true
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.19.1/geckodriver-v0.19.1-linux64.tar.gz
   - mkdir geckodriver
@@ -26,9 +33,3 @@ script:
   - coverage report
 after_success:
   - coveralls
-matrix:
-  exclude:
-  - python: 2.7
-    env: DJANGO="Django==2.0.9" MOZ_HEADLESS=1
-  - python: 2.7
-    env: DJANGO="Django==2.1.2" MOZ_HEADLESS=1
