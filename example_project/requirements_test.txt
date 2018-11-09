@@ -2,12 +2,12 @@ pathlib==1.0.1
 django-mptt==0.9.1
 
 # django-webtest
-django-webtest==1.9.3
+django-webtest==1.9.4
 beautifulsoup4==4.6.3
 cssselect==1.0.3
 lxml==4.2.5
 pyquery==1.4.0
-selenium==3.14.1
+selenium==3.141.0
 waitress==1.1.0
-WebOb==1.8.2
+WebOb==1.8.3
 WebTest==2.0.32
