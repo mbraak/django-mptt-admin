@@ -1,6 +1,5 @@
 var path = require("path");
 var webpack = require("webpack");
-var UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 const banner = "This file is generated\n";
 
@@ -29,5 +28,4 @@ module.exports = {
     externals: {
         jquery: "jQuery"
     }
-    //plugins: [new UglifyJsPlugin(), new webpack.BannerPlugin(banner)]
 };

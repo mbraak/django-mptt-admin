@@ -4,7 +4,7 @@
     "description": "Frontend code for django-mptt-admin",
     "main": "index.js",
     "scripts": {
-        "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack --mode development",
+        "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack --mode production",
         "sass": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/",
         "webpack": "webpack --mode development",
         "lint": "tslint django_mptt_admin.ts"
