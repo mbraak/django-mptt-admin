@@ -3,11 +3,11 @@ django-mptt==0.9.1
 
 # django-webtest
 django-webtest==1.9.4
-beautifulsoup4==4.6.3
+beautifulsoup4==4.7.1
 cssselect==1.0.3
-lxml==4.2.5
+lxml==4.3.0
 pyquery==1.4.0
 selenium==3.141.0
-waitress==1.1.0
-WebOb==1.8.4
+waitress==1.2.0
+WebOb==1.8.5
 WebTest==2.0.32
