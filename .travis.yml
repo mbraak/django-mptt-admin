@@ -16,6 +16,10 @@ matrix:
       env: DJANGO="Django==2.1.7" MOZ_HEADLESS=1
       dist: xenial
       sudo: true
+    - python: 3.7
+      env: DJANGO="https://www.djangoproject.com/download/2.2b1/tarball/" MOZ_HEADLESS=1
+      dist: xenial
+      sudo: true
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.24.0/geckodriver-v0.24.0-linux64.tar.gz
   - mkdir geckodriver
