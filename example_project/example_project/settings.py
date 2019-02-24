@@ -2,8 +2,6 @@ import sys
 
 from pathlib import Path
 
-import django
-
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
 
@@ -48,9 +46,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
-
-if django.VERSION[0:2] < (2, 0):
-    MIDDLEWARE.append('django.contrib.auth.middleware.SessionAuthenticationMiddleware')
 
 STATIC_URL = '/static/'
 ROOT_URLCONF = 'example_project.urls'

@@ -1,10 +1,8 @@
 import json
 
-import six
-
 
 def serialize_id(pk):
-    if isinstance(pk, six.integer_types + six.string_types):
+    if isinstance(pk, (int, str)):
         return pk
     else:
         # Nb. special case for uuid field
@@ -40,7 +38,7 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_l
         if item_label_field_name:
             label = getattr(instance, item_label_field_name)
         else:
-            label = six.text_type(instance)
+            label = str(instance)
 
         node_info = dict(
             name=label,

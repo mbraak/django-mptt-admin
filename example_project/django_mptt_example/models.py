@@ -1,11 +1,8 @@
-from six import python_2_unicode_compatible
-
 from django.db import models
 
 from mptt.models import TreeForeignKey, MPTTModel
 
 
-@python_2_unicode_compatible
 class Country(MPTTModel):
     class Meta:
         verbose_name_plural = 'countries'
