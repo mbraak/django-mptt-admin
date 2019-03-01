@@ -1,6 +1,6 @@
 mkdocs==1.0.4
 click==7.0
-tornado==5.1.1
+tornado==6.0
 Jinja2==2.10
 Markdown==3.0.1
 livereload==2.6.0
