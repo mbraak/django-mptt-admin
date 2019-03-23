@@ -205,6 +205,7 @@ class DjangoMpttAdminMixin(object):
         admin_media = super(DjangoMpttAdminMixin, self).media
 
         js = [
+            "admin/js/jquery.init.js",
             static('django_mptt_admin/jquery_namespace.js'),
             static('django_mptt_admin/django_mptt_admin.js'),
         ]
