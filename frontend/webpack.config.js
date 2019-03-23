@@ -1,7 +1,4 @@
 var path = require("path");
-var webpack = require("webpack");
-
-const banner = "This file is generated\n";
 
 module.exports = {
     entry: {
