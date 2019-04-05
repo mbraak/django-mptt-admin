@@ -9,7 +9,7 @@
 
 ## Requirements
 
-The package is tested with Django (1.11 - 2.1), and django-mptt (0.9.x). Also with Python 2.7, 3.5 - 3.7.
+The package is tested with Django (1.11 - 2.2), and django-mptt (0.9.x). Also with Python 2.7, 3.5 - 3.7.
 
 Note that version 0.5.0 also supports Django 1.8 - 1.10.
 
@@ -121,10 +121,11 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**dev**
+**0.7.0** (april 5 2018)
 
 * Issue #242: minified build
 * Issue #243: upgrade jqTree to 1.4.9
+* Issue #252: support Django 2.2
 
 **0.6.0** (august 4 2018)
 
