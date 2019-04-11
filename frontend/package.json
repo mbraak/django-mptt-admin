@@ -24,15 +24,15 @@
         "@types/querystringify": "^2.0.0",
         "node-sass": "^4.11.0",
         "ts-loader": "^5.3.1",
-        "tslint": "^5.10.0",
-        "typescript": "^3.2.2",
+        "tslint": "^5.15.0",
+        "typescript": "^3.4.3",
         "uglifyjs-webpack-plugin": "^2.0.1",
         "webpack": "^4.27.1",
         "webpack-cli": "^3.1.2"
     },
     "dependencies": {
         "cookie": "^0.3.1",
-        "jqtree": "^1.4.9",
+        "jqtree": "^1.4.10",
         "querystringify": "^2.1.0",
         "spin.js": "^4.0.0",
         "url-parse": "^1.4.4"
