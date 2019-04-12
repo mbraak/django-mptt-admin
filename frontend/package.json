@@ -20,8 +20,10 @@
     },
     "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
     "devDependencies": {
+        "@types/cookie": "^0.3.2",
         "@types/jquery": "^3.3.22",
         "@types/querystringify": "^2.0.0",
+        "@types/url-parse": "^1.4.3",
         "node-sass": "^4.11.0",
         "ts-loader": "^5.3.1",
         "tslint": "^5.15.0",
