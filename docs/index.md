@@ -121,7 +121,12 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**0.7.0** (april 5 2018)
+**development**
+
+* Issue #254: upgrade jqtree to 1.4.10
+* Issue #255: test with django-mptt 0.10
+
+**0.7.0** (april 5 2019)
 
 * Issue #242: minified build
 * Issue #243: upgrade jqTree to 1.4.9
