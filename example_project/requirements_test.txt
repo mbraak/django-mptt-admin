@@ -7,6 +7,6 @@ cssselect==1.0.3
 lxml==4.3.3
 pyquery==1.4.0
 selenium==3.141.0
-waitress==1.2.1
+waitress==1.3.0
 WebOb==1.8.5
 WebTest==2.0.33
