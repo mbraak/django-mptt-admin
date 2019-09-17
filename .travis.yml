@@ -13,7 +13,11 @@ matrix:
       dist: xenial
       sudo: true
     - python: 3.7
-      env: DJANGO="Django==2.2.7" MOZ_HEADLESS=1"
+      env: DJANGO="Django==2.2.7" MOZ_HEADLESS=1
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: DJANGO="Django==3.0a1" MOZ_HEADLESS=1
       dist: xenial
       sudo: true
 before_install:
@@ -27,7 +31,7 @@ install:
   - pip install -r example_project/requirements_travis.txt
   - pip install -e .
 script:
-  - python example_project/manage.py test django_mptt_example
+  - python -Wd example_project/manage.py test django_mptt_example
   - coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
   - coverage report
 after_success:

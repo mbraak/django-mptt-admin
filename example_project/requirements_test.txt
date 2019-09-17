@@ -1,7 +1,7 @@
 https://github.com/django-mptt/django-mptt/archive/master.zip
 
 # django-webtest
-https://github.com/mbraak/django-webtest/archive/django3.zip
+django-webtest==1.9.7
 beautifulsoup4==4.8.1
 cssselect==1.1.0
 lxml==4.4.2
