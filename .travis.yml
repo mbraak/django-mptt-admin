@@ -5,19 +5,19 @@ addons:
 matrix:
   include:
     - python: 2.7
-      env: DJANGO="Django==1.11.24" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.9.1"
+      env: DJANGO="Django==1.11.25" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.9.1"
     - python: 3.6
-      env: DJANGO="Django==1.11.24" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.10.0"
+      env: DJANGO="Django==1.11.25" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.10.0"
     - python: 3.7
       env: DJANGO="Django==2.0.13" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.10.0"
       dist: xenial
       sudo: true
     - python: 3.7
-      env: DJANGO="Django==2.1.12" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.10.0"
+      env: DJANGO="Django==2.1.13" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.10.0"
       dist: xenial
       sudo: true
     - python: 3.7
-      env: DJANGO="Django==2.2.5" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.10.0"
+      env: DJANGO="Django==2.2.6" MOZ_HEADLESS=1 DJANGO_MPTT="django-mptt==0.10.0"
       dist: xenial
       sudo: true
 before_install:
