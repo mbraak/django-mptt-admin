@@ -202,8 +202,6 @@ class DjangoMpttAdminMixin(object):
        ] + super(DjangoMpttAdminMixin, self).get_urls()
 
     def get_tree_media(self):
-        admin_media = super(DjangoMpttAdminMixin, self).media
-
         js = [
             "admin/js/jquery.init.js",
             static('django_mptt_admin/jquery_namespace.js'),
@@ -217,7 +215,7 @@ class DjangoMpttAdminMixin(object):
 
         tree_media = Media(js=js, css=css)
 
-        return admin_media + tree_media
+        return self.media + tree_media
 
     @csrf_protect_m
     @transaction.atomic()

@@ -121,6 +121,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+* Issue #270: support media class
+
 **0.7.1** (april 23 2019)
 
 * Issue #254: upgrade jqtree to 1.4.10
