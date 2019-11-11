@@ -123,7 +123,7 @@ Also see the example project for a complete continent filter.
 
 **0.7.2** (october 19 2019)
 
-* Issue #270: support media class
+* Issue #270: support media class (thanks to Sencer H.)
 
 **0.7.1** (april 23 2019)
 
