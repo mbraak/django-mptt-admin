@@ -128,16 +128,16 @@ function initTree(
             }
         }
 
-        const node_id = getNodeId();
+        const nodeId = getNodeId();
 
         if (isLoading) {
-            spinners[node_id] = new Spinner().spin(getContainer());
+            spinners[nodeId] = new Spinner().spin(getContainer());
         } else {
-            const spinner = spinners[node_id];
+            const spinner = spinners[nodeId];
 
             if (spinner) {
                 spinner.stop();
-                spinners[node_id] = null;
+                spinners[nodeId] = null;
             }
         }
     }

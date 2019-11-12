@@ -7,7 +7,7 @@
         "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack --mode production",
         "sass": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/",
         "webpack": "webpack --mode development",
-        "lint": "tslint django_mptt_admin.ts"
+        "lint": "eslint django_mptt_admin.ts"
     },
     "repository": {
         "type": "git",
@@ -24,9 +24,11 @@
         "@types/jquery": "^3.3.22",
         "@types/querystringify": "^2.0.0",
         "@types/url-parse": "^1.4.3",
+        "@typescript-eslint/eslint-plugin": "^2.6.1",
+        "@typescript-eslint/parser": "^2.6.1",
+        "eslint": "^6.6.0",
         "node-sass": "^4.13.0",
         "ts-loader": "^6.2.1",
-        "tslint": "^5.20.1",
         "typescript": "^3.7.2",
         "webpack": "^4.41.2",
         "webpack-cli": "^3.3.10"
