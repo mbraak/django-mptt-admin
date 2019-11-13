@@ -121,6 +121,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+* Issue #276: fix movement during drag-and-drop
+
 **0.7.2** (october 19 2019)
 
 * Issue #270: support media class (thanks to Sencer H.)
