@@ -9,9 +9,9 @@
 
 ## Requirements
 
-The package is tested with Django (1.11 - 2.2), and django-mptt (0.9 and 0.10). Also with Python 2.7, 3.5 - 3.7.
+The package is tested with Django (2.0 - 3.0), and django-mptt (0.9 and 0.10). Also with Python 3.5 - 3.7.
 
-Note that version 0.5.0 also supports Django 1.8 - 1.10.
+Note that version 0.7.2 also supports Django 1.11.
 
 ## Installation
 
@@ -121,8 +121,9 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**1.0.0 (december 5 2019)**
 
+* Issue #271: support Django 3
 * Issue #276: fix movement during drag-and-drop
 
 **0.7.2** (october 19 2019)
