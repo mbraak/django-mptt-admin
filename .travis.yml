@@ -9,11 +9,11 @@ matrix:
       dist: xenial
       sudo: true
     - python: 3.7
-      env: DJANGO="Django==2.1.14" MOZ_HEADLESS=1
+      env: DJANGO="Django==2.1.15" MOZ_HEADLESS=1
       dist: xenial
       sudo: true
     - python: 3.7
-      env: DJANGO="Django==2.2.7" MOZ_HEADLESS=1
+      env: DJANGO="Django==2.2.8" MOZ_HEADLESS=1
       dist: xenial
       sudo: true
     - python: 3.7
