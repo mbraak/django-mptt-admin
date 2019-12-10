@@ -9,9 +9,9 @@
 
 ## Requirements
 
-The package is tested with Django (2.0 - 3.0), and django-mptt (0.9 and 0.10). Also with Python 3.5 - 3.7.
+The package is tested with Django (2.0 - 3.0), and django-mptt (0.9 and 0.10). Also with Python 3.5 - 3.8.
 
-Note that version 0.7.2 also supports Django 1.11.
+Note that version 0.7.2 also supports Django 1.11 and Python 2.7.
 
 ## Installation
 
