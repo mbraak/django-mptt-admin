@@ -2,7 +2,7 @@ https://github.com/django-mptt/django-mptt/archive/master.zip
 
 # django-webtest
 django-webtest==1.9.7
-beautifulsoup4==4.8.1
+beautifulsoup4==4.8.2
 cssselect==1.1.0
 lxml==4.4.2
 pyquery==1.4.1
