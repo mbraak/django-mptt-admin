@@ -4,7 +4,7 @@ https://github.com/django-mptt/django-mptt/archive/master.zip
 django-webtest==1.9.7
 beautifulsoup4==4.8.2
 cssselect==1.1.0
-lxml==4.4.3
+lxml==4.5.0
 pyquery==1.4.1
 selenium==3.141.0
 waitress==1.4.2
