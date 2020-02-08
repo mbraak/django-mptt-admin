@@ -121,6 +121,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+* Issue #282: add German translations (thanks to Christian Wiegand)
+
 **1.0.0 (december 5 2019)**
 
 * Issue #271: support Django 3
