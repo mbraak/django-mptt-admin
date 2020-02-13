@@ -124,6 +124,7 @@ Also see the example project for a complete continent filter.
 **development**
 
 * Issue #282: add German translations (thanks to Christian Wiegand)
+* Iseue #284: add Polish translations (thanks to Paweł Chojnowski)
 
 **1.0.0 (december 5 2019)**
 
