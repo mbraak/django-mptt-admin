@@ -121,12 +121,12 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**1.0.1** (february 14 2020)
 
 * Issue #282: add German translations (thanks to Christian Wiegand)
-* Iseue #284: add Polish translations (thanks to Paweł Chojnowski)
+* Issue #284: add Polish translations (thanks to Paweł Chojnowski)
 
-**1.0.0 (december 5 2019)**
+**1.0.0** (december 5 2019)
 
 * Issue #271: support Django 3
 * Issue #276: fix movement during drag-and-drop
