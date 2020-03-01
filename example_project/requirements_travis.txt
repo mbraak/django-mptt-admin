@@ -1,5 +1,5 @@
 coverage==5.0.3
-coveralls==1.11.0
+coveralls==1.11.1
 docopt==0.6.2
 PyYAML===5.1
-requests==2.22.0
+requests==2.23.0
