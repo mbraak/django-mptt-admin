@@ -9,11 +9,11 @@ matrix:
     - python: 3.7
       env: DJANGO="Django==2.1.15" MOZ_HEADLESS=1
     - python: 3.7
-      env: DJANGO="Django==2.2.10" MOZ_HEADLESS=1
+      env: DJANGO="Django==2.2.11" MOZ_HEADLESS=1
     - python: 3.7
-      env: DJANGO="Django==3.0.3" MOZ_HEADLESS=1
+      env: DJANGO="Django==3.0.4" MOZ_HEADLESS=1
     - python: 3.8
-      env: DJANGO="Django==3.0.3" MOZ_HEADLESS=1
+      env: DJANGO="Django==3.0.4" MOZ_HEADLESS=1
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
   - mkdir geckodriver
