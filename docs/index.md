@@ -121,6 +121,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+* Issue #287: add Catalan and Spanish translations (thanks to Joan Marc Soler)
+
 **1.0.1** (february 14 2020)
 
 * Issue #282: add German translations (thanks to Christian Wiegand)
