@@ -9,4 +9,4 @@ pyquery==1.4.1
 selenium==3.141.0
 waitress==1.4.3
 WebOb==1.8.6
-WebTest==2.0.34
+WebTest==2.0.35
