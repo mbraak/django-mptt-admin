@@ -8,13 +8,12 @@ from django.http import JsonResponse
 from django.template.response import TemplateResponse
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList, IGNORED_PARAMS
-from django.conf.urls import url
 from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.db import transaction
 from django.utils.http import urlencode
 from django.forms import Media
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.views.i18n import JavaScriptCatalog
 import django
 
@@ -176,7 +175,7 @@ class DjangoMpttAdminMixin:
             return update_wrapper(wrapper, view)
 
         def create_url(regex, url_name, view, kwargs=None, cacheable=False):
-            return url(
+            return re_path(
                 regex,
                 wrap(view, cacheable),
                 kwargs=kwargs,
