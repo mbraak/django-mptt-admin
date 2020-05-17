@@ -48,7 +48,7 @@ class TreeChangeList(ChangeList):
         if django.VERSION[0:2] >= (2, 1):
             params['sortable_by'] = []
 
-        super(TreeChangeList, self).__init__(**params)
+        super().__init__(**params)
 
     def get_filters_params(self, params=None):
         if not params:
@@ -79,7 +79,7 @@ class TreeChangeList(ChangeList):
         return qs
 
 
-class DjangoMpttAdminMixin(object):
+class DjangoMpttAdminMixin:
     tree_auto_open = 1
     tree_load_on_demand = 1
     trigger_save_after_move = False
@@ -106,7 +106,7 @@ class DjangoMpttAdminMixin(object):
         request.current_app = self.admin_site.name
         is_popup = IS_POPUP_VAR in request.GET
         if is_popup:
-            return super(DjangoMpttAdminMixin, self).changelist_view(request, extra_context=extra_context)
+            return super().changelist_view(request, extra_context=extra_context)
 
         if not self.has_change_permission(request, None):
             raise PermissionDenied()
@@ -199,7 +199,7 @@ class DjangoMpttAdminMixin(object):
            create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
            create_url(r'^grid/$', 'grid', self.grid_view),
            create_js_catalog_url()
-       ] + super(DjangoMpttAdminMixin, self).get_urls()
+       ] + super().get_urls()
 
     def get_tree_media(self):
         js = [
@@ -336,7 +336,7 @@ class DjangoMpttAdminMixin(object):
 
         if extra_context:
             context.update(extra_context)
-        return super(DjangoMpttAdminMixin, self).changelist_view(request, context)
+        return super().changelist_view(request, context)
 
     def get_preserved_filters(self, request):
         """
@@ -359,7 +359,7 @@ class DjangoMpttAdminMixin(object):
             preserved_filters = request.GET.urlencode()
             return urlencode({'_changelist_filters': preserved_filters})
         else:
-            return super(DjangoMpttAdminMixin, self).get_preserved_filters(request)
+            return super().get_preserved_filters(request)
 
     def filter_tree_queryset(self, queryset, request):
         """
@@ -368,7 +368,7 @@ class DjangoMpttAdminMixin(object):
         return queryset
 
     def get_changeform_initial_data(self, request):
-        initial_data = super(DjangoMpttAdminMixin, self).get_changeform_initial_data(request=request)
+        initial_data = super().get_changeform_initial_data(request=request)
 
         if 'insert_at' in request.GET:
             initial_data[self.get_insert_at_field()] = request.GET.get('insert_at')

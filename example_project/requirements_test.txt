@@ -1,8 +1,8 @@
-https://github.com/django-mptt/django-mptt/archive/master.zip
+django-mptt==0.11.0
 
 # django-webtest
 django-webtest==1.9.7
-beautifulsoup4==4.8.2
+beautifulsoup4==4.9.0
 cssselect==1.1.0
 lxml==4.5.0
 pyquery==1.4.1
