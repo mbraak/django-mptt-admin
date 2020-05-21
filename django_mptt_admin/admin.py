@@ -15,7 +15,6 @@ from django.utils.http import urlencode
 from django.forms import Media
 from django.urls import re_path, reverse
 from django.views.i18n import JavaScriptCatalog
-import django
 
 from mptt.admin import MPTTModelAdmin
 
@@ -42,10 +41,8 @@ class TreeChangeList(ChangeList):
             list_per_page=100,
             list_editable=(),
             list_max_show_all=200,
+            sortable_by=[],
         )
-
-        if django.VERSION[0:2] >= (2, 1):
-            params['sortable_by'] = []
 
         super().__init__(**params)
 
