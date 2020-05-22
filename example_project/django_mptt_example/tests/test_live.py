@@ -10,7 +10,7 @@ class LiveTestCase(BaseLiveTestCase):
     PASSWORD = 'p'
 
     def setUp(self):
-        super(LiveTestCase, self).setUp()
+        super().setUp()
 
         User.objects.create_superuser(self.USERNAME, 'admin@admin.com', self.PASSWORD)
 
@@ -24,8 +24,12 @@ class LiveTestCase(BaseLiveTestCase):
         self.page = page
 
     def test_show_tree(self):
+        page = self.page
+
+        page.find_title_element('Oceania')
+
         self.assertEqual(
-            self.page.node_titles(),
+            page.node_titles(),
             [
                 'root',
                 'Africa',
