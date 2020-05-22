@@ -50,5 +50,10 @@ class Page:
 
         node_element.find_element_by_class_name('jqtree-toggler').click()
 
+    def grid_view(self):
+        self.selenium.find_element_by_link_text('GRID VIEW').click()
+        self.selenium.find_element_by_id('result_list')
 
-
+    def tree_view(self):
+        self.selenium.find_element_by_link_text('TREE VIEW').click()
+        self.selenium.find_element_by_id('tree')

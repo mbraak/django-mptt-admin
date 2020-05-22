@@ -49,3 +49,9 @@ class LiveTestCase(BaseLiveTestCase):
 
         page.toggle_node('Oceania')
         page.assert_page_contains_text('Tuvalu')
+
+    def test_grid_view(self):
+        page = self.page
+
+        page.grid_view()
+        page.tree_view()
