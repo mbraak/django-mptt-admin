@@ -4,19 +4,15 @@ from selenium.webdriver.firefox.options import Options
 
 
 class BaseLiveTestCase(StaticLiveServerTestCase):
-    selenium = None
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
+        super().setUp()
 
         options = Options()
         options.headless = True
 
-        cls.selenium = WebDriver(options=options)
-        cls.selenium.implicitly_wait(10)
+        self.selenium = WebDriver(options=options)
+        self.selenium.implicitly_wait(10)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.selenium.quit()
-        super().tearDownClass()
+    def tearDown(self):
+        self.selenium.quit()
+        super().tearDown()
