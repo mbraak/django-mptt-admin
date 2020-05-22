@@ -1,3 +1,7 @@
+def parent_element(element):
+    return element.get_property('parentElement')
+
+
 class Page:
     def __init__(self, live_server_url, selenium):
         self.live_server_url = live_server_url
@@ -27,10 +31,24 @@ class Page:
     def node_titles(self):
         return [e.text for e in self.selenium.find_elements_by_class_name('jqtree-title')]
 
+    def find_title_element(self, title):
+        return self.selenium.find_element_by_xpath(f"//span[text()='{title}']")
+
+    def find_node_element(self, title):
+        return parent_element(parent_element(self.find_title_element(title)))
+
     def select_node(self, title):
-        self.selenium.find_element_by_xpath(f"//span[text()='{title}']").click()
+        self.find_title_element(title).click()
 
         self.selenium.find_element_by_class_name('jqtree-selected')
 
     def selected_node(self):
         return self.selenium.find_element_by_css_selector('.jqtree-selected > .jqtree-element > .jqtree-title')
+
+    def toggle_node(self, title):
+        node_element = self.find_node_element(title)
+
+        node_element.find_element_by_class_name('jqtree-toggler').click()
+
+
+

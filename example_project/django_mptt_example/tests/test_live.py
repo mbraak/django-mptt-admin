@@ -43,3 +43,9 @@ class LiveTestCase(BaseLiveTestCase):
 
         page.select_node('Antarctica')
         self.assertEqual(page.selected_node().text, 'Antarctica')
+
+    def test_open_node(self):
+        page = self.page
+
+        page.toggle_node('Oceania')
+        page.assert_page_contains_text('Tuvalu')
