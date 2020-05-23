@@ -15,5 +15,6 @@ class BaseLiveTestCase(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.selenium.quit()
+        self.selenium.command_executor._conn.clear()
 
         super().tearDown()
