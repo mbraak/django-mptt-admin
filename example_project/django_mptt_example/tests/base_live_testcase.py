@@ -15,4 +15,5 @@ class BaseLiveTestCase(StaticLiveServerTestCase):
 
     def tearDown(self):
         self.selenium.quit()
+
         super().tearDown()

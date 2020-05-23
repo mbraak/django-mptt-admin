@@ -51,7 +51,7 @@ class LiveTestCase(BaseLiveTestCase):
     def test_open_node(self):
         page = self.page
 
-        page.toggle_node('Oceania')
+        page.open_node('Oceania')
         page.assert_page_contains_text('Tuvalu')
 
     def test_grid_view(self):
@@ -59,3 +59,17 @@ class LiveTestCase(BaseLiveTestCase):
 
         page.grid_view()
         page.tree_view()
+
+    def test_save_state(self):
+        page = self.page
+
+        page.open_node('Oceania')
+        page.select_node('Tuvalu')
+
+        page.grid_view()
+        page.tree_view()
+
+        page.assert_page_contains_text('Tuvalu')
+        self.assertEqual(page.selected_node().text, 'Tuvalu')
+
+        self.assertEqual(page.open_nodes(), ['root', 'Oceania'])

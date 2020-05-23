@@ -31,8 +31,15 @@ class Page:
     def node_titles(self):
         return [e.text for e in self.selenium.find_elements_by_class_name('jqtree-title')]
 
+    def open_nodes(self):
+        nodes = self.selenium.find_elements_by_xpath(
+            f"//li[contains(@class, 'jqtree-folder') and not(contains(@class, 'jqtree-closed'))]/div[contains(@class, 'jqtree-element')]/span[contains(@class, 'jqtree-title')]"
+        )
+
+        return [e.text for e in nodes]
+
     def find_title_element(self, title):
-        return self.selenium.find_element_by_xpath(f"//span[text()='{title}']")
+        return self.selenium.find_element_by_xpath(f"//span[contains(@class, 'jqtree-title') and text()='{title}']")
 
     def find_node_element(self, title):
         return parent_element(parent_element(self.find_title_element(title)))
@@ -40,15 +47,22 @@ class Page:
     def select_node(self, title):
         self.find_title_element(title).click()
 
-        self.selenium.find_element_by_class_name('jqtree-selected')
+        self.selenium.find_element_by_xpath(f"//li[contains(@class, 'jqtree-selected')]//span[text()='{title}']")
 
     def selected_node(self):
         return self.selenium.find_element_by_css_selector('.jqtree-selected > .jqtree-element > .jqtree-title')
 
-    def toggle_node(self, title):
+    def open_node(self, title):
         node_element = self.find_node_element(title)
 
+        if 'jqtree-closed' not in node_element.get_attribute('class').split():
+            raise Exception(f"Node '{title}' must be closed")
+
         node_element.find_element_by_class_name('jqtree-toggler').click()
+
+        self.selenium.find_element_by_xpath(
+            f"//span[contains(@class, 'jqtree-title') and @aria-expanded='true' and text()='{title}']"
+        )
 
     def grid_view(self):
         self.selenium.find_element_by_link_text('GRID VIEW').click()
