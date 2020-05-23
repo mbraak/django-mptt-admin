@@ -73,3 +73,16 @@ class LiveTestCase(BaseLiveTestCase):
         self.assertEqual(page.selected_node().text, 'Tuvalu')
 
         self.assertEqual(page.open_nodes(), ['root', 'Oceania'])
+
+    def test_edit(self):
+        page = self.page
+
+        page.edit_node('Oceania')
+        name_input = page.find_input('name')
+        self.assertEqual(name_input.get_attribute('value'), 'Oceania')
+
+        name_input.clear()
+        name_input.send_keys('**Oceania**')
+        page.save_form()
+
+        page.find_title_element('**Oceania**')
