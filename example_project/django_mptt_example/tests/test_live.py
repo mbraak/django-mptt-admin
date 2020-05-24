@@ -86,3 +86,15 @@ class LiveTestCase(BaseLiveTestCase):
         page.save_form()
 
         page.find_title_element('**Oceania**')
+
+    def test_add(self):
+        page = self.page
+
+        page.add_node('Oceania')
+
+        page.find_input('code').send_keys('TST')
+        page.find_input('name').send_keys('**Test**')
+        page.save_form()
+
+        page.open_node('Oceania')
+        page.find_title_element('**Test**')

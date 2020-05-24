@@ -87,11 +87,19 @@ class Page:
         )
 
     def edit_node(self, title):
-        links = [
-            e for e in self.find_node_element(title).find_elements_by_css_selector("a.edit") if e.text == '(edit)'
-        ]
-        links[0].click()
+        self.find_edit_link(title, '(edit)').click()
         self.assert_page_contains_text('Change country')
+
+    def find_edit_link(self, node_title, link_title):
+        links = [
+            e for e in self.find_node_element(node_title).find_elements_by_css_selector("a.edit")
+            if e.text == link_title
+        ]
+        return links[0]
+
+    def add_node(self, parent_title):
+        self.find_edit_link(parent_title, '(add)').click()
+        self.assert_page_contains_text('Add country')
 
     def grid_view(self):
         self.selenium.find_element_by_link_text('GRID VIEW').click()
