@@ -1,71 +1,100 @@
 from django.contrib.auth.models import User
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-from selenium.webdriver.firefox.webdriver import WebDriver
-from selenium.webdriver.firefox.options import Options
-
+from .base_live_testcase import BaseLiveTestCase
 from .utils import read_testdata
+from .page import Page
 
 
-class LiveTestCase(StaticLiveServerTestCase):
+class LiveTestCase(BaseLiveTestCase):
     USERNAME = 'admin'
     PASSWORD = 'p'
 
-    selenium = None
-
-    @classmethod
-    def setUpClass(cls):
-        super(LiveTestCase, cls).setUpClass()
-
-        options = Options()
-        options.headless = True
-
-        cls.selenium = WebDriver(options=options)
-        cls.selenium.implicitly_wait(10)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.selenium.quit()
-        super(LiveTestCase, cls).tearDownClass()
-
-    def login(self):
-        selenium = self.selenium
-
-        selenium.get('%s%s' % (self.live_server_url, '/login/'))
-
-        selenium.find_element_by_name('username').send_keys(self.USERNAME)
-        selenium.find_element_by_name('password').send_keys(self.PASSWORD)
-        selenium.find_element_by_xpath('//input[@value="Log in"]').click()
-
-    def visit_countries_page(self):
-        selenium = self.selenium
-
-        selenium.get(self.live_server_url)
-        selenium.find_element_by_link_text('Countries').click()
-
     def setUp(self):
-        super(LiveTestCase, self).setUp()
+        super().setUp()
 
         User.objects.create_superuser(self.USERNAME, 'admin@admin.com', self.PASSWORD)
 
         read_testdata()
 
-        self.login()
-        self.visit_countries_page()
+        page = Page(live_server_url=self.live_server_url, selenium=self.selenium)
+
+        page.login(self.USERNAME, self.PASSWORD)
+        page.visit_countries_page()
+
+        self.page = page
 
     def test_show_tree(self):
-        selenium = self.selenium
+        page = self.page
+
+        page.find_title_element('Oceania')
 
         self.assertEqual(
-            len(selenium.find_elements_by_class_name('jqtree-title')),
-            8
+            page.node_titles(),
+            [
+                'root',
+                'Africa',
+                'Antarctica',
+                'Asia',
+                'Europe',
+                'North America',
+                'Oceania',
+                'South America'
+            ]
         )
 
     def test_select_node(self):
-        selenium = self.selenium
+        page = self.page
 
-        selenium.find_element_by_xpath("//span[contains(text(), 'Europe')]").click()
+        page.select_node('Antarctica')
+        self.assertEqual(page.selected_node().text, 'Antarctica')
 
-        self.assertTrue(
-            selenium.find_element_by_class_name('jqtree-selected').text.startswith('Europe'),
-        )
+    def test_open_node(self):
+        page = self.page
+
+        page.open_node('Oceania')
+        page.assert_page_contains_text('Tuvalu')
+
+    def test_grid_view(self):
+        page = self.page
+
+        page.grid_view()
+        page.tree_view()
+
+    def test_save_state(self):
+        page = self.page
+
+        page.open_node('Oceania')
+        page.select_node('Tuvalu')
+
+        page.grid_view()
+        page.tree_view()
+
+        page.assert_page_contains_text('Tuvalu')
+        self.assertEqual(page.selected_node().text, 'Tuvalu')
+
+        self.assertEqual(page.open_nodes(), ['root', 'Oceania'])
+
+    def test_edit(self):
+        page = self.page
+
+        page.edit_node('Oceania')
+        name_input = page.find_input('name')
+        self.assertEqual(name_input.get_attribute('value'), 'Oceania')
+
+        name_input.clear()
+        name_input.send_keys('**Oceania**')
+        page.save_form()
+
+        page.find_title_element('**Oceania**')
+
+    def test_add(self):
+        page = self.page
+
+        page.add_node('Oceania')
+
+        page.find_input('code').send_keys('TST')
+        page.find_input('name').send_keys('**Test**')
+        page.save_form()
+
+        page.open_node('Oceania')
+        page.find_title_element('**Test**')
