@@ -7,7 +7,8 @@
         "build": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/ && webpack --mode production",
         "sass": "node-sass django_mptt_admin.scss -o ../django_mptt_admin/static/django_mptt_admin/",
         "webpack": "webpack --mode development --watch",
-        "lint": "eslint django_mptt_admin.ts"
+        "lint": "eslint django_mptt_admin.ts",
+        "tsc": "tsc --noEmit"
     },
     "repository": {
         "type": "git",
@@ -20,21 +21,22 @@
     },
     "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
     "devDependencies": {
-        "@types/cookie": "^0.3.3",
-        "@types/jquery": "^3.3.32",
+        "@types/cookie": "^0.4.0",
+        "@types/jquery": "^3.3.35",
         "@types/querystringify": "^2.0.0",
         "@types/url-parse": "^1.4.3",
-        "@typescript-eslint/eslint-plugin": "^2.19.2",
-        "@typescript-eslint/parser": "^2.19.2",
+        "@typescript-eslint/eslint-plugin": "^2.33.0",
+        "@typescript-eslint/parser": "^2.33.0",
         "eslint": "^6.8.0",
-        "node-sass": "^4.13.1",
-        "ts-loader": "^6.2.1",
-        "typescript": "^3.7.5",
-        "webpack": "^4.41.6",
+        "eslint-plugin-import": "^2.20.1",
+        "node-sass": "^4.14.1",
+        "ts-loader": "^7.0.4",
+        "typescript": "^3.9.2",
+        "webpack": "^4.43.0",
         "webpack-cli": "^3.3.11"
     },
     "dependencies": {
-        "cookie": "^0.4.0",
+        "cookie": "^0.4.1",
         "jqtree": "^1.4.12",
         "querystringify": "^2.1.1",
         "spin.js": "^4.1.0",
