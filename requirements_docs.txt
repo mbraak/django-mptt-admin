@@ -3,5 +3,5 @@ click==7.1.2
 tornado==6.0.4
 Jinja2==2.11.2
 Markdown==3.2.2
-livereload==2.6.1
+livereload==2.6.2
 MarkupSafe==1.1.1
