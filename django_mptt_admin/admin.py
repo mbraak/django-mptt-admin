@@ -15,6 +15,7 @@ from django.utils.http import urlencode
 from django.forms import Media
 from django.urls import re_path, reverse
 from django.views.i18n import JavaScriptCatalog
+import django
 
 from mptt.admin import MPTTModelAdmin
 
@@ -59,7 +60,10 @@ class TreeChangeList(ChangeList):
         return lookup_params
 
     def get_queryset(self, request):
-        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = self.get_filters(request)
+        if django.VERSION >= (3,1):
+            self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct, self.has_active_filters = self.get_filters(request)
+        else:
+            self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = self.get_filters(request)
 
         qs = util.get_tree_queryset(
             model=self.model,
