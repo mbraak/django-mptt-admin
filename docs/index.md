@@ -80,9 +80,12 @@ class CountryAdmin(DjangoMpttAdmin):
 
 **use_context_menu**
 
-True / False. Default is False.
+Capture the contextmenu event. NB: the contextmenu event is triggered when you click with the right mouse button.
 
-"useContextMenu" option for tree.
+* True: Capture the contextmenu event.
+  * This is useful if you want to write custom javascript to catch the `tree.contextmenu` event.
+  * Also see https://mbraak.github.io/jqTree/#usecontextmenu and https://mbraak.github.io/jqTree/#event-tree-contextmenu
+* False (default): do not capture the contextmenu event.
 
 **item_label_field_name**
 
