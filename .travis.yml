@@ -11,7 +11,7 @@ matrix:
     - python: 3.8
       env: DJANGO="Django==3.0.8" MOZ_HEADLESS=1
     - python: 3.8
-      env: DJANGO="Django==3.1b1" MOZ_HEADLESS=1
+      env: DJANGO="Django==3.1rc1" MOZ_HEADLESS=1
 before_install:
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
   - mkdir geckodriver
