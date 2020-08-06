@@ -8,13 +8,12 @@ from django.http import JsonResponse
 from django.template.response import TemplateResponse
 from django.contrib.admin.options import csrf_protect_m
 from django.contrib.admin.views.main import ChangeList, IGNORED_PARAMS
-from django.conf.urls import url
 from django.contrib.admin.utils import unquote, quote
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.db import transaction
 from django.utils.http import urlencode
 from django.forms import Media
-from django.urls import reverse
+from django.urls import re_path, reverse
 from django.views.i18n import JavaScriptCatalog
 import django
 
@@ -43,10 +42,8 @@ class TreeChangeList(ChangeList):
             list_per_page=100,
             list_editable=(),
             list_max_show_all=200,
+            sortable_by=[],
         )
-
-        if django.VERSION[0:2] >= (2, 1):
-            params['sortable_by'] = []
 
         super().__init__(**params)
 
@@ -63,7 +60,10 @@ class TreeChangeList(ChangeList):
         return lookup_params
 
     def get_queryset(self, request):
-        self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = self.get_filters(request)
+        if django.VERSION >= (3,1):
+            self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct, self.has_active_filters = self.get_filters(request)
+        else:
+            self.filter_specs, self.has_filters, remaining_lookup_params, filters_use_distinct = self.get_filters(request)
 
         qs = util.get_tree_queryset(
             model=self.model,
@@ -176,7 +176,7 @@ class DjangoMpttAdminMixin:
             return update_wrapper(wrapper, view)
 
         def create_url(regex, url_name, view, kwargs=None, cacheable=False):
-            return url(
+            return re_path(
                 regex,
                 wrap(view, cacheable),
                 kwargs=kwargs,
