@@ -37,7 +37,7 @@
     },
     "dependencies": {
         "cookie": "^0.4.1",
-        "jqtree": "^1.4.12",
+        "jqtree": "^1.5.0",
         "querystringify": "^2.1.1",
         "spin.js": "^4.1.0",
         "url-parse": "^1.4.4"
