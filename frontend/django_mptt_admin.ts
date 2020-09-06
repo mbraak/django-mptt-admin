@@ -34,7 +34,7 @@ function initTree(
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
-        insertAtUrl.query.insert_at = `${node.id}`;
+        insertAtUrl.query.insert_at = `${node.id as string | number}`;
 
         const insertUrlString = urlToString(insertAtUrl);
 
@@ -75,7 +75,7 @@ function initTree(
             target_id: info.target_node.id,
             position: info.position,
         };
-        const $el = jQuery(info.moved_node.element) as JQuery<HTMLElement>;
+        const $el = jQuery(info.moved_node.element);
 
         handleLoading(true, null, $el);
 
@@ -127,11 +127,11 @@ function initTree(
         node: INode | null,
         $el: JQuery
     ) {
-        function getNodeId() {
+        function getNodeId(): string | number {
             if (!node) {
                 return "__root__";
             } else {
-                return node.id;
+                return node.id as string | number;
             }
         }
 
@@ -180,7 +180,7 @@ function initTree(
         dragAndDrop: true,
         onCreateLi: createLi,
         onLoadFailed: handleLoadFailed,
-        onLoading: handleLoading,
+        onLoading: handleLoading as any, // eslint-disable-line @typescript-eslint/no-unsafe-assignment
         saveState: $tree.data("save_state") as boolean,
         useContextMenu: Boolean($tree.data("use_context_menu")),
     });
