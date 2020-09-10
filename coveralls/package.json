@@ -4,6 +4,6 @@
     "nyc": "^15.1.0"
   },
   "scripts": {
-    "merge_coverage": "nyc --temp-dir=../js_coverage/ --reporter=json-summary report"
+    "merge_coverage": "nyc --temp-dir=../js_coverage/ --reporter=lcovonly report"
   }
 }
