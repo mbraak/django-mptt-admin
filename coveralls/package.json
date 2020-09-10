@@ -1,10 +1,9 @@
 {
   "name": "coverage",
   "dependencies": {
-    "nyc": "^15.1.0",
-    "nyc-report-lcov-absolute": "^1.0.0"
+    "nyc": "^15.1.0"
   },
   "scripts": {
-    "merge_coverage": "nyc --temp-dir=../js_coverage/ --reporter=nyc-report-lcov-absolute report"
+    "merge_coverage": "nyc --temp-dir=../js_coverage/ --reporter=lcovonly report"
   }
 }
