@@ -23,9 +23,9 @@ install:
   - pip install -r example_project/requirements_travis.txt
   - pip install -e .
 script:
-  - cd frontend && yarn && yarn run build && cd ..
   - python -Wd example_project/manage.py test django_mptt_example
-  - coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
+  - cd frontend && yarn && yarn run build && cd ..
+  - COVERAGE=true coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
   - cd coveralls
   - yarn && gem install coveralls-lcov
   - yarn run merge_coverage

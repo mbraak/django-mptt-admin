@@ -1,4 +1,5 @@
 import sys
+import os
 
 from pathlib import Path
 
@@ -76,4 +77,4 @@ TEMPLATES = [
 
 ALLOWED_HOSTS = ['*']
 
-DJANGO_MPTT_ADMIN_COVERAGE_JS = True
+DJANGO_MPTT_ADMIN_COVERAGE_JS = 'COVERAGE' in os.environ
