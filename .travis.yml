@@ -24,7 +24,13 @@ install:
   - pip install -e .
 script:
   - python -Wd example_project/manage.py test django_mptt_example
-  - coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
+  - cd frontend && yarn && yarn run build && cd ..
+  - COVERAGE=true coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
+  - cd coveralls
+  - yarn && gem install coveralls-lcov
+  - yarn run merge_coverage
+  - coveralls-lcov -v -n coverage/lcov.info > coverage.json
+  - cd ..
   - coverage report
 after_success:
-  - coveralls
+  - coveralls --merge=coveralls/coverage.json

@@ -1,13 +1,21 @@
+from uuid import uuid4
+
 from django.contrib.auth.models import User
 
 from .base_live_testcase import BaseLiveTestCase
-from .utils import read_testdata
+from .utils import clean_directory, read_testdata, write_json
 from .page import Page
 
 
 class LiveTestCase(BaseLiveTestCase):
     USERNAME = 'admin'
     PASSWORD = 'p'
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        clean_directory('js_coverage')
 
     def setUp(self):
         super().setUp()
@@ -22,6 +30,15 @@ class LiveTestCase(BaseLiveTestCase):
         page.visit_countries_page()
 
         self.page = page
+
+    def tearDown(self):
+        try:
+            coverage = self.selenium.execute_script('return window.__coverage__')
+
+            filename = uuid4().hex
+            write_json(f'js_coverage/{filename}.json', coverage)
+        finally:
+            super().tearDown()
 
     def test_show_tree(self):
         page = self.page
