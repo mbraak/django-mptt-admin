@@ -1,3 +1,4 @@
+from pathlib import Path
 from uuid import uuid4
 
 from django.contrib.auth.models import User
@@ -36,7 +37,9 @@ class LiveTestCase(BaseLiveTestCase):
             coverage = self.selenium.execute_script('return window.__coverage__')
 
             filename = uuid4().hex
-            write_json(f'js_coverage/{filename}.json', coverage)
+            path = f'js_coverage/{filename}.json'
+            print(Path(path).absolute())
+            write_json(path, coverage)
         finally:
             super().tearDown()
 
