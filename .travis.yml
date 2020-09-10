@@ -28,7 +28,6 @@ script:
   - cd coveralls
   - yarn && gem install coveralls-lcov
   - yarn run merge_coverage
-  - cat coverage/lcov.info
   - coveralls-lcov -v -n coverage/lcov.info > coverage.json
   - cd ..
   - coverage report
