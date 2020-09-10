@@ -25,6 +25,7 @@ install:
 script:
   - python -Wd example_project/manage.py test django_mptt_example
   - coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
+  - cd coveralls && yarn && yarn run merge_coverage && cd ..
   - coverage report
 after_success:
-  - coveralls
+  - coveralls --merge=coveralls/coverage/coverage-summary.json
