@@ -1,50 +1,13 @@
-from uuid import uuid4
-
-from django.contrib.auth.models import User
-from django.conf import settings
-
 from .base_live_testcase import BaseLiveTestCase
-from .utils import clean_directory, read_testdata, write_json
-from .page import Page
+from .utils import read_testdata
 
 
 class LiveTestCase(BaseLiveTestCase):
-    USERNAME = 'admin'
-    PASSWORD = 'p'
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        if settings.DJANGO_MPTT_ADMIN_COVERAGE_JS:
-            clean_directory('js_coverage')
-
     def setUp(self):
         super().setUp()
 
-        User.objects.create_superuser(self.USERNAME, 'admin@admin.com', self.PASSWORD)
-
         read_testdata()
-
-        page = Page(live_server_url=self.live_server_url, selenium=self.selenium)
-
-        page.login(self.USERNAME, self.PASSWORD)
-        page.visit_countries_page()
-
-        self.page = page
-
-    def tearDown(self):
-        try:
-            if settings.DJANGO_MPTT_ADMIN_COVERAGE_JS:
-                self.save_coverage()
-        finally:
-            super().tearDown()
-
-    def save_coverage(self):
-        coverage = self.selenium.execute_script('return window.__coverage__')
-
-        filename = uuid4().hex
-        write_json(f'js_coverage/{filename}.json', coverage)
+        self.page.visit_countries_page()
 
     def test_show_tree(self):
         page = self.page
