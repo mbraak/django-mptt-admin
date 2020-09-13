@@ -12,7 +12,7 @@ def read_testdata():
             obj.save()
 
 
-def remove_directory(string):
+def remove_directory(string):  # pragma: no cover
     path = Path(string)
 
     if not path.exists():

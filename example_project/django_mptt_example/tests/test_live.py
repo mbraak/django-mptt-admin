@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from django.contrib.auth.models import User
+from django.conf import settings
 
 from .base_live_testcase import BaseLiveTestCase
 from .utils import clean_directory, read_testdata, write_json
@@ -15,7 +16,8 @@ class LiveTestCase(BaseLiveTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        clean_directory('js_coverage')
+        if settings.DJANGO_MPTT_ADMIN_COVERAGE_JS:
+            clean_directory('js_coverage')
 
     def setUp(self):
         super().setUp()
@@ -33,12 +35,16 @@ class LiveTestCase(BaseLiveTestCase):
 
     def tearDown(self):
         try:
-            coverage = self.selenium.execute_script('return window.__coverage__')
-
-            filename = uuid4().hex
-            write_json(f'js_coverage/{filename}.json', coverage)
+            if settings.DJANGO_MPTT_ADMIN_COVERAGE_JS:
+                self.save_coverage()
         finally:
             super().tearDown()
+
+    def save_coverage(self):
+        coverage = self.selenium.execute_script('return window.__coverage__')
+
+        filename = uuid4().hex
+        write_json(f'js_coverage/{filename}.json', coverage)
 
     def test_show_tree(self):
         page = self.page
