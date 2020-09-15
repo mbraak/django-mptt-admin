@@ -199,7 +199,7 @@ class DjangoMpttAdminMixin:
            create_url(r'^tree_json/$', 'tree_json', self.tree_json_view),
            create_url(r'^grid/$', 'grid', self.grid_view),
            create_js_catalog_url()
-       ] + super().get_urls()
+        ] + super().get_urls()
 
     def get_tree_media(self):
         django_mptt_admin_js = 'django_mptt_admin.coverage.js' if settings.DJANGO_MPTT_ADMIN_COVERAGE_JS else 'django_mptt_admin.js'
