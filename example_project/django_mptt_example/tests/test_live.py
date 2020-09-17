@@ -1,12 +1,12 @@
 from .base_live_testcase import BaseLiveTestCase
-from .utils import read_testdata
 
 
 class LiveTestCase(BaseLiveTestCase):
+    fixtures = ['countries.json']
+
     def setUp(self):
         super().setUp()
 
-        read_testdata()
         self.page.visit_countries_page()
 
     def test_show_tree(self):

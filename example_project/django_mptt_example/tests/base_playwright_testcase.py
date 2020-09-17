@@ -1,7 +1,6 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import User
 from .playwright_page import PlaywrightPage
-from .utils import read_testdata
 
 
 class BasePlaywrightTestCase(StaticLiveServerTestCase):
@@ -9,7 +8,6 @@ class BasePlaywrightTestCase(StaticLiveServerTestCase):
         super().setUp()
 
         User.objects.create_superuser('admin', 'admin@admin.com', 'password')
-        read_testdata()
 
         self.page = PlaywrightPage(self.live_server_url)
         self.setup_page()
