@@ -136,12 +136,6 @@ class DjangoMpttAdminMixin:
             else:
                 return settings.CSRF_COOKIE_NAME
 
-        def get_tree_animation_speed():
-            if self.tree_animation_speed is None:
-                return None
-            else:
-                return util.get_javascript_value(self.tree_animation_speed)
-
         grid_url = get_admin_url_with_filters('grid')
         tree_json_url = get_admin_url_with_filters('tree_json')
         insert_at_url = get_admin_url_with_preserved_filters('add')
@@ -154,7 +148,7 @@ class DjangoMpttAdminMixin:
             media=self.get_tree_media(),
             has_add_permission=self.has_add_permission(request),
             opts=change_list.opts,
-            tree_animation_speed=get_tree_animation_speed(),
+            tree_animation_speed=self.get_tree_animation_speed(),
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
             tree_json_url=tree_json_url,
             insert_at_url=insert_at_url,
@@ -387,6 +381,13 @@ class DjangoMpttAdminMixin:
 
     def get_insert_at_field(self):
         return 'parent'
+
+    def get_tree_animation_speed(self):
+        if self.tree_animation_speed is None:
+            return None
+        else:
+            return util.get_javascript_value(self.tree_animation_speed)
+
 
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, MPTTModelAdmin):

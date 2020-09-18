@@ -1,6 +1,9 @@
+from django.test import override_settings
+
 from .base_playwright_testcase import BasePlaywrightTestCase
 
 
+@override_settings(DJANGO_TESTING=True)
 class PlaywrightTestCase(BasePlaywrightTestCase):
     fixtures = ['countries.json']
 
