@@ -48,6 +48,10 @@ Use the DjangoMpttAdmin class in admin.py:
 
 ## Options
 
+**tree_animation_speed**
+
+The speed of the open/close animation in milliseconds. The default is 200 milliseconds.
+
 **tree_auto_open**
 
 Auto-open node. Default value is 1.
@@ -126,6 +130,10 @@ class CountryAdmin(DjangoMpttAdmin):
 Also see the example project for a complete continent filter.
 
 ## Changelog
+
+**development**
+
+* Issue #309: add option for animation speed
 
 **1.0.2** (june 26 2020)
 

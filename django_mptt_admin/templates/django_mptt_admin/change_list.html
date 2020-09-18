@@ -12,6 +12,9 @@
     <div
         id="tree"
         class="block-style"
+        {% if tree_animation_speed is not None %}
+            data-tree-animation-speed="{{ tree_animation_speed }}"
+        {% endif %}
         data-url="{{ tree_json_url }}"
         data-insert_at_url="{{ insert_at_url }}"
         data-save_state="{{ app_label }}_{{ model_name }}"

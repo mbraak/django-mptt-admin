@@ -20,12 +20,17 @@ interface JQTreeSelectEvent extends JQuery.Event {
     node: INode;
 }
 
+interface Parameters {
+    animationSpeed: number | string | null;
+    autoOpen: boolean | number;
+    autoEscape: boolean;
+    csrfCookieName: string;
+    rtl: boolean;
+}
+
 function initTree(
     $tree: JQuery,
-    autoOpen: boolean | number,
-    autoEscape: boolean,
-    rtl: boolean,
-    csrfCookieName: string
+    { animationSpeed, autoOpen, autoEscape, csrfCookieName, rtl }: Parameters
 ) {
     let errorNode: INode | null = null;
     const insertAtUrl = new URL($tree.data("insert_at_url"), true);
@@ -172,7 +177,7 @@ function initTree(
         }
     }
 
-    $tree.tree({
+    const treeOptions: Record<string, unknown> = {
         autoOpen,
         autoEscape,
         buttonLeft: rtl,
@@ -183,7 +188,13 @@ function initTree(
         onLoading: handleLoading as any, // eslint-disable-line @typescript-eslint/no-unsafe-assignment
         saveState: $tree.data("save_state") as boolean,
         useContextMenu: Boolean($tree.data("use_context_menu")),
-    });
+    };
+
+    if (animationSpeed !== null) {
+        treeOptions["animationSpeed"] = animationSpeed;
+    }
+
+    $tree.tree(treeOptions);
 
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
@@ -204,11 +215,21 @@ jQuery(() => {
     const $tree = jQuery("#tree");
 
     if ($tree.length) {
+        const animationSpeed = $tree.data("tree-animation-speed") as
+            | number
+            | string
+            | null;
         const autoOpen = $tree.data("auto_open") as boolean | number;
         const autoEscape = Boolean($tree.data("autoescape"));
         const rtl = $tree.data("rtl") === "1";
         const csrfCookieName = $tree.data("csrf-cookie-name") as string;
 
-        initTree($tree, autoOpen, autoEscape, rtl, csrfCookieName);
+        initTree($tree, {
+            animationSpeed,
+            autoOpen,
+            autoEscape,
+            csrfCookieName,
+            rtl,
+        });
     }
 });
