@@ -131,6 +131,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+* Issue #309: add option for animation speed
+
 **1.0.2** (june 26 2020)
 
 * Issue #287: add Catalan and Spanish translations (thanks to Joan Marc Soler)
