@@ -4722,7 +4722,12 @@ var querystringify = __webpack_require__(2);
 
  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 
-function initTree($tree, autoOpen, autoEscape, rtl, csrfCookieName) {
+function initTree($tree, _ref) {
+  var animationSpeed = _ref.animationSpeed,
+      autoOpen = _ref.autoOpen,
+      autoEscape = _ref.autoEscape,
+      csrfCookieName = _ref.csrfCookieName,
+      rtl = _ref.rtl;
   var errorNode = null;
   var insertAtUrl = new url_parse($tree.data("insert_at_url"), true);
 
@@ -4843,7 +4848,7 @@ function initTree($tree, autoOpen, autoEscape, rtl, csrfCookieName) {
     }
   }
 
-  $tree.tree({
+  var treeOptions = {
     autoOpen: autoOpen,
     autoEscape: autoEscape,
     buttonLeft: rtl,
@@ -4855,7 +4860,13 @@ function initTree($tree, autoOpen, autoEscape, rtl, csrfCookieName) {
     // eslint-disable-line @typescript-eslint/no-unsafe-assignment
     saveState: $tree.data("save_state"),
     useContextMenu: Boolean($tree.data("use_context_menu"))
-  });
+  };
+
+  if (animationSpeed !== null) {
+    treeOptions["animationSpeed"] = animationSpeed;
+  }
+
+  $tree.tree(treeOptions);
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
 }
@@ -4876,11 +4887,18 @@ jQuery(function () {
   var $tree = jQuery("#tree");
 
   if ($tree.length) {
+    var animationSpeed = $tree.data("tree-animation-speed");
     var autoOpen = $tree.data("auto_open");
     var autoEscape = Boolean($tree.data("autoescape"));
     var rtl = $tree.data("rtl") === "1";
     var csrfCookieName = $tree.data("csrf-cookie-name");
-    initTree($tree, autoOpen, autoEscape, rtl, csrfCookieName);
+    initTree($tree, {
+      animationSpeed: animationSpeed,
+      autoOpen: autoOpen,
+      autoEscape: autoEscape,
+      csrfCookieName: csrfCookieName,
+      rtl: rtl
+    });
   }
 });
 
