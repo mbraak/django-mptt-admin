@@ -45,3 +45,15 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
 
         page.grid_view()
         page.tree_view()
+
+    def test_save_state(self):
+        page = self.page
+
+        page.open_node('Oceania')
+        page.select_node('Tuvalu')
+
+        page.grid_view()
+        page.tree_view()
+
+        page.assert_page_contains_text('Tuvalu')
+        self.assertEqual(page.selected_node().textContent(), 'Tuvalu')

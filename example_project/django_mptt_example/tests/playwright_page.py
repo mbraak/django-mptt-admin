@@ -8,8 +8,11 @@ class PlaywrightPage:
         self.live_server_url = live_server_url
 
         self.playwright = sync_playwright().start()
-        self.browser = self.playwright.chromium.launch()
+        self.browser = self.playwright.chromium.launch(headless=False)
         self.page = self.browser.newPage()
+
+    def assert_page_contains_text(self, text):
+        self.page.querySelector(f'text="{text}"')
 
     def close(self):
         self.browser.close()
