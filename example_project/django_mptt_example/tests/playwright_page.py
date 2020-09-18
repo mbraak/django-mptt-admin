@@ -15,6 +15,9 @@ class PlaywrightPage:
         self.browser.close()
         self.playwright.stop()
 
+    def find_link(self, label):
+        return self.page.querySelector(f'css=a >> text="{label}"')
+
     def find_node_element(self, title) -> ElementHandle:
         node_element = self.find_title_element(title).evaluateHandle(
             """
@@ -42,6 +45,10 @@ class PlaywrightPage:
         assert toggler
         return toggler
 
+    def grid_view(self):
+        self.find_link('Grid view').click()
+        self.page.waitForSelector('#result_list')
+
     def login(self, username, password):
         page = self.page
 
@@ -62,14 +69,18 @@ class PlaywrightPage:
         toggler = self.find_toggler(node_element)
         toggler.click()
 
-        wait_until(lambda: 'jqtree-loading' in node_element.getAttribute('class'))
-        wait_until(lambda: 'jqtree-loading' not in node_element.getAttribute('class'))
+        if 'jqtree-loading' in node_element.getAttribute('class'):
+            wait_until(lambda: 'jqtree-loading' not in node_element.getAttribute('class'))
 
     def select_node(self, title):
         self.find_title_element(title).click()
 
     def selected_node(self):
         return self.page.querySelector('.jqtree-selected > .jqtree-element > .jqtree-title')
+
+    def tree_view(self):
+        self.find_link('Tree view').click()
+        self.page.waitForSelector('css=#tree >> text=Oceania')
 
     def visit_countries_page(self):
         page = self.page

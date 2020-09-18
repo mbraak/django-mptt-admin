@@ -40,3 +40,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.open_node('Oceania')
         page.find_title_element('Tuvalu')
 
+    def test_grid_view(self):
+        page = self.page
+
+        page.grid_view()
+        page.tree_view()
