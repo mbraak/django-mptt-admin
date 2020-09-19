@@ -123,5 +123,8 @@ class PlaywrightPage:
         page.waitForSelector('text=Select country to change')
         page.waitForSelector('css=#tree >> text=Oceania')
 
+    def wait_for_node(self, title):
+        self.page.waitForSelector(f'css=#tree .jqtree-title >> text="{title}"')
+
     def wait_for_text(self, text):
         self.page.waitForSelector(f'text="{text}"')

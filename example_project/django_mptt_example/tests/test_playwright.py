@@ -58,7 +58,7 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.grid_view()
         page.tree_view()
 
-        page.wait_for_text('Tuvalu')
+        page.wait_for_node('Tuvalu')
         self.assertEqual(page.selected_node().textContent(), 'Tuvalu')
 
     def test_edit(self):
@@ -71,7 +71,7 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         name_input.fill('**Oceania**')
         page.save_form()
 
-        page.wait_for_text('**Oceania**')
+        page.wait_for_node('**Oceania**')
         page.find_node_element('**Oceania**')
 
     def test_add(self):
@@ -83,7 +83,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.find_input('name').fill('**Test**')
         page.save_form()
 
-        page.wait_for_text('Oceania')
+        page.wait_for_node('Oceania')
         page.open_node('Oceania')
-        page.wait_for_text('**Test**')
+
+        page.wait_for_node('**Test**')
         page.find_node_element('**Test**')
