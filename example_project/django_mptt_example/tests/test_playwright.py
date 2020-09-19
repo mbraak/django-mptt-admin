@@ -58,5 +58,17 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.grid_view()
         page.tree_view()
 
-        page.assert_page_contains_text('Tuvalu')
+        page.wait_for_text('Tuvalu')
         self.assertEqual(page.selected_node().textContent(), 'Tuvalu')
+
+    def test_edit(self):
+        page = self.page
+
+        page.edit_node('Oceania')
+        name_input = page.find_input('name')
+        self.assertEqual(name_input.getAttribute('value'), 'Oceania')
+
+        name_input.fill('**Oceania**')
+        page.save_form()
+
+        page.find_title_element('**Oceania**')

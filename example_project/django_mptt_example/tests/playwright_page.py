@@ -11,12 +11,23 @@ class PlaywrightPage:
         self.browser = self.playwright.chromium.launch()
         self.page = self.browser.newPage()
 
-    def assert_page_contains_text(self, text):
-        self.page.querySelector(f'text="{text}"')
-
     def close(self):
         self.browser.close()
         self.playwright.stop()
+
+    def edit_node(self, title):
+        self.find_edit_link(title, '(edit)').click()
+        self.page.waitForSelector('text="Change country"')
+
+    def find_edit_link(self, node_title, link_title):
+        links = [
+            e for e in self.find_node_element(node_title).querySelectorAll('a.edit')
+            if e.textContent() == link_title
+        ]
+        return links[0]
+
+    def find_input(self, name):
+        return self.page.querySelector(f"input[name='{name}']")
 
     def find_link(self, label):
         return self.page.querySelector(f'css=a >> text="{label}"')
@@ -75,6 +86,10 @@ class PlaywrightPage:
         if 'jqtree-loading' in node_element.getAttribute('class'):
             wait_until(lambda: 'jqtree-loading' not in node_element.getAttribute('class'))
 
+    def save_form(self):
+        self.page.querySelector("input[value='Save']").click()
+        self.page.waitForSelector('li.success')
+
     def select_node(self, title):
         self.find_title_element(title).click()
 
@@ -90,3 +105,6 @@ class PlaywrightPage:
         page.goto(self.live_server_url + '/django_mptt_example/country/')
         page.waitForSelector('text=Select country to change')
         page.waitForSelector('css=#tree >> text=Oceania')
+
+    def wait_for_text(self, text):
+        self.page.waitForSelector(f'text="{text}"')
