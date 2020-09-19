@@ -6,7 +6,6 @@ lxml==4.5.2
 playwright==0.140.0
 psycopg2-binary==2.8.6
 pyquery==1.4.1
-selenium==3.141.0
 waitress==1.4.4
 WebOb==1.8.6
 WebTest==2.0.35
