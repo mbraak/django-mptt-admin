@@ -20,6 +20,7 @@ before_install:
 install:
   - pip install $DJANGO
   - pip install -r example_project/requirements_test.txt
+  - python -m playwright install
   - pip install -r example_project/requirements_travis.txt
   - pip install -e .
 script:
