@@ -20,6 +20,25 @@ class PlaywrightPage:
         self.browser.close()
         self.playwright.stop()
 
+    def close_node(self, title):
+        self.toggle_node(title)
+
+    def drag_and_drop(self, from_title, to_title):
+        from_rect = self.find_title_element(from_title).boundingBox()
+        to_rect = self.find_title_element(to_title).boundingBox()
+
+        self.page.mouse.move(
+            from_rect['x'] + from_rect['width'] / 2,
+            from_rect['y'] + from_rect['height'] / 2
+        )
+        self.page.mouse.down()
+        self.page.waitForTimeout(400)
+        self.page.mouse.move(
+            to_rect['x'] + to_rect['width'] / 2,
+            to_rect['y'] + to_rect['height'] / 2
+        )
+        self.page.mouse.up()
+
     def edit_node(self, title):
         self.find_edit_link(title, '(edit)').click()
         self.page.waitForSelector('text="Change country"')
@@ -84,9 +103,8 @@ class PlaywrightPage:
         return [e.textContent() for e in self.page.querySelectorAll('.jqtree-title')]
 
     def open_node(self, title):
+        self.toggle_node(title)
         node_element = self.find_node_element(title)
-        toggler = self.find_toggler(node_element)
-        toggler.click()
 
         if 'jqtree-loading' in node_element.getAttribute('class'):
             wait_until(lambda: 'jqtree-loading' not in node_element.getAttribute('class'))
@@ -112,6 +130,11 @@ class PlaywrightPage:
 
     def selected_node(self):
         return self.page.querySelector('.jqtree-selected > .jqtree-element > .jqtree-title')
+
+    def toggle_node(self, title):
+        node_element = self.find_node_element(title)
+        toggler = self.find_toggler(node_element)
+        toggler.click()
 
     def tree_view(self):
         self.find_link('Tree view').click()

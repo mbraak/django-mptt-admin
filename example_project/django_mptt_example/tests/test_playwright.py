@@ -88,3 +88,23 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
 
         page.wait_for_node('**Test**')
         page.find_node_element('**Test**')
+
+    def test_move_node(self):
+        page = self.page
+
+        page.open_node('Asia')
+        page.close_node('Asia')
+
+        page.drag_and_drop('Africa', 'Asia')
+        page.page.waitForResponse('**/move/')
+
+        self.assertEqual(
+            page.node_titles()[:5],
+            [
+                'root',
+                'Antarctica',
+                'Asia',
+                'Africa',
+                'Afghanistan',
+            ]
+        )
