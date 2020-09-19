@@ -17,12 +17,6 @@ def remove_directory(string):  # pragma: no cover
     path.rmdir()
 
 
-def clean_directory(string):
-    remove_directory(string)
-
-    Path(string).mkdir()
-
-
 def write_json(path, data):
     json = dumps(data)
 

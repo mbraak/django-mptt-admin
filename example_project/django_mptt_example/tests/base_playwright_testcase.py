@@ -1,5 +1,6 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.contrib.auth.models import User
+from django.conf import settings
 from .playwright_page import PlaywrightPage
 
 
@@ -14,6 +15,9 @@ class BasePlaywrightTestCase(StaticLiveServerTestCase):
 
     def tearDown(self):
         try:
+            if settings.DJANGO_MPTT_ADMIN_COVERAGE_JS:
+                self.page.save_coverage()
+
             self.page.close()
         finally:
             super().tearDown()

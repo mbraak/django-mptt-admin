@@ -1,6 +1,7 @@
+from uuid import uuid4
 from playwright import sync_playwright
 from playwright.sync_api import ElementHandle
-from .utils import wait_until
+from .utils import wait_until, write_json
 
 
 class PlaywrightPage:
@@ -89,6 +90,18 @@ class PlaywrightPage:
 
         if 'jqtree-loading' in node_element.getAttribute('class'):
             wait_until(lambda: 'jqtree-loading' not in node_element.getAttribute('class'))
+
+    def save_coverage(self):
+        coverage = self.page.evaluateHandle(
+            """
+            function() {
+                return window.__coverage__;
+            }
+            """
+        ).jsonValue()
+
+        filename = uuid4().hex
+        write_json(f'js_coverage/{filename}.json', coverage)
 
     def save_form(self):
         self.page.querySelector("input[value='Save']").click()
