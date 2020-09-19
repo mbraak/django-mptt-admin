@@ -1,0 +1,6 @@
+[run]
+branch = True
+
+[paths]
+source =
+  django_mptt_admin
