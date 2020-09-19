@@ -71,7 +71,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         name_input.fill('**Oceania**')
         page.save_form()
 
-        page.find_title_element('**Oceania**')
+        page.wait_for_text('**Oceania**')
+        page.find_node_element('**Oceania**')
 
     def test_add(self):
         page = self.page
@@ -82,5 +83,7 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.find_input('name').fill('**Test**')
         page.save_form()
 
+        page.wait_for_text('Oceania')
         page.open_node('Oceania')
-        page.find_title_element('**Test**')
+        page.wait_for_text('**Test**')
+        page.find_node_element('**Test**')
