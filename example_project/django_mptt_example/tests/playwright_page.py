@@ -11,6 +11,10 @@ class PlaywrightPage:
         self.browser = self.playwright.chromium.launch()
         self.page = self.browser.newPage()
 
+    def add_node(self, parent_title):
+        self.find_edit_link(parent_title, '(add)').click()
+        self.wait_for_text('Add country')
+
     def close(self):
         self.browser.close()
         self.playwright.stop()

@@ -72,3 +72,15 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.save_form()
 
         page.find_title_element('**Oceania**')
+
+    def test_add(self):
+        page = self.page
+
+        page.add_node('Oceania')
+
+        page.find_input('code').fill('TST')
+        page.find_input('name').fill('**Test**')
+        page.save_form()
+
+        page.open_node('Oceania')
+        page.find_title_element('**Test**')
