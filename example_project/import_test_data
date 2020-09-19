@@ -1,1 +1,1 @@
-python manage.py loaddata django_mptt_example/tests/testdata/countries.json
+python manage.py loaddata django_mptt_example/fixtures/countries.json
