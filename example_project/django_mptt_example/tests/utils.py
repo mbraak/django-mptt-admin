@@ -27,7 +27,7 @@ def get_continents():
     return ','.join(c.name for c in Country.objects.filter(level=1).order_by('lft'))
 
 
-def wait_until(fn):
+def wait_until(fn):  # pragma: no cover
     for i in range(100):
         if fn():
             return
