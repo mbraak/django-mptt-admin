@@ -32,7 +32,7 @@ class PlaywrightPage:
             from_rect['y'] + from_rect['height'] / 2
         )
         self.page.mouse.down()
-        self.page.waitForTimeout(400)
+        self.page.waitForTimeout(200)
         self.page.mouse.move(
             to_rect['x'] + to_rect['width'] / 2,
             to_rect['y'] + to_rect['height'] / 2
