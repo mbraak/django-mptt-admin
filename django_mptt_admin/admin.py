@@ -83,6 +83,7 @@ class DjangoMpttAdminMixin:
     tree_animation_speed = None
     tree_auto_open = 1
     tree_load_on_demand = 1
+    tree_mouse_delay = None
     trigger_save_after_move = False
 
     # Autoescape the tree data; default is True
@@ -141,23 +142,24 @@ class DjangoMpttAdminMixin:
         insert_at_url = get_admin_url_with_preserved_filters('add')
 
         context = dict(
-            title=change_list.title,
             app_label=self.model._meta.app_label,
-            model_name=util.get_model_name(self.model),
+            autoescape=util.get_javascript_value(self.autoescape),
             cl=change_list,
-            media=self.get_tree_media(),
+            csrf_cookie_name=get_csrf_cookie_name(),
+            grid_url=grid_url,
             has_add_permission=self.has_add_permission(request),
+            insert_at_url=insert_at_url,
+            jsi18n_url=self.get_admin_url('jsi18n'),
+            media=self.get_tree_media(),
+            model_name=util.get_model_name(self.model),
             opts=change_list.opts,
+            preserved_filters=preserved_filters,
+            title = change_list.title,
             tree_animation_speed=self.get_tree_animation_speed(),
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
             tree_json_url=tree_json_url,
-            insert_at_url=insert_at_url,
-            grid_url=grid_url,
-            autoescape=util.get_javascript_value(self.autoescape),
+            tree_mouse_delay=self.get_tree_mouse_delay(),
             use_context_menu=util.get_javascript_value(self.use_context_menu),
-            jsi18n_url=self.get_admin_url('jsi18n'),
-            preserved_filters=preserved_filters,
-            csrf_cookie_name=get_csrf_cookie_name()
         )
         if extra_context:
             context.update(extra_context)
@@ -388,6 +390,11 @@ class DjangoMpttAdminMixin:
         else:
             return util.get_javascript_value(self.tree_animation_speed)
 
+    def get_tree_mouse_delay(self):
+        if self.tree_mouse_delay is None:
+            return None
+        else:
+            return util.get_javascript_value(self.tree_mouse_delay)
 
 
 class DjangoMpttAdmin(DjangoMpttAdminMixin, MPTTModelAdmin):

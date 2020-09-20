@@ -41,5 +41,11 @@ class CountryAdmin(DjangoMpttAdmin):
         else:
             return None
 
+    def get_tree_mouse_delay(self):
+        if getattr(settings, 'DJANGO_TESTING', False):
+            return 0
+        else:
+            return None
+
 
 admin.site.register(Country, CountryAdmin)

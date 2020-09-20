@@ -4727,6 +4727,7 @@ function initTree($tree, _ref) {
       autoOpen = _ref.autoOpen,
       autoEscape = _ref.autoEscape,
       csrfCookieName = _ref.csrfCookieName,
+      mouseDelay = _ref.mouseDelay,
       rtl = _ref.rtl;
   var errorNode = null;
   var insertAtUrl = new url_parse($tree.data("insert_at_url"), true);
@@ -4869,6 +4870,10 @@ function initTree($tree, _ref) {
   $tree.tree(treeOptions);
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
+
+  if (mouseDelay !== null) {
+    $tree.tree("setMouseDelay", mouseDelay);
+  }
 }
 
 function urlToString(url) {
@@ -4890,6 +4895,7 @@ jQuery(function () {
     var animationSpeed = $tree.data("tree-animation-speed");
     var autoOpen = $tree.data("auto_open");
     var autoEscape = Boolean($tree.data("autoescape"));
+    var mouseDelay = $tree.data("tree-mouse-delay");
     var rtl = $tree.data("rtl") === "1";
     var csrfCookieName = $tree.data("csrf-cookie-name");
     initTree($tree, {
@@ -4897,6 +4903,7 @@ jQuery(function () {
       autoOpen: autoOpen,
       autoEscape: autoEscape,
       csrfCookieName: csrfCookieName,
+      mouseDelay: mouseDelay,
       rtl: rtl
     });
   }
