@@ -1,31 +1,32 @@
 language: python
 dist: bionic
 addons:
-  firefox: latest
+  apt:
+    packages:
+      - ffmpeg
+services:
+  - postgresql
 matrix:
   include:
     - python: 3.7
-      env: DJANGO="Django==2.2.16" MOZ_HEADLESS=1
+      env: DJANGO="Django==2.2.16"
     - python: 3.7
-      env: DJANGO="Django==3.0.10" MOZ_HEADLESS=1
+      env: DJANGO="Django==3.0.10"
     - python: 3.8
-      env: DJANGO="Django==3.0.10" MOZ_HEADLESS=1
+      env: DJANGO="Django==3.0.10"
     - python: 3.8
-      env: DJANGO="Django==3.1.1" MOZ_HEADLESS=1
-before_install:
-  - wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
-  - mkdir geckodriver
-  - tar -xzf geckodriver-v0.26.0-linux64.tar.gz -C geckodriver
-  - export PATH=$PATH:$PWD/geckodriver
+      env: DJANGO="Django==3.1.1"
 install:
   - pip install $DJANGO
   - pip install -r example_project/requirements_test.txt
+  - python -m playwright install
   - pip install -r example_project/requirements_travis.txt
   - pip install -e .
 script:
   - python -Wd example_project/manage.py test django_mptt_example
   - cd frontend && yarn && yarn run build && cd ..
-  - COVERAGE=true coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
+  - mkdir js_coverage
+  - COVERAGE=true coverage run --source=django_mptt_admin example_project/manage.py test django_mptt_example
   - cd coveralls
   - yarn && gem install coveralls-lcov
   - yarn run merge_coverage

@@ -4,14 +4,10 @@ from django.test import TestCase
 from django_mptt_admin.util import get_tree_queryset, get_tree_from_queryset, get_javascript_value, serialize_id
 
 from ..models import Country
-from .utils import read_testdata
 
 
 class GetQuerySetTestCase(TestCase):
-    def setUp(self):
-        super().setUp()
-
-        read_testdata()
+    fixtures = ['countries.json']
 
     def test_default(self):
         qs = get_tree_queryset(Country)
@@ -39,10 +35,7 @@ class GetQuerySetTestCase(TestCase):
 
 
 class GetTreeFromQuerySetTestCase(TestCase):
-    def setUp(self):
-        super().setUp()
-
-        read_testdata()
+    fixtures = ['countries.json']
 
     def test_default(self):
         tree = get_tree_from_queryset(get_tree_queryset(Country))

@@ -1,10 +1,10 @@
 from django_webtest import WebTest
 from django.contrib.auth.models import User
 
-from .utils import read_testdata
-
 
 class BaseViewTestCase(WebTest):
+    fixtures = ['countries.json']
+
     def create_test_user(self):
         User.objects.create_superuser('admin', 'admin@admin.com', 'password')
 
@@ -13,8 +13,6 @@ class BaseViewTestCase(WebTest):
 
         self.create_test_user()
         self.login()
-
-        read_testdata()
 
     def login(self):
         login_page = self.app.get('/login/')

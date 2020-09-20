@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.conf import settings
 
 from django_mptt_admin.admin import DjangoMpttAdmin
 
@@ -33,6 +34,12 @@ class CountryAdmin(DjangoMpttAdmin):
 
     def has_change_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    def get_tree_animation_speed(self):
+        if getattr(settings, 'DJANGO_TESTING', False):
+            return 0
+        else:
+            return None
 
 
 admin.site.register(Country, CountryAdmin)
