@@ -25,12 +25,20 @@ interface Parameters {
     autoOpen: boolean | number;
     autoEscape: boolean;
     csrfCookieName: string;
+    mouseDelay: number | null;
     rtl: boolean;
 }
 
 function initTree(
     $tree: JQuery,
-    { animationSpeed, autoOpen, autoEscape, csrfCookieName, rtl }: Parameters
+    {
+        animationSpeed,
+        autoOpen,
+        autoEscape,
+        csrfCookieName,
+        mouseDelay,
+        rtl,
+    }: Parameters
 ) {
     let errorNode: INode | null = null;
     const insertAtUrl = new URL($tree.data("insert_at_url"), true);
@@ -198,6 +206,10 @@ function initTree(
 
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
+
+    if (mouseDelay !== null) {
+        $tree.tree("setMouseDelay", mouseDelay);
+    }
 }
 
 function urlToString(url: URL): string {
@@ -221,6 +233,7 @@ jQuery(() => {
             | null;
         const autoOpen = $tree.data("auto_open") as boolean | number;
         const autoEscape = Boolean($tree.data("autoescape"));
+        const mouseDelay = $tree.data("tree-mouse-delay") as number | null;
         const rtl = $tree.data("rtl") === "1";
         const csrfCookieName = $tree.data("csrf-cookie-name") as string;
 
@@ -229,6 +242,7 @@ jQuery(() => {
             autoOpen,
             autoEscape,
             csrfCookieName,
+            mouseDelay,
             rtl,
         });
     }

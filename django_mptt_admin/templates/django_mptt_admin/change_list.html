@@ -15,6 +15,9 @@
         {% if tree_animation_speed is not None %}
             data-tree-animation-speed="{{ tree_animation_speed }}"
         {% endif %}
+        {% if tree_mouse_delay is not None %}
+            data-tree-mouse-delay="{{ tree_mouse_delay }}"
+        {% endif %}
         data-url="{{ tree_json_url }}"
         data-insert_at_url="{{ insert_at_url }}"
         data-save_state="{{ app_label }}_{{ model_name }}"
