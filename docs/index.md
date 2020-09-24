@@ -134,6 +134,7 @@ Also see the example project for a complete continent filter.
 **development**
 
 * Issue #309: add option for animation speed
+* Issue #314: update jqtree to 1.5.1
 
 **1.0.2** (june 26 2020)
 
