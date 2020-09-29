@@ -8,7 +8,7 @@ class BasePlaywrightTestCase(StaticLiveServerTestCase):
     def setUp(self):
         super().setUp()
 
-        User.objects.create_superuser('admin', 'admin@admin.com', 'password')
+        User.objects.create_superuser("admin", "admin@admin.com", "password")
 
         self.page = PlaywrightPage(self.live_server_url)
         self.setup_page()
@@ -23,4 +23,4 @@ class BasePlaywrightTestCase(StaticLiveServerTestCase):
             super().tearDown()
 
     def setup_page(self):
-        self.page.login('admin', 'password')
+        self.page.login("admin", "password")

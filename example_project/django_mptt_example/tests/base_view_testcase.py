@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 
 
 class BaseViewTestCase(WebTest):
-    fixtures = ['countries.json']
+    fixtures = ["countries.json"]
 
     def create_test_user(self):
-        User.objects.create_superuser('admin', 'admin@admin.com', 'password')
+        User.objects.create_superuser("admin", "admin@admin.com", "password")
 
     def setUp(self):
         super().setUp()
@@ -15,13 +15,13 @@ class BaseViewTestCase(WebTest):
         self.login()
 
     def login(self):
-        login_page = self.app.get('/login/')
+        login_page = self.app.get("/login/")
         form = login_page.form
 
-        form['username'] = 'admin'
-        form['password'] = 'password'
+        form["username"] = "admin"
+        form["password"] = "password"
 
         form.submit()
 
-        response = self.app.get('/')
-        self.assertEqual(response.context['user'].username, 'admin')
+        response = self.app.get("/")
+        self.assertEqual(response.context["user"].username, "admin")

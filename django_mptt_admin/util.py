@@ -9,7 +9,9 @@ def serialize_id(pk):
         return str(pk)
 
 
-def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_label_field_name=None):
+def get_tree_from_queryset(
+    queryset, on_create_node=None, max_level=None, item_label_field_name=None
+):
     """
     Return tree data that is suitable for jqTree.
     The queryset must be sorted by 'tree_id' and 'left' fields.
@@ -40,16 +42,13 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_l
         else:
             label = str(instance)
 
-        node_info = dict(
-            name=label,
-            id=serialize_id(pk)
-        )
+        node_info = dict(name=label, id=serialize_id(pk))
         if on_create_node:
             on_create_node(instance, node_info)
 
         if max_level is not None and not instance.is_leaf_node():
             # If there is a maximum level and this node has children, then initially set property 'load_on_demand' to true.
-            node_info['load_on_demand'] = True
+            node_info["load_on_demand"] = True
 
         if instance.level == min_level:
             # This is the lowest level. Skip finding a parent.
@@ -66,15 +65,15 @@ def get_tree_from_queryset(queryset, on_create_node=None, max_level=None, item_l
 
             # Check for corner case: parent is deleted.
             if parent_info:
-                if 'children' not in parent_info:
-                    parent_info['children'] = []
+                if "children" not in parent_info:
+                    parent_info["children"] = []
 
                 # Add node to the tree
-                parent_info['children'].append(node_info)
+                parent_info["children"].append(node_info)
 
                 # If there is a maximum level, then reset property 'load_on_demand' for parent
                 if max_level is not None:
-                    parent_info['load_on_demand'] = False
+                    parent_info["load_on_demand"] = False
 
         # Update node dict
         node_dict[pk] = node_info
@@ -102,7 +101,7 @@ def get_tree_queryset(model, node_id=None, max_level=None, include_root=True):
         if not include_root:
             qs = qs.exclude(level=0)
 
-    return qs.order_by('tree_id', 'lft')
+    return qs.order_by("tree_id", "lft")
 
 
 def get_javascript_value(value):
@@ -116,9 +115,9 @@ def get_javascript_value(value):
     """
     if isinstance(value, bool):
         if value:
-            return 'true'
+            return "true"
         else:
-            return 'false'
+            return "false"
     else:
         return json.dumps(value)
 
