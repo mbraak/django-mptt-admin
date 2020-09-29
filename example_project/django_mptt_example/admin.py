@@ -7,11 +7,11 @@ from .models import Country
 
 
 class ContinentFilter(admin.SimpleListFilter):
-    title = 'continent'
-    parameter_name = 'continent'
+    title = "continent"
+    parameter_name = "continent"
 
     def lookups(self, request, model_admin):
-        continents = Country.objects.filter(level=1).order_by('name')
+        continents = Country.objects.filter(level=1).order_by("name")
 
         return [(c.name, c.name) for c in continents]
 
@@ -28,21 +28,21 @@ class ContinentFilter(admin.SimpleListFilter):
 
 class CountryAdmin(DjangoMpttAdmin):
     tree_auto_open = 0
-    list_display = ('code', 'name')
-    ordering = ('name',)
+    list_display = ("code", "name")
+    ordering = ("name",)
     list_filter = (ContinentFilter,)
 
     def has_change_permission(self, request, obj=None):
         return request.user.is_superuser
 
     def get_tree_animation_speed(self):
-        if getattr(settings, 'DJANGO_TESTING', False):
+        if getattr(settings, "DJANGO_TESTING", False):
             return 0
         else:
             return None
 
     def get_tree_mouse_delay(self):
-        if getattr(settings, 'DJANGO_TESTING', False):
+        if getattr(settings, "DJANGO_TESTING", False):
             return 0
         else:
             return None
