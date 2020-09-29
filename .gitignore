@@ -1,2 +1,4 @@
 .DS_Store
 *.pyc
+django_mptt_admin/static/django_mptt_admin/django_mptt_admin.coverage.js
+django_mptt_admin/static/django_mptt_admin/django_mptt_admin.coverage.js.map
