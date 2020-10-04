@@ -4862,7 +4862,6 @@ function initTree($tree, _ref) {
     onCreateLi: createLi,
     onLoadFailed: handleLoadFailed,
     onLoading: handleLoading,
-    // eslint-disable-line @typescript-eslint/no-unsafe-assignment
     saveState: $tree.data("save_state"),
     useContextMenu: Boolean($tree.data("use_context_menu"))
   };
