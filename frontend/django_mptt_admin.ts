@@ -193,7 +193,7 @@ function initTree(
         dragAndDrop: true,
         onCreateLi: createLi,
         onLoadFailed: handleLoadFailed,
-        onLoading: handleLoading as any, // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+        onLoading: handleLoading,
         saveState: $tree.data("save_state") as boolean,
         useContextMenu: Boolean($tree.data("use_context_menu")),
     };
