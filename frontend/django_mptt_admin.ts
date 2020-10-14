@@ -206,8 +206,9 @@ function initTree(
 
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
+    console.log({ mouseDelay });
 
-    if (mouseDelay !== null) {
+    if (mouseDelay != null) {
         $tree.tree("setMouseDelay", mouseDelay);
     }
 }
