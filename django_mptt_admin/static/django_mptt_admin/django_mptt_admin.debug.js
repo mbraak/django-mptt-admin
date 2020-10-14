@@ -4873,8 +4873,11 @@ function initTree($tree, _ref) {
   $tree.tree(treeOptions);
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
+  console.log({
+    mouseDelay: mouseDelay
+  });
 
-  if (mouseDelay !== null) {
+  if (mouseDelay != null) {
     $tree.tree("setMouseDelay", mouseDelay);
   }
 }
