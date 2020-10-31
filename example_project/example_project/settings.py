@@ -75,4 +75,5 @@ TEMPLATES = [
 
 ALLOWED_HOSTS = ["*"]
 
-DJANGO_MPTT_ADMIN_COVERAGE_JS = "COVERAGE" in os.environ
+if "COVERAGE" in os.environ:
+    DJANGO_MPTT_ADMIN_COVERAGE_JS = True
