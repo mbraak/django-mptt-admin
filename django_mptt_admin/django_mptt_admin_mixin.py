@@ -150,7 +150,7 @@ class DjangoMpttAdminMixin:
     def get_tree_media(self: ModelAdmin):
         django_mptt_admin_js = (
             "django_mptt_admin.coverage.js"
-            if settings.DJANGO_MPTT_ADMIN_COVERAGE_JS
+            if getattr(settings, 'DJANGO_MPTT_ADMIN_COVERAGE_JS', False)
             else "django_mptt_admin.js"
         )
 

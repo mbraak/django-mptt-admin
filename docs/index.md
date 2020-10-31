@@ -131,10 +131,18 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.0.2** (october 27 2020)
+
+* Issue #328: fix DJANGO_MPTT_ADMIN_COVERAGE_JS (thanks to Andrew Kh)
+
+**2.0.1** (october 26 2020)
 
 * Issue #309: add option for animation speed
-* Issue #314: update jqtree to 1.5.1
+* Issue #325: update jqtree to 1.5.2
+
+**2.0.0** (august 7 2020)
+
+* Support Django 3.1
 
 **1.0.2** (june 26 2020)
 
