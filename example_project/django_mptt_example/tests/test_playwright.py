@@ -113,3 +113,10 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
                 "Afghanistan",
             ],
         )
+
+    def test_load_error(self):
+        page = self.page
+        page.page.route("**", lambda route, _request: route.abort())
+
+        page.toggle_node("Asia")
+        page.wait_for_text("Error while loading the data from the server")
