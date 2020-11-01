@@ -34,8 +34,17 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
     def test_select_node(self):
         page = self.page
 
-        page.select_node("Antarctica")
-        self.assertEqual(page.selected_node().textContent(), "Antarctica")
+        page.select_node("Asia")
+        self.assertEqual(page.selected_node().textContent(), "Asia")
+        self.assertEqual(
+            page.find_edit_link("Asia", "(edit)").getAttribute("tabindex"), "0"
+        )
+
+        page.select_node("Europe")
+        self.assertEqual(page.selected_node().textContent(), "Europe")
+        self.assertEqual(
+            page.find_edit_link("Asia", "(edit)").getAttribute("tabindex"), "-1"
+        )
 
     def test_open_node(self):
         page = self.page
@@ -108,3 +117,25 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
                 "Afghanistan",
             ],
         )
+
+    def test_move_node_error(self):
+        page = self.page
+
+        page.open_node("Asia")
+        page.close_node("Asia")
+
+        page.abort_requests()
+
+        page.drag_and_drop("Africa", "Asia")
+        page.wait_for_text("move failed")
+
+        page.reset_abort_requests()
+        page.drag_and_drop("Africa", "Asia")
+        page.page.waitForResponse("**/move/")
+
+    def test_load_error(self):
+        page = self.page
+        page.abort_requests()
+
+        page.toggle_node("Asia")
+        page.wait_for_text("Error while loading the data from the server")

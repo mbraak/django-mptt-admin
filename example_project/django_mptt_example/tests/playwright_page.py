@@ -9,8 +9,14 @@ class PlaywrightPage:
         self.live_server_url = live_server_url
 
         self.playwright = sync_playwright().start()
-        self.browser = self.playwright.chromium.launch()
+        self.browser = self.playwright.chromium.launch(headless=True)
         self.page = self.browser.newPage()
+
+    def abort_requests(self):
+        self.page.route("**", lambda route, _request: route.abort())
+
+    def reset_abort_requests(self):
+        self.page.unroute("**")
 
     def add_node(self, parent_title):
         self.find_edit_link(parent_title, "(add)").click()
