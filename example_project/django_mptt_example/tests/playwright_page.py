@@ -12,6 +12,9 @@ class PlaywrightPage:
         self.browser = self.playwright.chromium.launch(headless=True)
         self.page = self.browser.newPage()
 
+    def abort_requests(self):
+        self.page.route("**", lambda route, _request: route.abort())
+
     def add_node(self, parent_title):
         self.find_edit_link(parent_title, "(add)").click()
         self.wait_for_text("Add country")
