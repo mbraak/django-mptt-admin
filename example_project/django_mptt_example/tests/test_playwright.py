@@ -129,6 +129,10 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.drag_and_drop("Africa", "Asia")
         page.wait_for_text("move failed")
 
+        page.reset_abort_requests()
+        page.drag_and_drop("Africa", "Asia")
+        page.page.waitForResponse("**/move/")
+
     def test_load_error(self):
         page = self.page
         page.abort_requests()

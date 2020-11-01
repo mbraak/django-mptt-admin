@@ -15,6 +15,9 @@ class PlaywrightPage:
     def abort_requests(self):
         self.page.route("**", lambda route, _request: route.abort())
 
+    def reset_abort_requests(self):
+        self.page.unroute("**")
+
     def add_node(self, parent_title):
         self.find_edit_link(parent_title, "(add)").click()
         self.wait_for_text("Add country")

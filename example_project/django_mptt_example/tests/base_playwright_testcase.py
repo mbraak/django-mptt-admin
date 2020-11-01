@@ -15,7 +15,7 @@ class BasePlaywrightTestCase(StaticLiveServerTestCase):
 
     def tearDown(self):
         try:
-            if getattr(settings, 'DJANGO_MPTT_ADMIN_COVERAGE_JS', False):
+            if getattr(settings, "DJANGO_MPTT_ADMIN_COVERAGE_JS", False):
                 self.page.save_coverage()
 
             self.page.close()
