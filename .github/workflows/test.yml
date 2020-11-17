@@ -30,6 +30,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install wheel
         pip install -r example_project/requirements_test.txt
         python -m playwright install
         pip install -r example_project/requirements_travis.txt
@@ -37,3 +38,7 @@ jobs:
     - name: Test
       run: |
         python -Wd example_project/manage.py test django_mptt_example
+      env:
+        POSTGRES_HOST: localhost
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_PORT: 5432
