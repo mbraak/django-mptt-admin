@@ -6,8 +6,24 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    container: node:10.18-jessie
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out repository code
+      uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
