@@ -23,7 +23,7 @@ jobs:
     steps:
     - name: Check out repository code
       uses: actions/checkout@v2
-    - name: Cache dependency
+    - name: Cache dependencies
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
