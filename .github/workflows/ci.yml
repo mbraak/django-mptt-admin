@@ -49,3 +49,27 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '14'
+    - name: Setup coverage
+      run: |
+        cd frontend && yarn && yarn run build && cd ..
+        mkdir js_coverage
+    - name: Test with coverage
+      run: |
+        COVERAGE=true coverage run --source=django_mptt_admin example_project/manage.py test django_mptt_example
+    - name: Merge coverage
+      run: |
+        cd coveralls
+        yarn && gem install coveralls-lcov
+        yarn run merge_coverage
+        coveralls-lcov -v -n coverage/lcov.info > coverage.json
+        cd ..
+        coverage report
+    - name: Upload coverage
+      run: |
+        coveralls --merge=coveralls/coverage.json
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
