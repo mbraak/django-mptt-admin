@@ -80,3 +80,6 @@ jobs:
         coveralls --merge=coveralls/coverage.json
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
+        COVERALLS_SERVICE_NAME: github
+        COVERALLS_GIT_COMMIT: ${{ github.sha }}
+        COVERALLS_GIT_BRANCH: ${{ github.ref }}
