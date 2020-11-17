@@ -15,7 +15,7 @@ DATABASES = dict(
         ENGINE="django.db.backends.postgresql",
         NAME="django-mptt-admin-example",
         USER="postgres",
-        PASSWORD="",
+        PASSWORD="postgres",
         HOST="",
         PORT="",
     )
