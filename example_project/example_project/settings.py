@@ -16,8 +16,8 @@ DATABASES = dict(
         NAME="django-mptt-admin-example",
         USER="postgres",
         PASSWORD="postgres",
-        HOST="",
-        PORT="",
+        HOST="localhost",
+        PORT="5432",
     )
 )
 
