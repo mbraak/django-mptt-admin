@@ -60,6 +60,10 @@ jobs:
     - name: Test with coverage
       run: |
         COVERAGE=true coverage run --source=django_mptt_admin example_project/manage.py test django_mptt_example
+      env:
+        POSTGRES_HOST: localhost
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_PORT: 5432
     - name: Merge coverage
       run: |
         cd coveralls
