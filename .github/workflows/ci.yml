@@ -27,13 +27,23 @@ jobs:
     steps:
     - name: Check out repository code
       uses: actions/checkout@v2
-    - name: Cache dependencies
+    - name: Cache python dependencies
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
+    - name: Get yarn cache directory path
+       id: yarn-cache-dir-path
+       run: echo "::set-output name=dir::$(yarn cache dir)"
+    - name: Cache javascript dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
+        restore-keys: |
+         ${{ runner.os }}-yarn-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -60,7 +70,10 @@ jobs:
         node-version: '14'
     - name: Setup coverage
       run: |
-        cd frontend && yarn && yarn run build && cd ..
+        cd frontend
+        yarn --prefer-offline
+        yarn run build
+        cd ..
         mkdir js_coverage
     - name: Test with coverage
       run: |
