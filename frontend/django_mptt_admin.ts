@@ -1,8 +1,6 @@
 import "jqtree";
 import { Spinner } from "spin.js";
 import * as cookie from "cookie";
-import * as URL from "url-parse";
-import * as qs from "querystringify";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 interface JQTreeMoveEvent extends JQuery.Event {
@@ -41,15 +39,21 @@ function initTree(
     }: Parameters
 ) {
     let errorNode: INode | null = null;
-    const insertAtUrl = new URL($tree.data("insert_at_url"), true);
+    const baseUrl = "http://example.com";
+    const insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
 
     function createLi(node: INode, $li: JQuery, isSelected: boolean) {
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
-        insertAtUrl.query.insert_at = `${node.id as string | number}`;
+        insertAtUrl.searchParams.set(
+            "insert_at",
+            `${node.id as string | number}`
+        );
 
-        const insertUrlString = urlToString(insertAtUrl);
+        const insertUrlString = insertAtUrl
+            .toString()
+            .substring(baseUrl.length);
 
         const tabindex = isSelected ? "0" : "-1";
 
@@ -206,21 +210,9 @@ function initTree(
 
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
-    console.log({ mouseDelay });
 
     if (mouseDelay != null) {
         $tree.tree("setMouseDelay", mouseDelay);
-    }
-}
-
-function urlToString(url: URL): string {
-    const { pathname, query } = url;
-    const querystring = qs.stringify(query);
-
-    if (!querystring) {
-        return pathname;
-    } else {
-        return `${pathname}?${querystring}`;
     }
 }
 
