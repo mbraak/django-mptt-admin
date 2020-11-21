@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mbraak/django-mptt-admin.svg?branch=master)](https://travis-ci.org/mbraak/django-mptt-admin) [![Version](https://badge.fury.io/py/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
+![Continuous integration](https://github.com/mbraak/django-mptt-admin/workflows/Continuous%20integration/badge.svg) [![Version](https://badge.fury.io/py/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
 [![Coverage Status](https://coveralls.io/repos/mbraak/django-mptt-admin/badge.svg?branch=master&service=github)](https://coveralls.io/github/mbraak/django-mptt-admin?branch=master)
 [![Requirements Status](https://requires.io/github/mbraak/django-mptt-admin/requirements.svg?branch=master)](https://requires.io/github/mbraak/django-mptt-admin/requirements/?branch=master)
