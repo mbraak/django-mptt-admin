@@ -28,7 +28,6 @@
         "@jsdevtools/coverage-istanbul-loader": "^3.0.5",
         "@types/cookie": "^0.4.0",
         "@types/jquery": "^3.5.0",
-        "@types/url-parse": "^1.4.3",
         "@typescript-eslint/eslint-plugin": "^4.0.1",
         "@typescript-eslint/parser": "^4.0.1",
         "babel-loader": "^8.1.0",
@@ -42,7 +41,6 @@
     "dependencies": {
         "cookie": "^0.4.1",
         "jqtree": "^1.5.2",
-        "spin.js": "^4.1.0",
-        "url-parse": "^1.4.4"
+        "spin.js": "^4.1.0"
     }
 }
