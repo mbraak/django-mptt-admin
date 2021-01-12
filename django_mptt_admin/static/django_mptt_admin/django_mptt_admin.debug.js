@@ -1209,9 +1209,6 @@ var MouseWidget = /** @class */ (function (_super) {
         };
         return _this;
     }
-    MouseWidget.prototype.setMouseDelay = function (mouseDelay) {
-        this.mouseDelay = mouseDelay;
-    };
     MouseWidget.prototype.init = function () {
         var element = this.$el.get(0);
         element.addEventListener("mousedown", this.mouseDown, {
@@ -1221,7 +1218,6 @@ var MouseWidget = /** @class */ (function (_super) {
             passive: false
         });
         this.isMouseStarted = false;
-        this.mouseDelay = 0;
         this.mouseDelayTimer = null;
         this.isMouseDelayMet = false;
         this.mouseDownInfo = null;
@@ -1258,18 +1254,22 @@ var MouseWidget = /** @class */ (function (_super) {
         document.addEventListener("touchend", this.touchEnd, {
             passive: false
         });
-        if (this.mouseDelay) {
-            this.startMouseDelayTimer();
+        var mouseDelay = this.getMouseDelay();
+        if (mouseDelay) {
+            this.startMouseDelayTimer(mouseDelay);
+        }
+        else {
+            this.isMouseDelayMet = true;
         }
     };
-    MouseWidget.prototype.startMouseDelayTimer = function () {
+    MouseWidget.prototype.startMouseDelayTimer = function (mouseDelay) {
         var _this = this;
         if (this.mouseDelayTimer) {
             clearTimeout(this.mouseDelayTimer);
         }
         this.mouseDelayTimer = window.setTimeout(function () {
             _this.isMouseDelayMet = true;
-        }, this.mouseDelay);
+        }, mouseDelay);
         this.isMouseDelayMet = false;
     };
     MouseWidget.prototype.handleMouseMove = function (e, positionInfo) {
@@ -1280,7 +1280,7 @@ var MouseWidget = /** @class */ (function (_super) {
             }
             return;
         }
-        if (this.mouseDelay && !this.isMouseDelayMet) {
+        if (!this.isMouseDelayMet) {
             return;
         }
         if (this.mouseDownInfo) {
@@ -1332,7 +1332,7 @@ var positionNames = {
     inside: Position.Inside,
     none: Position.None
 };
-exports.getPositionName = function (position) {
+var getPositionName = function (position) {
     for (var name_1 in positionNames) {
         if (Object.prototype.hasOwnProperty.call(positionNames, name_1)) {
             if (positionNames[name_1] === position) {
@@ -1342,9 +1342,11 @@ exports.getPositionName = function (position) {
     }
     return "";
 };
-exports.getPosition = function (name) {
+exports.getPositionName = getPositionName;
+var getPosition = function (name) {
     return positionNames[name];
 };
+exports.getPosition = getPosition;
 var Node = /** @class */ (function () {
     function Node(o, isRoot, nodeClass) {
         if (o === void 0) { o = null; }
@@ -3278,7 +3280,6 @@ var JqTreeWidget = /** @class */ (function (_super) {
     JqTreeWidget.prototype.init = function () {
         _super.prototype.init.call(this);
         this.element = this.$el;
-        this.mouseDelay = 300;
         this.isInitialized = false;
         this.options.rtl = this.getRtlOption();
         if (this.options.closedIcon == null) {
@@ -3338,6 +3339,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
         else {
             return false;
         }
+    };
+    JqTreeWidget.prototype.getMouseDelay = function () {
+        var _a;
+        return (_a = this.options.startDndDelay) !== null && _a !== void 0 ? _a : 0;
     };
     JqTreeWidget.prototype.initData = function () {
         if (this.options.data) {
@@ -3717,41 +3722,41 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.defaults = {
         animationSpeed: "fast",
-        autoOpen: false,
-        saveState: false,
-        dragAndDrop: false,
-        selectable: true,
-        useContextMenu: true,
-        onCanSelectNode: undefined,
-        onSetStateFromStorage: undefined,
-        onGetStateFromStorage: undefined,
-        onCreateLi: undefined,
-        onIsMoveHandle: undefined,
-        // Can this node be moved?
-        onCanMove: undefined,
-        // Can this node be moved to this position? function(moved_node, target_node, position)
-        onCanMoveTo: undefined,
-        onLoadFailed: undefined,
         autoEscape: true,
-        dataUrl: undefined,
+        autoOpen: false,
+        buttonLeft: true,
         // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
         // http://www.fileformat.info/info/unicode/char/25ba/index.htm
         closedIcon: undefined,
-        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
-        openedIcon: "&#x25bc;",
-        slide: true,
-        nodeClass: node_1.Node,
+        data: undefined,
         dataFilter: undefined,
+        dataUrl: undefined,
+        dragAndDrop: false,
         keyboardSupport: true,
-        openFolderDelay: 500,
-        rtl: undefined,
+        nodeClass: node_1.Node,
+        onCanMove: undefined,
+        onCanMoveTo: undefined,
+        onCanSelectNode: undefined,
+        onCreateLi: undefined,
         onDragMove: undefined,
         onDragStop: undefined,
-        buttonLeft: true,
+        onGetStateFromStorage: undefined,
+        onIsMoveHandle: undefined,
+        onLoadFailed: undefined,
         onLoading: undefined,
+        onSetStateFromStorage: undefined,
+        openedIcon: "&#x25bc;",
+        openFolderDelay: 500,
+        // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+        // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+        rtl: undefined,
+        saveState: false,
+        selectable: true,
         showEmptyFolder: false,
-        tabIndex: 0
+        slide: true,
+        startDndDelay: 300,
+        tabIndex: 0,
+        useContextMenu: true
     };
     return JqTreeWidget;
 }(mouse_widget_1["default"]));
@@ -3767,13 +3772,16 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 
 exports.__esModule = true;
 exports.getBoolString = exports.isFunction = exports.isInt = void 0;
-exports.isInt = function (n) {
+var isInt = function (n) {
     return typeof n === "number" && n % 1 === 0;
 };
-exports.isFunction = function (v) { return typeof v === "function"; };
-exports.getBoolString = function (value) {
+exports.isInt = isInt;
+var isFunction = function (v) { return typeof v === "function"; };
+exports.isFunction = isFunction;
+var getBoolString = function (value) {
     return value ? "true" : "false";
 };
+exports.getBoolString = getBoolString;
 
 
 /***/ }),
@@ -3783,7 +3791,7 @@ exports.getBoolString = function (value) {
 
 
 exports.__esModule = true;
-var version = "1.5.2";
+var version = "1.5.3";
 exports.default = version;
 
 
