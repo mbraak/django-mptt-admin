@@ -9,7 +9,7 @@
 
 ## Requirements
 
-The package is tested with Django (2.2 - 3.1), and django-mptt (0.11). Also with Python 3.6 - 3.8.
+The package is tested with Django (2.2 - 3.1), and django-mptt (0.11). Also with Python 3.6 - 3.9.
 
 Older versions:
 
@@ -130,6 +130,10 @@ class CountryAdmin(DjangoMpttAdmin):
 Also see the example project for a complete continent filter.
 
 ## Changelog
+
+**development version**
+
+* Issue #341: update jqtree to 1.5.3
 
 **2.0.2** (october 27 2020)
 

@@ -206,14 +206,14 @@ function initTree(
         treeOptions["animationSpeed"] = animationSpeed;
     }
 
+    if (mouseDelay != null) {
+        treeOptions["startDndDelay"] = mouseDelay;
+    }
+
     $tree.tree(treeOptions);
 
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
-
-    if (mouseDelay != null) {
-        $tree.tree("setMouseDelay", mouseDelay);
-    }
 }
 
 jQuery(() => {
