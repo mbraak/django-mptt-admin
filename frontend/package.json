@@ -40,7 +40,7 @@
     },
     "dependencies": {
         "cookie": "^0.4.1",
-        "jqtree": "^1.5.3",
+        "jqtree": "^1.6.0",
         "spin.js": "^4.1.0"
     }
 }
