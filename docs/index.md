@@ -85,6 +85,16 @@ class CountryAdmin(DjangoMpttAdmin):
     return queryset.filter(name='abc')
 ```
 
+**is_drag_and_drop_enabled**
+
+Override the **is_drag_and_drop_enabled** method to disable drag-and-drop. By default drag-and-drop is enabled.
+
+```python
+class CountryAdmin(DjangoMpttAdmin):
+  def is_drag_and_drop_enabled(self):
+    return False
+```
+
 **use_context_menu**
 
 Capture the contextmenu event. NB: the contextmenu event is triggered when you click with the right mouse button.
