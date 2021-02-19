@@ -54,7 +54,7 @@ jobs:
         pip install wheel
         pip install django==${{ matrix.django }}
         pip install -r example_project/requirements_test.txt
-        python -m playwright install
+        playwright install
         pip install -r example_project/requirements_ci.txt
         pip install -e .
     - name: Run tests
