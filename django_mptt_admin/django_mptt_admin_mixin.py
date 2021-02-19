@@ -87,6 +87,7 @@ class DjangoMpttAdminMixin:
             autoescape=util.get_javascript_value(self.autoescape),
             cl=change_list,
             csrf_cookie_name=get_csrf_cookie_name(),
+            drag_and_drop=util.get_javascript_value(self.is_drag_and_drop_enabled()),
             grid_url=grid_url,
             has_add_permission=self.has_add_permission(request),
             insert_at_url=insert_at_url,
@@ -95,7 +96,6 @@ class DjangoMpttAdminMixin:
             model_name=util.get_model_name(self.model),
             opts=change_list.opts,
             preserved_filters=preserved_filters,
-            readonly=util.get_javascript_value(self.is_readonly()),
             title=change_list.title,
             tree_animation_speed=self.get_tree_animation_speed(),
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
@@ -340,7 +340,6 @@ class DjangoMpttAdminMixin:
         else:
             return util.get_javascript_value(self.tree_mouse_delay)
 
-    def is_readonly(self) -> bool:
-        # Override this method to make the tree readonly
-        # - Readonly disables drag-and-drop
-        return False
+    def is_drag_and_drop_enabled(self) -> bool:
+        # Override this method to disable drag-and-drop
+        return True
