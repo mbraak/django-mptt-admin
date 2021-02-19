@@ -35,15 +35,15 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page = self.page
 
         page.select_node("Asia")
-        self.assertEqual(page.selected_node().textContent(), "Asia")
+        self.assertEqual(page.selected_node().text_content(), "Asia")
         self.assertEqual(
-            page.find_edit_link("Asia", "(edit)").getAttribute("tabindex"), "0"
+            page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "0"
         )
 
         page.select_node("Europe")
-        self.assertEqual(page.selected_node().textContent(), "Europe")
+        self.assertEqual(page.selected_node().text_content(), "Europe")
         self.assertEqual(
-            page.find_edit_link("Asia", "(edit)").getAttribute("tabindex"), "-1"
+            page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "-1"
         )
 
     def test_open_node(self):
@@ -68,14 +68,14 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.tree_view()
 
         page.wait_for_node("Tuvalu")
-        self.assertEqual(page.selected_node().textContent(), "Tuvalu")
+        self.assertEqual(page.selected_node().text_content(), "Tuvalu")
 
     def test_edit(self):
         page = self.page
 
         page.edit_node("Oceania")
         name_input = page.find_input("name")
-        self.assertEqual(name_input.getAttribute("value"), "Oceania")
+        self.assertEqual(name_input.get_attribute("value"), "Oceania")
 
         name_input.fill("**Oceania**")
         page.save_form()
@@ -104,8 +104,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.open_node("Asia")
         page.close_node("Asia")
 
-        page.drag_and_drop("Africa", "Asia")
-        page.page.waitForResponse("**/move/")
+        with page.page.expect_response("**/move/"):
+            page.drag_and_drop("Africa", "Asia")
 
         self.assertEqual(
             page.node_titles()[:5],
@@ -130,8 +130,9 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.wait_for_text("move failed")
 
         page.reset_abort_requests()
-        page.drag_and_drop("Africa", "Asia")
-        page.page.waitForResponse("**/move/")
+
+        with page.page.expect_response("**/move/"):
+            page.drag_and_drop("Africa", "Asia")
 
     def test_load_error(self):
         page = self.page
