@@ -24,6 +24,7 @@ interface Parameters {
     autoEscape: boolean;
     csrfCookieName: string;
     mouseDelay: number | null;
+    readonly: boolean;
     rtl: boolean;
 }
 
@@ -35,6 +36,7 @@ function initTree(
         autoEscape,
         csrfCookieName,
         mouseDelay,
+        readonly,
         rtl,
     }: Parameters
 ) {
@@ -60,10 +62,14 @@ function initTree(
         $title.after(
             `<a href="${
                 node.url as string
-            }" class="edit" tabindex="${tabindex}">(${gettext("edit")})</a>`,
-            `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
-                "add"
-            )})</a>`
+            }" class="edit" tabindex="${tabindex}">(${gettext(
+                readonly ? "view" : "edit"
+            )})</a>`,
+            readonly
+                ? ""
+                : `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
+                      "add"
+                  )})</a>`
         );
     }
 
@@ -194,7 +200,7 @@ function initTree(
         autoEscape,
         buttonLeft: rtl,
         closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
-        dragAndDrop: true,
+        dragAndDrop: !readonly,
         onCreateLi: createLi,
         onLoadFailed: handleLoadFailed,
         onLoading: handleLoading,
@@ -227,6 +233,7 @@ jQuery(() => {
         const autoOpen = $tree.data("auto_open") as boolean | number;
         const autoEscape = Boolean($tree.data("autoescape"));
         const mouseDelay = $tree.data("tree-mouse-delay") as number | null;
+        const readonly = $tree.data("readonly") as boolean;
         const rtl = $tree.data("rtl") === "1";
         const csrfCookieName = $tree.data("csrf-cookie-name") as string;
 
@@ -236,6 +243,7 @@ jQuery(() => {
             autoEscape,
             csrfCookieName,
             mouseDelay,
+            readonly,
             rtl,
         });
     }
