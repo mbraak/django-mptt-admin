@@ -3847,6 +3847,8 @@ module.exports = jQuery;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
 // EXTERNAL MODULE: ./node_modules/jqtree/lib/tree.jquery.js
@@ -4056,6 +4058,7 @@ function initTree($tree, _ref) {
       autoEscape = _ref.autoEscape,
       csrfCookieName = _ref.csrfCookieName,
       mouseDelay = _ref.mouseDelay,
+      readonly = _ref.readonly,
       rtl = _ref.rtl;
   var errorNode = null;
   var baseUrl = "http://example.com";
@@ -4067,7 +4070,7 @@ function initTree($tree, _ref) {
     insertAtUrl.searchParams.set("insert_at", "".concat(node.id));
     var insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
     var tabindex = isSelected ? "0" : "-1";
-    $title.after("<a href=\"".concat(node.url, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("edit"), ")</a>"), "<a href=\"".concat(insertUrlString, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("add"), ")</a>"));
+    $title.after("<a href=\"".concat(node.url, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext(readonly ? "view" : "edit"), ")</a>"), readonly ? "" : "<a href=\"".concat(insertUrlString, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("add"), ")</a>"));
   }
 
   function getCsrfToken() {
@@ -4183,7 +4186,7 @@ function initTree($tree, _ref) {
     autoEscape: autoEscape,
     buttonLeft: rtl,
     closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
-    dragAndDrop: true,
+    dragAndDrop: !readonly,
     onCreateLi: createLi,
     onLoadFailed: handleLoadFailed,
     onLoading: handleLoading,
@@ -4212,6 +4215,7 @@ jQuery(function () {
     var autoOpen = $tree.data("auto_open");
     var autoEscape = Boolean($tree.data("autoescape"));
     var mouseDelay = $tree.data("tree-mouse-delay");
+    var readonly = $tree.data("readonly");
     var rtl = $tree.data("rtl") === "1";
     var csrfCookieName = $tree.data("csrf-cookie-name");
     initTree($tree, {
@@ -4220,6 +4224,7 @@ jQuery(function () {
       autoEscape: autoEscape,
       csrfCookieName: csrfCookieName,
       mouseDelay: mouseDelay,
+      readonly: readonly,
       rtl: rtl
     });
   }
