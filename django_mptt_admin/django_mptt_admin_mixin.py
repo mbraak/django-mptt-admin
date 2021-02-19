@@ -95,6 +95,7 @@ class DjangoMpttAdminMixin:
             model_name=util.get_model_name(self.model),
             opts=change_list.opts,
             preserved_filters=preserved_filters,
+            readonly=util.get_javascript_value(self.is_readonly()),
             title=change_list.title,
             tree_animation_speed=self.get_tree_animation_speed(),
             tree_auto_open=util.get_javascript_value(self.tree_auto_open),
@@ -338,3 +339,8 @@ class DjangoMpttAdminMixin:
             return None
         else:
             return util.get_javascript_value(self.tree_mouse_delay)
+
+    def is_readonly(self) -> bool:
+        # Override this method to make the tree readonly
+        # - Readonly disables drag-and-drop
+        return False
