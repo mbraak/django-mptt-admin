@@ -87,6 +87,7 @@ class DjangoMpttAdminMixin:
             autoescape=util.get_javascript_value(self.autoescape),
             cl=change_list,
             csrf_cookie_name=get_csrf_cookie_name(),
+            drag_and_drop=util.get_javascript_value(self.is_drag_and_drop_enabled()),
             grid_url=grid_url,
             has_add_permission=self.has_add_permission(request),
             insert_at_url=insert_at_url,
@@ -338,3 +339,7 @@ class DjangoMpttAdminMixin:
             return None
         else:
             return util.get_javascript_value(self.tree_mouse_delay)
+
+    def is_drag_and_drop_enabled(self) -> bool:
+        # Override this method to disable drag-and-drop
+        return True

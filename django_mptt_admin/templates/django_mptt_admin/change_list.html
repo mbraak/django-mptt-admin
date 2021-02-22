@@ -12,6 +12,15 @@
     <div
         id="tree"
         class="block-style"
+        data-auto_open="{{ tree_auto_open }}"
+        data-autoescape="{{ autoescape }}"
+        data-csrf-cookie-name="{{ csrf_cookie_name }}"
+        data-insert_at_url="{{ insert_at_url }}"
+        data-drag-and-drop="{{ drag_and_drop }}"
+        {% if LANGUAGE_BIDI %}
+            data-rtl
+        {% endif %}
+        data-save_state="{{ app_label }}_{{ model_name }}"
         {% if tree_animation_speed is not None %}
             data-tree-animation-speed="{{ tree_animation_speed }}"
         {% endif %}
@@ -19,14 +28,6 @@
             data-tree-mouse-delay="{{ tree_mouse_delay }}"
         {% endif %}
         data-url="{{ tree_json_url }}"
-        data-insert_at_url="{{ insert_at_url }}"
-        data-save_state="{{ app_label }}_{{ model_name }}"
-        data-auto_open="{{ tree_auto_open }}"
-        data-autoescape="{{ autoescape }}"
-        data-csrf-cookie-name="{{ csrf_cookie_name }}"
-        {% if LANGUAGE_BIDI %}
-            data-rtl
-        {% endif %}
         data-use_context_menu="{{ use_context_menu }}"
     ></div>
 {% endblock %}
