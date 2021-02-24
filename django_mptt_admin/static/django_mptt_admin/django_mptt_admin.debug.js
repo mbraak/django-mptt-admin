@@ -1224,12 +1224,15 @@ var MouseWidget = /** @class */ (function (_super) {
     };
     MouseWidget.prototype.deinit = function () {
         var el = this.$el.get(0);
-        el.removeEventListener("mousedown", this.mouseDown);
-        el.removeEventListener("touchstart", this.touchStart);
-        document.removeEventListener("mousemove", this.mouseMove);
-        document.removeEventListener("touchmove", this.touchMove);
-        document.removeEventListener("mouseup", this.mouseUp);
-        document.removeEventListener("touchend", this.touchEnd);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        el.removeEventListener("mousedown", this.mouseDown, {
+            passive: false
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        el.removeEventListener("touchstart", this.touchStart, {
+            passive: false
+        });
+        this.removeMouseMoveEventListeners();
     };
     MouseWidget.prototype.handleMouseDown = function (positionInfo) {
         // We may have missed mouseup (out of window)
@@ -1268,7 +1271,9 @@ var MouseWidget = /** @class */ (function (_super) {
             clearTimeout(this.mouseDelayTimer);
         }
         this.mouseDelayTimer = window.setTimeout(function () {
-            _this.isMouseDelayMet = true;
+            if (_this.mouseDownInfo) {
+                _this.isMouseDelayMet = true;
+            }
         }, mouseDelay);
         this.isMouseDelayMet = false;
     };
@@ -1297,14 +1302,31 @@ var MouseWidget = /** @class */ (function (_super) {
         }
     };
     MouseWidget.prototype.handleMouseUp = function (positionInfo) {
-        document.removeEventListener("mousemove", this.mouseMove);
-        document.removeEventListener("touchmove", this.touchMove);
-        document.removeEventListener("mouseup", this.mouseUp);
-        document.removeEventListener("touchend", this.touchEnd);
+        this.removeMouseMoveEventListeners();
+        this.isMouseDelayMet = false;
+        this.mouseDownInfo = null;
         if (this.isMouseStarted) {
             this.isMouseStarted = false;
             this.mouseStop(positionInfo);
         }
+    };
+    MouseWidget.prototype.removeMouseMoveEventListeners = function () {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        document.removeEventListener("mousemove", this.mouseMove, {
+            passive: false
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        document.removeEventListener("touchmove", this.touchMove, {
+            passive: false
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        document.removeEventListener("mouseup", this.mouseUp, {
+            passive: false
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        document.removeEventListener("touchend", this.touchEnd, {
+            passive: false
+        });
     };
     return MouseWidget;
 }(simple_widget_1["default"]));
@@ -1359,7 +1381,7 @@ var Node = /** @class */ (function () {
         this.children = [];
         this.parent = null;
         if (isRoot) {
-            this.idMapping = {};
+            this.idMapping = new Map();
             this.tree = this;
             this.nodeClass = nodeClass;
         }
@@ -1731,16 +1753,16 @@ var Node = /** @class */ (function () {
         return level;
     };
     Node.prototype.getNodeById = function (nodeId) {
-        return this.idMapping[nodeId] || null;
+        return this.idMapping.get(nodeId) || null;
     };
     Node.prototype.addNodeToIndex = function (node) {
         if (node.id != null) {
-            this.idMapping[node.id] = node;
+            this.idMapping.set(node.id, node);
         }
     };
     Node.prototype.removeNodeFromIndex = function (node) {
         if (node.id != null) {
-            delete this.idMapping[node.id];
+            this.idMapping["delete"](node.id);
         }
     };
     Node.prototype.removeChildren = function () {
@@ -2584,6 +2606,7 @@ exports.__esModule = true;
 var SelectNodeHandler = /** @class */ (function () {
     function SelectNodeHandler(treeWidget) {
         this.treeWidget = treeWidget;
+        this.selectedNodes = new Set();
         this.clear();
     }
     SelectNodeHandler.prototype.getSelectedNode = function () {
@@ -2596,20 +2619,19 @@ var SelectNodeHandler = /** @class */ (function () {
         }
     };
     SelectNodeHandler.prototype.getSelectedNodes = function () {
+        var _this = this;
         if (this.selectedSingleNode) {
             return [this.selectedSingleNode];
         }
         else {
-            var selectedNodes = [];
-            for (var id in this.selectedNodes) {
-                if (Object.prototype.hasOwnProperty.call(this.selectedNodes, id)) {
-                    var node = this.treeWidget.getNodeById(id);
-                    if (node) {
-                        selectedNodes.push(node);
-                    }
+            var selectedNodes_1 = [];
+            this.selectedNodes.forEach(function (id) {
+                var node = _this.treeWidget.getNodeById(id);
+                if (node) {
+                    selectedNodes_1.push(node);
                 }
-            }
-            return selectedNodes;
+            });
+            return selectedNodes_1;
         }
     };
     SelectNodeHandler.prototype.getSelectedNodesUnder = function (parent) {
@@ -2636,12 +2658,7 @@ var SelectNodeHandler = /** @class */ (function () {
     };
     SelectNodeHandler.prototype.isNodeSelected = function (node) {
         if (node.id != null) {
-            if (this.selectedNodes[node.id]) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return this.selectedNodes.has(node.id);
         }
         else if (this.selectedSingleNode) {
             return this.selectedSingleNode.element === node.element;
@@ -2651,7 +2668,7 @@ var SelectNodeHandler = /** @class */ (function () {
         }
     };
     SelectNodeHandler.prototype.clear = function () {
-        this.selectedNodes = {};
+        this.selectedNodes.clear();
         this.selectedSingleNode = null;
     };
     SelectNodeHandler.prototype.removeFromSelection = function (node, includeChildren) {
@@ -2664,11 +2681,11 @@ var SelectNodeHandler = /** @class */ (function () {
             }
         }
         else {
-            delete this.selectedNodes[node.id];
+            this.selectedNodes["delete"](node.id);
             if (includeChildren) {
                 node.iterate(function () {
                     if (node.id != null) {
-                        delete _this.selectedNodes[node.id];
+                        _this.selectedNodes["delete"](node.id);
                     }
                     return true;
                 });
@@ -2677,7 +2694,7 @@ var SelectNodeHandler = /** @class */ (function () {
     };
     SelectNodeHandler.prototype.addToSelection = function (node) {
         if (node.id != null) {
-            this.selectedNodes[node.id] = true;
+            this.selectedNodes.add(node.id);
         }
         else {
             this.selectedSingleNode = node;
@@ -3791,7 +3808,7 @@ exports.getBoolString = getBoolString;
 
 
 exports.__esModule = true;
-var version = "1.5.3";
+var version = "1.6.0";
 exports.default = version;
 
 
@@ -3830,6 +3847,8 @@ module.exports = jQuery;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
 // EXTERNAL MODULE: ./node_modules/jqtree/lib/tree.jquery.js
@@ -4038,6 +4057,7 @@ function initTree($tree, _ref) {
       autoOpen = _ref.autoOpen,
       autoEscape = _ref.autoEscape,
       csrfCookieName = _ref.csrfCookieName,
+      dragAndDrop = _ref.dragAndDrop,
       mouseDelay = _ref.mouseDelay,
       rtl = _ref.rtl;
   var errorNode = null;
@@ -4166,7 +4186,7 @@ function initTree($tree, _ref) {
     autoEscape: autoEscape,
     buttonLeft: rtl,
     closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
-    dragAndDrop: true,
+    dragAndDrop: dragAndDrop,
     onCreateLi: createLi,
     onLoadFailed: handleLoadFailed,
     onLoading: handleLoading,
@@ -4195,6 +4215,7 @@ jQuery(function () {
     var autoOpen = $tree.data("auto_open");
     var autoEscape = Boolean($tree.data("autoescape"));
     var mouseDelay = $tree.data("tree-mouse-delay");
+    var dragAndDrop = $tree.data("drag-and-drop");
     var rtl = $tree.data("rtl") === "1";
     var csrfCookieName = $tree.data("csrf-cookie-name");
     initTree($tree, {
@@ -4202,6 +4223,7 @@ jQuery(function () {
       autoOpen: autoOpen,
       autoEscape: autoEscape,
       csrfCookieName: csrfCookieName,
+      dragAndDrop: dragAndDrop,
       mouseDelay: mouseDelay,
       rtl: rtl
     });

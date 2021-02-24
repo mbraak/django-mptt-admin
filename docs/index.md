@@ -85,6 +85,16 @@ class CountryAdmin(DjangoMpttAdmin):
     return queryset.filter(name='abc')
 ```
 
+**is_drag_and_drop_enabled**
+
+Override the **is_drag_and_drop_enabled** method to disable drag-and-drop. By default drag-and-drop is enabled.
+
+```python
+class CountryAdmin(DjangoMpttAdmin):
+  def is_drag_and_drop_enabled(self):
+    return False
+```
+
 **use_context_menu**
 
 Capture the contextmenu event. NB: the contextmenu event is triggered when you click with the right mouse button.
@@ -133,7 +143,8 @@ Also see the example project for a complete continent filter.
 
 **development version**
 
-* Issue #341: update jqtree to 1.5.3
+* Issue #341: update jqtree to 1.6.0
+* Issue #345: add option to disable drag-and-drop (thanks to Maxim Popov)
 
 **2.0.2** (october 27 2020)
 
