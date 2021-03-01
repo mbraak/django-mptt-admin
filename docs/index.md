@@ -141,7 +141,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development version**
+**2.0.3** (march 1 2021)
 
 * Issue #341: update jqtree to 1.6.0
 * Issue #345: add option to disable drag-and-drop (thanks to Maxim Popov)
