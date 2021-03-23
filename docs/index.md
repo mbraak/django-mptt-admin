@@ -9,7 +9,7 @@
 
 ## Requirements
 
-The package is tested with Django (2.2 - 3.1), and django-mptt (0.11). Also with Python 3.6 - 3.9.
+The package is tested with Django (2.2 - 3.2), and django-mptt (0.12). Also with Python 3.6 - 3.9.
 
 Older versions:
 
@@ -140,6 +140,10 @@ class CountryAdmin(DjangoMpttAdmin):
 Also see the example project for a complete continent filter.
 
 ## Changelog
+
+**development**
+
+* Issue #353: support Django 3.2
 
 **2.0.3** (march 1 2021)
 
