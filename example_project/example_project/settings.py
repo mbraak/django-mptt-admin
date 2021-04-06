@@ -10,6 +10,8 @@ sys.path.append(str(BASE_DIR.parent))
 
 DEBUG = True
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 DATABASES = dict(
     default=dict(
         ENGINE="django.db.backends.postgresql",
