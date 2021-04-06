@@ -141,7 +141,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.1.0** (april 6 2021)
 
 * Issue #353: support Django 3.2
 
