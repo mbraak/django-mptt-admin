@@ -9,7 +9,7 @@
 
 ## Requirements
 
-The package is tested with Django (2.2 - 3.2), and django-mptt (0.12). Also with Python 3.6 - 3.9.
+The package is tested with Django (2.2, 3.1 and 3.2), and django-mptt (0.12). Also with Python 3.6 - 3.9.
 
 Older versions:
 
