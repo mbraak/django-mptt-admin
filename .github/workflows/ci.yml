@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ['2.2.20', '3.1.8', '3.2']
+        django: ['django==2.2.20', 'django==3.1.8', 'django==3.2', 'https://github.com/django/django/archive/refs/heads/main.zip']
 
     services:
       postgres:
@@ -52,7 +52,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install wheel
-        pip install django==${{ matrix.django }}
+        pip install ${{ matrix.django }}
         pip install -r example_project/requirements_test.txt
         playwright install chromium
         pip install -r example_project/requirements_ci.txt
