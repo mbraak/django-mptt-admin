@@ -1,1 +1,1 @@
-PYTHONWARNINGS=default python manage.py test django_mptt_example
+PYTHONWARNINGS=default python manage.py test --failfast -v 2 django_mptt_example
