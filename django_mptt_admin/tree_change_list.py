@@ -27,6 +27,9 @@ class TreeChangeList(ChangeList):
             sortable_by=[],
         )
 
+        if django.VERSION >= (4, 0):
+            params['search_help_text'] = ''
+
         super().__init__(**params)
 
     def get_filters_params(self, params=None):
