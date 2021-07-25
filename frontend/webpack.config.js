@@ -3,8 +3,6 @@ const path = require("path");
 const skipCompressJs = Boolean(process.env.SKIP_COMPRESS_JS);
 const coverage = Boolean(process.env.COVERAGE);
 
-const minimize = !skipCompressJs && !coverage;
-
 const getOutputFilename = () => {
     if (coverage) {
         return "django_mptt_admin.coverage.js";
@@ -14,6 +12,8 @@ const getOutputFilename = () => {
         return "django_mptt_admin.js";
     }
 };
+
+const minimize = !skipCompressJs && !coverage;
 
 module.exports = {
     entry: {
@@ -33,16 +33,14 @@ module.exports = {
                 exclude: /node_modules/,
                 use: {
                     loader: "babel-loader",
+                    options: {
+                        presets: [
+                            "@babel/preset-typescript",
+                            "@babel/preset-env",
+                        ],
+                        plugins: coverage ? ["istanbul"] : [],
+                    },
                 },
-            },
-            coverage && {
-                test: /\.ts$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: "@jsdevtools/coverage-istanbul-loader",
-                    options: { esModules: true },
-                },
-                enforce: "post",
             },
         ].filter(Boolean),
     },
