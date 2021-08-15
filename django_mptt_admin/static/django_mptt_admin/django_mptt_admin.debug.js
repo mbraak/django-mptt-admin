@@ -2,7 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 489:
+/***/ 416:
 /***/ ((__unused_webpack_module, exports) => {
 
 var __webpack_unused_export__;
@@ -212,7 +212,7 @@ function tryDecode(str, decode) {
 
 /***/ }),
 
-/***/ 770:
+/***/ 935:
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -321,7 +321,7 @@ exports.default = DataLoader;
 
 /***/ }),
 
-/***/ 61:
+/***/ 228:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -333,6 +333,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -341,7 +343,7 @@ var __extends = (this && this.__extends) || (function () {
 exports.__esModule = true;
 exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
 var jQueryProxy = __webpack_require__(609);
-var node_1 = __webpack_require__(996);
+var node_1 = __webpack_require__(222);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 var jQuery = jQueryProxy["default"] || jQueryProxy;
 var DragAndDropHandler = /** @class */ (function () {
@@ -814,12 +816,12 @@ var DragElement = /** @class */ (function () {
 
 /***/ }),
 
-/***/ 936:
+/***/ 779:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(739);
+var util_1 = __webpack_require__(260);
 var ElementsRenderer = /** @class */ (function () {
     function ElementsRenderer(treeWidget) {
         this.treeWidget = treeWidget;
@@ -1024,7 +1026,7 @@ exports.default = ElementsRenderer;
 
 /***/ }),
 
-/***/ 35:
+/***/ 519:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1123,7 +1125,7 @@ exports.default = KeyHandler;
 
 /***/ }),
 
-/***/ 862:
+/***/ 866:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1135,6 +1137,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1144,7 +1148,7 @@ exports.__esModule = true;
 /*
 This widget does the same a the mouse widget in jqueryui.
 */
-var simple_widget_1 = __webpack_require__(362);
+var simple_widget_1 = __webpack_require__(697);
 var getPositionInfoFromMouseEvent = function (e) { return ({
     pageX: e.pageX,
     pageY: e.pageY,
@@ -1335,7 +1339,7 @@ exports.default = MouseWidget;
 
 /***/ }),
 
-/***/ 996:
+/***/ 222:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1935,7 +1939,7 @@ exports.Node = Node;
 
 /***/ }),
 
-/***/ 360:
+/***/ 531:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1947,6 +1951,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -1954,7 +1960,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.BorderDropHint = exports.FolderElement = exports.NodeElement = void 0;
-var node_1 = __webpack_require__(996);
+var node_1 = __webpack_require__(222);
 var NodeElement = /** @class */ (function () {
     function NodeElement(node, treeWidget) {
         this.init(node, treeWidget);
@@ -2155,12 +2161,12 @@ var GhostDropHint = /** @class */ (function () {
 
 /***/ }),
 
-/***/ 340:
+/***/ 956:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 exports.__esModule = true;
-var util_1 = __webpack_require__(739);
+var util_1 = __webpack_require__(260);
 var SaveStateHandler = /** @class */ (function () {
     function SaveStateHandler(treeWidget) {
         this.treeWidget = treeWidget;
@@ -2382,7 +2388,7 @@ exports.default = SaveStateHandler;
 
 /***/ }),
 
-/***/ 966:
+/***/ 327:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2598,7 +2604,7 @@ exports.default = ScrollHandler;
 
 /***/ }),
 
-/***/ 791:
+/***/ 765:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2713,7 +2719,7 @@ exports.default = SelectNodeHandler;
 
 /***/ }),
 
-/***/ 362:
+/***/ 697:
 /***/ (function(__unused_webpack_module, exports) {
 
 
@@ -2837,7 +2843,7 @@ exports.default = SimpleWidget;
 
 /***/ }),
 
-/***/ 661:
+/***/ 227:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -2849,6 +2855,8 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -2867,20 +2875,20 @@ var __assign = (this && this.__assign) || function () {
 };
 exports.__esModule = true;
 exports.JqTreeWidget = void 0;
-var version_1 = __webpack_require__(529);
+var version_1 = __webpack_require__(692);
 var jQueryProxy = __webpack_require__(609);
-var dragAndDropHandler_1 = __webpack_require__(61);
-var elementsRenderer_1 = __webpack_require__(936);
-var dataLoader_1 = __webpack_require__(770);
-var keyHandler_1 = __webpack_require__(35);
-var mouse_widget_1 = __webpack_require__(862);
-var saveStateHandler_1 = __webpack_require__(340);
-var scrollHandler_1 = __webpack_require__(966);
-var selectNodeHandler_1 = __webpack_require__(791);
-var simple_widget_1 = __webpack_require__(362);
-var node_1 = __webpack_require__(996);
-var util_1 = __webpack_require__(739);
-var nodeElement_1 = __webpack_require__(360);
+var dragAndDropHandler_1 = __webpack_require__(228);
+var elementsRenderer_1 = __webpack_require__(779);
+var dataLoader_1 = __webpack_require__(935);
+var keyHandler_1 = __webpack_require__(519);
+var mouse_widget_1 = __webpack_require__(866);
+var saveStateHandler_1 = __webpack_require__(956);
+var scrollHandler_1 = __webpack_require__(327);
+var selectNodeHandler_1 = __webpack_require__(765);
+var simple_widget_1 = __webpack_require__(697);
+var node_1 = __webpack_require__(222);
+var util_1 = __webpack_require__(260);
+var nodeElement_1 = __webpack_require__(531);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 var jQuery = jQueryProxy["default"] || jQueryProxy;
 var NODE_PARAM_IS_EMPTY = "Node parameter is empty";
@@ -2994,6 +3002,10 @@ var JqTreeWidget = /** @class */ (function (_super) {
     };
     JqTreeWidget.prototype.reload = function (onFinished) {
         this.doLoadDataFromUrl(null, null, onFinished);
+        return this.element;
+    };
+    JqTreeWidget.prototype.refresh = function () {
+        this._refreshElements(null);
         return this.element;
     };
     JqTreeWidget.prototype.getNodeById = function (nodeId) {
@@ -3783,7 +3795,7 @@ simple_widget_1["default"].register(JqTreeWidget, "tree");
 
 /***/ }),
 
-/***/ 739:
+/***/ 260:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3803,12 +3815,12 @@ exports.getBoolString = getBoolString;
 
 /***/ }),
 
-/***/ 529:
+/***/ 692:
 /***/ ((__unused_webpack_module, exports) => {
 
 
 exports.__esModule = true;
-var version = "1.6.0";
+var version = "1.6.1";
 exports.default = version;
 
 
@@ -3829,8 +3841,9 @@ module.exports = jQuery;
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
@@ -3851,9 +3864,9 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
-// EXTERNAL MODULE: ./node_modules/jqtree/lib/tree.jquery.js
-var tree_jquery = __webpack_require__(661);
-;// CONCATENATED MODULE: ./node_modules/spin.js/spin.js
+// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.6.1/node_modules/jqtree/lib/tree.jquery.js
+var tree_jquery = __webpack_require__(227);
+;// CONCATENATED MODULE: ./node_modules/.pnpm/spin.js@4.1.0/node_modules/spin.js/spin.js
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -4045,8 +4058,8 @@ function convertOffset(x, y, degrees) {
     ];
 }
 
-// EXTERNAL MODULE: ./node_modules/cookie/index.js
-var cookie = __webpack_require__(489);
+// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@0.4.1/node_modules/cookie/index.js
+var cookie = __webpack_require__(416);
 ;// CONCATENATED MODULE: ./django_mptt_admin.ts
 
 
