@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ['django==2.2.24', 'django==3.1.13', 'django==3.2.7', 'https://github.com/django/django/archive/refs/heads/main.zip']
+        django: ['django==2.2.24', 'django==3.1.13', 'django==3.2.7', 'django==4.0a1']
 
     services:
       postgres:
