@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ['django==2.2.24', 'django==3.1.13', 'django==3.2.7', 'django==4.0a1']
+        django: ['django==2.2.24', 'django==3.1.13', 'django==3.2.8', 'django==4.0a1']
 
     services:
       postgres:
@@ -47,7 +47,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: '3.10'
     - name: Install python packages
       run: |
         python -m pip install --upgrade pip
