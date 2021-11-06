@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ['2.2.24', '3.1.13', '3.2.8']
+        django: ['2.2.24', '3.1.13', '3.2.9']
 
     services:
       postgres:
