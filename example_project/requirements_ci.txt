@@ -1,5 +1,5 @@
-coverage==6.1.1
-coveralls==3.3.0
+coverage==5.5  # rq.filter: < 6
+coveralls==3.3.1
 docopt==0.6.2
 PyYAML===5.4
 requests==2.26.0
