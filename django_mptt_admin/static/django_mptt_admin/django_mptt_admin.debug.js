@@ -316,7 +316,7 @@ var DataLoader = /** @class */ (function () {
     };
     return DataLoader;
 }());
-exports.default = DataLoader;
+exports["default"] = DataLoader;
 
 
 /***/ }),
@@ -342,7 +342,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
-var jQueryProxy = __webpack_require__(609);
+var jQueryProxy = __webpack_require__(311);
 var node_1 = __webpack_require__(222);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 var jQuery = jQueryProxy["default"] || jQueryProxy;
@@ -1021,7 +1021,7 @@ var ElementsRenderer = /** @class */ (function () {
     };
     return ElementsRenderer;
 }());
-exports.default = ElementsRenderer;
+exports["default"] = ElementsRenderer;
 
 
 /***/ }),
@@ -1120,7 +1120,7 @@ var KeyHandler = /** @class */ (function () {
     KeyHandler.DOWN = 40;
     return KeyHandler;
 }());
-exports.default = KeyHandler;
+exports["default"] = KeyHandler;
 
 
 /***/ }),
@@ -1334,7 +1334,7 @@ var MouseWidget = /** @class */ (function (_super) {
     };
     return MouseWidget;
 }(simple_widget_1["default"]));
-exports.default = MouseWidget;
+exports["default"] = MouseWidget;
 
 
 /***/ }),
@@ -2383,7 +2383,7 @@ var SaveStateHandler = /** @class */ (function () {
     };
     return SaveStateHandler;
 }());
-exports.default = SaveStateHandler;
+exports["default"] = SaveStateHandler;
 
 
 /***/ }),
@@ -2599,7 +2599,7 @@ var ScrollHandler = /** @class */ (function () {
     };
     return ScrollHandler;
 }());
-exports.default = ScrollHandler;
+exports["default"] = ScrollHandler;
 
 
 /***/ }),
@@ -2714,7 +2714,7 @@ var SelectNodeHandler = /** @class */ (function () {
     };
     return SelectNodeHandler;
 }());
-exports.default = SelectNodeHandler;
+exports["default"] = SelectNodeHandler;
 
 
 /***/ }),
@@ -2838,7 +2838,7 @@ var SimpleWidget = /** @class */ (function () {
     SimpleWidget.defaults = {};
     return SimpleWidget;
 }());
-exports.default = SimpleWidget;
+exports["default"] = SimpleWidget;
 
 
 /***/ }),
@@ -2876,7 +2876,7 @@ var __assign = (this && this.__assign) || function () {
 exports.__esModule = true;
 exports.JqTreeWidget = void 0;
 var version_1 = __webpack_require__(692);
-var jQueryProxy = __webpack_require__(609);
+var jQueryProxy = __webpack_require__(311);
 var dragAndDropHandler_1 = __webpack_require__(228);
 var elementsRenderer_1 = __webpack_require__(779);
 var dataLoader_1 = __webpack_require__(935);
@@ -3821,12 +3821,12 @@ exports.getBoolString = getBoolString;
 
 exports.__esModule = true;
 var version = "1.6.1";
-exports.default = version;
+exports["default"] = version;
 
 
 /***/ }),
 
-/***/ 609:
+/***/ 311:
 /***/ ((module) => {
 
 module.exports = jQuery;
@@ -3866,7 +3866,7 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.6.1/node_modules/jqtree/lib/tree.jquery.js
 var tree_jquery = __webpack_require__(227);
-;// CONCATENATED MODULE: ./node_modules/.pnpm/spin.js@4.1.0/node_modules/spin.js/spin.js
+;// CONCATENATED MODULE: ./node_modules/.pnpm/spin.js@4.1.1/node_modules/spin.js/spin.js
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {

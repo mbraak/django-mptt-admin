@@ -42,7 +42,7 @@ function initTree(
 ) {
     let errorNode: INode | null = null;
     const baseUrl = "http://example.com";
-    const insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
+    const insertAtUrl = new URL($tree.data("insert_at_url") as string, baseUrl);
 
     function createLi(node: INode, $li: JQuery, isSelected: boolean) {
         // Create edit link
@@ -71,9 +71,11 @@ function initTree(
 
     function getCsrfToken() {
         function getFromMiddleware() {
-            return (document.querySelector(
-                '[name="csrfmiddlewaretoken"]'
-            ) as HTMLInputElement).value;
+            return (
+                document.querySelector(
+                    '[name="csrfmiddlewaretoken"]'
+                ) as HTMLInputElement
+            ).value;
         }
 
         function getFromCookie() {
