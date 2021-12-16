@@ -141,6 +141,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+* Update jqtree to 1.6.2. This fixes an issue with the keyboard focus when using on demand loading.
+
 **2.2.0** (december 8 2021)
 
 * Support Django 4.0
