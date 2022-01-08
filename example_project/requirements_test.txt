@@ -1,8 +1,8 @@
 beautifulsoup4==4.10.0
 django-mptt==0.13.4
-django-webtest==1.9.8
+django-webtest==1.9.9
 cssselect==1.1.0
-lxml==4.6.5
+lxml==4.7.1
 playwright==1.17.2
 psycopg2-binary==2.8.6 # rq.filter: <2.9
 pyquery==1.4.3
