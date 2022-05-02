@@ -19,7 +19,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     author='Marco Braak',
-    author_email='mbraak@ridethepony.nl',
+    author_email='marco.braak@planet.nl',
     install_requires=['django-mptt'],
     description='Django-mptt-admin provides a nice Django Admin interface for Mptt models',
     url='https://github.com/mbraak/django-mptt-admin',
