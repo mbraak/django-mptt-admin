@@ -26,9 +26,9 @@ jobs:
 
     steps:
     - name: Check out repository code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Cache python packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
@@ -38,14 +38,14 @@ jobs:
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
     - name: Cache javascript packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
         restore-keys: |
          ${{ runner.os }}-yarn-
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: '3.10'
     - name: Install python packages
@@ -65,7 +65,7 @@ jobs:
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
     - name: Setup node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: '14'
     - name: Setup coverage
@@ -82,7 +82,7 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
-    - uses: actions/setup-ruby@v1
+    - uses: ruby/setup-ruby@v1
       with:
         ruby-version: '2.6'
     - name: Merge coverage
