@@ -60,7 +60,7 @@ class MoveTestCase(BaseViewTestCase):
 
     def move(self, source_id, target_id, position):
         countries_page = self.app.get("/django_mptt_example/country/")
-        csrf_token = countries_page.form["csrfmiddlewaretoken"].value
+        csrf_token = countries_page.forms['changelist-form']["csrfmiddlewaretoken"].value
 
         response = self.app.post(
             "/django_mptt_example/country/{0:d}/move/".format(source_id),
