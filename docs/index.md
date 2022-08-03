@@ -1,20 +1,20 @@
 # Django Mptt Admin
 
-*Django-mptt-admin* provides a nice Django Admin interface for [django-mptt models](http://django-mptt.github.io/django-mptt/).
+_Django-mptt-admin_ provides a nice Django Admin interface for [django-mptt models](http://django-mptt.github.io/django-mptt/).
 
-* The source is available on [https://github.com/mbraak/django-mptt-admin](https://github.com/mbraak/django-mptt-admin).
-* Documentation is available on [https://mbraak.github.io/django-mptt-admin/](https://mbraak.github.io/django-mptt-admin/).
+- The source is available on [https://github.com/mbraak/django-mptt-admin](https://github.com/mbraak/django-mptt-admin).
+- Documentation is available on [https://mbraak.github.io/django-mptt-admin/](https://mbraak.github.io/django-mptt-admin/).
 
 ![Screenshot](https://raw.github.com/mbraak/django-mptt-admin/master/screenshot.png)
 
 ## Requirements
 
-The package is tested with Django (2.2, 3 and 4.0), and django-mptt (0.12). Also with Python 3.6 - 3.10.
+The package is tested with Django (3.2, 4.0 and 4.1), and django-mptt (0.13). Also with Python 3.6 - 3.10.
 
 Older versions:
 
-* Version 1.0.x supports Django 2.0 and 2.1.
-* Version 0.7.2 supports Django 1.11 and Python 2.7.
+- Version 1.0.x supports Django 2.0 and 2.1.
+- Version 0.7.2 supports Django 1.11 and Python 2.7.
 
 ## Installation
 
@@ -57,17 +57,18 @@ The speed of the open/close animation in milliseconds. The default is 200 millis
 Auto-open node. Default value is 1.
 
 Values:
-* **True**: autopen all nodes
-* **False**: do not autoopen
-* **integer**: autopen until this level
+
+- **True**: autopen all nodes
+- **False**: do not autoopen
+- **integer**: autopen until this level
 
 **tree_load_on_demand**
 
 Load on demand (True / False / level). Default is True.
 
-* **True**: load nodes on demand
-* **False**: do not load nodes on demand
-* **int**: load nodes on demand until this level
+- **True**: load nodes on demand
+- **False**: do not load nodes on demand
+- **int**: load nodes on demand until this level
 
 **autoescape**
 
@@ -99,18 +100,19 @@ class CountryAdmin(DjangoMpttAdmin):
 
 Capture the contextmenu event. NB: the contextmenu event is triggered when you click with the right mouse button.
 
-* True: Capture the contextmenu event.
-  * This is useful if you want to write custom javascript to catch the `tree.contextmenu` event.
-  * Also see https://mbraak.github.io/jqTree/#usecontextmenu and https://mbraak.github.io/jqTree/#event-tree-contextmenu
-* False (default): do not capture the contextmenu event.
+- True: Capture the contextmenu event.
+  - This is useful if you want to write custom javascript to catch the `tree.contextmenu` event.
+  - Also see https://mbraak.github.io/jqTree/#usecontextmenu and https://mbraak.github.io/jqTree/#event-tree-contextmenu
+- False (default): do not capture the contextmenu event.
 
 **item_label_field_name**
 
 Define which field of the model should be the label for tree items.
 
 Possible values are:
-* string: name of the model field or model property method to use as tree items label
-* None (default): model unicode used ad tree item label
+
+- string: name of the model field or model property method to use as tree items label
+- None (default): model unicode used ad tree item label
 
 Example:
 
@@ -141,245 +143,246 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.3.0** (august 3 2022)
 
-* Update jqtree to 1.6.2. This fixes an issue with the keyboard focus when using on demand loading.
+- Update jqtree to 1.6.2. This fixes an issue with the keyboard focus when using on demand loading.
+- Support Django 4.1
 
 **2.2.0** (december 8 2021)
 
-* Support Django 4.0
+- Support Django 4.0
 
 **2.1.0** (april 6 2021)
 
-* Issue #353: support Django 3.2
+- Issue #353: support Django 3.2
 
 **2.0.3** (march 1 2021)
 
-* Issue #341: update jqtree to 1.6.0
-* Issue #345: add option to disable drag-and-drop (thanks to Maxim Popov)
+- Issue #341: update jqtree to 1.6.0
+- Issue #345: add option to disable drag-and-drop (thanks to Maxim Popov)
 
 **2.0.2** (october 27 2020)
 
-* Issue #328: fix DJANGO_MPTT_ADMIN_COVERAGE_JS (thanks to Andrew Kh)
+- Issue #328: fix DJANGO_MPTT_ADMIN_COVERAGE_JS (thanks to Andrew Kh)
 
 **2.0.1** (october 26 2020)
 
-* Issue #309: add option for animation speed
-* Issue #325: update jqtree to 1.5.2
+- Issue #309: add option for animation speed
+- Issue #325: update jqtree to 1.5.2
 
 **2.0.0** (august 7 2020)
 
-* Support Django 3.1
+- Support Django 3.1
 
 **1.0.2** (june 26 2020)
 
-* Issue #287: add Catalan and Spanish translations (thanks to Joan Marc Soler)
+- Issue #287: add Catalan and Spanish translations (thanks to Joan Marc Soler)
 
 **1.0.1** (february 14 2020)
 
-* Issue #282: add German translations (thanks to Christian Wiegand)
-* Issue #284: add Polish translations (thanks to Paweł Chojnowski)
+- Issue #282: add German translations (thanks to Christian Wiegand)
+- Issue #284: add Polish translations (thanks to Paweł Chojnowski)
 
 **1.0.0** (december 5 2019)
 
-* Issue #271: support Django 3
-* Issue #276: fix movement during drag-and-drop
+- Issue #271: support Django 3
+- Issue #276: fix movement during drag-and-drop
 
 **0.7.2** (october 19 2019)
 
-* Issue #270: support media class (thanks to Sencer H.)
+- Issue #270: support media class (thanks to Sencer H.)
 
 **0.7.1** (april 23 2019)
 
-* Issue #254: upgrade jqtree to 1.4.10
-* Issue #255: test with django-mptt 0.10
-* Issue #258: include jqtree.css in django_mptt_admin.css
+- Issue #254: upgrade jqtree to 1.4.10
+- Issue #255: test with django-mptt 0.10
+- Issue #258: include jqtree.css in django_mptt_admin.css
 
 **0.7.0** (april 5 2019)
 
-* Issue #242: minified build
-* Issue #243: upgrade jqTree to 1.4.9
-* Issue #252: support Django 2.2
+- Issue #242: minified build
+- Issue #243: upgrade jqTree to 1.4.9
+- Issue #252: support Django 2.2
 
 **0.6.0** (august 4 2018)
 
-* Issue #232: support Django 2.1
-* Issue #233: upgrade jqTree to 1.4.7
+- Issue #232: support Django 2.1
+- Issue #233: upgrade jqTree to 1.4.7
 
 **0.5.1** (april 8 2018)
 
-* Issue #220: upgrade jqTree to 1.4.5
-* Issue #224: add a spinner for the move action (thanks to Riccardo Magliocchetti)
+- Issue #220: upgrade jqTree to 1.4.5
+- Issue #224: add a spinner for the move action (thanks to Riccardo Magliocchetti)
 
 **0.5.0** (december 7 2017)
 
-* Issue #217: Support Django 2.0
+- Issue #217: Support Django 2.0
 
 **0.4.7** (september 29 2017)
 
-* Issue #212: Fix unsafe reference to instance.parent (thanks to John D'Ambrosio)
-* Issue #211: Make ChangeList configurable using `change_list_tree_class` (thanks to Riccardo Magliocchetti)
+- Issue #212: Fix unsafe reference to instance.parent (thanks to John D'Ambrosio)
+- Issue #211: Make ChangeList configurable using `change_list_tree_class` (thanks to Riccardo Magliocchetti)
 
 **0.4.6** (june 7 2017)
 
-* Issue #200: Upgrade to jqtree 1.4.1
-* Issue #201: Make 'edit' and 'add' buttons not focusable
-* Issue #203: 'Add' url path must end with '/'
+- Issue #200: Upgrade to jqtree 1.4.1
+- Issue #201: Make 'edit' and 'add' buttons not focusable
+- Issue #203: 'Add' url path must end with '/'
 
 **0.4.5** (april 5 2017)
 
-* Issue #188: Handle CSRF_COOKIE_NAME option
-* Issue #189: Handle Django CSRF_USE_SESSIONS option (new option in Django 1.11)
-* Issue #191: Only initialize the tree on the tree page (thanks to Stanislav Zholudev)
-* Issue #197: Support Django 1.11
+- Issue #188: Handle CSRF_COOKIE_NAME option
+- Issue #189: Handle Django CSRF_USE_SESSIONS option (new option in Django 1.11)
+- Issue #191: Only initialize the tree on the tree page (thanks to Stanislav Zholudev)
+- Issue #197: Support Django 1.11
 
 **0.4.4** (january 30 2017)
 
-* Issue #185: Support preserved filters (thanks to Riccardo Magliocchetti)
-* Issue #186: Move list_filter option to DjangoMpttAdmin class
+- Issue #185: Support preserved filters (thanks to Riccardo Magliocchetti)
+- Issue #186: Move list_filter option to DjangoMpttAdmin class
 
 **0.4.3** (january 18 2017)
 
-* Issue 178: Added Hungarian translations (thanks to roodie)
-* Issue 182: Add option to configure node label (thanks to Claudio Bartolini)
-* Issue 183: Update jqtree to 1.3.7
+- Issue 178: Added Hungarian translations (thanks to roodie)
+- Issue 182: Add option to configure node label (thanks to Claudio Bartolini)
+- Issue 183: Update jqtree to 1.3.7
 
 **0.4.2** (november 10 2016)
 
-* Issue 170: Added FilterableDjangoMpttAdmin (thanks to Riccardo Magliocchetti)
-* Issue 172: Update jqtree to 1.3.6
-* Issue 173: Move translations to djangojs domain
-* Issue 174: Added French translations (thanks to Vhotz)
-* Issue 175: Fixed: can't move items in tree view with CSRF_COOKIE_HTTPONLY = True (thanks to Vhotz)
+- Issue 170: Added FilterableDjangoMpttAdmin (thanks to Riccardo Magliocchetti)
+- Issue 172: Update jqtree to 1.3.6
+- Issue 173: Move translations to djangojs domain
+- Issue 174: Added French translations (thanks to Vhotz)
+- Issue 175: Fixed: can't move items in tree view with CSRF_COOKIE_HTTPONLY = True (thanks to Vhotz)
 
 **0.4.1** (september 21 2016)
 
-* Issue 162: Add request parameter to filter_tree_queryset signature (thanks to Max Perreault)
-* Issue 163: Update to jqtree 1.3.5
+- Issue 162: Add request parameter to filter_tree_queryset signature (thanks to Max Perreault)
+- Issue 163: Update to jqtree 1.3.5
 
 **0.4.0** (august 3 2016)
 
-* Issue 152: Django 1.10 support.
-    * Drop support for Django 1.7
+- Issue 152: Django 1.10 support.
+  - Drop support for Django 1.7
 
 **0.3.8** (july 27 2016)
 
-* Issue 142: use the Django admin static tag for CSS / Javascript (thanks to Alex Tomkins)
-* Issue 143: update jqtree to 1.3.4
+- Issue 142: use the Django admin static tag for CSS / Javascript (thanks to Alex Tomkins)
+- Issue 143: update jqtree to 1.3.4
 
 **0.3.7** (june 1 2016)
 
-* Issue 132: use MPTTModelAdmin for DjangoMpttAdmin (thanks to Alex Tomkins)
-    * MPTTModelAdmin contains fixes for mass deletions and TreeForeignKey
-* Issue 139: update to jqtree 1.3.3
+- Issue 132: use MPTTModelAdmin for DjangoMpttAdmin (thanks to Alex Tomkins)
+  - MPTTModelAdmin contains fixes for mass deletions and TreeForeignKey
+- Issue 139: update to jqtree 1.3.3
 
 **0.3.6** (march 28 2016)
 
-* Issue 125: fix jQuery.cookie error (thanks to Patrick Colmant)
+- Issue 125: fix jQuery.cookie error (thanks to Patrick Colmant)
 
 **0.3.5** (march 28 2016)
 
-* Issue 126: add missing jqtree-circle.png (thanks to Generalov)
+- Issue 126: add missing jqtree-circle.png (thanks to Generalov)
 
 **0.3.4** (march 25 2016)
 
-* Issue 115: implemented 'add' button (thanks to Andrew Dodd)
-* Issue 116: fix block-style layout for right-to-left-languages
-* Issue 119: display transparent loading image
+- Issue 115: implemented 'add' button (thanks to Andrew Dodd)
+- Issue 116: fix block-style layout for right-to-left-languages
+- Issue 119: display transparent loading image
 
 **0.3.3** (february 10 2016)
 
-* Issue 112: correctly override media (thanks to Generalov)
+- Issue 112: correctly override media (thanks to Generalov)
 
 **0.3.2** (january 29 2016)
 
-* Issue 103: use jquery from django admin itself
-* Issue 105: added Turkish translation (thanks to Tagmat)
-* Issue 106: use the same colors as the Django admin
-* Issue 109: include locale files in package
+- Issue 103: use jquery from django admin itself
+- Issue 105: added Turkish translation (thanks to Tagmat)
+- Issue 106: use the same colors as the Django admin
+- Issue 109: include locale files in package
 
 **0.3.1** (december 2 2015)
 
-* Issue 82: make admin views easily extendable (thanks to Vsevolod Novikov)
-* Issue 93: flat styling
-* Issue 95: update jqtree to 1.3.0
-* Issue 96: cannot move to the top of the tree
-* Issue 97: support Django 1.9
+- Issue 82: make admin views easily extendable (thanks to Vsevolod Novikov)
+- Issue 93: flat styling
+- Issue 95: update jqtree to 1.3.0
+- Issue 96: cannot move to the top of the tree
+- Issue 97: support Django 1.9
 
 **0.3.0** (august 21 2015)
 
-* Issue 67: update jqtree to 1.2.1
-* Issue 68: drop support for Django 1.6 and older
-    * Note that version 0.2.1 supports these versions.
-* Issue 71: added use_context_menu option (thanks to ITCase)
-* Issue 75: added Russian translation (thanks to Mike Silonov)
-* Issue 80: fix wrong url resolving with multiple admin sites (thanks to Hubert Bielenia)
+- Issue 67: update jqtree to 1.2.1
+- Issue 68: drop support for Django 1.6 and older
+  - Note that version 0.2.1 supports these versions.
+- Issue 71: added use_context_menu option (thanks to ITCase)
+- Issue 75: added Russian translation (thanks to Mike Silonov)
+- Issue 80: fix wrong url resolving with multiple admin sites (thanks to Hubert Bielenia)
 
 **0.2.1** (march 29 2015)
 
-* Issue 65: support Django 1.8
+- Issue 65: support Django 1.8
 
 **0.2.0** (january 12 2015)
 
-* Issue 23: fixed save-state for load-on-demand
-* Issue 35: fixed auto-open for load-on-demand
-* Issue 40: use jqtree 1.0.0
-* Issue 45: added i18n support and Hebrew translation (thanks to Udi Oron)
-* Issue 47: added filter_tree_queryset method
+- Issue 23: fixed save-state for load-on-demand
+- Issue 35: fixed auto-open for load-on-demand
+- Issue 40: use jqtree 1.0.0
+- Issue 45: added i18n support and Hebrew translation (thanks to Udi Oron)
+- Issue 47: added filter_tree_queryset method
 
 **0.1.10** (september 24 2014)
 
-* Issue 31: added autoescape option
-* Issue 34: use the default change list in popup mode (thanks to hstanev)
-* Issue 36: the option tree_load_on_demand = False does not work
+- Issue 31: added autoescape option
+- Issue 34: use the default change list in popup mode (thanks to hstanev)
+- Issue 36: the option tree_load_on_demand = False does not work
 
 **0.1.9** (july 12 2014)
 
-* Issue 25: update jqtree to 0.21.0
-* Issue 28: fixing problems related to working with model's pk-field, named other than "id" (thanks to Igor Gai)
-* Issue 29: fix path to spinner.gif (thanks to Igor Gai)
+- Issue 25: update jqtree to 0.21.0
+- Issue 28: fixing problems related to working with model's pk-field, named other than "id" (thanks to Igor Gai)
+- Issue 29: fix path to spinner.gif (thanks to Igor Gai)
 
 **0.1.8** (februari 2 2014)
 
-* Issue 17: handle error when moving node
-* Issue 18: do not use inline javascript
-* Issue 19: support Django 1.7 alpha
+- Issue 17: handle error when moving node
+- Issue 18: do not use inline javascript
+- Issue 19: support Django 1.7 alpha
 
 **0.1.7** (january 3 2014)
 
-* Issue 16: moving a node fails if the node id is a uuid
+- Issue 16: moving a node fails if the node id is a uuid
 
 **0.1.6** (october 10 2013)
 
-* Issue 8: removing node from the tree causes the tree view to crash
+- Issue 8: removing node from the tree causes the tree view to crash
 
 **0.1.5** (august 27 2013)
 
-* Issue 6: save the tree state
-* Issue 7: do not handle the right mouse click
+- Issue 6: save the tree state
+- Issue 7: do not handle the right mouse click
 
 **0.1.4** (august 8 2013)
 
-* Issue 5: Support for uuid ids
+- Issue 5: Support for uuid ids
 
 **0.1.3** (may 2 2013)
 
-*This version drops support for Django 1.3.7*
+_This version drops support for Django 1.3.7_
 
-* Issue 2: Posting a screenshot in the readme would be really useful (thanks to Andy Baker)
-* Issue 3: Use static templatetag for CDN-compatible file paths (thanks to Alex Holmes)
-* Added [Coveralls](https://coveralls.io/r/mbraak/django-mptt-admin) support
+- Issue 2: Posting a screenshot in the readme would be really useful (thanks to Andy Baker)
+- Issue 3: Use static templatetag for CDN-compatible file paths (thanks to Alex Holmes)
+- Added [Coveralls](https://coveralls.io/r/mbraak/django-mptt-admin) support
 
 **0.1.2** (march 12 2013)
 
-* Issue 1: Grid view doesn't link correctly to object change pages (thanks to Kris Fields)
+- Issue 1: Grid view doesn't link correctly to object change pages (thanks to Kris Fields)
 
 **0.1.1** (februari 25 2013)
 
-* Added experimental Python 3 support
+- Added experimental Python 3 support
 
 **0.1** (februari 7 2013)
 
-* Initial version
+- Initial version
 
 [![Code Issues](https://www.quantifiedcode.com/api/v1/project/dd888e7a1804465798821f28717af384/badge.svg)](https://www.quantifiedcode.com/app/project/dd888e7a1804465798821f28717af384)
