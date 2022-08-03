@@ -2,7 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 188:
+/***/ 591:
 /***/ ((__unused_webpack_module, exports) => {
 
 var __webpack_unused_export__;
@@ -28,8 +28,7 @@ __webpack_unused_export__ = serialize;
  * @private
  */
 
-var decode = decodeURIComponent;
-var encode = encodeURIComponent;
+var __toString = Object.prototype.toString
 
 /**
  * RegExp to match field-content in RFC 7230 sec 3.2
@@ -60,31 +59,42 @@ function parse(str, options) {
 
   var obj = {}
   var opt = options || {};
-  var pairs = str.split(';')
   var dec = opt.decode || decode;
 
-  for (var i = 0; i < pairs.length; i++) {
-    var pair = pairs[i];
-    var index = pair.indexOf('=')
+  var index = 0
+  while (index < str.length) {
+    var eqIdx = str.indexOf('=', index)
 
-    // skip things that don't look like key=value
-    if (index < 0) {
-      continue;
+    // no more cookie pairs
+    if (eqIdx === -1) {
+      break
     }
 
-    var key = pair.substring(0, index).trim()
+    var endIdx = str.indexOf(';', index)
+
+    if (endIdx === -1) {
+      endIdx = str.length
+    } else if (endIdx < eqIdx) {
+      // backtrack on prior semicolon
+      index = str.lastIndexOf(';', eqIdx - 1) + 1
+      continue
+    }
+
+    var key = str.slice(index, eqIdx).trim()
 
     // only assign once
-    if (undefined == obj[key]) {
-      var val = pair.substring(index + 1, pair.length).trim()
+    if (undefined === obj[key]) {
+      var val = str.slice(eqIdx + 1, endIdx).trim()
 
       // quoted values
-      if (val[0] === '"') {
+      if (val.charCodeAt(0) === 0x22) {
         val = val.slice(1, -1)
       }
 
       obj[key] = tryDecode(val, dec);
     }
+
+    index = endIdx + 1
   }
 
   return obj;
@@ -153,11 +163,13 @@ function serialize(name, val, options) {
   }
 
   if (opt.expires) {
-    if (typeof opt.expires.toUTCString !== 'function') {
+    var expires = opt.expires
+
+    if (!isDate(expires) || isNaN(expires.valueOf())) {
       throw new TypeError('option expires is invalid');
     }
 
-    str += '; Expires=' + opt.expires.toUTCString();
+    str += '; Expires=' + expires.toUTCString()
   }
 
   if (opt.httpOnly) {
@@ -166,6 +178,26 @@ function serialize(name, val, options) {
 
   if (opt.secure) {
     str += '; Secure';
+  }
+
+  if (opt.priority) {
+    var priority = typeof opt.priority === 'string'
+      ? opt.priority.toLowerCase()
+      : opt.priority
+
+    switch (priority) {
+      case 'low':
+        str += '; Priority=Low'
+        break
+      case 'medium':
+        str += '; Priority=Medium'
+        break
+      case 'high':
+        str += '; Priority=High'
+        break
+      default:
+        throw new TypeError('option priority is invalid')
+    }
   }
 
   if (opt.sameSite) {
@@ -191,6 +223,42 @@ function serialize(name, val, options) {
   }
 
   return str;
+}
+
+/**
+ * URL-decode string value. Optimized to skip native call when no %.
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+
+function decode (str) {
+  return str.indexOf('%') !== -1
+    ? decodeURIComponent(str)
+    : str
+}
+
+/**
+ * URL-encode value.
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+
+function encode (val) {
+  return encodeURIComponent(val)
+}
+
+/**
+ * Determine if value is a Date.
+ *
+ * @param {*} val
+ * @private
+ */
+
+function isDate (val) {
+  return __toString.call(val) === '[object Date]' ||
+    val instanceof Date
 }
 
 /**
@@ -5525,8 +5593,8 @@ function convertOffset(x, y, degrees) {
     ];
 }
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@0.4.2/node_modules/cookie/index.js
-var cookie = __webpack_require__(188);
+// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@0.5.0/node_modules/cookie/index.js
+var cookie = __webpack_require__(591);
 ;// CONCATENATED MODULE: ./django_mptt_admin.ts
 
 
