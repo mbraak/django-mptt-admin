@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ['django==3.2.13', 'django==4.0.5', 'https://www.djangoproject.com/download/4.1b1/tarball/']
+        django: ['django==3.2.14', 'django==4.0.6', 'https://www.djangoproject.com/download/4.1b1/tarball/']
 
     services:
       postgres:
