@@ -143,7 +143,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**2.3.0** (august 3 2022)
+**2.3.0** (august 4 2022)
 
 - Update jqtree to 1.6.2. This fixes an issue with the keyboard focus when using on demand loading.
 - Support Django 4.1
