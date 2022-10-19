@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ['django==3.2.16', 'django==4.0.8', 'Django==4.1.2']
+        django: ['django==3.2.16', 'django==4.0.8', 'django==4.1.2']
 
     services:
       postgres:
@@ -27,6 +27,27 @@ jobs:
     steps:
     - name: Check out repository code
       uses: actions/checkout@v3
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+          node-version: 16
+    - name: Install pnpm
+      run: npm install -g pnpm
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+    - uses: actions/cache@v3
+      name: Setup pnpm cache
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+    - name: Install javascript packages
+      run: |
+          cd frontend
+          pnpm install
     - name: Cache python packages
       uses: actions/cache@v3
       with:
@@ -34,18 +55,8 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - name: Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-    - name: Cache javascript packages
-      uses: actions/cache@v3
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/package.json') }}
-        restore-keys: |
-         ${{ runner.os }}-yarn-
     - name: Set up Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
     - name: Install python packages
@@ -71,8 +82,7 @@ jobs:
     - name: Setup coverage
       run: |
         cd frontend
-        yarn --prefer-offline
-        yarn run build
+        pnpm run build
         cd ..
         mkdir js_coverage
     - name: Test with coverage
@@ -88,8 +98,8 @@ jobs:
     - name: Merge coverage
       run: |
         cd coveralls
-        yarn && gem install coveralls-lcov
-        yarn run merge_coverage
+        pnpm i && gem install coveralls-lcov
+        pnpm run merge_coverage
         coveralls-lcov -v -n coverage/lcov.info > coverage.json
         cd ..
         coverage report
