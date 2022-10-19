@@ -98,8 +98,8 @@ jobs:
     - name: Merge coverage
       run: |
         cd coveralls
-        yarn && gem install coveralls-lcov
-        yarn run merge_coverage
+        pnpm i && gem install coveralls-lcov
+        pnpm run merge_coverage
         coveralls-lcov -v -n coverage/lcov.info > coverage.json
         cd ..
         coverage report
