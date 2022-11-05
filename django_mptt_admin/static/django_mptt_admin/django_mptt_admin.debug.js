@@ -5602,20 +5602,21 @@ var cookie = __webpack_require__(591);
 ;// CONCATENATED MODULE: ./django_mptt_admin.ts
 
 
- // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 
 function initTree($tree, _ref) {
   var animationSpeed = _ref.animationSpeed,
-      autoOpen = _ref.autoOpen,
-      autoEscape = _ref.autoEscape,
-      csrfCookieName = _ref.csrfCookieName,
-      dragAndDrop = _ref.dragAndDrop,
-      mouseDelay = _ref.mouseDelay,
-      rtl = _ref.rtl;
+    autoOpen = _ref.autoOpen,
+    autoEscape = _ref.autoEscape,
+    csrfCookieName = _ref.csrfCookieName,
+    dragAndDrop = _ref.dragAndDrop,
+    mouseDelay = _ref.mouseDelay,
+    rtl = _ref.rtl;
   var errorNode = null;
   var baseUrl = "http://example.com";
   var insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
-
   function createLi(node, $li, isSelected) {
     // Create edit link
     var $title = $li.find(".jqtree-title");
@@ -5624,12 +5625,10 @@ function initTree($tree, _ref) {
     var tabindex = isSelected ? "0" : "-1";
     $title.after("<a href=\"".concat(node.url, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("edit"), ")</a>"), "<a href=\"".concat(insertUrlString, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("add"), ")</a>"));
   }
-
   function getCsrfToken() {
     function getFromMiddleware() {
       return document.querySelector('[name="csrfmiddlewaretoken"]').value;
     }
-
     function getFromCookie() {
       if (!csrfCookieName) {
         return null;
@@ -5637,10 +5636,8 @@ function initTree($tree, _ref) {
         return cookie/* parse */.Q(document.cookie)[csrfCookieName];
       }
     }
-
     return getFromCookie() || getFromMiddleware();
   }
-
   function handleMove(eventParam) {
     var e = eventParam;
     var info = e.move_info;
@@ -5671,7 +5668,6 @@ function initTree($tree, _ref) {
         errorNode = info.moved_node;
       }
     });
-
     function removeErrorMessage() {
       if (errorNode) {
         jQuery(errorNode.element).find(".mptt-admin-error").remove();
@@ -5679,13 +5675,10 @@ function initTree($tree, _ref) {
       }
     }
   }
-
   function handleLoadFailed() {
     $tree.html(gettext("Error while loading the data from the server"));
   }
-
   var spinners = {};
-
   function handleLoading(isLoading, node, $el) {
     function getNodeId() {
       if (!node) {
@@ -5694,7 +5687,6 @@ function initTree($tree, _ref) {
         return node.id;
       }
     }
-
     function getContainer() {
       if (node) {
         return $el.find(".jqtree-element")[0];
@@ -5702,37 +5694,30 @@ function initTree($tree, _ref) {
         return $el[0];
       }
     }
-
     var nodeId = getNodeId();
-
     if (isLoading) {
       spinners[nodeId] = new Spinner().spin(getContainer());
     } else {
       var spinner = spinners[nodeId];
-
       if (spinner) {
         spinner.stop();
         spinners[nodeId] = null;
       }
     }
   }
-
   function handleSelect(eventParam) {
     var e = eventParam;
     var node = e.node,
-        deselected_node = e.deselected_node;
-
+      deselected_node = e.deselected_node;
     if (deselected_node) {
       // deselected node: remove tabindex
       jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
     }
-
     if (node) {
       // selected: add tabindex
       jQuery(node.element).find(".edit").attr("tabindex", 0);
     }
   }
-
   var treeOptions = {
     autoOpen: autoOpen,
     autoEscape: autoEscape,
@@ -5745,23 +5730,18 @@ function initTree($tree, _ref) {
     saveState: $tree.data("save_state"),
     useContextMenu: Boolean($tree.data("use_context_menu"))
   };
-
   if (animationSpeed !== null) {
     treeOptions["animationSpeed"] = animationSpeed;
   }
-
   if (mouseDelay != null) {
     treeOptions["startDndDelay"] = mouseDelay;
   }
-
   $tree.tree(treeOptions);
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
 }
-
 jQuery(function () {
   var $tree = jQuery("#tree");
-
   if ($tree.length) {
     var animationSpeed = $tree.data("tree-animation-speed");
     var autoOpen = $tree.data("auto_open");
