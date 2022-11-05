@@ -280,7 +280,7 @@ function tryDecode(str, decode) {
 
 /***/ }),
 
-/***/ 865:
+/***/ 944:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -436,7 +436,7 @@ exports["default"] = DataLoader;
 
 /***/ }),
 
-/***/ 885:
+/***/ 799:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -448,7 +448,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
 
-var _node = __webpack_require__(535);
+var _node = __webpack_require__(546);
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -456,9 +456,9 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } Object.defineProperty(subClass, "prototype", { value: Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }), writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
@@ -468,7 +468,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -748,7 +748,11 @@ var DragAndDropHandler = /*#__PURE__*/function () {
       };
 
       this.stopOpenFolderTimer();
-      this.openFolderTimer = window.setTimeout(openFolder, this.treeWidget.options.openFolderDelay);
+      var openFolderDelay = this.treeWidget.options.openFolderDelay;
+
+      if (openFolderDelay !== false) {
+        this.openFolderTimer = window.setTimeout(openFolder, openFolderDelay);
+      }
     }
   }, {
     key: "stopOpenFolderTimer",
@@ -1126,7 +1130,7 @@ var DragElement = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ 134:
+/***/ 815:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1136,7 +1140,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _util = __webpack_require__(492);
+var _util = __webpack_require__(242);
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -1420,7 +1424,7 @@ exports["default"] = ElementsRenderer;
 
 /***/ }),
 
-/***/ 460:
+/***/ 373:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1565,7 +1569,7 @@ _defineProperty(KeyHandler, "DOWN", 40);
 
 /***/ }),
 
-/***/ 250:
+/***/ 616:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1577,7 +1581,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _simple = _interopRequireDefault(__webpack_require__(560));
+var _simple = _interopRequireDefault(__webpack_require__(88));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -1587,9 +1591,9 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } Object.defineProperty(subClass, "prototype", { value: Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }), writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
@@ -1599,7 +1603,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -1877,7 +1881,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 535:
+/***/ 546:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2662,7 +2666,7 @@ exports.Node = Node;
 
 /***/ }),
 
-/***/ 842:
+/***/ 448:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -2674,11 +2678,11 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports.NodeElement = exports.FolderElement = exports.BorderDropHint = void 0;
 
-var _node = __webpack_require__(535);
+var _node = __webpack_require__(546);
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } Object.defineProperty(subClass, "prototype", { value: Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }), writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
@@ -2688,7 +2692,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -3005,7 +3009,7 @@ var GhostDropHint = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ 21:
+/***/ 200:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -3015,7 +3019,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _util = __webpack_require__(492);
+var _util = __webpack_require__(242);
 
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -3338,7 +3342,7 @@ exports["default"] = SaveStateHandler;
 
 /***/ }),
 
-/***/ 143:
+/***/ 45:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3647,7 +3651,7 @@ exports["default"] = ScrollHandler;
 
 /***/ }),
 
-/***/ 511:
+/***/ 810:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3801,7 +3805,7 @@ exports["default"] = SelectNodeHandler;
 
 /***/ }),
 
-/***/ 560:
+/***/ 88:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3999,7 +4003,7 @@ _defineProperty(SimpleWidget, "defaults", {});
 
 /***/ }),
 
-/***/ 503:
+/***/ 933:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 var __webpack_unused_export__;
@@ -4010,31 +4014,31 @@ __webpack_unused_export__ = ({
 });
 __webpack_unused_export__ = void 0;
 
-var _version = _interopRequireDefault(__webpack_require__(938));
+var _version = _interopRequireDefault(__webpack_require__(959));
 
-var _dragAndDropHandler = __webpack_require__(885);
+var _dragAndDropHandler = __webpack_require__(799);
 
-var _elementsRenderer = _interopRequireDefault(__webpack_require__(134));
+var _elementsRenderer = _interopRequireDefault(__webpack_require__(815));
 
-var _dataLoader = _interopRequireDefault(__webpack_require__(865));
+var _dataLoader = _interopRequireDefault(__webpack_require__(944));
 
-var _keyHandler = _interopRequireDefault(__webpack_require__(460));
+var _keyHandler = _interopRequireDefault(__webpack_require__(373));
 
-var _mouse = _interopRequireDefault(__webpack_require__(250));
+var _mouse = _interopRequireDefault(__webpack_require__(616));
 
-var _saveStateHandler = _interopRequireDefault(__webpack_require__(21));
+var _saveStateHandler = _interopRequireDefault(__webpack_require__(200));
 
-var _scrollHandler = _interopRequireDefault(__webpack_require__(143));
+var _scrollHandler = _interopRequireDefault(__webpack_require__(45));
 
-var _selectNodeHandler = _interopRequireDefault(__webpack_require__(511));
+var _selectNodeHandler = _interopRequireDefault(__webpack_require__(810));
 
-var _simple = _interopRequireDefault(__webpack_require__(560));
+var _simple = _interopRequireDefault(__webpack_require__(88));
 
-var _node6 = __webpack_require__(535);
+var _node6 = __webpack_require__(546);
 
-var _util = __webpack_require__(492);
+var _util = __webpack_require__(242);
 
-var _nodeElement = __webpack_require__(842);
+var _nodeElement = __webpack_require__(448);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -4064,13 +4068,13 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-function _get() { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(arguments.length < 3 ? target : receiver); } return desc.value; }; } return _get.apply(this, arguments); }
+function _get() { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get.bind(); } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(arguments.length < 3 ? target : receiver); } return desc.value; }; } return _get.apply(this, arguments); }
 
 function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } Object.defineProperty(subClass, "prototype", { value: Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }), writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
@@ -4080,7 +4084,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
 
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -5323,7 +5327,7 @@ _simple["default"].register(JqTreeWidget, "tree");
 
 /***/ }),
 
-/***/ 492:
+/***/ 242:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5353,7 +5357,7 @@ exports.getBoolString = getBoolString;
 
 /***/ }),
 
-/***/ 938:
+/***/ 959:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -5399,8 +5403,8 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.6.2/node_modules/jqtree/lib/tree.jquery.js
-var tree_jquery = __webpack_require__(503);
+// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.6.3/node_modules/jqtree/lib/tree.jquery.js
+var tree_jquery = __webpack_require__(933);
 ;// CONCATENATED MODULE: ./node_modules/.pnpm/spin.js@4.1.1/node_modules/spin.js/spin.js
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -5598,20 +5602,21 @@ var cookie = __webpack_require__(591);
 ;// CONCATENATED MODULE: ./django_mptt_admin.ts
 
 
- // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 
 function initTree($tree, _ref) {
   var animationSpeed = _ref.animationSpeed,
-      autoOpen = _ref.autoOpen,
-      autoEscape = _ref.autoEscape,
-      csrfCookieName = _ref.csrfCookieName,
-      dragAndDrop = _ref.dragAndDrop,
-      mouseDelay = _ref.mouseDelay,
-      rtl = _ref.rtl;
+    autoOpen = _ref.autoOpen,
+    autoEscape = _ref.autoEscape,
+    csrfCookieName = _ref.csrfCookieName,
+    dragAndDrop = _ref.dragAndDrop,
+    mouseDelay = _ref.mouseDelay,
+    rtl = _ref.rtl;
   var errorNode = null;
   var baseUrl = "http://example.com";
   var insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
-
   function createLi(node, $li, isSelected) {
     // Create edit link
     var $title = $li.find(".jqtree-title");
@@ -5620,12 +5625,10 @@ function initTree($tree, _ref) {
     var tabindex = isSelected ? "0" : "-1";
     $title.after("<a href=\"".concat(node.url, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("edit"), ")</a>"), "<a href=\"".concat(insertUrlString, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("add"), ")</a>"));
   }
-
   function getCsrfToken() {
     function getFromMiddleware() {
       return document.querySelector('[name="csrfmiddlewaretoken"]').value;
     }
-
     function getFromCookie() {
       if (!csrfCookieName) {
         return null;
@@ -5633,10 +5636,8 @@ function initTree($tree, _ref) {
         return cookie/* parse */.Q(document.cookie)[csrfCookieName];
       }
     }
-
     return getFromCookie() || getFromMiddleware();
   }
-
   function handleMove(eventParam) {
     var e = eventParam;
     var info = e.move_info;
@@ -5667,7 +5668,6 @@ function initTree($tree, _ref) {
         errorNode = info.moved_node;
       }
     });
-
     function removeErrorMessage() {
       if (errorNode) {
         jQuery(errorNode.element).find(".mptt-admin-error").remove();
@@ -5675,13 +5675,10 @@ function initTree($tree, _ref) {
       }
     }
   }
-
   function handleLoadFailed() {
     $tree.html(gettext("Error while loading the data from the server"));
   }
-
   var spinners = {};
-
   function handleLoading(isLoading, node, $el) {
     function getNodeId() {
       if (!node) {
@@ -5690,7 +5687,6 @@ function initTree($tree, _ref) {
         return node.id;
       }
     }
-
     function getContainer() {
       if (node) {
         return $el.find(".jqtree-element")[0];
@@ -5698,37 +5694,30 @@ function initTree($tree, _ref) {
         return $el[0];
       }
     }
-
     var nodeId = getNodeId();
-
     if (isLoading) {
       spinners[nodeId] = new Spinner().spin(getContainer());
     } else {
       var spinner = spinners[nodeId];
-
       if (spinner) {
         spinner.stop();
         spinners[nodeId] = null;
       }
     }
   }
-
   function handleSelect(eventParam) {
     var e = eventParam;
     var node = e.node,
-        deselected_node = e.deselected_node;
-
+      deselected_node = e.deselected_node;
     if (deselected_node) {
       // deselected node: remove tabindex
       jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
     }
-
     if (node) {
       // selected: add tabindex
       jQuery(node.element).find(".edit").attr("tabindex", 0);
     }
   }
-
   var treeOptions = {
     autoOpen: autoOpen,
     autoEscape: autoEscape,
@@ -5741,23 +5730,18 @@ function initTree($tree, _ref) {
     saveState: $tree.data("save_state"),
     useContextMenu: Boolean($tree.data("use_context_menu"))
   };
-
   if (animationSpeed !== null) {
     treeOptions["animationSpeed"] = animationSpeed;
   }
-
   if (mouseDelay != null) {
     treeOptions["startDndDelay"] = mouseDelay;
   }
-
   $tree.tree(treeOptions);
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
 }
-
 jQuery(function () {
   var $tree = jQuery("#tree");
-
   if ($tree.length) {
     var animationSpeed = $tree.data("tree-animation-speed");
     var autoOpen = $tree.data("auto_open");
