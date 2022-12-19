@@ -78,7 +78,7 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v3
       with:
-        node-version: '14'
+        node-version: '16'
     - name: Setup coverage
       run: |
         cd frontend
@@ -94,15 +94,17 @@ jobs:
         POSTGRES_PORT: 5432
     - uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '2.6'
+        ruby-version: '2.7'
     - name: Merge coverage
       run: |
         cd coveralls
         pnpm i && gem install coveralls-lcov
-        pnpm run merge_coverage
+        pnpm run merge_coverage_lcov
+        pnpm run merge_coverage_json
         coveralls-lcov -v -n coverage/lcov.info > coverage.json
         cd ..
         coverage report
+        coverage lcov
     - name: Coveralls
       run: |
         coveralls --merge=coveralls/coverage.json
@@ -115,5 +117,5 @@ jobs:
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: coveralls/coverage/lcov.info
+        file: coveralls/coverage/lcov.info,coverage.lcov
         verbose: true
