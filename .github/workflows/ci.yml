@@ -103,7 +103,7 @@ jobs:
         coveralls-lcov -v -n coverage/lcov.info > coverage.json
         cd ..
         coverage report
-    - name: Upload coverage
+    - name: Coveralls
       run: |
         coveralls --merge=coveralls/coverage.json
       env:
@@ -116,5 +116,4 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         directory: js_coverage
-        files: .coverage
         verbose: true
