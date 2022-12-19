@@ -115,5 +115,5 @@ jobs:
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
-        directory: js_coverage
+        file: coveralls/coverage/lcov.info
         verbose: true
