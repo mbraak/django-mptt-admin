@@ -2,7 +2,7 @@ beautifulsoup4==4.11.1
 django-mptt==0.14.0
 django-webtest==1.9.10
 cssselect==1.2.0
-lxml==4.9.1
+lxml==4.9.2
 playwright==1.28.0
 psycopg2-binary==2.9.5
 pyquery==1.4.3
