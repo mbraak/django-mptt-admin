@@ -51,7 +51,7 @@ class DjangoMpttAdminMixin:
         if is_popup:
             return super(DjangoMpttAdminMixin, self).changelist_view(request, extra_context=extra_context)
 
-        if not self.has_change_permission(request, None):
+        if not self.has_view_permission(request, None):
             raise PermissionDenied()
 
         change_list = self.get_change_list_for_tree(request)
@@ -84,12 +84,13 @@ class DjangoMpttAdminMixin:
 
         context = dict(
             app_label=self.opts.app_label,
-            autoescape=util.get_javascript_value(self.autoescape),
+            autoescape=self.autoescape,
             cl=change_list,
             csrf_cookie_name=get_csrf_cookie_name(),
-            drag_and_drop=util.get_javascript_value(self.is_drag_and_drop_enabled()),
+            drag_and_drop=self.is_drag_and_drop_enabled(),
             grid_url=grid_url,
             has_add_permission=self.has_add_permission(request),
+            has_change_permission=self.has_change_permission(request),
             insert_at_url=insert_at_url,
             jsi18n_url=self.get_admin_url("jsi18n"),
             media=self.get_tree_media(),
@@ -97,11 +98,11 @@ class DjangoMpttAdminMixin:
             opts=change_list.opts,
             preserved_filters=preserved_filters,
             title=change_list.title,
-            tree_animation_speed=self.get_tree_animation_speed(),
-            tree_auto_open=util.get_javascript_value(self.tree_auto_open),
+            tree_animation_speed=self.tree_animation_speed,
+            tree_auto_open=self.tree_auto_open,
             tree_json_url=tree_json_url,
-            tree_mouse_delay=self.get_tree_mouse_delay(),
-            use_context_menu=util.get_javascript_value(self.use_context_menu),
+            tree_mouse_delay=self.tree_mouse_delay,
+            use_context_menu=self.use_context_menu,
         )
         if extra_context:
             context.update(extra_context)
@@ -327,18 +328,6 @@ class DjangoMpttAdminMixin:
 
     def get_insert_at_field(self):
         return "parent"
-
-    def get_tree_animation_speed(self):
-        if self.tree_animation_speed is None:
-            return None
-        else:
-            return util.get_javascript_value(self.tree_animation_speed)
-
-    def get_tree_mouse_delay(self):
-        if self.tree_mouse_delay is None:
-            return None
-        else:
-            return util.get_javascript_value(self.tree_mouse_delay)
 
     def is_drag_and_drop_enabled(self) -> bool:
         # Override this method to disable drag-and-drop

@@ -1,6 +1,3 @@
-import json
-
-
 def serialize_id(pk):
     if isinstance(pk, (int, str)):
         return pk
@@ -102,24 +99,6 @@ def get_tree_queryset(model, node_id=None, max_level=None, include_root=True):
             qs = qs.exclude(level=0)
 
     return qs.order_by("tree_id", "lft")
-
-
-def get_javascript_value(value):
-    """
-    Get javascript value for python value.
-
-    >>> get_javascript_value(True)
-    true
-    >>> get_javascript_value(10)
-    10
-    """
-    if isinstance(value, bool):
-        if value:
-            return "true"
-        else:
-            return "false"
-    else:
-        return json.dumps(value)
 
 
 def get_model_name(model):

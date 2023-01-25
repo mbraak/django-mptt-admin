@@ -24,6 +24,8 @@ interface Parameters {
     autoEscape: boolean;
     csrfCookieName: string;
     dragAndDrop: boolean;
+    hasAddPermission: boolean;
+    hasChangePermission: boolean;
     mouseDelay: number | null;
     rtl: boolean;
 }
@@ -36,6 +38,8 @@ function initTree(
         autoEscape,
         csrfCookieName,
         dragAndDrop,
+        hasAddPermission,
+        hasChangePermission,
         mouseDelay,
         rtl,
     }: Parameters
@@ -58,14 +62,19 @@ function initTree(
             .substring(baseUrl.length);
 
         const tabindex = isSelected ? "0" : "-1";
+        const editCaption = hasChangePermission
+            ? gettext("edit")
+            : gettext("view");
 
         $title.after(
             `<a href="${
                 node.url as string
-            }" class="edit" tabindex="${tabindex}">(${gettext("edit")})</a>`,
-            `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
-                "add"
-            )})</a>`
+            }" class="edit" tabindex="${tabindex}">(${editCaption})</a>`,
+            hasAddPermission
+                ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
+                      "add"
+                  )})</a>`
+                : ""
         );
     }
 
@@ -198,7 +207,7 @@ function initTree(
         autoEscape,
         buttonLeft: rtl,
         closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
-        dragAndDrop,
+        dragAndDrop: dragAndDrop && hasChangePermission,
         onCreateLi: createLi,
         onLoadFailed: handleLoadFailed,
         onLoading: handleLoading,
@@ -230,6 +239,10 @@ jQuery(() => {
             | null;
         const autoOpen = $tree.data("auto_open") as boolean | number;
         const autoEscape = Boolean($tree.data("autoescape"));
+        const hasAddPermission = Boolean($tree.data("has-add-permission"));
+        const hasChangePermission = Boolean(
+            $tree.data("has-change-permission")
+        );
         const mouseDelay = $tree.data("tree-mouse-delay") as number | null;
         const dragAndDrop = $tree.data("drag-and-drop") as boolean;
         const rtl = $tree.data("rtl") === "1";
@@ -241,6 +254,8 @@ jQuery(() => {
             autoEscape,
             csrfCookieName,
             dragAndDrop,
+            hasAddPermission,
+            hasChangePermission,
             mouseDelay,
             rtl,
         });
