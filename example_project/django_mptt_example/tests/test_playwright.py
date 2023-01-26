@@ -1,5 +1,7 @@
 from django.test import override_settings
+from django.contrib.auth.models import Permission, User
 
+from ..models import Country
 from .base_playwright_testcase import BasePlaywrightTestCase
 
 
@@ -8,8 +10,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
     fixtures = ["countries.json"]
 
     def setUp(self):
+        User.objects.create_superuser("admin", "admin@admin.com", "password")
         super().setUp()
-
         self.page.visit_countries_page()
 
     def test_display_tree(self):
@@ -140,3 +142,24 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
 
         page.toggle_node("Asia")
         page.wait_for_text("Error while loading the data from the server")
+
+
+@override_settings(DJANGO_TESTING=True)
+class PlaywrightPermissionsTestCase(BasePlaywrightTestCase):
+    fixtures = ["countries.json"]
+
+    def setUp(self):
+        user = User.objects.create_user(
+            "admin", "admin@admin.com", "password", is_staff=True
+        )
+
+        user.user_permissions.add(Permission.objects.get(codename="view_country"))
+        user.save()
+
+        super().setUp()
+        self.page.visit_countries_page(expected_text="Select country to view")
+
+    def test_display_tree(self):
+        page = self.page
+
+        page.find_edit_link("Asia", "(view)")
