@@ -4,7 +4,6 @@ from django.test import TestCase
 from django_mptt_admin.util import (
     get_tree_queryset,
     get_tree_from_queryset,
-    get_javascript_value,
     serialize_id,
 )
 
@@ -63,14 +62,6 @@ class GetTreeFromQuerySetTestCase(TestCase):
         continents = root["children"]
         african_countries = continents[0]["children"]
         self.assertEqual(african_countries[0]["name"], "DZ")
-
-
-class GetJavascriptValueTestCase(TestCase):
-    testcases = ((True, "true"), (False, "false"), (10, "10"))
-
-    def test(self):
-        for [value, expected] in self.testcases:
-            self.assertEqual(get_javascript_value(value), expected)
 
 
 class SerializeIdTestCase(TestCase):
