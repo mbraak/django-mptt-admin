@@ -101,7 +101,7 @@ class DjangoMpttAdminMixin:
             tree_animation_speed=self.tree_animation_speed,
             tree_auto_open=self.tree_auto_open,
             tree_json_url=tree_json_url,
-            tree_mouse_delay=self.tree_mouse_delay,
+            tree_mouse_delay=self.get_tree_mouse_delay(),
             use_context_menu=self.use_context_menu,
         )
         if extra_context:
