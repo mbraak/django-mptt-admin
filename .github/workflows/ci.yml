@@ -100,5 +100,5 @@ jobs:
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: coveralls/coverage/lcov.info,coverage.lcov
+        file: coverage/coverage/lcov.info,coverage.lcov
         verbose: true
