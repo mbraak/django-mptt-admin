@@ -92,14 +92,10 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '2.7'
     - name: Merge coverage
       run: |
         cd coverage
         pnpm i
-        gem install coveralls-lcov
         pnpm run merge_coverage_lcov
         coverage report
         coverage lcov
