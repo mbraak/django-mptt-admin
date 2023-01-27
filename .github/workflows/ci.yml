@@ -96,6 +96,7 @@ jobs:
       run: |
         cd coverage
         pnpm i
+        pnpm run print_coverage
         pnpm run merge_coverage_lcov
         coverage report
         coverage lcov
