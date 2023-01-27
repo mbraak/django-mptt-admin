@@ -97,6 +97,8 @@ jobs:
         cd coverage
         pnpm i
         pnpm run merge_coverage_lcov
+        coverage report
+        coverage lcov
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
