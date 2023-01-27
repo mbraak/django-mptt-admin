@@ -94,13 +94,9 @@ jobs:
         POSTGRES_PORT: 5432
     - name: Merge coverage
       run: |
-        cd coverage
-        pnpm i
-        pnpm run merge_coverage_lcov
         coverage report
         coverage lcov
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
-        file: coverage/coverage/lcov.info,coverage.lcov
         verbose: true
