@@ -92,28 +92,11 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
-    - uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '2.7'
     - name: Merge coverage
       run: |
-        cd coveralls
-        pnpm i && gem install coveralls-lcov
+        cd coverage
+        pnpm i
         pnpm run merge_coverage_lcov
-        pnpm run merge_coverage_json
-        coveralls-lcov -v -n coverage/lcov.info > coverage.json
-        cd ..
-        coverage report
-        coverage lcov
-    - name: Coveralls
-      run: |
-        coveralls --merge=coveralls/coverage.json
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.github_token }}
-        COVERALLS_SERVICE_NAME: github
-        COVERALLS_GIT_COMMIT: ${{ github.sha }}
-        COVERALLS_GIT_BRANCH: ${{ github.ref }}
-        COVERALLS_SERVICE_JOB_ID: ${{ github.run_id }}
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
