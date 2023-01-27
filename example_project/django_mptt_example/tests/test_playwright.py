@@ -33,6 +33,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
             ],
         )
 
+        self.assertEqual(self.page.page.get_by_text("(add)").count(), 8)
+
     def test_select_node(self):
         page = self.page
 
@@ -140,7 +142,7 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
 
 
 @override_settings(DJANGO_TESTING=True)
-class PlaywrightPermissionsTestCase(BasePlaywrightTestCase):
+class PlaywrightReadonlyTestCase(BasePlaywrightTestCase):
     fixtures = ["countries.json"]
 
     def setUp(self):
@@ -158,3 +160,4 @@ class PlaywrightPermissionsTestCase(BasePlaywrightTestCase):
         page = self.page
 
         page.find_edit_link("Asia", "(view)")
+        self.assertEqual(self.page.page.get_by_text("(add)").count(), 0)
