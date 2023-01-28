@@ -92,7 +92,7 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
-    - name: Merge python coverage
+    - name: Merge coverage
       run: |
         coverage report
         coverage lcov
