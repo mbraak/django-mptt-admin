@@ -92,10 +92,11 @@ jobs:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres
         POSTGRES_PORT: 5432
-    - name: Merge coverage
-      run: |
-        coverage report
-        coverage lcov
+    - name: Merge Python coverage
+      run: coverage report && coverage lcov
+    - name: Merge javascript coverage
+      working-directory: ./coverage
+      run: pnpm i && pnpm run merge_coverage
     - name: Codecov
       uses: codecov/codecov-action@v3
       with:
