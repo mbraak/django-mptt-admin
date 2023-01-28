@@ -45,9 +45,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pnpm-store-
     - name: Install javascript packages
-      run: |
-          cd frontend
-          pnpm install
+      working-directory: ./frontend
+      run: pnpm install
     - name: Cache python packages
       uses: actions/cache@v3
       with:
@@ -61,16 +60,9 @@ jobs:
         python-version: '3.10'
     - name: Install python packages
       run: |
-        python -m pip install --upgrade pip
-        pip install wheel
-        pip install ${{ matrix.django }}
-        pip install -r example_project/requirements_test.txt
-        playwright install chromium
-        pip install -r example_project/requirements_ci.txt
-        pip install -e .
+        python -m pip install --upgrade pip && pip install wheel && pip install ${{ matrix.django }} && pip install -r example_project/requirements_test.txt && playwright install chromium && pip install -r example_project/requirements_ci.txt && pip install -e .
     - name: Run tests
-      run: |
-        python -Wd example_project/manage.py test django_mptt_example
+      run: python -Wd example_project/manage.py test django_mptt_example
       env:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres
@@ -79,12 +71,11 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '16'
-    - name: Setup coverage
-      run: |
-        cd frontend
-        pnpm run build
-        cd ..
-        mkdir js_coverage
+    - name: Build javascript
+      working-directory: ./frontend
+      run: pnpm run build
+    - name: Create javascript coverage directory
+      run: mkdir js_coverage
     - name: Test with coverage
       run: |
         COVERAGE=true coverage run --source=django_mptt_admin example_project/manage.py test django_mptt_example
