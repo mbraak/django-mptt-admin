@@ -1,2 +1,2 @@
 fixes:
-  - "/home/runner/work/django-mptt-admin/django-mptt-admin/frontend/*::frontend/"
+  - "/home/runner/work/django-mptt-admin/django-mptt-admin/frontend/::frontend/"
