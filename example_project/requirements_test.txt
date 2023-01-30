@@ -5,7 +5,7 @@ cssselect==1.2.0
 lxml==4.9.2
 playwright==1.29.1
 psycopg2-binary==2.9.5
-pyquery==1.4.3
+pyquery==2.0.0
 waitress==2.1.2
 WebOb==1.8.7
 WebTest==3.0.0
