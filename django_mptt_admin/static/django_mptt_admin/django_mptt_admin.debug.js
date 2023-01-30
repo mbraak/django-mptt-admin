@@ -4849,6 +4849,8 @@ function initTree($tree, _ref) {
     autoEscape = _ref.autoEscape,
     csrfCookieName = _ref.csrfCookieName,
     dragAndDrop = _ref.dragAndDrop,
+    hasAddPermission = _ref.hasAddPermission,
+    hasChangePermission = _ref.hasChangePermission,
     mouseDelay = _ref.mouseDelay,
     rtl = _ref.rtl;
   var errorNode = null;
@@ -4860,7 +4862,8 @@ function initTree($tree, _ref) {
     insertAtUrl.searchParams.set("insert_at", "".concat(node.id));
     var insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
     var tabindex = isSelected ? "0" : "-1";
-    $title.after("<a href=\"".concat(node.url, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("edit"), ")</a>"), "<a href=\"".concat(insertUrlString, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("add"), ")</a>"));
+    var editCaption = hasChangePermission ? gettext("edit") : gettext("view");
+    $title.after("<a href=\"".concat(node.url, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(editCaption, ")</a>"), hasAddPermission ? "<a href=\"".concat(insertUrlString, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("add"), ")</a>") : "");
   }
   function getCsrfToken() {
     function getFromMiddleware() {
@@ -4960,7 +4963,7 @@ function initTree($tree, _ref) {
     autoEscape: autoEscape,
     buttonLeft: rtl,
     closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
-    dragAndDrop: dragAndDrop,
+    dragAndDrop: dragAndDrop && hasChangePermission,
     onCreateLi: createLi,
     onLoadFailed: handleLoadFailed,
     onLoading: handleLoading,
@@ -4983,6 +4986,8 @@ jQuery(function () {
     var animationSpeed = $tree.data("tree-animation-speed");
     var autoOpen = $tree.data("auto_open");
     var autoEscape = Boolean($tree.data("autoescape"));
+    var hasAddPermission = Boolean($tree.data("has-add-permission"));
+    var hasChangePermission = Boolean($tree.data("has-change-permission"));
     var mouseDelay = $tree.data("tree-mouse-delay");
     var dragAndDrop = $tree.data("drag-and-drop");
     var rtl = $tree.data("rtl") === "1";
@@ -4993,6 +4998,8 @@ jQuery(function () {
       autoEscape: autoEscape,
       csrfCookieName: csrfCookieName,
       dragAndDrop: dragAndDrop,
+      hasAddPermission: hasAddPermission,
+      hasChangePermission: hasChangePermission,
       mouseDelay: mouseDelay,
       rtl: rtl
     });

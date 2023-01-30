@@ -149,10 +149,10 @@ class PlaywrightPage:
         self.find_link("Tree view").click()
         self.page.wait_for_selector("css=#tree >> text=Oceania")
 
-    def visit_countries_page(self):
+    def visit_countries_page(self, expected_text="Select country to change"):
         page = self.page
         page.goto(self.live_server_url + "/django_mptt_example/country/")
-        page.wait_for_selector("text=Select country to change")
+        page.wait_for_selector(f"text={expected_text}")
         page.wait_for_selector("css=#tree >> text=Oceania")
 
     def wait_for_node(self, title):
