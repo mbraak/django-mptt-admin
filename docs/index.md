@@ -143,6 +143,15 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**2.4.0** (january 31 2023)
+
+- Issue #426: handle permissions:
+  - 'Add' link: only display it if the admin user has the 'Add' permission
+  - 'Edit' link: only display it if the admin user has the 'Edit' permission
+    - Otherwise: still display it but change the text to 'view'
+  - Drag and drop: only enable it if the admin user has the 'Edit' permission
+    - It's also possible to disable drag and drop by overriding the 'is_drag_and_drop_enabled' method.
+
 **2.3.0** (august 4 2022)
 
 - Update jqtree to 1.6.2. This fixes an issue with the keyboard focus when using on demand loading.
