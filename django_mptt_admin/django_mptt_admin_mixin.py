@@ -332,3 +332,6 @@ class DjangoMpttAdminMixin:
     def is_drag_and_drop_enabled(self) -> bool:
         # Override this method to disable drag-and-drop
         return True
+
+    def get_tree_mouse_delay(self):
+        return self.tree_mouse_delay
