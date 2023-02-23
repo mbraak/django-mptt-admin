@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ['django==3.2.16', 'django==4.0.8', 'django==4.1.5', 'django==4.2a1']
+        django: ['django==3.2.18', 'django==4.0.10', 'django==4.1.7', 'django==4.2a1']
 
     services:
       postgres:
@@ -78,7 +78,7 @@ jobs:
       run: mkdir js_coverage
     - name: Test with coverage
       run: |
-        COVERAGE=true coverage run --source=django_mptt_admin example_project/manage.py test django_mptt_example
+        COVERAGE=true coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
       env:
         POSTGRES_HOST: localhost
         POSTGRES_PASSWORD: postgres

@@ -143,6 +143,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**2.4.1** (february 1 2023)
+
+- Issue #431: fix get_tree_mouse_delay error
+
 **2.4.0** (january 31 2023)
 
 - Issue #426: handle permissions:
