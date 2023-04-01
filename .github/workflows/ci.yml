@@ -32,7 +32,7 @@ jobs:
       with:
           node-version: 16
     - name: Install pnpm
-      run: npm install -g pnpm
+      run: npm install -g pnpm^8
     - name: Get pnpm store directory
       id: pnpm-cache
       run: |
