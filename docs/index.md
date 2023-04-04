@@ -9,7 +9,7 @@ _Django-mptt-admin_ provides a nice Django Admin interface for [django-mptt mode
 
 ## Requirements
 
-The package is tested with Django (3.2, 4.0 and 4.1), and django-mptt (0.13). Also with Python 3.6 - 3.10.
+The package is tested with Django (3.2, 4.0 - 4.2), and django-mptt (0.13). Also with Python 3.7 - 3.11.
 
 Older versions:
 
@@ -142,6 +142,10 @@ class CountryAdmin(DjangoMpttAdmin):
 Also see the example project for a complete continent filter.
 
 ## Changelog
+
+**2.5.0** (april 4 2023)
+
+- Support Django 4.2
 
 **2.4.1** (february 1 2023)
 
