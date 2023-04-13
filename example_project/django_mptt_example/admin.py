@@ -35,12 +35,6 @@ class CountryAdmin(DjangoMpttAdmin):
     def has_change_permission(self, request, obj=None):
         return request.user.is_superuser
 
-    def get_tree_animation_speed(self):
-        if getattr(settings, "DJANGO_TESTING", False):
-            return 0
-        else:
-            return None
-
     def get_tree_mouse_delay(self):
         if getattr(settings, "DJANGO_TESTING", False):
             return 0

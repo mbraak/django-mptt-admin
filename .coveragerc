@@ -1,2 +1,6 @@
 [run]
 branch = True
+omit =
+  example_project/django_mptt_example/tests/base_playwright_testcase.py
+  example_project/django_mptt_example/tests/playwright_page.py
+  example_project/django_mptt_example/tests/test_playwright.py
