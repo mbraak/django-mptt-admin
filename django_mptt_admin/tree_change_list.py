@@ -45,21 +45,13 @@ class TreeChangeList(ChangeList):
         return lookup_params
 
     def get_queryset(self, request):
-        if django.VERSION >= (3, 1):
-            (
-                self.filter_specs,
-                self.has_filters,
-                remaining_lookup_params,
-                filters_use_distinct,
-                self.has_active_filters,
-            ) = self.get_filters(request)
-        else:
-            (
-                self.filter_specs,
-                self.has_filters,
-                remaining_lookup_params,
-                filters_use_distinct,
-            ) = self.get_filters(request)
+        (
+            self.filter_specs,
+            self.has_filters,
+            remaining_lookup_params,
+            filters_use_distinct,
+            self.has_active_filters,
+        ) = self.get_filters(request)
 
         qs = util.get_tree_queryset(
             model=self.model,
