@@ -7,13 +7,14 @@
     padding: 1em 0 1em 0;
 
     .mptt-admin-error {
-        color: red;
+        color: var(--error-fg);
         margin-left: 8px;
     }
 
     ul.jqtree-tree {
         .jqtree-toggler {
             top: 10%;
+            color: var(--body-fg);
         }
 
         .edit {
@@ -48,10 +49,11 @@
 
             .jqtree-element {
                 margin-bottom: 8px;
-                background-color: #eee;
+                background-color: var(--darkened-bg);
                 padding: 8px;
 
                 .jqtree-title {
+                    color: var(--body-fg);
                     margin-left: 0;
                     margin-right: 0;
                 }
@@ -62,15 +64,16 @@
             }
 
             li.jqtree-selected > .jqtree-element {
-                background: #79aec8;
+                background: var(--breadcrumbs-bg);
+                color: var(--header-color);
                 text-shadow: none;
 
                 .jqtree-title {
-                    color: #fff;
+                    color: var(--breadcrumbs-link-fg);
                 }
 
                 .edit {
-                    color: #c4dce8;
+                    color: var(--breadcrumbs-fg);
                 }
             }
 
