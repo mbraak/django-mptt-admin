@@ -35,8 +35,8 @@
         "eslint": "^8.43.0",
         "eslint-plugin-import": "^2.27.5",
         "sass": "^1.63.6",
-        "typescript": "^5.1.5",
-        "webpack": "^5.88.0",
+        "typescript": "^5.1.6",
+        "webpack": "^5.88.1",
         "webpack-cli": "^5.1.4"
     },
     "dependencies": {
