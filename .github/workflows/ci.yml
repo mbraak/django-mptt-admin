@@ -4,12 +4,11 @@ on: [push]
 
 jobs:
   runner-job:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        django: ['django==3.2.19', 'django==4.1.9', 'django==4.2.2']
+        django: ["django==3.2.20", "django==4.1.10", "django==4.2.3"]
 
     services:
       postgres:
@@ -25,70 +24,70 @@ jobs:
           - 5432:5432
 
     steps:
-    - name: Check out repository code
-      uses: actions/checkout@v3
-    - name: Setup node
-      uses: actions/setup-node@v3
-      with:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
           node-version: 16
-    - name: Install pnpm
-      run: npm install -g pnpm
-    - name: Get pnpm store directory
-      id: pnpm-cache
-      run: |
-        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v3
-      name: Setup pnpm cache
-      with:
-        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
-    - name: Install javascript packages
-      working-directory: ./frontend
-      run: pnpm install
-    - name: Cache python packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    - name: Install python packages
-      run: |
-        python -m pip install --upgrade pip && pip install wheel && pip install ${{ matrix.django }} && pip install -r example_project/requirements_test.txt && playwright install chromium && pip install -r example_project/requirements_ci.txt && pip install -e .
-    - name: Run tests
-      run: python -Wd example_project/manage.py test django_mptt_example
-      env:
-        POSTGRES_HOST: localhost
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_PORT: 5432
-    - name: Setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
-    - name: Build javascript
-      working-directory: ./frontend
-      run: pnpm run build
-    - name: Create javascript coverage directory
-      run: mkdir js_coverage
-    - name: Test with coverage
-      run: |
-        COVERAGE=true coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
-      env:
-        POSTGRES_HOST: localhost
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_PORT: 5432
-    - name: Merge Python coverage
-      run: coverage report && coverage lcov
-    - name: Merge javascript coverage
-      working-directory: ./coverage
-      run: pnpm i && pnpm run merge_coverage
-    - name: Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        verbose: true
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install javascript packages
+        working-directory: ./frontend
+        run: pnpm install
+      - name: Cache python packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install python packages
+        run: |
+          python -m pip install --upgrade pip && pip install wheel && pip install ${{ matrix.django }} && pip install -r example_project/requirements_test.txt && playwright install chromium && pip install -r example_project/requirements_ci.txt && pip install -e .
+      - name: Run tests
+        run: python -Wd example_project/manage.py test django_mptt_example
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_PORT: 5432
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - name: Build javascript
+        working-directory: ./frontend
+        run: pnpm run build
+      - name: Create javascript coverage directory
+        run: mkdir js_coverage
+      - name: Test with coverage
+        run: |
+          COVERAGE=true coverage run --source=django_mptt_admin,example_project/django_mptt_example example_project/manage.py test django_mptt_example
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_PORT: 5432
+      - name: Merge Python coverage
+        run: coverage report && coverage lcov
+      - name: Merge javascript coverage
+        working-directory: ./coverage
+        run: pnpm i && pnpm run merge_coverage
+      - name: Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          verbose: true
