@@ -280,7 +280,7 @@ function tryDecode(str, decode) {
 
 /***/ }),
 
-/***/ 892:
+/***/ 107:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -410,7 +410,7 @@ exports["default"] = DataLoader;
 
 /***/ }),
 
-/***/ 183:
+/***/ 676:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -419,7 +419,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports.HitAreasGenerator = exports.DragAndDropHandler = void 0;
-var _node = __webpack_require__(874);
+var _node = __webpack_require__(504);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -627,6 +627,9 @@ var DragAndDropHandler = /*#__PURE__*/function () {
       while (low < high) {
         var mid = low + high >> 1;
         var area = this.hitAreas[mid];
+        if (!area) {
+          return null;
+        }
         if (y < area.top) {
           high = mid;
         } else if (y > area.bottom) {
@@ -779,10 +782,16 @@ var VisibleNodeIterator = /*#__PURE__*/function () {
         if (mustIterateInside) {
           var childrenLength = node.children.length;
           node.children.forEach(function (_, i) {
-            if (i === childrenLength - 1) {
-              _iterateNode(node.children[i], null);
-            } else {
-              _iterateNode(node.children[i], node.children[i + 1]);
+            var child = node.children[i];
+            if (child) {
+              if (i === childrenLength - 1) {
+                _iterateNode(child, null);
+              } else {
+                var nextChild = node.children[i + 1];
+                if (nextChild) {
+                  _iterateNode(child, nextChild);
+                }
+              }
             }
           });
           if (node.is_open && $element) {
@@ -941,12 +950,14 @@ var HitAreasGenerator = /*#__PURE__*/function (_VisibleNodeIterator) {
       var i = 0;
       while (i < positionCount) {
         var position = positionsInGroup[i];
-        hitAreas.push({
-          top: areaTop,
-          bottom: areaTop + areaHeight,
-          node: position.node,
-          position: position.position
-        });
+        if (position) {
+          hitAreas.push({
+            top: areaTop,
+            bottom: areaTop + areaHeight,
+            node: position.node,
+            position: position.position
+          });
+        }
         areaTop += areaHeight;
         i += 1;
       }
@@ -991,7 +1002,7 @@ var DragElement = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ 666:
+/***/ 741:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1000,7 +1011,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
-var _util = __webpack_require__(618);
+var _util = __webpack_require__(627);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -1035,7 +1046,9 @@ var ElementsRenderer = /*#__PURE__*/function () {
     value: function renderFromRoot() {
       var $element = this.treeWidget.element;
       $element.empty();
-      this.createDomElements($element[0], this.treeWidget.tree.children, true, 1);
+      if ($element[0]) {
+        this.createDomElements($element[0], this.treeWidget.tree.children, true, 1);
+      }
     }
   }, {
     key: "renderFromNode",
@@ -1122,6 +1135,14 @@ var ElementsRenderer = /*#__PURE__*/function () {
       return li;
     }
   }, {
+    key: "setTreeItemAriaAttributes",
+    value: function setTreeItemAriaAttributes(element, name, level, isSelected) {
+      element.setAttribute("aria-label", name);
+      element.setAttribute("aria-level", "".concat(level));
+      element.setAttribute("aria-selected", (0, _util.getBoolString)(isSelected));
+      element.setAttribute("role", "treeitem");
+    }
+  }, {
     key: "createFolderLi",
     value: function createFolderLi(node, level, isSelected) {
       var buttonClasses = this.getButtonClasses(node);
@@ -1131,26 +1152,28 @@ var ElementsRenderer = /*#__PURE__*/function () {
       // li
       var li = document.createElement("li");
       li.className = "jqtree_common ".concat(folderClasses);
-      li.setAttribute("role", "presentation");
+      li.setAttribute("role", "none");
 
       // div
       var div = document.createElement("div");
       div.className = "jqtree-element jqtree_common";
-      div.setAttribute("role", "presentation");
+      div.setAttribute("role", "none");
       li.appendChild(div);
 
       // button link
       var buttonLink = document.createElement("a");
       buttonLink.className = buttonClasses;
-      buttonLink.appendChild(iconElement.cloneNode(true));
-      buttonLink.setAttribute("role", "presentation");
-      buttonLink.setAttribute("aria-hidden", "true");
+      if (iconElement) {
+        buttonLink.appendChild(iconElement.cloneNode(true));
+      }
       if (this.treeWidget.options.buttonLeft) {
         div.appendChild(buttonLink);
       }
 
       // title span
-      div.appendChild(this.createTitleSpan(node.name, level, isSelected, node.is_open, true));
+      var titleSpan = this.createTitleSpan(node.name, isSelected, true, level);
+      titleSpan.setAttribute("aria-expanded", (0, _util.getBoolString)(node.is_open));
+      div.appendChild(titleSpan);
       if (!this.treeWidget.options.buttonLeft) {
         div.appendChild(buttonLink);
       }
@@ -1168,21 +1191,22 @@ var ElementsRenderer = /*#__PURE__*/function () {
       // li
       var li = document.createElement("li");
       li.className = classString;
-      li.setAttribute("role", "presentation");
+      li.setAttribute("role", "none");
 
       // div
       var div = document.createElement("div");
       div.className = "jqtree-element jqtree_common";
-      div.setAttribute("role", "presentation");
+      div.setAttribute("role", "none");
       li.appendChild(div);
 
       // title span
-      div.appendChild(this.createTitleSpan(node.name, level, isSelected, node.is_open, false));
+      var titleSpan = this.createTitleSpan(node.name, isSelected, false, level);
+      div.appendChild(titleSpan);
       return li;
     }
   }, {
     key: "createTitleSpan",
-    value: function createTitleSpan(nodeName, level, isSelected, isOpen, isFolder) {
+    value: function createTitleSpan(nodeName, isSelected, isFolder, level) {
       var titleSpan = document.createElement("span");
       var classes = "jqtree-title jqtree_common";
       if (isFolder) {
@@ -1190,16 +1214,13 @@ var ElementsRenderer = /*#__PURE__*/function () {
       }
       classes += " jqtree-title-button-".concat(this.treeWidget.options.buttonLeft ? "left" : "right");
       titleSpan.className = classes;
-      titleSpan.setAttribute("role", "treeitem");
-      titleSpan.setAttribute("aria-level", "".concat(level));
-      titleSpan.setAttribute("aria-selected", (0, _util.getBoolString)(isSelected));
-      titleSpan.setAttribute("aria-expanded", (0, _util.getBoolString)(isOpen));
       if (isSelected) {
         var tabIndex = this.treeWidget.options.tabIndex;
         if (tabIndex !== undefined) {
           titleSpan.setAttribute("tabindex", "".concat(tabIndex));
         }
       }
+      this.setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
       if (this.treeWidget.options.autoEscape) {
         titleSpan.textContent = nodeName;
       } else {
@@ -1255,7 +1276,7 @@ exports["default"] = ElementsRenderer;
 
 /***/ }),
 
-/***/ 112:
+/***/ 923:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1376,7 +1397,7 @@ _defineProperty(KeyHandler, "DOWN", 40);
 
 /***/ }),
 
-/***/ 815:
+/***/ 408:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1385,7 +1406,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
-var _simple = _interopRequireDefault(__webpack_require__(474));
+var _simple = _interopRequireDefault(__webpack_require__(463));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1400,7 +1421,9 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf.bind() : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); } /*
+                                                                                                                                                                                                                                                                                                                                                                                              This widget does the same a the mouse widget in jqueryui.
+                                                                                                                                                                                                                                                                                                                                                                                              */
 var getPositionInfoFromMouseEvent = function getPositionInfoFromMouseEvent(e) {
   return {
     pageX: e.pageX,
@@ -1455,6 +1478,9 @@ var MouseWidget = /*#__PURE__*/function (_SimpleWidget) {
         return;
       }
       var touch = e.changedTouches[0];
+      if (!touch) {
+        return;
+      }
       _this.handleMouseDown(getPositionInfoFromTouch(touch, e));
     });
     _defineProperty(_assertThisInitialized(_this), "touchMove", function (e) {
@@ -1465,6 +1491,9 @@ var MouseWidget = /*#__PURE__*/function (_SimpleWidget) {
         return;
       }
       var touch = e.changedTouches[0];
+      if (!touch) {
+        return;
+      }
       _this.handleMouseMove(e, getPositionInfoFromTouch(touch, e));
     });
     _defineProperty(_assertThisInitialized(_this), "touchEnd", function (e) {
@@ -1475,6 +1504,9 @@ var MouseWidget = /*#__PURE__*/function (_SimpleWidget) {
         return;
       }
       var touch = e.changedTouches[0];
+      if (!touch) {
+        return;
+      }
       _this.handleMouseUp(getPositionInfoFromTouch(touch, e));
     });
     return _this;
@@ -1627,7 +1659,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 874:
+/***/ 504:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1646,14 +1678,14 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-var Position;
-exports.Position = Position;
-(function (Position) {
+var Position = /*#__PURE__*/function (Position) {
   Position[Position["Before"] = 1] = "Before";
   Position[Position["After"] = 2] = "After";
   Position[Position["Inside"] = 3] = "Inside";
   Position[Position["None"] = 4] = "None";
-})(Position || (exports.Position = Position = {}));
+  return Position;
+}({});
+exports.Position = Position;
 var positionNames = {
   before: Position.Before,
   after: Position.After,
@@ -2145,7 +2177,7 @@ var Node = /*#__PURE__*/function () {
       } else {
         var previousIndex = this.parent.getChildIndex(this) - 1;
         if (previousIndex >= 0) {
-          return this.parent.children[previousIndex];
+          return this.parent.children[previousIndex] || null;
         } else {
           return null;
         }
@@ -2159,7 +2191,7 @@ var Node = /*#__PURE__*/function () {
       } else {
         var nextIndex = this.parent.getChildIndex(this) + 1;
         if (nextIndex < this.parent.children.length) {
-          return this.parent.children[nextIndex];
+          return this.parent.children[nextIndex] || null;
         } else {
           return null;
         }
@@ -2189,7 +2221,7 @@ var Node = /*#__PURE__*/function () {
     value: function getNextNode() {
       var includeChildren = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
       if (includeChildren && this.hasChildren()) {
-        return this.children[0];
+        return this.children[0] || null;
       } else if (!this.parent) {
         return null;
       } else {
@@ -2206,7 +2238,7 @@ var Node = /*#__PURE__*/function () {
     value: function getNextVisibleNode() {
       if (this.hasChildren() && this.is_open) {
         // First child
-        return this.children[0];
+        return this.children[0] || null;
       } else {
         if (!this.parent) {
           return null;
@@ -2276,10 +2308,13 @@ var Node = /*#__PURE__*/function () {
         return null;
       } else {
         var lastChild = this.children[this.children.length - 1];
+        if (!lastChild) {
+          return null;
+        }
         if (!(lastChild.hasChildren() && lastChild.is_open)) {
           return lastChild;
         } else {
-          return lastChild.getLastChild();
+          return lastChild === null || lastChild === void 0 ? void 0 : lastChild.getLastChild();
         }
       }
     }
@@ -2332,7 +2367,7 @@ var Node = /*#__PURE__*/function () {
     key: "getNodeClass",
     value: function getNodeClass() {
       var _this$tree4;
-      return this.nodeClass || (this === null || this === void 0 ? void 0 : (_this$tree4 = this.tree) === null || _this$tree4 === void 0 ? void 0 : _this$tree4.nodeClass) || Node;
+      return this.nodeClass || (this === null || this === void 0 || (_this$tree4 = this.tree) === null || _this$tree4 === void 0 ? void 0 : _this$tree4.nodeClass) || Node;
     }
   }, {
     key: "createNode",
@@ -2347,7 +2382,7 @@ exports.Node = Node;
 
 /***/ }),
 
-/***/ 347:
+/***/ 389:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -2356,7 +2391,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports.NodeElement = exports.FolderElement = exports.BorderDropHint = void 0;
-var _node = __webpack_require__(874);
+var _node = __webpack_require__(504);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); Object.defineProperty(subClass, "prototype", { writable: false }); if (superClass) _setPrototypeOf(subClass, superClass); }
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf ? Object.setPrototypeOf.bind() : function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
@@ -2409,9 +2444,9 @@ var NodeElement = /*#__PURE__*/function () {
       var _this$treeWidget$opti;
       var $li = this.getLi();
       $li.addClass("jqtree-selected");
-      $li.attr("aria-selected", "true");
       var $span = this.getSpan();
       $span.attr("tabindex", (_this$treeWidget$opti = this.treeWidget.options.tabIndex) !== null && _this$treeWidget$opti !== void 0 ? _this$treeWidget$opti : null);
+      $span.attr("aria-selected", "true");
       if (mustSetFocus) {
         $span.trigger("focus");
       }
@@ -2421,10 +2456,10 @@ var NodeElement = /*#__PURE__*/function () {
     value: function deselect() {
       var $li = this.getLi();
       $li.removeClass("jqtree-selected");
-      $li.attr("aria-selected", "false");
       var $span = this.getSpan();
       $span.removeAttr("tabindex");
-      $span.blur();
+      $span.attr("aria-selected", "false");
+      $span.trigger("blur");
     }
   }, {
     key: "getUl",
@@ -2472,14 +2507,17 @@ var FolderElement = /*#__PURE__*/function (_NodeElement) {
       $button.html("");
       var buttonEl = $button.get(0);
       if (buttonEl) {
-        var icon = this.treeWidget.renderer.openedIconElement.cloneNode(true);
-        buttonEl.appendChild(icon);
+        var openedIconElement = this.treeWidget.renderer.openedIconElement;
+        if (openedIconElement) {
+          var icon = openedIconElement.cloneNode(true);
+          buttonEl.appendChild(icon);
+        }
       }
       var doOpen = function doOpen() {
         var $li = _this.getLi();
         $li.removeClass("jqtree-closed");
-        var $span = _this.getSpan();
-        $span.attr("aria-expanded", "true");
+        var $titleSpan = _this.getSpan();
+        $titleSpan.attr("aria-expanded", "true");
         if (onFinished) {
           onFinished(_this.node);
         }
@@ -2509,14 +2547,17 @@ var FolderElement = /*#__PURE__*/function (_NodeElement) {
       $button.html("");
       var buttonEl = $button.get(0);
       if (buttonEl) {
-        var icon = this.treeWidget.renderer.closedIconElement.cloneNode(true);
-        buttonEl.appendChild(icon);
+        var closedIconElement = this.treeWidget.renderer.closedIconElement;
+        if (closedIconElement) {
+          var icon = closedIconElement.cloneNode(true);
+          buttonEl.appendChild(icon);
+        }
       }
       var doClose = function doClose() {
         var $li = _this2.getLi();
         $li.addClass("jqtree-closed");
-        var $span = _this2.getSpan();
-        $span.attr("aria-expanded", "false");
+        var $titleSpan = _this2.getSpan();
+        $titleSpan.attr("aria-expanded", "false");
         _this2.treeWidget._triggerEvent("tree.close", {
           node: _this2.node
         });
@@ -2606,7 +2647,8 @@ var GhostDropHint = /*#__PURE__*/function () {
   }, {
     key: "moveInsideOpenFolder",
     value: function moveInsideOpenFolder() {
-      var childElement = this.node.children[0].element;
+      var _this$node$children$;
+      var childElement = (_this$node$children$ = this.node.children[0]) === null || _this$node$children$ === void 0 ? void 0 : _this$node$children$.element;
       if (childElement) {
         jQuery(childElement).before(this.$ghost);
       }
@@ -2623,7 +2665,7 @@ var GhostDropHint = /*#__PURE__*/function () {
 
 /***/ }),
 
-/***/ 389:
+/***/ 326:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -2632,7 +2674,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
-var _util = __webpack_require__(618);
+var _util = __webpack_require__(627);
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -2735,7 +2777,7 @@ var SaveStateHandler = /*#__PURE__*/function () {
     value: function getNodeIdToBeSelected() {
       var state = this.getStateFromStorage();
       if (state && state.selected_node) {
-        return state.selected_node[0];
+        return state.selected_node[0] || null;
       } else {
         return null;
       }
@@ -2907,7 +2949,7 @@ exports["default"] = SaveStateHandler;
 
 /***/ }),
 
-/***/ 109:
+/***/ 230:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -2949,7 +2991,7 @@ var ScrollHandler = /*#__PURE__*/function () {
     key: "scrollToY",
     value: function scrollToY(top) {
       this.ensureInit();
-      if (this.$scrollParent) {
+      if (this.$scrollParent && this.$scrollParent[0]) {
         this.$scrollParent[0].scrollTop = top;
       } else {
         var offset = this.treeWidget.$el.offset();
@@ -2995,7 +3037,8 @@ var ScrollHandler = /*#__PURE__*/function () {
   }, {
     key: "initScrollParent",
     value: function initScrollParent() {
-      var _this = this;
+      var _this = this,
+        _$scrollParent$;
       var getParentWithOverflow = function getParentWithOverflow() {
         var cssAttributes = ["overflow", "overflow-y"];
         var hasOverFlow = function hasOverFlow($el) {
@@ -3036,7 +3079,7 @@ var ScrollHandler = /*#__PURE__*/function () {
         setDocumentAsScrollParent();
       }
       var $scrollParent = getParentWithOverflow();
-      if ($scrollParent && $scrollParent.length && $scrollParent[0].tagName !== "HTML") {
+      if ($scrollParent && $scrollParent.length && ((_$scrollParent$ = $scrollParent[0]) === null || _$scrollParent$ === void 0 ? void 0 : _$scrollParent$.tagName) !== "HTML") {
         this.$scrollParent = $scrollParent;
         var offset = this.$scrollParent.offset();
         this.scrollParentTop = offset ? offset.top : 0;
@@ -3122,6 +3165,9 @@ var ScrollHandler = /*#__PURE__*/function () {
         return;
       }
       var scrollParent = $scrollParent[0];
+      if (!scrollParent) {
+        return;
+      }
       var canScrollRight = scrollParent.scrollLeft + scrollParent.clientWidth < scrollParent.scrollWidth;
       var canScrollLeft = scrollParent.scrollLeft > 0;
       var rightEdge = scrollParentOffset.left + scrollParent.clientWidth;
@@ -3159,7 +3205,7 @@ exports["default"] = ScrollHandler;
 
 /***/ }),
 
-/***/ 429:
+/***/ 243:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3190,7 +3236,7 @@ var SelectNodeHandler = /*#__PURE__*/function () {
     value: function getSelectedNode() {
       var selectedNodes = this.getSelectedNodes();
       if (selectedNodes.length) {
-        return selectedNodes[0];
+        return selectedNodes[0] || false;
       } else {
         return false;
       }
@@ -3294,7 +3340,7 @@ exports["default"] = SelectNodeHandler;
 
 /***/ }),
 
-/***/ 474:
+/***/ 463:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -3415,6 +3461,8 @@ var _register = function register(widgetClass, widgetName) {
         }
         return callFunction(this, functionName, args);
       }
+    } else {
+      return undefined;
     }
   };
 };
@@ -3457,7 +3505,7 @@ _defineProperty(SimpleWidget, "defaults", {});
 
 /***/ }),
 
-/***/ 551:
+/***/ 805:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 var __webpack_unused_export__;
@@ -3467,19 +3515,19 @@ __webpack_unused_export__ = ({
   value: true
 });
 __webpack_unused_export__ = void 0;
-var _version = _interopRequireDefault(__webpack_require__(184));
-var _dragAndDropHandler = __webpack_require__(183);
-var _elementsRenderer = _interopRequireDefault(__webpack_require__(666));
-var _dataLoader = _interopRequireDefault(__webpack_require__(892));
-var _keyHandler = _interopRequireDefault(__webpack_require__(112));
-var _mouse = _interopRequireDefault(__webpack_require__(815));
-var _saveStateHandler = _interopRequireDefault(__webpack_require__(389));
-var _scrollHandler = _interopRequireDefault(__webpack_require__(109));
-var _selectNodeHandler = _interopRequireDefault(__webpack_require__(429));
-var _simple = _interopRequireDefault(__webpack_require__(474));
-var _node6 = __webpack_require__(874);
-var _util = __webpack_require__(618);
-var _nodeElement = __webpack_require__(347);
+var _version = _interopRequireDefault(__webpack_require__(896));
+var _dragAndDropHandler = __webpack_require__(676);
+var _elementsRenderer = _interopRequireDefault(__webpack_require__(741));
+var _dataLoader = _interopRequireDefault(__webpack_require__(107));
+var _keyHandler = _interopRequireDefault(__webpack_require__(923));
+var _mouse = _interopRequireDefault(__webpack_require__(408));
+var _saveStateHandler = _interopRequireDefault(__webpack_require__(326));
+var _scrollHandler = _interopRequireDefault(__webpack_require__(230));
+var _selectNodeHandler = _interopRequireDefault(__webpack_require__(243));
+var _simple = _interopRequireDefault(__webpack_require__(463));
+var _node6 = __webpack_require__(504);
+var _util = __webpack_require__(627);
+var _nodeElement = __webpack_require__(389);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
@@ -4570,7 +4618,7 @@ _simple["default"].register(JqTreeWidget, "tree");
 
 /***/ }),
 
-/***/ 618:
+/***/ 627:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4594,7 +4642,7 @@ exports.getBoolString = getBoolString;
 
 /***/ }),
 
-/***/ 184:
+/***/ 896:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -4603,7 +4651,7 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
-var version = "1.7.0";
+var version = "1.7.1";
 var _default = version;
 exports["default"] = _default;
 
@@ -4640,8 +4688,8 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.7.0/node_modules/jqtree/lib/tree.jquery.js
-var tree_jquery = __webpack_require__(551);
+// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.7.1/node_modules/jqtree/lib/tree.jquery.js
+var tree_jquery = __webpack_require__(805);
 ;// CONCATENATED MODULE: ./node_modules/.pnpm/spin.js@4.1.1/node_modules/spin.js/spin.js
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
