@@ -4846,26 +4846,28 @@ var cookie = __webpack_require__(591);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 
 function initTree($tree, _ref) {
-  var animationSpeed = _ref.animationSpeed,
-    autoOpen = _ref.autoOpen,
-    autoEscape = _ref.autoEscape,
-    csrfCookieName = _ref.csrfCookieName,
-    dragAndDrop = _ref.dragAndDrop,
-    hasAddPermission = _ref.hasAddPermission,
-    hasChangePermission = _ref.hasChangePermission,
-    mouseDelay = _ref.mouseDelay,
-    rtl = _ref.rtl;
-  var errorNode = null;
-  var baseUrl = "http://example.com";
-  var insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
+  let {
+    animationSpeed,
+    autoOpen,
+    autoEscape,
+    csrfCookieName,
+    dragAndDrop,
+    hasAddPermission,
+    hasChangePermission,
+    mouseDelay,
+    rtl
+  } = _ref;
+  let errorNode = null;
+  const baseUrl = "http://example.com";
+  const insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
   function createLi(node, $li, isSelected) {
     // Create edit link
-    var $title = $li.find(".jqtree-title");
-    insertAtUrl.searchParams.set("insert_at", "".concat(node.id));
-    var insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
-    var tabindex = isSelected ? "0" : "-1";
-    var editCaption = hasChangePermission ? gettext("edit") : gettext("view");
-    $title.after("<a href=\"".concat(node.url, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(editCaption, ")</a>"), hasAddPermission ? "<a href=\"".concat(insertUrlString, "\" class=\"edit\" tabindex=\"").concat(tabindex, "\">(").concat(gettext("add"), ")</a>") : "");
+    const $title = $li.find(".jqtree-title");
+    insertAtUrl.searchParams.set("insert_at", `${node.id}`);
+    const insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
+    const tabindex = isSelected ? "0" : "-1";
+    const editCaption = hasChangePermission ? gettext("edit") : gettext("view");
+    $title.after(`<a href="${node.url}" class="edit" tabindex="${tabindex}">(${editCaption})</a>`, hasAddPermission ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext("add")})</a>` : "");
   }
   function getCsrfToken() {
     function getFromMiddleware() {
@@ -4881,32 +4883,32 @@ function initTree($tree, _ref) {
     return getFromCookie() || getFromMiddleware();
   }
   function handleMove(eventParam) {
-    var e = eventParam;
-    var info = e.move_info;
-    var data = {
+    const e = eventParam;
+    const info = e.move_info;
+    const data = {
       target_id: info.target_node.id,
       position: info.position
     };
-    var $el = jQuery(info.moved_node.element);
+    const $el = jQuery(info.moved_node.element);
     handleLoading(true, null, $el);
     removeErrorMessage();
     e.preventDefault();
     void jQuery.ajax({
       type: "POST",
       url: info.moved_node.move_url,
-      data: data,
-      beforeSend: function beforeSend(xhr) {
+      data,
+      beforeSend: xhr => {
         // Set Django csrf token
         xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
       },
-      success: function success() {
+      success: () => {
         info.do_move();
         handleLoading(false, null, $el);
       },
-      error: function error() {
+      error: () => {
         handleLoading(false, null, $el);
-        var $node = $el.find(".jqtree-element");
-        $node.append("<span class=\"mptt-admin-error\">".concat(gettext("move failed"), "</span>"));
+        const $node = $el.find(".jqtree-element");
+        $node.append(`<span class="mptt-admin-error">${gettext("move failed")}</span>`);
         errorNode = info.moved_node;
       }
     });
@@ -4920,7 +4922,7 @@ function initTree($tree, _ref) {
   function handleLoadFailed() {
     $tree.html(gettext("Error while loading the data from the server"));
   }
-  var spinners = {};
+  const spinners = {};
   function handleLoading(isLoading, node, $el) {
     function getNodeId() {
       if (!node) {
@@ -4936,11 +4938,11 @@ function initTree($tree, _ref) {
         return $el[0];
       }
     }
-    var nodeId = getNodeId();
+    const nodeId = getNodeId();
     if (isLoading) {
       spinners[nodeId] = new Spinner().spin(getContainer());
     } else {
-      var spinner = spinners[nodeId];
+      const spinner = spinners[nodeId];
       if (spinner) {
         spinner.stop();
         spinners[nodeId] = null;
@@ -4948,9 +4950,11 @@ function initTree($tree, _ref) {
     }
   }
   function handleSelect(eventParam) {
-    var e = eventParam;
-    var node = e.node,
-      deselected_node = e.deselected_node;
+    const e = eventParam;
+    const {
+      node,
+      deselected_node
+    } = e;
     if (deselected_node) {
       // deselected node: remove tabindex
       jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
@@ -4960,9 +4964,9 @@ function initTree($tree, _ref) {
       jQuery(node.element).find(".edit").attr("tabindex", 0);
     }
   }
-  var treeOptions = {
-    autoOpen: autoOpen,
-    autoEscape: autoEscape,
+  const treeOptions = {
+    autoOpen,
+    autoEscape,
     buttonLeft: rtl,
     closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
     dragAndDrop: dragAndDrop && hasChangePermission,
@@ -4982,28 +4986,28 @@ function initTree($tree, _ref) {
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
 }
-jQuery(function () {
-  var $tree = jQuery("#tree");
+jQuery(() => {
+  const $tree = jQuery("#tree");
   if ($tree.length) {
-    var animationSpeed = $tree.data("tree-animation-speed");
-    var autoOpen = $tree.data("auto_open");
-    var autoEscape = Boolean($tree.data("autoescape"));
-    var hasAddPermission = Boolean($tree.data("has-add-permission"));
-    var hasChangePermission = Boolean($tree.data("has-change-permission"));
-    var mouseDelay = $tree.data("tree-mouse-delay");
-    var dragAndDrop = $tree.data("drag-and-drop");
-    var rtl = $tree.data("rtl") === "1";
-    var csrfCookieName = $tree.data("csrf-cookie-name");
+    const animationSpeed = $tree.data("tree-animation-speed");
+    const autoOpen = $tree.data("auto_open");
+    const autoEscape = Boolean($tree.data("autoescape"));
+    const hasAddPermission = Boolean($tree.data("has-add-permission"));
+    const hasChangePermission = Boolean($tree.data("has-change-permission"));
+    const mouseDelay = $tree.data("tree-mouse-delay");
+    const dragAndDrop = $tree.data("drag-and-drop");
+    const rtl = $tree.data("rtl") === "1";
+    const csrfCookieName = $tree.data("csrf-cookie-name");
     initTree($tree, {
-      animationSpeed: animationSpeed,
-      autoOpen: autoOpen,
-      autoEscape: autoEscape,
-      csrfCookieName: csrfCookieName,
-      dragAndDrop: dragAndDrop,
-      hasAddPermission: hasAddPermission,
-      hasChangePermission: hasChangePermission,
-      mouseDelay: mouseDelay,
-      rtl: rtl
+      animationSpeed,
+      autoOpen,
+      autoEscape,
+      csrfCookieName,
+      dragAndDrop,
+      hasAddPermission,
+      hasChangePermission,
+      mouseDelay,
+      rtl
     });
   }
 });
