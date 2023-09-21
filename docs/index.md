@@ -143,7 +143,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**development (2.5.2) **
 
 **2.5.1** (may 6 2023)
 
