@@ -116,7 +116,7 @@ Possible values are:
 
 Example:
 
-```
+```python
 class MyMpttModel(MPTTModel):
     title = models.CharField(......
 
@@ -142,8 +142,6 @@ class CountryAdmin(DjangoMpttAdmin):
 Also see the example project for a complete continent filter.
 
 ## Changelog
-
-**development (2.5.2) **
 
 **2.5.1** (may 6 2023)
 
