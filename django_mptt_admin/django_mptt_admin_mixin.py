@@ -87,6 +87,9 @@ class DjangoMpttAdminMixin:
             "csrf_cookie_name": get_csrf_cookie_name(),
             "drag_and_drop": self.is_drag_and_drop_enabled(),
             "grid_url": grid_url,
+            "has_add_permission": self.has_add_permission(request),
+            "has_change_permission": self.has_change_permission(request),
+            "insert_at_url": insert_at_url,
             "jsi18n_url": self.get_admin_url("jsi18n"),
             "model_name": util.get_model_name(self.model),
             "tree_animation_speed": self.tree_animation_speed,
@@ -105,7 +108,6 @@ class DjangoMpttAdminMixin:
             "to_field": change_list.to_field,
             "cl": change_list,
             "media": self.get_tree_media(),
-            "has_add_permission": self.has_add_permission(request),
             "opts": change_list.opts,
             "preserved_filters": self.get_preserved_filters(request),
             **tree_options,
@@ -222,7 +224,6 @@ class DjangoMpttAdminMixin:
         url_name = "admin:{0!s}_{1!s}_{2!s}".format(
             opts.app_label, util.get_model_name(self.model), name
         )
-
         return reverse(url_name, args=args, current_app=self.admin_site.name)
 
     def get_tree_data(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], qs, max_level, filters_params):
@@ -238,7 +239,7 @@ class DjangoMpttAdminMixin:
             )
 
         def handle_create_node(instance, node_info):
-            pk = quote(getattr(instance, pk_attname))
+            pk = getattr(instance, pk_attname)
 
             node_url = add_preserved_filters_to_url(
                 self.get_admin_url("change", (quote(pk),))
