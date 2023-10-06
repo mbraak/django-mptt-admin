@@ -1,9 +1,15 @@
 {% extends 'admin/change_list.html' %}
-{% load i18n admin_list javascript_value %}
+{% load i18n admin_list static javascript_value %}
 
 {% block extrastyle %}
     {{ block.super }}
     <script type="text/javascript" src="{{ jsi18n_url }}"></script>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{{ media.js }}
+<script src="{% static 'admin/js/filters.js' %}" defer></script>
 {% endblock %}
 
 {% block search %}{% endblock %}
@@ -32,15 +38,6 @@
         data-url="{{ tree_json_url }}"
         data-use_context_menu="{{ use_context_menu|javascript_value }}"
     ></div>
-{% endblock %}
-
-{% block filters %}
-    {% if cl.has_filters %}
-        <div id="changelist-filter">
-          <h2>{% trans 'Filter' %}</h2>
-          {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
-        </div>
-    {% endif %}
 {% endblock %}
 
 {% block pagination %}{% endblock %}
