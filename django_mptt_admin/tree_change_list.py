@@ -1,11 +1,11 @@
-from django.contrib.admin.views.main import ChangeList, IGNORED_PARAMS
+from django.contrib.admin.views.main import ChangeList
 import django
 
 from . import util
 
 
 class TreeChangeList(ChangeList):
-    TREE_IGNORED_PARAMS = IGNORED_PARAMS + ("_", "node", "selected_node")
+    TREE_IGNORED_PARAMS = ("_", "node", "selected_node")
 
     def __init__(self, request, model, model_admin, list_filter, node_id, max_level):
         self.node_id = node_id
@@ -33,7 +33,7 @@ class TreeChangeList(ChangeList):
         super().__init__(**params)
 
     def get_filters_params(self, params=None):
-        params = params or self.filter_params
+        params = super().get_filters_params()
 
         lookup_params = params.copy()
 
