@@ -116,7 +116,7 @@ Possible values are:
 
 Example:
 
-```
+```python
 class MyMpttModel(MPTTModel):
     title = models.CharField(......
 
