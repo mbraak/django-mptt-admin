@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.5.0
     version: 0.5.0
   jqtree:
-    specifier: ^1.7.4
-    version: 1.7.4(jquery@3.7.1)
+    specifier: ^1.7.5
+    version: 1.7.5(jquery@3.7.1)
   spin.js:
     specifier: ^4.1.1
     version: 4.1.1
@@ -3056,8 +3056,8 @@ packages:
       supports-color: 8.1.1
     dev: true
 
-  /jqtree@1.7.4(jquery@3.7.1):
-    resolution: {integrity: sha512-hHrqC7Vd9hZl7lwhRkl5azEAqU6/TibaPfqWHsXQf07kJY5qrbA7u/lNpFenRGv7ikARj7giin4F0tgkmgl5QA==}
+  /jqtree@1.7.5(jquery@3.7.1):
+    resolution: {integrity: sha512-Bw7pMExChLOWW6GIQv0xZ9PlochLpAu4hYqJIGdWYLZP+M9q5pKwsGO+fnrkY2lC5WMkiH3ghwXd1uIIpRGq+A==}
     peerDependencies:
       jquery: ^3
     dependencies:
