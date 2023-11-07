@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 591:
+/***/ 706:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -180,6 +180,10 @@ function serialize(name, val, options) {
     str += '; Secure';
   }
 
+  if (opt.partitioned) {
+    str += '; Partitioned'
+  }
+
   if (opt.priority) {
     var priority = typeof opt.priority === 'string'
       ? opt.priority.toLowerCase()
@@ -241,7 +245,7 @@ function decode (str) {
 /**
  * URL-encode value.
  *
- * @param {string} str
+ * @param {string} val
  * @returns {string}
  */
 
@@ -534,8 +538,8 @@ function convertOffset(x, y, degrees) {
     ];
 }
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@0.5.0/node_modules/cookie/index.js
-var cookie = __webpack_require__(591);
+// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@0.6.0/node_modules/cookie/index.js
+var cookie = __webpack_require__(706);
 ;// CONCATENATED MODULE: ./django_mptt_admin.ts
 
 
