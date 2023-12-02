@@ -1,5 +1,5 @@
 /*
-JqTree 1.7.5
+JqTree 1.8.0
 
 Copyright 2023 Marco Braak
 
