@@ -14,12 +14,13 @@
     ul.jqtree-tree {
         .jqtree-toggler {
             top: 10%;
-            color: var(--body-fg);
+            color: var(--link-fg);
         }
 
         .edit {
             margin-left: 0.5em;
             vertical-align: middle;
+            color: var(--link-fg);
         }
 
         ul.jqtree_common {

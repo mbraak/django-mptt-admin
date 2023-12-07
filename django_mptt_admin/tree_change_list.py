@@ -1,11 +1,11 @@
-from django.contrib.admin.views.main import ChangeList, IGNORED_PARAMS
+from django.contrib.admin.views.main import ChangeList
 import django
 
 from . import util
 
 
 class TreeChangeList(ChangeList):
-    TREE_IGNORED_PARAMS = IGNORED_PARAMS + ("_", "node", "selected_node")
+    TREE_IGNORED_PARAMS = ("_", "node", "selected_node")
 
     def __init__(self, request, model, model_admin, list_filter, node_id, max_level):
         self.node_id = node_id
@@ -14,16 +14,16 @@ class TreeChangeList(ChangeList):
         params = dict(
             request=request,
             model=model,
-            list_filter=list_filter,
-            model_admin=model_admin,
             list_display=(),
             list_display_links=(),
+            list_filter=list_filter,
             date_hierarchy=None,
             search_fields=(),
             list_select_related=(),
             list_per_page=100,
-            list_editable=(),
             list_max_show_all=200,
+            list_editable=(),
+            model_admin=model_admin,
             sortable_by=[],
         )
 
@@ -33,8 +33,7 @@ class TreeChangeList(ChangeList):
         super().__init__(**params)
 
     def get_filters_params(self, params=None):
-        if not params:
-            params = self.params
+        params = super().get_filters_params()
 
         lookup_params = params.copy()
 
@@ -44,12 +43,12 @@ class TreeChangeList(ChangeList):
 
         return lookup_params
 
-    def get_queryset(self, request):
+    def get_queryset(self, request, exclude_parameters=None):
         (
             self.filter_specs,
             self.has_filters,
             remaining_lookup_params,
-            filters_use_distinct,
+            filters_may_have_duplicates,
             self.has_active_filters,
         ) = self.get_filters(request)
 
@@ -63,5 +62,10 @@ class TreeChangeList(ChangeList):
             new_qs = filter_spec.queryset(request, qs)
             if new_qs is not None:
                 qs = new_qs
+
+        self.clear_all_filters_qs = self.get_query_string(
+            new_params=remaining_lookup_params,
+            remove=self.get_filters_params(),
+        )
 
         return qs
