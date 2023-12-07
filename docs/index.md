@@ -142,7 +142,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.6.0** (december 7 2023)
 
 - Issue #495: support Django 5.0
 
