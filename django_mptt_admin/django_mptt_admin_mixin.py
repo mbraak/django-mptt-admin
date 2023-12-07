@@ -51,7 +51,7 @@ class DjangoMpttAdminMixin:
         if is_popup:
             return super(DjangoMpttAdminMixin, self).changelist_view(request, extra_context=extra_context)
 
-        if not self.has_view_permission(request, None):
+        if not self.has_view_or_change_permission(request):
             raise PermissionDenied()
 
         change_list = self.get_change_list_for_tree(request)
@@ -82,32 +82,39 @@ class DjangoMpttAdminMixin:
         tree_json_url = get_admin_url_with_filters("tree_json")
         insert_at_url = get_admin_url_with_preserved_filters("add")
 
-        context = dict(
-            app_label=self.opts.app_label,
-            autoescape=self.autoescape,
-            cl=change_list,
-            csrf_cookie_name=get_csrf_cookie_name(),
-            drag_and_drop=self.is_drag_and_drop_enabled(),
-            grid_url=grid_url,
-            has_add_permission=self.has_add_permission(request),
-            has_change_permission=self.has_change_permission(request),
-            insert_at_url=insert_at_url,
-            jsi18n_url=self.get_admin_url("jsi18n"),
-            media=self.get_tree_media(),
-            model_name=util.get_model_name(self.model),
-            opts=change_list.opts,
-            preserved_filters=preserved_filters,
-            title=change_list.title,
-            tree_animation_speed=self.tree_animation_speed,
-            tree_auto_open=self.tree_auto_open,
-            tree_json_url=tree_json_url,
-            tree_mouse_delay=self.get_tree_mouse_delay(),
-            use_context_menu=self.use_context_menu,
-        )
-        if extra_context:
-            context.update(extra_context)
+        tree_options = {
+            "autoescape": self.autoescape,
+            "csrf_cookie_name": get_csrf_cookie_name(),
+            "drag_and_drop": self.is_drag_and_drop_enabled(),
+            "grid_url": grid_url,
+            "has_add_permission": self.has_add_permission(request),
+            "has_change_permission": self.has_change_permission(request),
+            "insert_at_url": insert_at_url,
+            "jsi18n_url": self.get_admin_url("jsi18n"),
+            "model_name": util.get_model_name(self.model),
+            "tree_animation_speed": self.tree_animation_speed,
+            "tree_auto_open": self.tree_auto_open,
+            "tree_json_url": tree_json_url,
+            "tree_mouse_delay": self.get_tree_mouse_delay(),
+            "use_context_menu": self.use_context_menu
+        }
 
-        context.update(self.admin_site.each_context(request))
+        context = {
+            **self.admin_site.each_context(request),
+            "module_name": str(self.opts.verbose_name_plural),
+            "title": change_list.title,
+            "subtitle": None,
+            "is_popup": change_list.is_popup,
+            "to_field": change_list.to_field,
+            "cl": change_list,
+            "media": self.get_tree_media(),
+            "opts": change_list.opts,
+            "preserved_filters": self.get_preserved_filters(request),
+            **tree_options,
+            **(extra_context or {}),
+        }
+
+        request.current_app = self.admin_site.name
 
         return TemplateResponse(request, self.change_tree_template, context)
 
@@ -217,7 +224,6 @@ class DjangoMpttAdminMixin:
         url_name = "admin:{0!s}_{1!s}_{2!s}".format(
             opts.app_label, util.get_model_name(self.model), name
         )
-
         return reverse(url_name, args=args, current_app=self.admin_site.name)
 
     def get_tree_data(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], qs, max_level, filters_params):
@@ -233,7 +239,7 @@ class DjangoMpttAdminMixin:
             )
 
         def handle_create_node(instance, node_info):
-            pk = quote(getattr(instance, pk_attname))
+            pk = getattr(instance, pk_attname)
 
             node_url = add_preserved_filters_to_url(
                 self.get_admin_url("change", (quote(pk),))
