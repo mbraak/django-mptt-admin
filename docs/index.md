@@ -142,6 +142,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Issue #495: support Django 5.0
+
 **2.5.1** (may 6 2023)
 
 - Support dark mode (thanks to Sumit Kumar)
