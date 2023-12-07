@@ -3,7 +3,7 @@ name: Publish docs via GitHub Pages
 on:
   push:
     branches:
-      - main
+      - master
       - mkdocs-workflow
 
 jobs:
