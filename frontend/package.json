@@ -4,7 +4,11 @@
     "description": "Frontend code for django-mptt-admin",
     "main": "index.js",
     "scripts": {
-        "build": "pnpm run sass && webpack --mode production; SKIP_COMPRESS_JS=true webpack --mode production; COVERAGE=true webpack --mode production",
+        "build": "pnpm run sass && pnpm run build_javascript_production && pnpm run build_javascript_production_debug && pnpm run build_javascript_coverage && pnpm run copy_jqtree_map_files",
+        "build_javascript_production": "webpack --mode production",
+        "build_javascript_production_debug": "SKIP_COMPRESS_JS=true webpack --mode production",
+        "build_javascript_coverage": "COVERAGE=true webpack --mode production",
+        "copy_jqtree_map_files": "cp node_modules/jqtree/*.map ../django_mptt_admin/static/django_mptt_admin/",
         "sass": "sass django_mptt_admin.scss ../django_mptt_admin/static/django_mptt_admin/django_mptt_admin.css",
         "webpack": "webpack --mode development --watch",
         "lint": "eslint django_mptt_admin.ts",
