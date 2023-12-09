@@ -142,6 +142,8 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**2.6.1** (december 9 2023)
+
 - Issue #505: fix collectstatic error
 
 **2.6.0** (december 7 2023)
