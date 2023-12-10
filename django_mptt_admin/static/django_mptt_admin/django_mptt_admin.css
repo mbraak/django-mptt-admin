@@ -57,6 +57,10 @@ ul.jqtree-tree .jqtree-element {
   display: flex;
 }
 
+ul.jqtree-tree .jqtree-element:has(.jqtree-title-button-right) {
+  display: block;
+}
+
 ul.jqtree-tree .jqtree-title {
   color: #1c4257;
   vertical-align: middle;
@@ -201,11 +205,12 @@ span.jqtree-dragging {
 }
 #tree ul.jqtree-tree .jqtree-toggler {
   top: 10%;
-  color: var(--body-fg);
+  color: var(--link-fg);
 }
 #tree ul.jqtree-tree .edit {
   margin-left: 0.5em;
   vertical-align: middle;
+  color: var(--link-fg);
 }
 #tree ul.jqtree-tree ul.jqtree_common {
   margin-top: 0;
