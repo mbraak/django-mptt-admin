@@ -36,7 +36,7 @@ module.exports = {
                     options: {
                         presets: [
                             "@babel/preset-typescript",
-                            "@babel/preset-env",
+                            ["@babel/preset-env", { targets: "defaults" }],
                         ],
                         plugins: coverage ? ["istanbul"] : [],
                     },
