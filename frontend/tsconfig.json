@@ -2,7 +2,9 @@
     "compileOnSave": false,
     "exclude": ["node_modules"],
     "compilerOptions": {
-        "moduleResolution": "node",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
