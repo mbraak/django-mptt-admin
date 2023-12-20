@@ -1,5 +1,4 @@
 import "jqtree";
-import { Spinner } from "spin.js";
 import * as cookie from "cookie";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -150,7 +149,7 @@ function initTree(
         $tree.html(gettext("Error while loading the data from the server"));
     }
 
-    const spinners: Record<number | string, Spinner | null> = {};
+    const spinners: Record<number | string, HTMLElement | null> = {};
 
     function handleLoading(
         isLoading: boolean,
@@ -167,22 +166,26 @@ function initTree(
 
         function getContainer() {
             if (node) {
-                return $el.find(".jqtree-element")[0];
+                return $el.find(".jqtree-element")[0] as HTMLElement;
             } else {
-                return $el[0];
+                return $el[0] as HTMLElement;
             }
         }
 
         const nodeId = getNodeId();
 
         if (isLoading) {
-            spinners[nodeId] = new Spinner().spin(getContainer());
+            const container = getContainer();
+            const spinner = document.createElement("span");
+            spinner.className = "jqtree-spin";
+            container.append(spinner);
+
+            spinners[nodeId] = spinner;
         } else {
             const spinner = spinners[nodeId];
 
             if (spinner) {
-                spinner.stop();
-                spinners[nodeId] = null;
+                spinner.remove();
             }
         }
     }
