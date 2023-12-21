@@ -1,5 +1,14 @@
 @import "node_modules/jqtree/jqtree";
 
+@keyframes jqtree-spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
 #changelist {
     border: none;
 }
@@ -36,6 +45,19 @@
                 margin-left: 0;
                 margin-right: 0.5em;
             }
+        }
+
+        .jqtree-spin {
+            margin-left: 1em;
+            width: 1em;
+            height: 1em;
+            border: 2px solid var(--body-fg);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: jqtree-spin 1s linear infinite;
+            vertical-align: middle;
         }
     }
 

@@ -1,14 +1,13 @@
 import "jqtree";
-import { Spinner } from "spin.js";
 import * as cookie from "cookie";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 interface JQTreeMoveEvent extends JQuery.Event {
     move_info: {
+        do_move: () => void;
         moved_node: INode;
         position: string;
         target_node: INode;
-        do_move: () => void;
     };
 }
 
@@ -20,8 +19,8 @@ interface JQTreeSelectEvent extends JQuery.Event {
 
 interface Parameters {
     animationSpeed: number | string | null;
-    autoOpen: boolean | number;
     autoEscape: boolean;
+    autoOpen: boolean | number;
     csrfCookieName: string;
     dragAndDrop: boolean;
     hasAddPermission: boolean;
@@ -34,8 +33,8 @@ function initTree(
     $tree: JQuery,
     {
         animationSpeed,
-        autoOpen,
         autoEscape,
+        autoOpen,
         csrfCookieName,
         dragAndDrop,
         hasAddPermission,
@@ -102,8 +101,8 @@ function initTree(
         const e = eventParam as JQTreeMoveEvent;
         const info = e.move_info;
         const data = {
-            target_id: info.target_node.id,
             position: info.position,
+            target_id: info.target_node.id,
         };
         const $el = jQuery(info.moved_node.element);
 
@@ -150,7 +149,7 @@ function initTree(
         $tree.html(gettext("Error while loading the data from the server"));
     }
 
-    const spinners: Record<number | string, Spinner | null> = {};
+    const spinners: Record<number | string, HTMLElement | null> = {};
 
     function handleLoading(
         isLoading: boolean,
@@ -167,22 +166,26 @@ function initTree(
 
         function getContainer() {
             if (node) {
-                return $el.find(".jqtree-element")[0];
+                return $el.find(".jqtree-element")[0] as HTMLElement;
             } else {
-                return $el[0];
+                return $el[0] as HTMLElement;
             }
         }
 
         const nodeId = getNodeId();
 
         if (isLoading) {
-            spinners[nodeId] = new Spinner().spin(getContainer());
+            const container = getContainer();
+            const spinner = document.createElement("span");
+            spinner.className = "jqtree-spin";
+            container.append(spinner);
+
+            spinners[nodeId] = spinner;
         } else {
             const spinner = spinners[nodeId];
 
             if (spinner) {
-                spinner.stop();
-                spinners[nodeId] = null;
+                spinner.remove();
             }
         }
     }
