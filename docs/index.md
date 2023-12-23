@@ -142,6 +142,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Issue #509: use css for the loading spinner. Support dark mode.
+
 **2.6.1** (december 9 2023)
 
 - Issue #505: fix collectstatic error

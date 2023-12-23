@@ -192,6 +192,14 @@ span.jqtree-dragging {
   padding: 2px 8px;
 }
 
+@keyframes jqtree-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 #changelist {
   border: none;
 }
@@ -221,6 +229,18 @@ span.jqtree-dragging {
 #tree ul.jqtree-tree.jqtree-rtl .edit {
   margin-left: 0;
   margin-right: 0.5em;
+}
+#tree ul.jqtree-tree .jqtree-spin {
+  margin-left: 1em;
+  width: 1em;
+  height: 1em;
+  border: 2px solid var(--body-fg);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: jqtree-spin 1s linear infinite;
+  vertical-align: middle;
 }
 #tree.block-style ul.jqtree-tree {
   margin-left: 0;

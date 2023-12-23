@@ -45,7 +45,6 @@
     },
     "dependencies": {
         "cookie": "^0.6.0",
-        "jqtree": "^1.8.0",
-        "spin.js": "^4.1.1"
+        "jqtree": "^1.8.0"
     }
 }
