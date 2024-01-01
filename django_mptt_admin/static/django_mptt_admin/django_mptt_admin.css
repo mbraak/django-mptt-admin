@@ -230,7 +230,7 @@ span.jqtree-dragging {
   margin-left: 0;
   margin-right: 0.5em;
 }
-#tree ul.jqtree-tree .jqtree-spin {
+#tree .jqtree-spin {
   margin-left: 1em;
   width: 1em;
   height: 1em;
