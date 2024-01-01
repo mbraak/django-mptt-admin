@@ -46,19 +46,19 @@
                 margin-right: 0.5em;
             }
         }
+    }
 
-        .jqtree-spin {
-            margin-left: 1em;
-            width: 1em;
-            height: 1em;
-            border: 2px solid var(--body-fg);
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: jqtree-spin 1s linear infinite;
-            vertical-align: middle;
-        }
+    .jqtree-spin {
+        margin-left: 1em;
+        width: 1em;
+        height: 1em;
+        border: 2px solid var(--body-fg);
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: jqtree-spin 1s linear infinite;
+        vertical-align: middle;
     }
 
     &.block-style {

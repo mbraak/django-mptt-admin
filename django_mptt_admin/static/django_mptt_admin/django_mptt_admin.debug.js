@@ -383,6 +383,8 @@ var __webpack_exports__ = {};
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
 function initTree($tree, _ref) {
   let {
     animationSpeed,
@@ -428,7 +430,7 @@ function initTree($tree, _ref) {
       target_id: info.target_node.id
     };
     const $el = jQuery(info.moved_node.element);
-    handleLoading(true, null, $el);
+    handleLoading(true, null);
     removeErrorMessage();
     e.preventDefault();
     void jQuery.ajax({
@@ -441,10 +443,10 @@ function initTree($tree, _ref) {
       },
       success: () => {
         info.do_move();
-        handleLoading(false, null, $el);
+        handleLoading(false, null);
       },
       error: () => {
-        handleLoading(false, null, $el);
+        handleLoading(false, null);
         const $node = $el.find(".jqtree-element");
         $node.append(`<span class="mptt-admin-error">${gettext("move failed")}</span>`);
         errorNode = info.moved_node;
@@ -461,7 +463,7 @@ function initTree($tree, _ref) {
     $tree.html(gettext("Error while loading the data from the server"));
   }
   const spinners = {};
-  function handleLoading(isLoading, node, $el) {
+  function handleLoading(isLoading, node) {
     function getNodeId() {
       if (!node) {
         return "__root__";
@@ -471,9 +473,9 @@ function initTree($tree, _ref) {
     }
     function getContainer() {
       if (node) {
-        return $el.find(".jqtree-element")[0];
+        return node.element;
       } else {
-        return $el[0];
+        return $tree.get(0);
       }
     }
     const nodeId = getNodeId();
@@ -505,6 +507,13 @@ function initTree($tree, _ref) {
       jQuery(node.element).find(".edit").attr("tabindex", 0);
     }
   }
+  function handleLoadingEvent(e) {
+    const {
+      isLoading,
+      node
+    } = e;
+    handleLoading(isLoading, node);
+  }
   const treeOptions = {
     autoOpen,
     autoEscape,
@@ -513,7 +522,6 @@ function initTree($tree, _ref) {
     dragAndDrop: dragAndDrop && hasChangePermission,
     onCreateLi: createLi,
     onLoadFailed: handleLoadFailed,
-    onLoading: handleLoading,
     saveState: $tree.data("save_state"),
     useContextMenu: Boolean($tree.data("use_context_menu"))
   };
@@ -523,9 +531,10 @@ function initTree($tree, _ref) {
   if (mouseDelay != null) {
     treeOptions["startDndDelay"] = mouseDelay;
   }
-  $tree.tree(treeOptions);
+  $tree.on("tree.loading_data", handleLoadingEvent);
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
+  $tree.tree(treeOptions);
 }
 jQuery(() => {
   const $tree = jQuery("#tree");

@@ -7,9 +7,8 @@
 {% endblock %}
 
 {% block extrahead %}
-{{ block.super }}
-{{ media.js }}
-<script src="{% static 'admin/js/filters.js' %}" defer></script>
+    {{ block.super }}
+    <script src="{% static 'admin/js/filters.js' %}" defer></script>
 {% endblock %}
 
 {% block search %}{% endblock %}
