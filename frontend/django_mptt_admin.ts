@@ -17,6 +17,12 @@ interface JQTreeSelectEvent extends JQuery.Event {
     node: INode;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+interface JQTreeLoadingEvent extends JQuery.Event {
+    isLoading: boolean;
+    node: INode | null;
+}
+
 interface Parameters {
     animationSpeed: number | string | null;
     autoEscape: boolean;
@@ -106,7 +112,7 @@ function initTree(
         };
         const $el = jQuery(info.moved_node.element);
 
-        handleLoading(true, null, $el);
+        handleLoading(true, null);
 
         removeErrorMessage();
 
@@ -122,10 +128,10 @@ function initTree(
             },
             success: () => {
                 info.do_move();
-                handleLoading(false, null, $el);
+                handleLoading(false, null);
             },
             error: () => {
-                handleLoading(false, null, $el);
+                handleLoading(false, null);
                 const $node = $el.find(".jqtree-element");
                 $node.append(
                     `<span class="mptt-admin-error">${gettext(
@@ -151,11 +157,7 @@ function initTree(
 
     const spinners: Record<number | string, HTMLElement | null> = {};
 
-    function handleLoading(
-        isLoading: boolean,
-        node: INode | null,
-        $el: JQuery
-    ) {
+    function handleLoading(isLoading: boolean, node: INode | null) {
         function getNodeId(): string | number {
             if (!node) {
                 return "__root__";
@@ -166,9 +168,9 @@ function initTree(
 
         function getContainer() {
             if (node) {
-                return $el.find(".jqtree-element")[0] as HTMLElement;
+                return node.element;
             } else {
-                return $el[0] as HTMLElement;
+                return $tree.get(0) as HTMLElement;
             }
         }
 
@@ -205,6 +207,12 @@ function initTree(
         }
     }
 
+    function handleLoadingEvent(e: JQuery.Event) {
+        const { isLoading, node } = e as JQTreeLoadingEvent;
+
+        handleLoading(isLoading, node);
+    }
+
     const treeOptions: Record<string, unknown> = {
         autoOpen,
         autoEscape,
@@ -213,7 +221,6 @@ function initTree(
         dragAndDrop: dragAndDrop && hasChangePermission,
         onCreateLi: createLi,
         onLoadFailed: handleLoadFailed,
-        onLoading: handleLoading,
         saveState: $tree.data("save_state") as boolean,
         useContextMenu: Boolean($tree.data("use_context_menu")),
     };
@@ -226,10 +233,11 @@ function initTree(
         treeOptions["startDndDelay"] = mouseDelay;
     }
 
-    $tree.tree(treeOptions);
-
+    $tree.on("tree.loading_data", handleLoadingEvent);
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
+
+    $tree.tree(treeOptions);
 }
 
 jQuery(() => {
