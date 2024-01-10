@@ -23,6 +23,10 @@ interface JQTreeLoadingEvent extends JQuery.Event {
     node: INode | null;
 }
 
+interface JQTreeLoadDataEvent extends JQuery.Event {
+    parent_node: INode | null;
+}
+
 interface Parameters {
     animationSpeed: number | string | null;
     autoEscape: boolean;
@@ -210,7 +214,15 @@ function initTree(
     function handleLoadingEvent(e: JQuery.Event) {
         const { isLoading, node } = e as JQTreeLoadingEvent;
 
-        handleLoading(isLoading, node);
+        if (isLoading) {
+            handleLoading(true, node);
+        }
+    }
+
+    function handleLoadDataEvent(e: JQuery.Event) {
+        const { parent_node } = e as JQTreeLoadDataEvent;
+
+        handleLoading(false, parent_node);
     }
 
     const treeOptions: Record<string, unknown> = {
@@ -234,6 +246,7 @@ function initTree(
     }
 
     $tree.on("tree.loading_data", handleLoadingEvent);
+    $tree.on("tree.load_data", handleLoadDataEvent);
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
 
