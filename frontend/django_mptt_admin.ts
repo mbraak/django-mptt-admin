@@ -23,6 +23,10 @@ interface JQTreeLoadingEvent extends JQuery.Event {
     node: INode | null;
 }
 
+interface JQTreeLoadDataEvent extends JQuery.Event {
+    parent_node: INode | null;
+}
+
 interface Parameters {
     animationSpeed: number | string | null;
     autoEscape: boolean;
@@ -112,7 +116,7 @@ function initTree(
         };
         const $el = jQuery(info.moved_node.element);
 
-        handleLoading(true, null);
+        handleLoading(null);
 
         removeErrorMessage();
 
@@ -128,10 +132,10 @@ function initTree(
             },
             success: () => {
                 info.do_move();
-                handleLoading(false, null);
+                handleLoaded(null);
             },
             error: () => {
-                handleLoading(false, null);
+                handleLoaded(null);
                 const $node = $el.find(".jqtree-element");
                 $node.append(
                     `<span class="mptt-admin-error">${gettext(
@@ -157,15 +161,15 @@ function initTree(
 
     const spinners: Record<number | string, HTMLElement | null> = {};
 
-    function handleLoading(isLoading: boolean, node: INode | null) {
-        function getNodeId(): string | number {
-            if (!node) {
-                return "__root__";
-            } else {
-                return node.id as string | number;
-            }
+    function getSpinnerId(node: INode | null): string | number {
+        if (!node) {
+            return "__root__";
+        } else {
+            return node.id as string | number;
         }
+    }
 
+    function handleLoading(node: INode | null) {
         function getContainer() {
             if (node) {
                 return node.element;
@@ -174,21 +178,22 @@ function initTree(
             }
         }
 
-        const nodeId = getNodeId();
+        const container = getContainer();
 
-        if (isLoading) {
-            const container = getContainer();
-            const spinner = document.createElement("span");
-            spinner.className = "jqtree-spin";
-            container.append(spinner);
+        const spinner = document.createElement("span");
+        spinner.className = "jqtree-spin";
+        container.append(spinner);
 
-            spinners[nodeId] = spinner;
-        } else {
-            const spinner = spinners[nodeId];
+        const spinnerId = getSpinnerId(node);
+        spinners[spinnerId] = spinner;
+    }
 
-            if (spinner) {
-                spinner.remove();
-            }
+    function handleLoaded(node: INode | null) {
+        const spinnerId = getSpinnerId(node);
+        const spinner = spinners[spinnerId];
+
+        if (spinner) {
+            spinner.remove();
         }
     }
 
@@ -210,7 +215,15 @@ function initTree(
     function handleLoadingEvent(e: JQuery.Event) {
         const { isLoading, node } = e as JQTreeLoadingEvent;
 
-        handleLoading(isLoading, node);
+        if (isLoading) {
+            handleLoading(node);
+        }
+    }
+
+    function handleLoadDataEvent(e: JQuery.Event) {
+        const { parent_node } = e as JQTreeLoadDataEvent;
+
+        handleLoaded(parent_node);
     }
 
     const treeOptions: Record<string, unknown> = {
@@ -234,6 +247,7 @@ function initTree(
     }
 
     $tree.on("tree.loading_data", handleLoadingEvent);
+    $tree.on("tree.load_data", handleLoadDataEvent);
     $tree.on("tree.move", handleMove);
     $tree.on("tree.select", handleSelect);
 

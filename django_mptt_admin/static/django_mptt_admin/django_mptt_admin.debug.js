@@ -430,7 +430,7 @@ function initTree($tree, _ref) {
       target_id: info.target_node.id
     };
     const $el = jQuery(info.moved_node.element);
-    handleLoading(true, null);
+    handleLoading(null);
     removeErrorMessage();
     e.preventDefault();
     void jQuery.ajax({
@@ -443,10 +443,10 @@ function initTree($tree, _ref) {
       },
       success: () => {
         info.do_move();
-        handleLoading(false, null);
+        handleLoaded(null);
       },
       error: () => {
-        handleLoading(false, null);
+        handleLoaded(null);
         const $node = $el.find(".jqtree-element");
         $node.append(`<span class="mptt-admin-error">${gettext("move failed")}</span>`);
         errorNode = info.moved_node;
@@ -463,14 +463,14 @@ function initTree($tree, _ref) {
     $tree.html(gettext("Error while loading the data from the server"));
   }
   const spinners = {};
-  function handleLoading(isLoading, node) {
-    function getNodeId() {
-      if (!node) {
-        return "__root__";
-      } else {
-        return node.id;
-      }
+  function getSpinnerId(node) {
+    if (!node) {
+      return "__root__";
+    } else {
+      return node.id;
     }
+  }
+  function handleLoading(node) {
     function getContainer() {
       if (node) {
         return node.element;
@@ -478,18 +478,18 @@ function initTree($tree, _ref) {
         return $tree.get(0);
       }
     }
-    const nodeId = getNodeId();
-    if (isLoading) {
-      const container = getContainer();
-      const spinner = document.createElement("span");
-      spinner.className = "jqtree-spin";
-      container.append(spinner);
-      spinners[nodeId] = spinner;
-    } else {
-      const spinner = spinners[nodeId];
-      if (spinner) {
-        spinner.remove();
-      }
+    const container = getContainer();
+    const spinner = document.createElement("span");
+    spinner.className = "jqtree-spin";
+    container.append(spinner);
+    const spinnerId = getSpinnerId(node);
+    spinners[spinnerId] = spinner;
+  }
+  function handleLoaded(node) {
+    const spinnerId = getSpinnerId(node);
+    const spinner = spinners[spinnerId];
+    if (spinner) {
+      spinner.remove();
     }
   }
   function handleSelect(eventParam) {
@@ -512,7 +512,15 @@ function initTree($tree, _ref) {
       isLoading,
       node
     } = e;
-    handleLoading(isLoading, node);
+    if (isLoading) {
+      handleLoading(node);
+    }
+  }
+  function handleLoadDataEvent(e) {
+    const {
+      parent_node
+    } = e;
+    handleLoaded(parent_node);
   }
   const treeOptions = {
     autoOpen,
@@ -532,6 +540,7 @@ function initTree($tree, _ref) {
     treeOptions["startDndDelay"] = mouseDelay;
   }
   $tree.on("tree.loading_data", handleLoadingEvent);
+  $tree.on("tree.load_data", handleLoadDataEvent);
   $tree.on("tree.move", handleMove);
   $tree.on("tree.select", handleSelect);
   $tree.tree(treeOptions);
