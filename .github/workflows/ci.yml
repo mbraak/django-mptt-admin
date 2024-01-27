@@ -25,18 +25,18 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Get pnpm store directory
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -47,29 +47,25 @@ jobs:
         working-directory: ./frontend
         run: pnpm install
       - name: Cache python packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
       - name: Install python packages
         run: |
-          python -m pip install --upgrade pip && pip install wheel && pip install ${{ matrix.django }} && pip install -r example_project/requirements_test.txt && playwright install chromium && pip install -r example_project/requirements_ci.txt && pip install -e .
+          pip install ${{ matrix.django }} && pip install -r example_project/requirements_test.txt && playwright install chromium && pip install -r example_project/requirements_ci.txt && pip install -e .
       - name: Run tests
         run: python -Wd example_project/manage.py test django_mptt_example
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PASSWORD: postgres
           POSTGRES_PORT: 5432
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
       - name: Build javascript
         working-directory: ./frontend
         run: pnpm run build
