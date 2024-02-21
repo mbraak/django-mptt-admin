@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 296:
+/***/ 615:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -20,7 +20,7 @@ var __webpack_unused_export__;
  * @public
  */
 
-exports.K = parse;
+exports.q = parse;
 __webpack_unused_export__ = serialize;
 
 /**
@@ -284,7 +284,7 @@ function tryDecode(str, decode) {
 
 /***/ }),
 
-/***/ 824:
+/***/ 936:
 /***/ (() => {
 
 /*
@@ -373,9 +373,9 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-/* harmony import */ var jqtree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(824);
+/* harmony import */ var jqtree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(936);
 /* harmony import */ var jqtree__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(jqtree__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(296);
+/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(615);
 
 
 
@@ -417,7 +417,7 @@ function initTree($tree, _ref) {
       if (!csrfCookieName) {
         return null;
       } else {
-        return cookie__WEBPACK_IMPORTED_MODULE_1__/* .parse */ .K(document.cookie)[csrfCookieName];
+        return cookie__WEBPACK_IMPORTED_MODULE_1__/* .parse */ .q(document.cookie)[csrfCookieName];
       }
     }
     return getFromCookie() || getFromMiddleware();
