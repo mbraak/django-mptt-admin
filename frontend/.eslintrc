@@ -9,8 +9,7 @@
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:import/errors",
-        "plugin:import/warnings",
+        "plugin:import/recommended",
         "plugin:import/typescript"
     ],
     "rules": {
@@ -21,5 +20,16 @@
     },
     "parserOptions": {
         "project": "./tsconfig.json"
-    }
+    },
+    "settings": {
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts"]
+        },
+        "import/resolver": {
+            "typescript": {
+                "alwaysTryTypes": true,
+                "project": "./tsconfig.json"
+            }
+        }
+      }
 }
