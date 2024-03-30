@@ -84,6 +84,6 @@ jobs:
         working-directory: ./coverage
         run: pnpm i && pnpm run merge_coverage
       - name: Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           verbose: true
