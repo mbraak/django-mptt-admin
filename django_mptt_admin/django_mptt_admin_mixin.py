@@ -15,6 +15,7 @@ from django.utils.http import urlencode
 from django.forms import Media
 from django.urls import re_path, reverse
 from django.views.i18n import JavaScriptCatalog
+import django
 
 from . import util
 from .tree_change_list import TreeChangeList
@@ -101,6 +102,7 @@ class DjangoMpttAdminMixin:
 
         context = {
             **self.admin_site.each_context(request),
+            "django_major_version": django.VERSION[0],
             "module_name": str(self.opts.verbose_name_plural),
             "title": change_list.title,
             "subtitle": None,
