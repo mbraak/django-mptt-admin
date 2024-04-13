@@ -142,7 +142,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.6.2** (april 13 2024)
 
 - Issue #509: use css for the loading spinner. Support dark mode.
 - Issue #541: fix javascript import error in Django 3.2 (thanks to scottp-dpaw)
