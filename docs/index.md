@@ -9,10 +9,11 @@ _Django-mptt-admin_ provides a nice Django Admin interface for [django-mptt mode
 
 ## Requirements
 
-The package is tested with Django (3.2, 4.2 and 5.0), and django-mptt (0.13). Also with Python 3.8 - 3.12.
+The package is tested with Django (4.2, 5.0 and 5.1), and django-mptt (0.13). Also with Python 3.8 - 3.12.
 
 Older versions:
 
+- Version 2.6.x supports Django 3.2.
 - Version 2.5.x supports Django 4.1.
 
 ## Installation
