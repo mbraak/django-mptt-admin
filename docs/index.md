@@ -143,6 +143,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Issue #557. Support Django 5.1. Drop support for Django 3.2.
+
 **2.6.2** (april 13 2024)
 
 - Issue #509: use css for the loading spinner. Support dark mode.
