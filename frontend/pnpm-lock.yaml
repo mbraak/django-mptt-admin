@@ -12,8 +12,8 @@ importers:
         specifier: ^0.6.0
         version: 0.6.0
       jqtree:
-        specifier: ^1.8.3
-        version: 1.8.3(jquery@3.7.1)
+        specifier: ^1.8.4
+        version: 1.8.4(jquery@3.7.1)
     devDependencies:
       '@babel/core':
         specifier: ^7.24.9
@@ -1657,8 +1657,8 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
 
-  jqtree@1.8.3:
-    resolution: {integrity: sha512-QwfAOURWwqYhdOSPyPT0/SJH88kQUMiCJQaFxH2Pon9WWYvNin9llujZ1MjdSC/QcSJKlXxAm6asenug3mKpag==}
+  jqtree@1.8.4:
+    resolution: {integrity: sha512-ZI5pqZ6QDAUv+pSdjtye7029x1ZRi+T0WuiUWB7LPtQUEa17fEZC9KpAt8+jbFwyootRySyRqKbgPr4Ce55idg==}
     peerDependencies:
       jquery: ^3
 
@@ -4245,7 +4245,7 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jqtree@1.8.3(jquery@3.7.1):
+  jqtree@1.8.4(jquery@3.7.1):
     dependencies:
       jquery: 3.7.1
 
