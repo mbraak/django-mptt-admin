@@ -143,7 +143,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.7.0** (august 13 2024)
 
 - Issue #557: support Django 5.1; drop support for Django 3.2
 
