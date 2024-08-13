@@ -145,7 +145,7 @@ Also see the example project for a complete continent filter.
 
 **development**
 
-- Issue #557. Support Django 5.1. Drop support for Django 3.2.
+- Issue #557: support Django 5.1; drop support for Django 3.2
 
 **2.6.2** (april 13 2024)
 
