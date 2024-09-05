@@ -401,9 +401,13 @@ function initTree($tree, _ref) {
   const baseUrl = "http://example.com";
   const insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
   function createLi(node, $li, isSelected) {
+    if (node.id == null) {
+      return;
+    }
+
     // Create edit link
     const $title = $li.find(".jqtree-title");
-    insertAtUrl.searchParams.set("insert_at", `${node.id}`);
+    insertAtUrl.searchParams.set("insert_at", node.id.toString());
     const insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
     const tabindex = isSelected ? "0" : "-1";
     const editCaption = hasChangePermission ? gettext("edit") : gettext("view");
@@ -411,7 +415,8 @@ function initTree($tree, _ref) {
   }
   function getCsrfToken() {
     function getFromMiddleware() {
-      return document.querySelector('[name="csrfmiddlewaretoken"]').value;
+      const inputElement = document.querySelector('[name="csrfmiddlewaretoken"]');
+      return inputElement?.value;
     }
     function getFromCookie() {
       if (!csrfCookieName) {
@@ -420,7 +425,7 @@ function initTree($tree, _ref) {
         return cookie__WEBPACK_IMPORTED_MODULE_1__/* .parse */ .q(document.cookie)[csrfCookieName];
       }
     }
-    return getFromCookie() || getFromMiddleware();
+    return getFromCookie() ?? getFromMiddleware() ?? "";
   }
   function handleMove(eventParam) {
     const e = eventParam;
@@ -467,7 +472,11 @@ function initTree($tree, _ref) {
     if (!node) {
       return "__root__";
     } else {
-      return node.id;
+      if (node.id == null) {
+        return null;
+      } else {
+        return node.id;
+      }
     }
   }
   function handleLoading(node) {
@@ -479,14 +488,20 @@ function initTree($tree, _ref) {
       }
     }
     const container = getContainer();
+    const spinnerId = getSpinnerId(node);
+    if (!container || spinnerId == null) {
+      return;
+    }
     const spinner = document.createElement("span");
     spinner.className = "jqtree-spin";
     container.append(spinner);
-    const spinnerId = getSpinnerId(node);
     spinners[spinnerId] = spinner;
   }
   function handleLoaded(node) {
     const spinnerId = getSpinnerId(node);
+    if (spinnerId == null) {
+      return;
+    }
     const spinner = spinners[spinnerId];
     if (spinner) {
       spinner.remove();
@@ -502,10 +517,9 @@ function initTree($tree, _ref) {
       // deselected node: remove tabindex
       jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
     }
-    if (node) {
-      // selected: add tabindex
-      jQuery(node.element).find(".edit").attr("tabindex", 0);
-    }
+
+    // selected: add tabindex
+    jQuery(node.element).find(".edit").attr("tabindex", 0);
   }
   function handleLoadingEvent(e) {
     const {
@@ -534,10 +548,10 @@ function initTree($tree, _ref) {
     useContextMenu: Boolean($tree.data("use_context_menu"))
   };
   if (animationSpeed !== null) {
-    treeOptions["animationSpeed"] = animationSpeed;
+    treeOptions.animationSpeed = animationSpeed;
   }
   if (mouseDelay != null) {
-    treeOptions["startDndDelay"] = mouseDelay;
+    treeOptions.startDndDelay = mouseDelay;
   }
   $tree.on("tree.loading_data", handleLoadingEvent);
   $tree.on("tree.load_data", handleLoadDataEvent);
