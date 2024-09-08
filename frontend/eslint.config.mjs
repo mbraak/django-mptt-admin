@@ -1,13 +1,14 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
+import eslintPluginDeprecation from "eslint-plugin-deprecation";
 
 export default [
     eslint.configs.recommended,
-    importPlugin.flatConfigs.recommended,
-    importPlugin.flatConfigs.typescript,
     ...tseslint.configs.strictTypeChecked,
     ...tseslint.configs.stylisticTypeChecked,
+    importPlugin.flatConfigs.recommended,
+    importPlugin.flatConfigs.typescript,
     {
         languageOptions: {
             parserOptions: {
@@ -15,8 +16,12 @@ export default [
                 tsconfigRootDir: import.meta.dirname,
             },
         },
+        plugins: {
+            deprecation: eslintPluginDeprecation,
+        },
         rules: {
             "@typescript-eslint/restrict-template-expressions": "error",
+            "deprecation/deprecation": "error",
         },
     },
 ];
