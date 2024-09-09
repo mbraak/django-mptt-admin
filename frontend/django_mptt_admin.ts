@@ -58,13 +58,14 @@ function initTree(
     const insertAtUrl = new URL($tree.data("insert_at_url") as string, baseUrl);
 
     function createLi(node: INode, $li: JQuery, isSelected: boolean) {
+        if (node.id == null) {
+            return;
+        }
+
         // Create edit link
         const $title = $li.find(".jqtree-title");
 
-        insertAtUrl.searchParams.set(
-            "insert_at",
-            `${node.id as string | number}`
-        );
+        insertAtUrl.searchParams.set("insert_at", node.id.toString());
 
         const insertUrlString = insertAtUrl
             .toString()
@@ -89,11 +90,10 @@ function initTree(
 
     function getCsrfToken() {
         function getFromMiddleware() {
-            return (
-                document.querySelector(
-                    '[name="csrfmiddlewaretoken"]'
-                ) as HTMLInputElement
-            ).value;
+            const inputElement = document.querySelector<HTMLInputElement>(
+                '[name="csrfmiddlewaretoken"]'
+            );
+            return inputElement?.value;
         }
 
         function getFromCookie() {
@@ -104,7 +104,7 @@ function initTree(
             }
         }
 
-        return getFromCookie() || getFromMiddleware();
+        return getFromCookie() ?? getFromMiddleware() ?? "";
     }
 
     function handleMove(eventParam: JQuery.Event) {
@@ -161,11 +161,15 @@ function initTree(
 
     const spinners: Record<number | string, HTMLElement | null> = {};
 
-    function getSpinnerId(node: INode | null): string | number {
+    function getSpinnerId(node: INode | null): string | number | null {
         if (!node) {
             return "__root__";
         } else {
-            return node.id as string | number;
+            if (node.id == null) {
+                return null;
+            } else {
+                return node.id as string | number;
+            }
         }
     }
 
@@ -174,22 +178,30 @@ function initTree(
             if (node) {
                 return node.element;
             } else {
-                return $tree.get(0) as HTMLElement;
+                return $tree.get(0);
             }
         }
 
         const container = getContainer();
+        const spinnerId = getSpinnerId(node);
+
+        if (!container || spinnerId == null) {
+            return;
+        }
 
         const spinner = document.createElement("span");
         spinner.className = "jqtree-spin";
         container.append(spinner);
-
-        const spinnerId = getSpinnerId(node);
         spinners[spinnerId] = spinner;
     }
 
     function handleLoaded(node: INode | null) {
         const spinnerId = getSpinnerId(node);
+
+        if (spinnerId == null) {
+            return;
+        }
+
         const spinner = spinners[spinnerId];
 
         if (spinner) {
@@ -206,10 +218,8 @@ function initTree(
             jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
         }
 
-        if (node) {
-            // selected: add tabindex
-            jQuery(node.element).find(".edit").attr("tabindex", 0);
-        }
+        // selected: add tabindex
+        jQuery(node.element).find(".edit").attr("tabindex", 0);
     }
 
     function handleLoadingEvent(e: JQuery.Event) {
@@ -239,11 +249,11 @@ function initTree(
     };
 
     if (animationSpeed !== null) {
-        treeOptions["animationSpeed"] = animationSpeed;
+        treeOptions.animationSpeed = animationSpeed;
     }
 
     if (mouseDelay != null) {
-        treeOptions["startDndDelay"] = mouseDelay;
+        treeOptions.startDndDelay = mouseDelay;
     }
 
     $tree.on("tree.loading_data", handleLoadingEvent);
