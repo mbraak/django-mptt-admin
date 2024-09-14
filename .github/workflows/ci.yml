@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ["django==4.2.14", "django==5.0.7", "django==5.1"]
+        django: ["django==4.2.16", "django==5.0.9", "django==5.1.1"]
 
     services:
       postgres:
