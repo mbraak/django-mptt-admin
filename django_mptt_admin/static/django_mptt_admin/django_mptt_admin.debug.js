@@ -378,13 +378,6 @@ var __webpack_exports__ = {};
 /* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(615);
 
 
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-
 function initTree($tree, _ref) {
   let {
     animationSpeed,
