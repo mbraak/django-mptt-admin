@@ -1,7 +1,6 @@
 import "jqtree";
 import * as cookie from "cookie";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 interface JQTreeMoveEvent extends JQuery.Event {
     move_info: {
         do_move: () => void;
@@ -11,13 +10,11 @@ interface JQTreeMoveEvent extends JQuery.Event {
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 interface JQTreeSelectEvent extends JQuery.Event {
     deselected_node: INode | null;
     node: INode;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 interface JQTreeLoadingEvent extends JQuery.Event {
     isLoading: boolean;
     node: INode | null;
