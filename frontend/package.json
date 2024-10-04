@@ -26,26 +26,26 @@
     },
     "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
     "devDependencies": {
-        "@babel/core": "^7.25.2",
-        "@babel/plugin-transform-runtime": "^7.25.4",
-        "@babel/preset-env": "^7.25.4",
-        "@babel/preset-typescript": "^7.24.7",
+        "@babel/core": "^7.25.7",
+        "@babel/plugin-transform-runtime": "^7.25.7",
+        "@babel/preset-env": "^7.25.7",
+        "@babel/preset-typescript": "^7.25.7",
         "@eslint/js": "^9.11.1",
         "@types/cookie": "^0.6.0",
         "@types/eslint__js": "^8.42.3",
         "@types/jquery": "^3.5.31",
-        "@types/node": "^22.7.3",
+        "@types/node": "^22.7.4",
         "babel-loader": "^9.2.1",
         "babel-plugin-istanbul": "^7.0.0",
         "eslint": "^9.11.1",
-        "sass": "^1.79.3",
+        "sass": "^1.79.4",
         "typescript": "^5.6.2",
-        "typescript-eslint": "^8.7.0",
+        "typescript-eslint": "^8.8.0",
         "webpack": "^5.95.0",
         "webpack-cli": "^5.1.4"
     },
     "dependencies": {
-        "cookie": "^0.6.0",
-        "jqtree": "^1.8.4"
+        "cookie": "^0.7",
+        "jqtree": "^1.8.5"
     }
 }
