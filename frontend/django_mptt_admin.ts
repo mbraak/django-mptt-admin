@@ -1,5 +1,5 @@
-import "jqtree";
 import * as cookie from "cookie";
+import "jqtree";
 
 interface JQTreeMoveEvent extends JQuery.Event {
     move_info: {
@@ -25,14 +25,14 @@ interface JQTreeLoadDataEvent extends JQuery.Event {
 }
 
 interface Parameters {
-    animationSpeed: number | string | null;
+    animationSpeed: null | number | string;
     autoEscape: boolean;
     autoOpen: boolean | number;
     csrfCookieName: string;
     dragAndDrop: boolean;
     hasAddPermission: boolean;
     hasChangePermission: boolean;
-    mouseDelay: number | null;
+    mouseDelay: null | number;
     rtl: boolean;
 }
 
@@ -120,17 +120,11 @@ function initTree(
         e.preventDefault();
 
         void jQuery.ajax({
-            type: "POST",
-            url: info.moved_node.move_url as string,
-            data,
             beforeSend: (xhr) => {
                 // Set Django csrf token
                 xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
             },
-            success: () => {
-                info.do_move();
-                handleLoaded(null);
-            },
+            data,
             error: () => {
                 handleLoaded(null);
                 const $node = $el.find(".jqtree-element");
@@ -142,6 +136,12 @@ function initTree(
 
                 errorNode = info.moved_node;
             },
+            success: () => {
+                info.do_move();
+                handleLoaded(null);
+            },
+            type: "POST",
+            url: info.moved_node.move_url as string,
         });
 
         function removeErrorMessage() {
@@ -158,14 +158,14 @@ function initTree(
 
     const spinners: Record<number | string, HTMLElement | null> = {};
 
-    function getSpinnerId(node: INode | null): string | number | null {
+    function getSpinnerId(node: INode | null): null | number | string {
         if (!node) {
             return "__root__";
         } else {
             if (node.id == null) {
                 return null;
             } else {
-                return node.id as string | number;
+                return node.id as number | string;
             }
         }
     }
@@ -208,7 +208,7 @@ function initTree(
 
     function handleSelect(eventParam: JQuery.Event) {
         const e = eventParam as JQTreeSelectEvent;
-        const { node, deselected_node } = e;
+        const { deselected_node, node } = e;
 
         if (deselected_node) {
             // deselected node: remove tabindex
@@ -234,8 +234,8 @@ function initTree(
     }
 
     const treeOptions: Record<string, unknown> = {
-        autoOpen,
         autoEscape,
+        autoOpen,
         buttonLeft: rtl,
         closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
         dragAndDrop: dragAndDrop && hasChangePermission,
@@ -266,24 +266,24 @@ jQuery(() => {
 
     if ($tree.length) {
         const animationSpeed = $tree.data("tree-animation-speed") as
+            | null
             | number
-            | string
-            | null;
+            | string;
         const autoOpen = $tree.data("auto_open") as boolean | number;
         const autoEscape = Boolean($tree.data("autoescape"));
         const hasAddPermission = Boolean($tree.data("has-add-permission"));
         const hasChangePermission = Boolean(
             $tree.data("has-change-permission")
         );
-        const mouseDelay = $tree.data("tree-mouse-delay") as number | null;
+        const mouseDelay = $tree.data("tree-mouse-delay") as null | number;
         const dragAndDrop = $tree.data("drag-and-drop") as boolean;
         const rtl = $tree.data("rtl") === "1";
         const csrfCookieName = $tree.data("csrf-cookie-name") as string;
 
         initTree($tree, {
             animationSpeed,
-            autoOpen,
             autoEscape,
+            autoOpen,
             csrfCookieName,
             dragAndDrop,
             hasAddPermission,
