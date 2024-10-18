@@ -33,20 +33,20 @@
         "@eslint/js": "^9.12.0",
         "@types/eslint__js": "^8.42.3",
         "@types/jquery": "^3.5.31",
-        "@types/node": "^22.7.5",
+        "@types/node": "^22.7.6",
         "babel-loader": "^9.2.1",
         "babel-plugin-istanbul": "^7.0.0",
         "eslint": "^9.12.0",
         "eslint-plugin-import": "^2.31.0",
-        "eslint-plugin-perfectionist": "^3.8.0",
-        "sass": "^1.79.5",
+        "eslint-plugin-perfectionist": "^3.9.1",
+        "sass": "^1.80.2",
         "typescript": "^5.6.3",
-        "typescript-eslint": "^8.8.1",
+        "typescript-eslint": "^8.10.0",
         "webpack": "^5.95.0",
         "webpack-cli": "^5.1.4"
     },
     "dependencies": {
-        "cookie": "^1",
+        "cookie": "^1.0.1",
         "jqtree": "^1.8.5"
     }
 }
