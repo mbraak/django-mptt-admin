@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 463:
+/***/ 286:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -181,7 +181,10 @@ function serialize(name, val, options) {
         str += "; Partitioned";
     }
     if (options.priority) {
-        switch (options.priority) {
+        const priority = typeof options.priority === "string"
+            ? options.priority.toLowerCase()
+            : options.sameSite;
+        switch (priority) {
             case "low":
                 str += "; Priority=Low";
                 break;
@@ -196,7 +199,10 @@ function serialize(name, val, options) {
         }
     }
     if (options.sameSite) {
-        switch (options.sameSite) {
+        const sameSite = typeof options.sameSite === "string"
+            ? options.sameSite.toLowerCase()
+            : options.sameSite;
+        switch (sameSite) {
             case true:
             case "strict":
                 str += "; SameSite=Strict";
@@ -325,7 +331,7 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(463);
+/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(286);
 /* harmony import */ var jqtree__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(157);
 /* harmony import */ var jqtree__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jqtree__WEBPACK_IMPORTED_MODULE_1__);
 
