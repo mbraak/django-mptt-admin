@@ -47,6 +47,6 @@
     },
     "dependencies": {
         "cookie": "^1.0.1",
-        "jqtree": "^1.8.5"
+        "jqtree": "^1.8.6"
     }
 }
