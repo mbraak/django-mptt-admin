@@ -1,6 +1,15 @@
 import * as cookie from "cookie";
 import "jqtree";
 
+interface JQTreeLoadDataEvent extends JQuery.Event {
+    parent_node: INode | null;
+}
+
+interface JQTreeLoadingEvent extends JQuery.Event {
+    isLoading: boolean;
+    node: INode | null;
+}
+
 interface JQTreeMoveEvent extends JQuery.Event {
     move_info: {
         do_move: () => void;
@@ -13,15 +22,6 @@ interface JQTreeMoveEvent extends JQuery.Event {
 interface JQTreeSelectEvent extends JQuery.Event {
     deselected_node: INode | null;
     node: INode;
-}
-
-interface JQTreeLoadingEvent extends JQuery.Event {
-    isLoading: boolean;
-    node: INode | null;
-}
-
-interface JQTreeLoadDataEvent extends JQuery.Event {
-    parent_node: INode | null;
 }
 
 interface Parameters {
