@@ -141,6 +141,47 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.wait_for_text("Error while loading the data from the server")
 
 
+# Test the CountryCodeAdmin
+# * Test the item_label_field_name feature
+@override_settings(DJANGO_TESTING=True)
+class PlaywrightCountryCodeAdminTestCase(BasePlaywrightTestCase):
+    fixtures = ["countries.json"]
+
+    def setUp(self):
+        User.objects.create_superuser("admin", "admin@admin.com", "password")
+        super().setUp()
+        self.page.visit_country_codes_page()
+
+    def test_display_tree(self):
+        page = self.page
+
+        page.find_title_element("Oceania")
+        page.open_node("Oceania")
+
+        page.find_title_element("AU")
+
+
+# Test the CountryCodeAdmin
+# * Test the item_label_field_name feature with html
+@override_settings(DJANGO_TESTING=True)
+class PlaywrightCountryCodeAndNameAdminTestCase(BasePlaywrightTestCase):
+    fixtures = ["countries.json"]
+
+    def setUp(self):
+        User.objects.create_superuser("admin", "admin@admin.com", "password")
+        super().setUp()
+        self.page.visit_country_codes_and_names_page()
+
+    def test_display_tree(self):
+        page = self.page
+
+        page.find_title_element("Oceania")
+        page.open_node("Oceania")
+
+        element = self.page.page.query_selector('css=strong >> text="AU"')
+        assert element
+
+
 @override_settings(DJANGO_TESTING=True)
 class PlaywrightReadonlyTestCase(BasePlaywrightTestCase):
     fixtures = ["countries.json"]
