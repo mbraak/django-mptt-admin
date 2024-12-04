@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.html import format_html
 
 from mptt.models import TreeForeignKey, MPTTModel
 
@@ -16,3 +17,8 @@ class Country(MPTTModel):
 
     def __str__(self):
         return self.name or self.code or ""
+
+    # Return the code if there is one, otherwise the name.
+    @property
+    def code_or_name(self):
+        return self.code or self.name

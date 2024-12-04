@@ -155,6 +155,12 @@ class PlaywrightPage:
         page.wait_for_selector(f"text={expected_text}")
         page.wait_for_selector("css=#tree >> text=Oceania")
 
+    def visit_country_codes_page(self, expected_text="Select country code to change"):
+        page = self.page
+        page.goto(self.live_server_url + "/django_mptt_example/countrycode/")
+        page.wait_for_selector(f"text={expected_text}")
+        page.wait_for_selector("css=#tree >> text=Oceania")
+
     def wait_for_node(self, title):
         self.page.wait_for_selector(f'css=#tree .jqtree-title >> text="{title}"')
 
