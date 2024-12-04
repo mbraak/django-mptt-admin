@@ -28,6 +28,6 @@ class Country(MPTTModel):
     @property
     def html_code_and_name(self):
         if self.code:
-            return format_html(f"<strong>{self.code}</strong> {self.name}")
+            return format_html("<strong>{}</strong> {}", self.code, self.name)
         else:
-            return format_html(f"<strong>{self.name}</strong>")
+            return format_html("<strong>{}</strong>", self.name)
