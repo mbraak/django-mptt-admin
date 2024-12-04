@@ -22,3 +22,12 @@ class Country(MPTTModel):
     @property
     def code_or_name(self):
         return self.code or self.name
+
+    # Return the code and the name. Contains html.
+    # * Return only the name for continents.
+    @property
+    def html_code_and_name(self):
+        if self.code:
+            return format_html(f"<strong>{self.code}</strong> {self.name}")
+        else:
+            return format_html(f"<strong>{self.name}</strong>")
