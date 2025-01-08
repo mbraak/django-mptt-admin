@@ -1,6 +1,15 @@
 import * as cookie from "cookie";
 import "jqtree";
 
+interface JQTreeLoadDataEvent extends JQuery.Event {
+    parent_node: INode | null;
+}
+
+interface JQTreeLoadingEvent extends JQuery.Event {
+    isLoading: boolean;
+    node: INode | null;
+}
+
 interface JQTreeMoveEvent extends JQuery.Event {
     move_info: {
         do_move: () => void;
@@ -13,15 +22,6 @@ interface JQTreeMoveEvent extends JQuery.Event {
 interface JQTreeSelectEvent extends JQuery.Event {
     deselected_node: INode | null;
     node: INode;
-}
-
-interface JQTreeLoadingEvent extends JQuery.Event {
-    isLoading: boolean;
-    node: INode | null;
-}
-
-interface JQTreeLoadDataEvent extends JQuery.Event {
-    parent_node: INode | null;
 }
 
 interface Parameters {
@@ -107,11 +107,17 @@ function initTree(
     function handleMove(eventParam: JQuery.Event) {
         const e = eventParam as JQTreeMoveEvent;
         const info = e.move_info;
+
+        if (!info.moved_node.element) {
+            return;
+        }
+
+        const $el = jQuery(info.moved_node.element);
+
         const data = {
             position: info.position,
             target_id: info.target_node.id,
         };
-        const $el = jQuery(info.moved_node.element);
 
         handleLoading(null);
 
@@ -145,7 +151,7 @@ function initTree(
         });
 
         function removeErrorMessage() {
-            if (errorNode) {
+            if (errorNode?.element) {
                 jQuery(errorNode.element).find(".mptt-admin-error").remove();
                 errorNode = null;
             }
@@ -210,13 +216,15 @@ function initTree(
         const e = eventParam as JQTreeSelectEvent;
         const { deselected_node, node } = e;
 
-        if (deselected_node) {
+        if (deselected_node?.element) {
             // deselected node: remove tabindex
             jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
         }
 
         // selected: add tabindex
-        jQuery(node.element).find(".edit").attr("tabindex", 0);
+        if (node.element) {
+            jQuery(node.element).find(".edit").attr("tabindex", 0);
+        }
     }
 
     function handleLoadingEvent(e: JQuery.Event) {

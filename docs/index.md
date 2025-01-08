@@ -143,6 +143,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**2.7.1** (january 8 2025)
+
+- Issue #604: delay before opening a folder during drag and drop
+
 **2.7.0** (august 13 2024)
 
 - Issue #557: support Django 5.1; drop support for Django 3.2
