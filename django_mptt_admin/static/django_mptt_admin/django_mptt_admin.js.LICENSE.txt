@@ -1,7 +1,7 @@
 /*
-JqTree 1.8.8
+JqTree 1.8.10
 
-Copyright 2024 Marco Braak
+Copyright 2025 Marco Braak
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
