@@ -8,7 +8,7 @@
         "build_javascript_production": "webpack --mode production",
         "build_javascript_production_debug": "SKIP_COMPRESS_JS=true webpack --mode production",
         "build_javascript_coverage": "COVERAGE=true webpack --mode production",
-        "copy_jqtree_map_files": "cp node_modules/jqtree/*.map ../django_mptt_admin/static/django_mptt_admin/",
+        "copy_jqtree_map_files": "cp node_modules/jqtree/*.map ../django_mptt_admin/static/django_mptt_admin/; cp node_modules/cookie/dist/*.map ../django_mptt_admin/static/django_mptt_admin/",
         "sass": "sass django_mptt_admin.scss ../django_mptt_admin/static/django_mptt_admin/django_mptt_admin.css",
         "webpack": "webpack --mode development --watch",
         "lint": "eslint django_mptt_admin.ts",

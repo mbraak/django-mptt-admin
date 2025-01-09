@@ -60,6 +60,9 @@ jobs:
       - name: Install python packages
         run: |
           pip install ${{ matrix.django }} && pip install -r example_project/requirements_test.txt && playwright install chromium && pip install -r example_project/requirements_ci.txt && pip install -e .
+      - name: Collect static files
+        run: python manage.py collectstatic --no-input
+        working-directory: example_project
       - name: Run tests
         run: python -Wd example_project/manage.py test django_mptt_example
         env:

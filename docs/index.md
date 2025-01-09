@@ -143,6 +143,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Issue #605: fix missing map file
+
 **2.7.1** (january 8 2025)
 
 - Issue #604: delay before opening a folder during drag and drop
