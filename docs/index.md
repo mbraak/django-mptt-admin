@@ -143,7 +143,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.7.2** (january 9 2025)
 
 - Issue #605: fix missing map file
 
