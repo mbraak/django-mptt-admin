@@ -81,3 +81,12 @@ ALLOWED_HOSTS = ["*"]
 
 if "COVERAGE" in os.environ:
     DJANGO_MPTT_ADMIN_COVERAGE_JS = True
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
+}
