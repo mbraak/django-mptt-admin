@@ -1,9 +1,9 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.conf import settings
+from django.test import LiveServerTestCase
 from .playwright_page import PlaywrightPage
 
 
-class BasePlaywrightTestCase(StaticLiveServerTestCase):
+class BasePlaywrightTestCase(LiveServerTestCase):
     def setUp(self):
         super().setUp()
 
