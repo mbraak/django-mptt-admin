@@ -1,4 +1,4 @@
-beautifulsoup4==4.12.3
+beautifulsoup4==4.13.0
 django-mptt==0.16.0
 django-webtest==1.9.12
 cssselect==1.2.0
