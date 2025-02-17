@@ -8,4 +8,4 @@ psycopg==3.2.4
 pyquery==2.0.1
 waitress==3.0.2
 WebOb==1.8.9
-WebTest==3.0.3
+WebTest==3.0.4
