@@ -3,7 +3,7 @@ django-mptt==0.16.0
 django-webtest==1.9.12
 cssselect==1.2.0
 lxml==5.3.1
-playwright==1.50.0
+playwright==1.51.0
 psycopg==3.2.5
 pyquery==2.0.1
 waitress==3.0.2
