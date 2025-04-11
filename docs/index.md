@@ -143,6 +143,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**2.8.0** (april 7 2025)
+
+- Support Django 5.2; drop support for Django 5.0
+
 **2.7.2** (january 9 2025)
 
 - Issue #605: fix missing map file
