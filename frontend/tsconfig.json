@@ -1,6 +1,7 @@
 {
     "compileOnSave": false,
     "exclude": ["node_modules"],
+    "include": ["src/**/*"],
     "compilerOptions": {
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "module": "ESNext",
@@ -14,6 +15,5 @@
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
         "strict": true
-    },
-    "files": ["django_mptt_admin.ts", "global.d.ts"]
+    }
 }
