@@ -17,7 +17,7 @@ const minimize = !skipCompressJs && !coverage;
 
 module.exports = {
     entry: {
-        django_mptt_admin: ["./django_mptt_admin.ts"],
+        django_mptt_admin: ["./src/djangoMpttAdmin.ts"],
     },
     output: {
         path: path.resolve(

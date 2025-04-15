@@ -63,6 +63,9 @@ jobs:
       - name: Build javascript
         working-directory: ./frontend
         run: pnpm run build
+      - name: Javascript test
+        working-directory: ./frontend
+        run: pnpm run test:coverage
       - name: Collect static files
         run: python manage.py collectstatic --no-input
         working-directory: example_project

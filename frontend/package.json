@@ -11,9 +11,12 @@
         "copy_jqtree_map_files": "cp node_modules/jqtree/*.map ../django_mptt_admin/static/django_mptt_admin/; cp node_modules/cookie/dist/*.map ../django_mptt_admin/static/django_mptt_admin/",
         "sass": "sass django_mptt_admin.scss ../django_mptt_admin/static/django_mptt_admin/django_mptt_admin.css",
         "webpack": "webpack --mode development --watch",
-        "lint": "eslint django_mptt_admin.ts",
+        "lint": "eslint src",
+        "test": "vitest --watch=false",
+        "test:coverage": "vitest run --coverage",
+        "test:watch": "vitest",
         "tsc": "tsc --noEmit",
-        "ci": "pnpm run lint && pnpm run tsc"
+        "ci": "pnpm run lint && pnpm run tsc && pnpm run test"
     },
     "repository": {
         "type": "git",
@@ -25,22 +28,30 @@
         "url": "https://github.com/mbraak/django-mptt-admin/issues"
     },
     "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
+    "peerDependencies": {
+        "jquery": "^3"
+    },
     "devDependencies": {
         "@babel/core": "^7.26.9",
         "@babel/plugin-transform-runtime": "^7.26.9",
         "@babel/preset-env": "^7.26.9",
         "@babel/preset-typescript": "^7.26.0",
         "@eslint/js": "^9.21.0",
+        "@testing-library/dom": "^10.4.0",
+        "@testing-library/jest-dom": "^6.6.3",
         "@types/jquery": "^3.5.32",
         "@types/node": "^22.13.5",
+        "@vitest/coverage-istanbul": "^3.1.1",
         "babel-loader": "^10.0.0",
         "babel-plugin-istanbul": "^7.0.0",
         "eslint": "^9.21.0",
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-perfectionist": "^4.9.0",
+        "jsdom": "^26.1.0",
         "sass": "^1.85.1",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.25.0",
+        "vitest": "^3.1.1",
         "webpack": "^5.98.0",
         "webpack-cli": "^6.0.1"
     },
