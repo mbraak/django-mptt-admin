@@ -2,6 +2,7 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
+import vitest from "@vitest/eslint-plugin";
 
 export default [
     eslint.configs.recommended,
@@ -19,6 +20,15 @@ export default [
         },
         rules: {
             "@typescript-eslint/restrict-template-expressions": "error",
+        },
+    },
+    {
+        files: ["src/**/*.test.ts"],
+        plugins: {
+            vitest,
+        },
+        rules: {
+            ...vitest.configs.recommended.rules,
         },
     },
 ];
