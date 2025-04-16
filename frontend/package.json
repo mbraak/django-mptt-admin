@@ -48,6 +48,7 @@
         "eslint-plugin-import": "^2.31.0",
         "eslint-plugin-perfectionist": "^4.9.0",
         "jsdom": "^26.1.0",
+        "msw": "^2.7.4",
         "sass": "^1.85.1",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.25.0",
