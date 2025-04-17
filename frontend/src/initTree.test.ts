@@ -13,6 +13,22 @@ import {
 
 import initTree, { InitTreeOptions } from "./initTree";
 
+const defaultTreeData = [
+    {
+        children: [
+            {
+                id: 2,
+                name: "Africa",
+                url: "/edit/2",
+            },
+        ],
+        id: 1,
+        name: "root",
+        url: "/edit/1",
+    },
+];
+let treeData = {};
+
 const server = setupServer();
 
 beforeAll(() => {
@@ -28,20 +44,7 @@ afterAll(() => {
 });
 
 beforeEach(() => {
-    const treeData = [
-        {
-            children: [
-                {
-                    id: 2,
-                    name: "Africa",
-                    url: "/edit/2",
-                },
-            ],
-            id: 1,
-            name: "root",
-            url: "/edit/1",
-        },
-    ];
+    treeData = defaultTreeData;
 
     server.use(
         http.get("/tree", () => HttpResponse.json(treeData)),
@@ -144,8 +147,31 @@ test("doesn't add add links when hasAddPermission is false", async () => {
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-    const addLinks = screen.queryAllByRole<HTMLAnchorElement>("link", {
+    const addLinks = screen.queryAllByRole("link", {
         name: "(add)",
     });
     expect(addLinks).toHaveLength(0);
+});
+
+test("doesn't add links without node ids", async () => {
+    treeData = [
+        {
+            children: [
+                {
+                    name: "Africa",
+                    url: "/edit/2",
+                },
+            ],
+            name: "root",
+            url: "/edit/1",
+        },
+    ];
+
+    initTestTree(createTreeElement());
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+    expect(
+        screen.getByRole("treeitem", { name: "Africa" })
+    ).toBeInTheDocument();
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
 });
