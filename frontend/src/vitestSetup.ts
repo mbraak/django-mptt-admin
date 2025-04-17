@@ -10,3 +10,5 @@ declare global {
 
 window.$ = jQuery;
 window.jQuery = jQuery;
+
+window.gettext = (key) => key;

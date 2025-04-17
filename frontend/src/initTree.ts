@@ -1,6 +1,18 @@
 import * as cookie from "cookie";
 import "jqtree";
 
+export interface InitTreeOptions {
+    animationSpeed: null | number | string;
+    autoEscape: boolean;
+    autoOpen: boolean | number;
+    csrfCookieName: string;
+    dragAndDrop: boolean;
+    hasAddPermission: boolean;
+    hasChangePermission: boolean;
+    mouseDelay: null | number;
+    rtl: boolean;
+}
+
 interface JQTreeLoadDataEvent extends JQuery.Event {
     parent_node: INode | null;
 }
@@ -24,18 +36,6 @@ interface JQTreeSelectEvent extends JQuery.Event {
     node: INode;
 }
 
-interface Parameters {
-    animationSpeed: null | number | string;
-    autoEscape: boolean;
-    autoOpen: boolean | number;
-    csrfCookieName: string;
-    dragAndDrop: boolean;
-    hasAddPermission: boolean;
-    hasChangePermission: boolean;
-    mouseDelay: null | number;
-    rtl: boolean;
-}
-
 function initTree(
     $tree: JQuery,
     {
@@ -48,7 +48,7 @@ function initTree(
         hasChangePermission,
         mouseDelay,
         rtl,
-    }: Parameters
+    }: InitTreeOptions
 ) {
     let errorNode: INode | null = null;
     const baseUrl = "http://example.com";
