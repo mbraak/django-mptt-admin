@@ -303,43 +303,16 @@ var jqtree=function(e){"use strict";class t{constructor(e){let{dataFilter:t,load
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/************************************************************************/
 var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
-/* harmony import */ var cookie__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(505);
-/* harmony import */ var jqtree__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(985);
-/* harmony import */ var jqtree__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jqtree__WEBPACK_IMPORTED_MODULE_1__);
+
+// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@1.0.2/node_modules/cookie/dist/index.js
+var dist = __webpack_require__(505);
+// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.8.10_jquery@3.7.1/node_modules/jqtree/tree.jquery.js
+var tree_jquery = __webpack_require__(985);
+;// ./src/initTree.ts
 
 
 function initTree($tree, _ref) {
@@ -379,7 +352,7 @@ function initTree($tree, _ref) {
       if (!csrfCookieName) {
         return null;
       } else {
-        return cookie__WEBPACK_IMPORTED_MODULE_0__/* .parse */ .qg(document.cookie)[csrfCookieName];
+        return dist/* parse */.qg(document.cookie)[csrfCookieName];
       }
     }
     return getFromCookie() ?? getFromMiddleware() ?? "";
@@ -521,6 +494,9 @@ function initTree($tree, _ref) {
   $tree.on("tree.select", handleSelect);
   $tree.tree(treeOptions);
 }
+/* harmony default export */ const src_initTree = (initTree);
+;// ./src/djangoMpttAdmin.ts
+
 jQuery(() => {
   const $tree = jQuery("#tree");
   if ($tree.length) {
@@ -533,7 +509,7 @@ jQuery(() => {
     const dragAndDrop = $tree.data("drag-and-drop");
     const rtl = $tree.data("rtl") === "1";
     const csrfCookieName = $tree.data("csrf-cookie-name");
-    initTree($tree, {
+    src_initTree($tree, {
       animationSpeed,
       autoEscape,
       autoOpen,

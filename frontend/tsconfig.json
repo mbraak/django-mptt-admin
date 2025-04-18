@@ -1,19 +1,23 @@
 {
     "compileOnSave": false,
     "exclude": ["node_modules"],
+    "include": ["src/**/*"],
     "compilerOptions": {
+        "esModuleInterop": true,
         "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "module": "ESNext",
         "moduleResolution": "bundler",
+        "noEmit": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noUncheckedIndexedAccess": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "rootDir": "src",
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
-        "strict": true
-    },
-    "files": ["django_mptt_admin.ts", "global.d.ts"]
+        "strict": true,
+        "target": "ES2022",
+    }
 }
