@@ -175,3 +175,17 @@ test("doesn't add links without node ids", async () => {
     ).toBeInTheDocument();
     expect(screen.queryAllByRole("link")).toHaveLength(0);
 });
+
+test("renders a link for a closed node with rtl is false", async () => {
+    initTestTree(createTreeElement());
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+    expect(screen.getByText("►")).toBeInTheDocument();
+});
+
+test("renders a link for a closed node with rtl is true", async () => {
+    initTestTree(createTreeElement(), { rtl: true });
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+    expect(screen.getByText("◀")).toBeInTheDocument();
+});
