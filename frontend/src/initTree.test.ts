@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
 import jQuery from "jquery";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -9,6 +9,7 @@ import {
     beforeEach,
     expect,
     test,
+    vi,
 } from "vitest";
 
 import initTree, { InitTreeOptions } from "./initTree";
@@ -48,7 +49,8 @@ beforeEach(() => {
 
     server.use(
         http.get("/tree", () => HttpResponse.json(treeData)),
-        http.get("/no_data", () => new HttpResponse(null, { status: 404 }))
+        http.get("/no_data", () => new HttpResponse(null, { status: 404 })),
+        http.post("/move", () => HttpResponse.json({}))
     );
 
     document.body.innerHTML = "";
@@ -188,4 +190,36 @@ test("renders a link for a closed node with rtl is true", async () => {
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
     expect(screen.getByText("◀")).toBeInTheDocument();
+});
+
+test("handles the tree.move event", async () => {
+    const treeElement = createTreeElement();
+    initTestTree(treeElement);
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    const doMove = vi.fn();
+    const africaElement = screen.getByRole("treeitem", { name: "Africa" });
+    const movedNode = {
+        element: africaElement,
+        id: 1,
+        move_url: "/move",
+    };
+    const targetNode = {
+        id: 2,
+    };
+
+    const move_info = {
+        do_move: doMove,
+        moved_node: movedNode,
+        original_event: {},
+        position: "after",
+        previous_parent: null,
+        target_node: targetNode,
+    };
+
+    jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+
+    await waitFor(() => {
+        expect(doMove).toHaveBeenCalled();
+    });
 });
