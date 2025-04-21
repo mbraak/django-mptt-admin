@@ -1,4 +1,5 @@
-import { screen } from "@testing-library/dom";
+import { screen, waitFor } from "@testing-library/dom";
+import * as cookie from "cookie";
 import jQuery from "jquery";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -7,8 +8,10 @@ import {
     afterEach,
     beforeAll,
     beforeEach,
+    describe,
     expect,
     test,
+    vi,
 } from "vitest";
 
 import initTree, { InitTreeOptions } from "./initTree";
@@ -28,6 +31,7 @@ const defaultTreeData = [
     },
 ];
 let treeData = {};
+let csrfTokenInRquest: null | string = null;
 
 const server = setupServer();
 
@@ -45,13 +49,21 @@ afterAll(() => {
 
 beforeEach(() => {
     treeData = defaultTreeData;
+    csrfTokenInRquest = null;
 
     server.use(
         http.get("/tree", () => HttpResponse.json(treeData)),
-        http.get("/no_data", () => new HttpResponse(null, { status: 404 }))
+        http.get("/no_data", () => new HttpResponse(null, { status: 404 })),
+        http.post("/move", ({ request }) => {
+            csrfTokenInRquest = request.headers.get("X-CSRFToken");
+            return HttpResponse.json({});
+        })
     );
 
     document.body.innerHTML = "";
+    document.cookie = cookie.serialize("csrf", "", {
+        expires: new Date("1970-01-01"),
+    });
 });
 
 const createTreeElement = (dataUrl = "/tree") => {
@@ -188,4 +200,112 @@ test("renders a link for a closed node with rtl is true", async () => {
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
     expect(screen.getByText("◀")).toBeInTheDocument();
+});
+
+describe("tree.move event", () => {
+    test("calls do_move", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = vi.fn();
+        const africaElement = screen.getByRole("treeitem", { name: "Africa" });
+        const movedNode = {
+            element: africaElement,
+            id: 1,
+            move_url: "/move",
+        };
+        const targetNode = {
+            id: 2,
+        };
+
+        const move_info = {
+            do_move: doMove,
+            moved_node: movedNode,
+            original_event: {},
+            position: "after",
+            previous_parent: null,
+            target_node: targetNode,
+        };
+
+        jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+    });
+
+    test("sets the csrf cookie with a crsf cookie", async () => {
+        document.cookie = cookie.serialize("csrf", "csrf1");
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = vi.fn();
+        const africaElement = screen.getByRole("treeitem", { name: "Africa" });
+        const movedNode = {
+            element: africaElement,
+            id: 1,
+            move_url: "/move",
+        };
+        const targetNode = {
+            id: 2,
+        };
+
+        const move_info = {
+            do_move: doMove,
+            moved_node: movedNode,
+            original_event: {},
+            position: "after",
+            previous_parent: null,
+            target_node: targetNode,
+        };
+
+        jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+        expect(csrfTokenInRquest).toEqual("csrf1");
+    });
+
+    test("sets the csrf cookie with a hidden csrf input", async () => {
+        const csrfInput = document.createElement("input");
+        csrfInput.setAttribute("name", "csrfmiddlewaretoken");
+        csrfInput.setAttribute("value", "csrf_test");
+        csrfInput.setAttribute("type", "hidden");
+        document.body.append(csrfInput);
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = vi.fn();
+        const africaElement = screen.getByRole("treeitem", { name: "Africa" });
+        const movedNode = {
+            element: africaElement,
+            id: 1,
+            move_url: "/move",
+        };
+        const targetNode = {
+            id: 2,
+        };
+
+        const move_info = {
+            do_move: doMove,
+            moved_node: movedNode,
+            original_event: {},
+            position: "after",
+            previous_parent: null,
+            target_node: targetNode,
+        };
+
+        jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+        expect(csrfTokenInRquest).toEqual("csrf_test");
+    });
 });
