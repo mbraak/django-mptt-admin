@@ -203,11 +203,7 @@ test("renders a link for a closed node with rtl is true", async () => {
 });
 
 describe("tree.move event", () => {
-    test("calls do_move", async () => {
-        const treeElement = createTreeElement();
-        initTestTree(treeElement);
-        expect(await screen.findByRole("tree")).toBeInTheDocument();
-
+    const triggerTreeMove = (treeElement: HTMLElement) => {
         const doMove = vi.fn();
         const africaElement = screen.getByRole("treeitem", { name: "Africa" });
         const movedNode = {
@@ -229,6 +225,16 @@ describe("tree.move event", () => {
         };
 
         jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+
+        return doMove;
+    };
+
+    test("calls do_move", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = triggerTreeMove(treeElement);
 
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
@@ -242,32 +248,42 @@ describe("tree.move event", () => {
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const doMove = vi.fn();
-        const africaElement = screen.getByRole("treeitem", { name: "Africa" });
-        const movedNode = {
-            element: africaElement,
-            id: 1,
-            move_url: "/move",
-        };
-        const targetNode = {
-            id: 2,
-        };
-
-        const move_info = {
-            do_move: doMove,
-            moved_node: movedNode,
-            original_event: {},
-            position: "after",
-            previous_parent: null,
-            target_node: targetNode,
-        };
-
-        jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+        const doMove = triggerTreeMove(treeElement);
 
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
         expect(csrfTokenInRquest).toEqual("csrf1");
+    });
+
+    test("sets the csrf cookie with a crsf cookie and a csrfCookieName parameter", async () => {
+        document.cookie = cookie.serialize("otherName", "value1");
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement, { csrfCookieName: "otherName" });
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = triggerTreeMove(treeElement);
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+        expect(csrfTokenInRquest).toEqual("value1");
+    });
+
+    test("sets the csrf cookie with a crsf cookie and an empty csrfCookieName parameter", async () => {
+        document.cookie = cookie.serialize("csrf", "testcsrf");
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement, { csrfCookieName: undefined });
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = triggerTreeMove(treeElement);
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+        expect(csrfTokenInRquest).toEqual("");
     });
 
     test("sets the csrf cookie with a hidden csrf input", async () => {
@@ -281,27 +297,7 @@ describe("tree.move event", () => {
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const doMove = vi.fn();
-        const africaElement = screen.getByRole("treeitem", { name: "Africa" });
-        const movedNode = {
-            element: africaElement,
-            id: 1,
-            move_url: "/move",
-        };
-        const targetNode = {
-            id: 2,
-        };
-
-        const move_info = {
-            do_move: doMove,
-            moved_node: movedNode,
-            original_event: {},
-            position: "after",
-            previous_parent: null,
-            target_node: targetNode,
-        };
-
-        jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+        const doMove = triggerTreeMove(treeElement);
 
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
