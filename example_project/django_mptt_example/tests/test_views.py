@@ -129,12 +129,16 @@ class FilterTestCase(BaseViewTestCase):
 
         country_node = root["children"][0]
 
-        expected_changelist_filters = "continent%3D%255B%2527Europe%2527%255D" if django.VERSION >= (5, 0) else "continent%3DEurope"
+        expected_changelist_filters = (
+            "continent%3D%255B%2527Europe%2527%255D"
+            if django.VERSION >= (5, 0)
+            else "continent%3DEurope"
+        )
         node_id = country_node["id"]
 
         self.assertEqual(
             country_node["url"],
-            f"/django_mptt_example/country/{node_id}/change/?_changelist_filters={expected_changelist_filters}"
+            f"/django_mptt_example/country/{node_id}/change/?_changelist_filters={expected_changelist_filters}",
         )
 
     def test_urls(self):

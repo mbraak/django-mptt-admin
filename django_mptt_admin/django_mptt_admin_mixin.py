@@ -46,11 +46,15 @@ class DjangoMpttAdminMixin:
     change_list_tree_class = TreeChangeList
 
     @csrf_protect_m
-    def changelist_view(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], request, extra_context=None):
+    def changelist_view(
+        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request, extra_context=None
+    ):
         request.current_app = self.admin_site.name
         is_popup = IS_POPUP_VAR in request.GET
         if is_popup:
-            return super(DjangoMpttAdminMixin, self).changelist_view(request, extra_context=extra_context)
+            return super(DjangoMpttAdminMixin, self).changelist_view(
+                request, extra_context=extra_context
+            )
 
         if not self.has_view_or_change_permission(request):
             raise PermissionDenied()
@@ -97,7 +101,7 @@ class DjangoMpttAdminMixin:
             "tree_auto_open": self.tree_auto_open,
             "tree_json_url": tree_json_url,
             "tree_mouse_delay": self.get_tree_mouse_delay(),
-            "use_context_menu": self.use_context_menu
+            "use_context_menu": self.use_context_menu,
         }
 
         context = {
@@ -120,7 +124,7 @@ class DjangoMpttAdminMixin:
 
         return TemplateResponse(request, self.change_tree_template, context)
 
-    def get_urls(self: Union[ModelAdmin, 'DjangoMpttAdminMixin']):
+    def get_urls(self: Union[ModelAdmin, "DjangoMpttAdminMixin"]):
         def wrap(view, cacheable=False):
             def wrapper(*args, **kwargs):
                 return self.admin_site.admin_view(view, cacheable)(*args, **kwargs)
@@ -161,7 +165,7 @@ class DjangoMpttAdminMixin:
     def get_tree_media(self: ModelAdmin):
         django_mptt_admin_js = (
             "django_mptt_admin.coverage.js"
-            if getattr(settings, 'DJANGO_MPTT_ADMIN_COVERAGE_JS', False)
+            if getattr(settings, "DJANGO_MPTT_ADMIN_COVERAGE_JS", False)
             else "django_mptt_admin.js"
         )
 
@@ -178,7 +182,7 @@ class DjangoMpttAdminMixin:
 
     @csrf_protect_m
     @transaction.atomic()
-    def move_view(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], request, object_id):
+    def move_view(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request, object_id):
         request.current_app = self.admin_site.name
         instance = self.get_object(request, unquote(object_id))
 
@@ -209,7 +213,12 @@ class DjangoMpttAdminMixin:
         if self.trigger_save_after_move:
             instance.save()
 
-    def get_change_list_for_tree(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], request, node_id=None, max_level=None):
+    def get_change_list_for_tree(
+        self: Union[ModelAdmin, "DjangoMpttAdminMixin"],
+        request,
+        node_id=None,
+        max_level=None,
+    ):
         request.current_app = self.admin_site.name
 
         return self.change_list_tree_class(
@@ -228,7 +237,9 @@ class DjangoMpttAdminMixin:
         )
         return reverse(url_name, args=args, current_app=self.admin_site.name)
 
-    def get_tree_data(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], qs, max_level, filters_params):
+    def get_tree_data(
+        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], qs, max_level, filters_params
+    ):
         pk_attname = self.opts.pk.attname
 
         preserved_filters = urlencode(
@@ -255,7 +266,7 @@ class DjangoMpttAdminMixin:
             qs, handle_create_node, max_level, self.item_label_field_name
         )
 
-    def tree_json_view(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], request):
+    def tree_json_view(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request):
         request.current_app = self.admin_site.name
         node_id = request.GET.get("node")
 
@@ -278,7 +289,9 @@ class DjangoMpttAdminMixin:
         # Set safe to False because the data is a list instead of a dict
         return JsonResponse(tree_data, safe=False)
 
-    def grid_view(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], request, extra_context=None):
+    def grid_view(
+        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request, extra_context=None
+    ):
         request.current_app = self.admin_site.name
 
         preserved_filters = self.get_preserved_filters(request)
@@ -294,7 +307,7 @@ class DjangoMpttAdminMixin:
             context.update(extra_context)
         return super(DjangoMpttAdminMixin, self).changelist_view(request, context)
 
-    def get_preserved_filters(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], request):
+    def get_preserved_filters(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request):
         """
         Override `get_preserved_filters` to make sure that it returns the current filters for the grid view.
         """
@@ -326,8 +339,12 @@ class DjangoMpttAdminMixin:
         """
         return queryset
 
-    def get_changeform_initial_data(self: Union[ModelAdmin, 'DjangoMpttAdminMixin'], request):
-        initial_data = super(DjangoMpttAdminMixin, self).get_changeform_initial_data(request=request)
+    def get_changeform_initial_data(
+        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request
+    ):
+        initial_data = super(DjangoMpttAdminMixin, self).get_changeform_initial_data(
+            request=request
+        )
 
         if "insert_at" in request.GET:
             initial_data[self.get_insert_at_field()] = request.GET.get("insert_at")

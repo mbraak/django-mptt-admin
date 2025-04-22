@@ -44,13 +44,13 @@ class CountryAdmin(DjangoMpttAdmin):
 
 # Display the code for countries instead of the name.
 class CountryCodeAdmin(CountryAdmin):
-    item_label_field_name = 'code_or_name'
+    item_label_field_name = "code_or_name"
 
 
 # Display a title with html
 class CountryWithHtmlAdmin(CountryAdmin):
     autoescape = False
-    item_label_field_name = 'html_code_and_name'
+    item_label_field_name = "html_code_and_name"
 
 
 class CountryCode(Country):

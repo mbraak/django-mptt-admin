@@ -28,7 +28,7 @@ class TreeChangeList(ChangeList):
         )
 
         if django.VERSION >= (4, 0):
-            params['search_help_text'] = ''
+            params["search_help_text"] = ""
 
         super().__init__(**params)
 
