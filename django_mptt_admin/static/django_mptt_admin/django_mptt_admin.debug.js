@@ -315,18 +315,17 @@ var tree_jquery = __webpack_require__(985);
 ;// ./src/initTree.ts
 
 
-function initTree($tree, _ref) {
-  let {
-    animationSpeed,
-    autoEscape,
-    autoOpen,
-    csrfCookieName,
-    dragAndDrop,
-    hasAddPermission,
-    hasChangePermission,
-    mouseDelay,
-    rtl
-  } = _ref;
+function initTree($tree, {
+  animationSpeed,
+  autoEscape,
+  autoOpen,
+  csrfCookieName,
+  dragAndDrop,
+  hasAddPermission,
+  hasChangePermission,
+  mouseDelay,
+  rtl
+}) {
   let errorNode = null;
   const baseUrl = "http://example.com";
   const insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
