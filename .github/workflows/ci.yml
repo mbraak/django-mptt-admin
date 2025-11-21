@@ -25,9 +25,9 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
       - name: Install pnpm
@@ -54,7 +54,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install python packages
