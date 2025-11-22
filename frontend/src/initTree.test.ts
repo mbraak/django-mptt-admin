@@ -31,7 +31,7 @@ const defaultTreeData = [
     },
 ];
 let treeData = {};
-let csrfTokenInRquest: null | string = null;
+let csrfTokenInRequest: null | string = null;
 
 const server = setupServer();
 
@@ -49,13 +49,13 @@ afterAll(() => {
 
 beforeEach(() => {
     treeData = defaultTreeData;
-    csrfTokenInRquest = null;
+    csrfTokenInRequest = null;
 
     server.use(
         http.get("/tree", () => HttpResponse.json(treeData)),
         http.get("/no_data", () => new HttpResponse(null, { status: 404 })),
         http.post("/move", ({ request }) => {
-            csrfTokenInRquest = request.headers.get("X-CSRFToken");
+            csrfTokenInRequest = request.headers.get("X-CSRFToken");
             return HttpResponse.json({});
         })
     );
@@ -253,7 +253,7 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRquest).toEqual("csrf1");
+        expect(csrfTokenInRequest).toEqual("csrf1");
     });
 
     test("sets the csrf cookie with a crsf cookie and a csrfCookieName parameter", async () => {
@@ -268,7 +268,7 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRquest).toEqual("value1");
+        expect(csrfTokenInRequest).toEqual("value1");
     });
 
     test("sets the csrf cookie with a crsf cookie and an empty csrfCookieName parameter", async () => {
@@ -283,7 +283,7 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRquest).toEqual("");
+        expect(csrfTokenInRequest).toEqual("");
     });
 
     test("sets the csrf cookie with a hidden csrf input", async () => {
@@ -302,6 +302,6 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRquest).toEqual("csrf_test");
+        expect(csrfTokenInRequest).toEqual("csrf_test");
     });
 });
