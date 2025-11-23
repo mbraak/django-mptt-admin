@@ -1,3 +1,18 @@
 {
-  "words": ["crsf", "csrfmiddlewaretoken", "jqtree", "mptt", "testcsrf"]
+  "language": "en-GB",
+  "words": [
+    "Åland",
+    "bouvet",
+    "countrycode",
+    "countrycodeandname",
+    "crsf",
+    "csrfmiddlewaretoken",
+    "jqtree",
+    "mptt",
+    "rght",
+    "tabindex",
+    "testcsrf",
+    "toggler",
+    "webtest"
+  ]
 }

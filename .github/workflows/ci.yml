@@ -30,9 +30,9 @@ jobs:
         uses: streetsidesoftware/cspell-action@v8
         with:
           files: |
-            frontend/src/**.ts
-            django_mptt_admin/**.py
-            example_project/**.py
+            frontend/src/**/*.ts
+            django_mptt_admin/**/*.py
+            example_project/**/*.py
           incremental_files_only: false
       - name: Setup node
         uses: actions/setup-node@v6
