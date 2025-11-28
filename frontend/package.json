@@ -41,24 +41,24 @@
         "@testing-library/jest-dom": "^6.9.1",
         "@types/jquery": "^3.5.33",
         "@types/node": "^24.10.1",
-        "@vitest/coverage-istanbul": "^4.0.12",
-        "@vitest/eslint-plugin": "^1.4.3",
+        "@vitest/coverage-istanbul": "^4.0.14",
+        "@vitest/eslint-plugin": "^1.5.0",
         "babel-loader": "^10.0.0",
         "babel-plugin-istanbul": "^7.0.1",
         "eslint": "^9.39.1",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-perfectionist": "^4.15.1",
         "jsdom": "^27.2.0",
-        "msw": "^2.12.2",
+        "msw": "^2.12.3",
         "sass": "^1.94.2",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.47.0",
-        "vitest": "^4.0.12",
+        "typescript-eslint": "^8.48.0",
+        "vitest": "^4.0.14",
         "webpack": "^5.103.0",
         "webpack-cli": "^6.0.1"
     },
     "dependencies": {
-        "cookie": "^1.0.2",
+        "cookie": "^1.1.1",
         "jqtree": "^1.8.10"
     }
 }
