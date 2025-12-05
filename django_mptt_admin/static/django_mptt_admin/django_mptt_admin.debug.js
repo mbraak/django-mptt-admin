@@ -1,15 +1,21 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 505:
+/***/ 163:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 var __webpack_unused_export__;
 
 __webpack_unused_export__ = ({ value: true });
-exports.qg = parse;
-__webpack_unused_export__ = serialize;
+__webpack_unused_export__ = parseCookie;
+exports.qg = parseCookie;
+__webpack_unused_export__ = stringifyCookie;
+__webpack_unused_export__ = stringifySetCookie;
+__webpack_unused_export__ = stringifySetCookie;
+__webpack_unused_export__ = parseSetCookie;
+__webpack_unused_export__ = stringifySetCookie;
+__webpack_unused_export__ = stringifySetCookie;
 /**
  * RegExp to match cookie-name in RFC 6265 sec 4.1.1
  * This refers out to the obsoleted definition of token in RFC 2616 sec 2.2
@@ -70,6 +76,10 @@ const domainValueRegExp = /^([.]?[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)([.][a-z0-9]
  *                     ; defined in RFC 5234 appendix B.1
  */
 const pathValueRegExp = /^[\u0020-\u003A\u003D-\u007E]*$/;
+/**
+ * RegExp to match max-age-value in RFC 6265 sec 5.6.2
+ */
+const maxAgeRegExp = /^-?\d+$/;
 const __toString = Object.prototype.toString;
 const NullObject = /* @__PURE__ */ (() => {
     const C = function () { };
@@ -77,12 +87,12 @@ const NullObject = /* @__PURE__ */ (() => {
     return C;
 })();
 /**
- * Parse a cookie header.
+ * Parse a `Cookie` header.
  *
  * Parse the given cookie header string into an object
  * The object has the various cookies as keys(names) => values
  */
-function parse(str, options) {
+function parseCookie(str, options) {
     const obj = new NullObject();
     const len = str.length;
     // RFC 6265 sec 4.1.1, RFC 2616 2.2 defines a cookie name consists of one char minimum, plus '='.
@@ -91,104 +101,95 @@ function parse(str, options) {
     const dec = options?.decode || decode;
     let index = 0;
     do {
-        const eqIdx = str.indexOf("=", index);
+        const eqIdx = eqIndex(str, index, len);
         if (eqIdx === -1)
             break; // No more cookie pairs.
-        const colonIdx = str.indexOf(";", index);
-        const endIdx = colonIdx === -1 ? len : colonIdx;
+        const endIdx = endIndex(str, index, len);
         if (eqIdx > endIdx) {
             // backtrack on prior semicolon
             index = str.lastIndexOf(";", eqIdx - 1) + 1;
             continue;
         }
-        const keyStartIdx = startIndex(str, index, eqIdx);
-        const keyEndIdx = endIndex(str, eqIdx, keyStartIdx);
-        const key = str.slice(keyStartIdx, keyEndIdx);
+        const key = valueSlice(str, index, eqIdx);
         // only assign once
         if (obj[key] === undefined) {
-            let valStartIdx = startIndex(str, eqIdx + 1, endIdx);
-            let valEndIdx = endIndex(str, endIdx, valStartIdx);
-            const value = dec(str.slice(valStartIdx, valEndIdx));
-            obj[key] = value;
+            obj[key] = dec(valueSlice(str, eqIdx + 1, endIdx));
         }
         index = endIdx + 1;
     } while (index < len);
     return obj;
 }
-function startIndex(str, index, max) {
-    do {
-        const code = str.charCodeAt(index);
-        if (code !== 0x20 /*   */ && code !== 0x09 /* \t */)
-            return index;
-    } while (++index < max);
-    return max;
-}
-function endIndex(str, index, min) {
-    while (index > min) {
-        const code = str.charCodeAt(--index);
-        if (code !== 0x20 /*   */ && code !== 0x09 /* \t */)
-            return index + 1;
-    }
-    return min;
-}
 /**
- * Serialize data into a cookie header.
- *
- * Serialize a name value pair into a cookie string suitable for
- * http headers. An optional options object specifies cookie parameters.
- *
- * serialize('foo', 'bar', { httpOnly: true })
- *   => "foo=bar; httpOnly"
+ * Stringifies an object into an HTTP `Cookie` header.
  */
-function serialize(name, val, options) {
+function stringifyCookie(cookie, options) {
     const enc = options?.encode || encodeURIComponent;
-    if (!cookieNameRegExp.test(name)) {
-        throw new TypeError(`argument name is invalid: ${name}`);
+    const cookieStrings = [];
+    for (const name of Object.keys(cookie)) {
+        const val = cookie[name];
+        if (val === undefined)
+            continue;
+        if (!cookieNameRegExp.test(name)) {
+            throw new TypeError(`cookie name is invalid: ${name}`);
+        }
+        const value = enc(val);
+        if (!cookieValueRegExp.test(value)) {
+            throw new TypeError(`cookie val is invalid: ${val}`);
+        }
+        cookieStrings.push(`${name}=${value}`);
     }
-    const value = enc(val);
+    return cookieStrings.join("; ");
+}
+function stringifySetCookie(_name, _val, _opts) {
+    const cookie = typeof _name === "object"
+        ? _name
+        : { ..._opts, name: _name, value: String(_val) };
+    const options = typeof _val === "object" ? _val : _opts;
+    const enc = options?.encode || encodeURIComponent;
+    if (!cookieNameRegExp.test(cookie.name)) {
+        throw new TypeError(`argument name is invalid: ${cookie.name}`);
+    }
+    const value = cookie.value ? enc(cookie.value) : "";
     if (!cookieValueRegExp.test(value)) {
-        throw new TypeError(`argument val is invalid: ${val}`);
+        throw new TypeError(`argument val is invalid: ${cookie.value}`);
     }
-    let str = name + "=" + value;
-    if (!options)
-        return str;
-    if (options.maxAge !== undefined) {
-        if (!Number.isInteger(options.maxAge)) {
-            throw new TypeError(`option maxAge is invalid: ${options.maxAge}`);
+    let str = cookie.name + "=" + value;
+    if (cookie.maxAge !== undefined) {
+        if (!Number.isInteger(cookie.maxAge)) {
+            throw new TypeError(`option maxAge is invalid: ${cookie.maxAge}`);
         }
-        str += "; Max-Age=" + options.maxAge;
+        str += "; Max-Age=" + cookie.maxAge;
     }
-    if (options.domain) {
-        if (!domainValueRegExp.test(options.domain)) {
-            throw new TypeError(`option domain is invalid: ${options.domain}`);
+    if (cookie.domain) {
+        if (!domainValueRegExp.test(cookie.domain)) {
+            throw new TypeError(`option domain is invalid: ${cookie.domain}`);
         }
-        str += "; Domain=" + options.domain;
+        str += "; Domain=" + cookie.domain;
     }
-    if (options.path) {
-        if (!pathValueRegExp.test(options.path)) {
-            throw new TypeError(`option path is invalid: ${options.path}`);
+    if (cookie.path) {
+        if (!pathValueRegExp.test(cookie.path)) {
+            throw new TypeError(`option path is invalid: ${cookie.path}`);
         }
-        str += "; Path=" + options.path;
+        str += "; Path=" + cookie.path;
     }
-    if (options.expires) {
-        if (!isDate(options.expires) ||
-            !Number.isFinite(options.expires.valueOf())) {
-            throw new TypeError(`option expires is invalid: ${options.expires}`);
+    if (cookie.expires) {
+        if (!isDate(cookie.expires) || !Number.isFinite(cookie.expires.valueOf())) {
+            throw new TypeError(`option expires is invalid: ${cookie.expires}`);
         }
-        str += "; Expires=" + options.expires.toUTCString();
+        str += "; Expires=" + cookie.expires.toUTCString();
     }
-    if (options.httpOnly) {
+    if (cookie.httpOnly) {
         str += "; HttpOnly";
     }
-    if (options.secure) {
+    if (cookie.secure) {
         str += "; Secure";
     }
-    if (options.partitioned) {
+    if (cookie.partitioned) {
         str += "; Partitioned";
     }
-    if (options.priority) {
-        const priority = typeof options.priority === "string"
-            ? options.priority.toLowerCase()
+    if (cookie.priority) {
+        const priority = typeof cookie.priority === "string"
+            ? cookie.priority.toLowerCase()
             : undefined;
         switch (priority) {
             case "low":
@@ -201,13 +202,13 @@ function serialize(name, val, options) {
                 str += "; Priority=High";
                 break;
             default:
-                throw new TypeError(`option priority is invalid: ${options.priority}`);
+                throw new TypeError(`option priority is invalid: ${cookie.priority}`);
         }
     }
-    if (options.sameSite) {
-        const sameSite = typeof options.sameSite === "string"
-            ? options.sameSite.toLowerCase()
-            : options.sameSite;
+    if (cookie.sameSite) {
+        const sameSite = typeof cookie.sameSite === "string"
+            ? cookie.sameSite.toLowerCase()
+            : cookie.sameSite;
         switch (sameSite) {
             case true:
             case "strict":
@@ -220,10 +221,120 @@ function serialize(name, val, options) {
                 str += "; SameSite=None";
                 break;
             default:
-                throw new TypeError(`option sameSite is invalid: ${options.sameSite}`);
+                throw new TypeError(`option sameSite is invalid: ${cookie.sameSite}`);
         }
     }
     return str;
+}
+/**
+ * Deserialize a `Set-Cookie` header into an object.
+ *
+ * deserialize('foo=bar; httpOnly')
+ *   => { name: 'foo', value: 'bar', httpOnly: true }
+ */
+function parseSetCookie(str, options) {
+    const dec = options?.decode || decode;
+    const len = str.length;
+    const endIdx = endIndex(str, 0, len);
+    const eqIdx = eqIndex(str, 0, endIdx);
+    const setCookie = eqIdx === -1
+        ? { name: "", value: dec(valueSlice(str, 0, endIdx)) }
+        : {
+            name: valueSlice(str, 0, eqIdx),
+            value: dec(valueSlice(str, eqIdx + 1, endIdx)),
+        };
+    let index = endIdx + 1;
+    while (index < len) {
+        const endIdx = endIndex(str, index, len);
+        const eqIdx = eqIndex(str, index, endIdx);
+        const attr = eqIdx === -1
+            ? valueSlice(str, index, endIdx)
+            : valueSlice(str, index, eqIdx);
+        const val = eqIdx === -1 ? undefined : valueSlice(str, eqIdx + 1, endIdx);
+        switch (attr.toLowerCase()) {
+            case "httponly":
+                setCookie.httpOnly = true;
+                break;
+            case "secure":
+                setCookie.secure = true;
+                break;
+            case "partitioned":
+                setCookie.partitioned = true;
+                break;
+            case "domain":
+                setCookie.domain = val;
+                break;
+            case "path":
+                setCookie.path = val;
+                break;
+            case "max-age":
+                if (val && maxAgeRegExp.test(val))
+                    setCookie.maxAge = Number(val);
+                break;
+            case "expires":
+                if (!val)
+                    break;
+                const date = new Date(val);
+                if (Number.isFinite(date.valueOf()))
+                    setCookie.expires = date;
+                break;
+            case "priority":
+                if (!val)
+                    break;
+                const priority = val.toLowerCase();
+                if (priority === "low" ||
+                    priority === "medium" ||
+                    priority === "high") {
+                    setCookie.priority = priority;
+                }
+                break;
+            case "samesite":
+                if (!val)
+                    break;
+                const sameSite = val.toLowerCase();
+                if (sameSite === "lax" ||
+                    sameSite === "strict" ||
+                    sameSite === "none") {
+                    setCookie.sameSite = sameSite;
+                }
+                break;
+        }
+        index = endIdx + 1;
+    }
+    return setCookie;
+}
+/**
+ * Find the `;` character between `min` and `len` in str.
+ */
+function endIndex(str, min, len) {
+    const index = str.indexOf(";", min);
+    return index === -1 ? len : index;
+}
+/**
+ * Find the `=` character between `min` and `max` in str.
+ */
+function eqIndex(str, min, max) {
+    const index = str.indexOf("=", min);
+    return index < max ? index : -1;
+}
+/**
+ * Slice out a value between startPod to max.
+ */
+function valueSlice(str, min, max) {
+    let start = min;
+    let end = max;
+    do {
+        const code = str.charCodeAt(start);
+        if (code !== 0x20 /*   */ && code !== 0x09 /* \t */)
+            break;
+    } while (++start < end);
+    while (end > start) {
+        const code = str.charCodeAt(end - 1);
+        if (code !== 0x20 /*   */ && code !== 0x09 /* \t */)
+            break;
+        end--;
+    }
+    return str.slice(start, end);
 }
 /**
  * URL-decode string value. Optimized to skip native call when no %.
@@ -308,8 +419,8 @@ var __webpack_exports__ = {};
 (() => {
 "use strict";
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@1.0.2/node_modules/cookie/dist/index.js
-var dist = __webpack_require__(505);
+// EXTERNAL MODULE: ./node_modules/.pnpm/cookie@1.1.1/node_modules/cookie/dist/index.js
+var dist = __webpack_require__(163);
 // EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.8.10_jquery@3.7.1/node_modules/jqtree/tree.jquery.js
 var tree_jquery = __webpack_require__(985);
 ;// ./src/initTree.ts
