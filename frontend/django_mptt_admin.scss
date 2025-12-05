@@ -2,12 +2,12 @@
 
 @keyframes jqtree-spin {
     0% {
-      transform: rotate(0deg);
+        transform: rotate(0deg);
     }
     100% {
-      transform: rotate(360deg);
+        transform: rotate(360deg);
     }
-  }
+}
 
 #changelist {
     border: none;
@@ -24,6 +24,7 @@
         .jqtree-toggler {
             top: 10%;
             color: var(--link-fg);
+            text-decoration: none;
         }
 
         .edit {
