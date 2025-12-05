@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        django: ["django==4.2.26", "django==5.1.14", "django==5.2.8"]
+        django: ["django==4.2.27", "django==5.1.15", "django==5.2.9"]
 
     services:
       postgres:
@@ -25,9 +25,17 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+      - name: Check spelling
+        uses: streetsidesoftware/cspell-action@v8
+        with:
+          files: |
+            frontend/src/**/*.ts
+            django_mptt_admin/**/*.py
+            example_project/**/*.py
+          incremental_files_only: false
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
       - name: Install pnpm
@@ -54,7 +62,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Install python packages
