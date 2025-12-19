@@ -1,8 +1,8 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 163:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 163
+(__unused_webpack_module, exports) {
 
 "use strict";
 var __webpack_unused_export__;
@@ -357,10 +357,10 @@ function isDate(val) {
 }
 //# sourceMappingURL=index.js.map
 
-/***/ }),
+/***/ },
 
-/***/ 985:
-/***/ (() => {
+/***/ 985
+() {
 
 /*
 JqTree 1.8.10
@@ -385,7 +385,7 @@ var jqtree=function(e){"use strict";class t{constructor(e){let{dataFilter:t,load
 //# sourceMappingURL=tree.jquery.js.map
 
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
