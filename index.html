@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>django-mptt-admin</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Django Mptt Admin";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> django-mptt-admin
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Django Mptt Admin</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#options">Options</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#filters">Filters</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#changelog">Changelog</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">django-mptt-admin</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Django Mptt Admin</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="django-mptt-admin">Django Mptt Admin</h1>
+<p><em>Django-mptt-admin</em> provides a nice Django Admin interface for <a href="http://django-mptt.github.io/django-mptt/">django-mptt models</a>.</p>
+<ul>
+<li>The source is available on <a href="https://github.com/mbraak/django-mptt-admin">https://github.com/mbraak/django-mptt-admin</a>.</li>
+<li>Documentation is available on <a href="https://mbraak.github.io/django-mptt-admin/">https://mbraak.github.io/django-mptt-admin/</a>.</li>
+</ul>
+<p><img alt="Screenshot" src="https://raw.github.com/mbraak/django-mptt-admin/master/screenshot.png" /></p>
+<h2 id="requirements">Requirements</h2>
+<p>The package is tested with Django (4.2, 5.2 and 6.0), and django-mptt (0.18). Also with Python 3.10 - 3.14.</p>
+<p>Older versions:</p>
+<ul>
+<li>Version 2.5.x supports Django 4.1.</li>
+<li>Version 2.7.x supports Django 5.0.</li>
+<li>Version 2.8.x supports Django 5.1.</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p>Install the package:</p>
+<pre><code>$ pip install django-mptt-admin
+</code></pre>
+<p>Add <strong>django_mptt_admin</strong> to your installed apps in <strong>settings.py</strong>.</p>
+<pre><code class="language-python">  INSTALLED_APPS = (
+      ..
+      'django_mptt_admin',
+  )
+</code></pre>
+<p>Use the DjangoMpttAdmin class in admin.py:</p>
+<pre><code class="language-python">    from django.contrib import admin
+    from django_mptt_admin.admin import DjangoMpttAdmin
+    from models import Country
+
+    class CountryAdmin(DjangoMpttAdmin):
+        pass
+
+    admin.site.register(Country, CountryAdmin)
+</code></pre>
+<h2 id="options">Options</h2>
+<p><strong>tree_animation_speed</strong></p>
+<p>The speed of the open/close animation in milliseconds. The default is 200 milliseconds.</p>
+<p><strong>tree_auto_open</strong></p>
+<p>Auto-open node. Default value is 1.</p>
+<p>Values:</p>
+<ul>
+<li><strong>True</strong>: autopen all nodes</li>
+<li><strong>False</strong>: do not autoopen</li>
+<li><strong>integer</strong>: autopen until this level</li>
+</ul>
+<p><strong>tree_load_on_demand</strong></p>
+<p>Load on demand (True / False / level). Default is True.</p>
+<ul>
+<li><strong>True</strong>: load nodes on demand</li>
+<li><strong>False</strong>: do not load nodes on demand</li>
+<li><strong>int</strong>: load nodes on demand until this level</li>
+</ul>
+<p><strong>autoescape</strong></p>
+<p>Autoescape (True / False). Default is True.</p>
+<p>Autoescape titles in tree.</p>
+<p><strong>filter_tree_queryset</strong></p>
+<p>Override the <strong>filter_tree_queryset</strong> method to filter the queyset for the tree.</p>
+<pre><code class="language-python">class CountryAdmin(DjangoMpttAdmin):
+  def filter_tree_queryset(self, queryset):
+    return queryset.filter(name='abc')
+</code></pre>
+<p><strong>is_drag_and_drop_enabled</strong></p>
+<p>Override the <strong>is_drag_and_drop_enabled</strong> method to disable drag-and-drop. By default drag-and-drop is enabled.</p>
+<pre><code class="language-python">class CountryAdmin(DjangoMpttAdmin):
+  def is_drag_and_drop_enabled(self):
+    return False
+</code></pre>
+<p><strong>use_context_menu</strong></p>
+<p>Capture the contextmenu event. NB: the contextmenu event is triggered when you click with the right mouse button.</p>
+<ul>
+<li>True: Capture the contextmenu event.</li>
+<li>This is useful if you want to write custom javascript to catch the <code>tree.contextmenu</code> event.</li>
+<li>Also see https://mbraak.github.io/jqTree/#usecontextmenu and https://mbraak.github.io/jqTree/#event-tree-contextmenu</li>
+<li>False (default): do not capture the contextmenu event.</li>
+</ul>
+<p><strong>item_label_field_name</strong></p>
+<p>Define which field of the model should be the label for tree items.</p>
+<p>Possible values are:</p>
+<ul>
+<li>string: name of the model field or model property method to use as tree items label</li>
+<li>None (default): model unicode used ad tree item label</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-python">class MyMpttModel(MPTTModel):
+    title = models.CharField(......
+
+    @property
+    def title_for_admin(self):
+          return '%s %s' % (self.pk, self.title)
+
+class MyMpttModelAdminClass(MPTTModelAdmin):
+    item_label_field_name = 'title_for_admin'
+</code></pre>
+<h2 id="filters">Filters</h2>
+<p>If you want to use filters, then you can set the <code>list_filter</code> option. See the <a href="https://docs.djangoproject.com/en/1.10/ref/contrib/admin/#django.contrib.admin.ModelAdmin.list_filter">Django docs</a>.</p>
+<pre><code class="language-python">from django_mptt_admin.admin import DjangoMpttAdmin
+
+class CountryAdmin(DjangoMpttAdmin):
+    list_filter = ('continent',)
+</code></pre>
+<p>Also see the example project for a complete continent filter.</p>
+<h2 id="changelog">Changelog</h2>
+<p><strong>2.9.0</strong> (december 2025)</p>
+<ul>
+<li>Support Django 6.0; drop support for Django 5.1</li>
+</ul>
+<p><strong>2.8.0</strong> (april 7 2025)</p>
+<ul>
+<li>Support Django 5.2; drop support for Django 5.0</li>
+</ul>
+<p><strong>2.7.2</strong> (january 9 2025)</p>
+<ul>
+<li>Issue #605: fix missing map file</li>
+</ul>
+<p><strong>2.7.1</strong> (january 8 2025)</p>
+<ul>
+<li>Issue #604: delay before opening a folder during drag and drop</li>
+</ul>
+<p><strong>2.7.0</strong> (august 13 2024)</p>
+<ul>
+<li>Issue #557: support Django 5.1; drop support for Django 3.2</li>
+</ul>
+<p><strong>2.6.2</strong> (april 13 2024)</p>
+<ul>
+<li>Issue #509: use css for the loading spinner. Support dark mode.</li>
+<li>Issue #541: fix javascript import error in Django 3.2 (thanks to scottp-dpaw)</li>
+</ul>
+<p><strong>2.6.1</strong> (december 9 2023)</p>
+<ul>
+<li>Issue #505: fix collectstatic error</li>
+</ul>
+<p><strong>2.6.0</strong> (december 7 2023)</p>
+<ul>
+<li>Issue #495: support Django 5.0</li>
+</ul>
+<p><strong>2.5.1</strong> (may 6 2023)</p>
+<ul>
+<li>Support dark mode (thanks to Sumit Kumar)</li>
+</ul>
+<p><strong>2.5.0</strong> (april 4 2023)</p>
+<ul>
+<li>Support Django 4.2</li>
+</ul>
+<p><strong>2.4.1</strong> (february 1 2023)</p>
+<ul>
+<li>Issue #431: fix get_tree_mouse_delay error</li>
+</ul>
+<p><strong>2.4.0</strong> (january 31 2023)</p>
+<ul>
+<li>Issue #426: handle permissions:</li>
+<li>'Add' link: only display it if the admin user has the 'Add' permission</li>
+<li>'Edit' link: only display it if the admin user has the 'Edit' permission<ul>
+<li>Otherwise: still display it but change the text to 'view'</li>
+</ul>
+</li>
+<li>Drag and drop: only enable it if the admin user has the 'Edit' permission<ul>
+<li>It's also possible to disable drag and drop by overriding the 'is_drag_and_drop_enabled' method.</li>
+</ul>
+</li>
+</ul>
+<p><strong>2.3.0</strong> (august 4 2022)</p>
+<ul>
+<li>Update jqtree to 1.6.2. This fixes an issue with the keyboard focus when using on demand loading.</li>
+<li>Support Django 4.1</li>
+</ul>
+<p><strong>2.2.0</strong> (december 8 2021)</p>
+<ul>
+<li>Support Django 4.0</li>
+</ul>
+<p><strong>2.1.0</strong> (april 6 2021)</p>
+<ul>
+<li>Issue #353: support Django 3.2</li>
+</ul>
+<p><strong>2.0.3</strong> (march 1 2021)</p>
+<ul>
+<li>Issue #341: update jqtree to 1.6.0</li>
+<li>Issue #345: add option to disable drag-and-drop (thanks to Maxim Popov)</li>
+</ul>
+<p><strong>2.0.2</strong> (october 27 2020)</p>
+<ul>
+<li>Issue #328: fix DJANGO_MPTT_ADMIN_COVERAGE_JS (thanks to Andrew Kh)</li>
+</ul>
+<p><strong>2.0.1</strong> (october 26 2020)</p>
+<ul>
+<li>Issue #309: add option for animation speed</li>
+<li>Issue #325: update jqtree to 1.5.2</li>
+</ul>
+<p><strong>2.0.0</strong> (august 7 2020)</p>
+<ul>
+<li>Support Django 3.1</li>
+</ul>
+<p><strong>1.0.2</strong> (june 26 2020)</p>
+<ul>
+<li>Issue #287: add Catalan and Spanish translations (thanks to Joan Marc Soler)</li>
+</ul>
+<p><strong>1.0.1</strong> (february 14 2020)</p>
+<ul>
+<li>Issue #282: add German translations (thanks to Christian Wiegand)</li>
+<li>Issue #284: add Polish translations (thanks to Paweł Chojnowski)</li>
+</ul>
+<p><strong>1.0.0</strong> (december 5 2019)</p>
+<ul>
+<li>Issue #271: support Django 3</li>
+<li>Issue #276: fix movement during drag-and-drop</li>
+</ul>
+<p><strong>0.7.2</strong> (october 19 2019)</p>
+<ul>
+<li>Issue #270: support media class (thanks to Sencer H.)</li>
+</ul>
+<p><strong>0.7.1</strong> (april 23 2019)</p>
+<ul>
+<li>Issue #254: upgrade jqtree to 1.4.10</li>
+<li>Issue #255: test with django-mptt 0.10</li>
+<li>Issue #258: include jqtree.css in django_mptt_admin.css</li>
+</ul>
+<p><strong>0.7.0</strong> (april 5 2019)</p>
+<ul>
+<li>Issue #242: minified build</li>
+<li>Issue #243: upgrade jqTree to 1.4.9</li>
+<li>Issue #252: support Django 2.2</li>
+</ul>
+<p><strong>0.6.0</strong> (august 4 2018)</p>
+<ul>
+<li>Issue #232: support Django 2.1</li>
+<li>Issue #233: upgrade jqTree to 1.4.7</li>
+</ul>
+<p><strong>0.5.1</strong> (april 8 2018)</p>
+<ul>
+<li>Issue #220: upgrade jqTree to 1.4.5</li>
+<li>Issue #224: add a spinner for the move action (thanks to Riccardo Magliocchetti)</li>
+</ul>
+<p><strong>0.5.0</strong> (december 7 2017)</p>
+<ul>
+<li>Issue #217: Support Django 2.0</li>
+</ul>
+<p><strong>0.4.7</strong> (september 29 2017)</p>
+<ul>
+<li>Issue #212: Fix unsafe reference to instance.parent (thanks to John D'Ambrosio)</li>
+<li>Issue #211: Make ChangeList configurable using <code>change_list_tree_class</code> (thanks to Riccardo Magliocchetti)</li>
+</ul>
+<p><strong>0.4.6</strong> (june 7 2017)</p>
+<ul>
+<li>Issue #200: Upgrade to jqtree 1.4.1</li>
+<li>Issue #201: Make 'edit' and 'add' buttons not focusable</li>
+<li>Issue #203: 'Add' url path must end with '/'</li>
+</ul>
+<p><strong>0.4.5</strong> (april 5 2017)</p>
+<ul>
+<li>Issue #188: Handle CSRF_COOKIE_NAME option</li>
+<li>Issue #189: Handle Django CSRF_USE_SESSIONS option (new option in Django 1.11)</li>
+<li>Issue #191: Only initialize the tree on the tree page (thanks to Stanislav Zholudev)</li>
+<li>Issue #197: Support Django 1.11</li>
+</ul>
+<p><strong>0.4.4</strong> (january 30 2017)</p>
+<ul>
+<li>Issue #185: Support preserved filters (thanks to Riccardo Magliocchetti)</li>
+<li>Issue #186: Move list_filter option to DjangoMpttAdmin class</li>
+</ul>
+<p><strong>0.4.3</strong> (january 18 2017)</p>
+<ul>
+<li>Issue 178: Added Hungarian translations (thanks to roodie)</li>
+<li>Issue 182: Add option to configure node label (thanks to Claudio Bartolini)</li>
+<li>Issue 183: Update jqtree to 1.3.7</li>
+</ul>
+<p><strong>0.4.2</strong> (november 10 2016)</p>
+<ul>
+<li>Issue 170: Added FilterableDjangoMpttAdmin (thanks to Riccardo Magliocchetti)</li>
+<li>Issue 172: Update jqtree to 1.3.6</li>
+<li>Issue 173: Move translations to djangojs domain</li>
+<li>Issue 174: Added French translations (thanks to Vhotz)</li>
+<li>Issue 175: Fixed: can't move items in tree view with CSRF_COOKIE_HTTPONLY = True (thanks to Vhotz)</li>
+</ul>
+<p><strong>0.4.1</strong> (september 21 2016)</p>
+<ul>
+<li>Issue 162: Add request parameter to filter_tree_queryset signature (thanks to Max Perreault)</li>
+<li>Issue 163: Update to jqtree 1.3.5</li>
+</ul>
+<p><strong>0.4.0</strong> (august 3 2016)</p>
+<ul>
+<li>Issue 152: Django 1.10 support.</li>
+<li>Drop support for Django 1.7</li>
+</ul>
+<p><strong>0.3.8</strong> (july 27 2016)</p>
+<ul>
+<li>Issue 142: use the Django admin static tag for CSS / Javascript (thanks to Alex Tomkins)</li>
+<li>Issue 143: update jqtree to 1.3.4</li>
+</ul>
+<p><strong>0.3.7</strong> (june 1 2016)</p>
+<ul>
+<li>Issue 132: use MPTTModelAdmin for DjangoMpttAdmin (thanks to Alex Tomkins)</li>
+<li>MPTTModelAdmin contains fixes for mass deletions and TreeForeignKey</li>
+<li>Issue 139: update to jqtree 1.3.3</li>
+</ul>
+<p><strong>0.3.6</strong> (march 28 2016)</p>
+<ul>
+<li>Issue 125: fix jQuery.cookie error (thanks to Patrick Colmant)</li>
+</ul>
+<p><strong>0.3.5</strong> (march 28 2016)</p>
+<ul>
+<li>Issue 126: add missing jqtree-circle.png (thanks to Generalov)</li>
+</ul>
+<p><strong>0.3.4</strong> (march 25 2016)</p>
+<ul>
+<li>Issue 115: implemented 'add' button (thanks to Andrew Dodd)</li>
+<li>Issue 116: fix block-style layout for right-to-left-languages</li>
+<li>Issue 119: display transparent loading image</li>
+</ul>
+<p><strong>0.3.3</strong> (february 10 2016)</p>
+<ul>
+<li>Issue 112: correctly override media (thanks to Generalov)</li>
+</ul>
+<p><strong>0.3.2</strong> (january 29 2016)</p>
+<ul>
+<li>Issue 103: use jquery from django admin itself</li>
+<li>Issue 105: added Turkish translation (thanks to Tagmat)</li>
+<li>Issue 106: use the same colors as the Django admin</li>
+<li>Issue 109: include locale files in package</li>
+</ul>
+<p><strong>0.3.1</strong> (december 2 2015)</p>
+<ul>
+<li>Issue 82: make admin views easily extendable (thanks to Vsevolod Novikov)</li>
+<li>Issue 93: flat styling</li>
+<li>Issue 95: update jqtree to 1.3.0</li>
+<li>Issue 96: cannot move to the top of the tree</li>
+<li>Issue 97: support Django 1.9</li>
+</ul>
+<p><strong>0.3.0</strong> (august 21 2015)</p>
+<ul>
+<li>Issue 67: update jqtree to 1.2.1</li>
+<li>Issue 68: drop support for Django 1.6 and older</li>
+<li>Note that version 0.2.1 supports these versions.</li>
+<li>Issue 71: added use_context_menu option (thanks to ITCase)</li>
+<li>Issue 75: added Russian translation (thanks to Mike Silonov)</li>
+<li>Issue 80: fix wrong url resolving with multiple admin sites (thanks to Hubert Bielenia)</li>
+</ul>
+<p><strong>0.2.1</strong> (march 29 2015)</p>
+<ul>
+<li>Issue 65: support Django 1.8</li>
+</ul>
+<p><strong>0.2.0</strong> (january 12 2015)</p>
+<ul>
+<li>Issue 23: fixed save-state for load-on-demand</li>
+<li>Issue 35: fixed auto-open for load-on-demand</li>
+<li>Issue 40: use jqtree 1.0.0</li>
+<li>Issue 45: added i18n support and Hebrew translation (thanks to Udi Oron)</li>
+<li>Issue 47: added filter_tree_queryset method</li>
+</ul>
+<p><strong>0.1.10</strong> (september 24 2014)</p>
+<ul>
+<li>Issue 31: added autoescape option</li>
+<li>Issue 34: use the default change list in popup mode (thanks to hstanev)</li>
+<li>Issue 36: the option tree_load_on_demand = False does not work</li>
+</ul>
+<p><strong>0.1.9</strong> (july 12 2014)</p>
+<ul>
+<li>Issue 25: update jqtree to 0.21.0</li>
+<li>Issue 28: fixing problems related to working with model's pk-field, named other than "id" (thanks to Igor Gai)</li>
+<li>Issue 29: fix path to spinner.gif (thanks to Igor Gai)</li>
+</ul>
+<p><strong>0.1.8</strong> (februari 2 2014)</p>
+<ul>
+<li>Issue 17: handle error when moving node</li>
+<li>Issue 18: do not use inline javascript</li>
+<li>Issue 19: support Django 1.7 alpha</li>
+</ul>
+<p><strong>0.1.7</strong> (january 3 2014)</p>
+<ul>
+<li>Issue 16: moving a node fails if the node id is a uuid</li>
+</ul>
+<p><strong>0.1.6</strong> (october 10 2013)</p>
+<ul>
+<li>Issue 8: removing node from the tree causes the tree view to crash</li>
+</ul>
+<p><strong>0.1.5</strong> (august 27 2013)</p>
+<ul>
+<li>Issue 6: save the tree state</li>
+<li>Issue 7: do not handle the right mouse click</li>
+</ul>
+<p><strong>0.1.4</strong> (august 8 2013)</p>
+<ul>
+<li>Issue 5: Support for uuid ids</li>
+</ul>
+<p><strong>0.1.3</strong> (may 2 2013)</p>
+<p><em>This version drops support for Django 1.3.7</em></p>
+<ul>
+<li>Issue 2: Posting a screenshot in the readme would be really useful (thanks to Andy Baker)</li>
+<li>Issue 3: Use static templatetag for CDN-compatible file paths (thanks to Alex Holmes)</li>
+<li>Added <a href="https://coveralls.io/r/mbraak/django-mptt-admin">Coveralls</a> support</li>
+</ul>
+<p><strong>0.1.2</strong> (march 12 2013)</p>
+<ul>
+<li>Issue 1: Grid view doesn't link correctly to object change pages (thanks to Kris Fields)</li>
+</ul>
+<p><strong>0.1.1</strong> (februari 25 2013)</p>
+<ul>
+<li>Added experimental Python 3 support</li>
+</ul>
+<p><strong>0.1</strong> (februari 7 2013)</p>
+<ul>
+<li>Initial version</li>
+</ul>
+<p><a href="https://www.quantifiedcode.com/app/project/dd888e7a1804465798821f28717af384"><img alt="Code Issues" src="https://www.quantifiedcode.com/api/v1/project/dd888e7a1804465798821f28717af384/badge.svg" /></a></p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.6.1
+Build Date UTC : 2026-02-27 07:46:50.807535+00:00
+-->
