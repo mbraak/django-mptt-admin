@@ -16,9 +16,10 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "rootDir": "src",
+        "skipLibCheck": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": false,
         "strict": true,
-        "target": "ES2022",
+        "target": "ES2022"
     }
 }
