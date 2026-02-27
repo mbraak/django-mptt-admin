@@ -1,7 +1,7 @@
 {
   "name": "coverage",
   "dependencies": {
-    "nyc": "^17.1.0"
+    "nyc": "^18"
   },
   "scripts": {
     "merge_coverage": "nyc --reporter lcov -t ./js_coverage --cwd .. report"
