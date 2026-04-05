@@ -44,7 +44,7 @@ jobs:
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -55,7 +55,7 @@ jobs:
         working-directory: ./frontend
         run: pnpm install
       - name: Cache python packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
@@ -92,7 +92,7 @@ jobs:
         working-directory: ./coverage
         run: pnpm i && pnpm run merge_coverage
       - name: Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
