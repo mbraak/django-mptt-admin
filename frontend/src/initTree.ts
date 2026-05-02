@@ -74,13 +74,12 @@ function initTree(
             : gettext("view");
 
         $title.after(
-            `<a href="${
-                node.url as string
+            `<a href="${node.url as string
             }" class="edit" tabindex="${tabindex}">(${editCaption})</a>`,
             hasAddPermission
                 ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
-                      "add"
-                  )})</a>`
+                    "add"
+                )})</a>`
                 : ""
         );
     }
@@ -171,7 +170,7 @@ function initTree(
             if (node.id == null) {
                 return null;
             } else {
-                return node.id as number | string;
+                return node.id;
             }
         }
     }
