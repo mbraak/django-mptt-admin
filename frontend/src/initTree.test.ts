@@ -1,6 +1,6 @@
 import { screen, waitFor } from "@testing-library/dom";
 import * as cookie from "cookie";
-import jQuery from "jquery";
+import { jQuery } from "jquery";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import {
