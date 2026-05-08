@@ -34,7 +34,7 @@
     "devDependencies": {
         "@babel/core": "^7.29.0",
         "@babel/plugin-transform-runtime": "^7.29.0",
-        "@babel/preset-env": "^7.29.2",
+        "@babel/preset-env": "^7.29.5",
         "@babel/preset-typescript": "^7.28.5",
         "@eslint/js": "^9.39.4",
         "@testing-library/dom": "^10.4.1",
@@ -48,11 +48,11 @@
         "eslint": "^9.39.4",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-perfectionist": "^5.9.0",
-        "jsdom": "^29.1.0",
-        "msw": "^2.13.6",
+        "jsdom": "^29.1.1",
+        "msw": "^2.14.3",
         "sass": "^1.99.0",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.59.1",
+        "typescript-eslint": "^8.59.2",
         "vitest": "^4.1.5",
         "webpack": "^5.106.2",
         "webpack-cli": "^7.0.2"
