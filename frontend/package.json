@@ -15,7 +15,7 @@
         "test": "vitest --watch=false",
         "test:coverage": "vitest run --coverage",
         "test:watch": "vitest",
-        "tsc": "tsc --noEmit --project tsconfig.json",
+        "tsc": "tsc --build",
         "ci": "pnpm run lint && pnpm run tsc && pnpm run test"
     },
     "repository": {
