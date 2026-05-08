@@ -1,4 +1,4 @@
-import jQuery from "jquery";
+import { jQuery } from "jquery";
 import "@testing-library/jest-dom/vitest";
 
 declare global {
