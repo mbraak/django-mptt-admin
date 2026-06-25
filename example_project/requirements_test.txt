@@ -1,11 +1,11 @@
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 django-mptt==0.18.0
 django-webtest==1.9.14
 cssselect==1.4.0
-lxml==6.1.0
-playwright==1.59.0
+lxml==6.1.1
+playwright==1.60.0
 psycopg==3.3.4
 pyquery==2.0.1
 waitress==3.0.2
-WebOb==1.8.9
+WebOb==1.8.10
 WebTest==3.0.7
