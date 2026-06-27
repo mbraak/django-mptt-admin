@@ -17,3 +17,5 @@ limitations under the License.
 @license
 
 */
+
+/*! js-cookie v3.0.8 | MIT */
