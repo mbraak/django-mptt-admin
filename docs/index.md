@@ -144,6 +144,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Use js-cookie. Everything should still work the same.
+
 **2.9.0** (december 2025)
 
 - Support Django 6.0; drop support for Django 5.1
