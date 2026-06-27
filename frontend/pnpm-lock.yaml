@@ -8,15 +8,15 @@ importers:
 
   .:
     dependencies:
-      cookie:
-        specifier: ^1.1.1
-        version: 1.1.1
       jqtree:
         specifier: ^1.8.11
         version: 1.8.11(jquery@4.0.0)
       jquery:
         specifier: '>= 3'
         version: 4.0.0
+      js-cookie:
+        specifier: ^3
+        version: 3.0.8
     devDependencies:
       '@babel/core':
         specifier: ^8.0.1
@@ -42,6 +42,9 @@ importers:
       '@types/jquery':
         specifier: ^4.0.1
         version: 4.0.1
+      '@types/js-cookie':
+        specifier: ^3.0.6
+        version: 3.0.6
       '@types/node':
         specifier: ^25.9.4
         version: 25.9.4
@@ -1126,6 +1129,9 @@ packages:
   '@types/jquery@4.0.1':
     resolution: {integrity: sha512-9a59A/tycXgYuPABcp6/3spSShn0NT2UOM4EfHvMumjYi4lJWTsK5SZWjhx3yRm9IHGCeWXdV2YfNsrWrft/CA==}
 
+  '@types/js-cookie@3.0.6':
+    resolution: {integrity: sha512-wkw9yd1kEXOPnvEeEV1Go1MmxtBJL0RR79aOTAApecWFVu7w0NNXNqhcWgvw2YgZDYadliXkl14pa3WXw5jlCQ==}
+
   '@types/jsesc@2.5.1':
     resolution: {integrity: sha512-9VN+6yxLOPLOav+7PwjZbxiID2bVaeq0ED4qSQmdQTdjnXJSaCVKTR58t15oqH1H5t8Ng2ZX1SabJVoN9Q34bw==}
 
@@ -2011,6 +2017,9 @@ packages:
 
   jquery@4.0.0:
     resolution: {integrity: sha512-TXCHVR3Lb6TZdtw1l3RTLf8RBWVGexdxL6AC8/e0xZKEpBflBsjh9/8LXw+dkNFuOyW9B7iB3O1sP7hS0Kiacg==}
+
+  js-cookie@3.0.8:
+    resolution: {integrity: sha512-yeJd4aNAdYZQjaon2bpD/Gb0B/omw7HQOsynXXcOiWVCacbBcPlgn8S/d1X6blFSaHao7ozqtW7NZW19xpCtIw==}
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
@@ -3924,6 +3933,8 @@ snapshots:
 
   '@types/jquery@4.0.1': {}
 
+  '@types/js-cookie@3.0.6': {}
+
   '@types/jsesc@2.5.1': {}
 
   '@types/json-schema@7.0.15': {}
@@ -4785,6 +4796,8 @@ snapshots:
       jquery: 4.0.0
 
   jquery@4.0.0: {}
+
+  js-cookie@3.0.8: {}
 
   js-tokens@10.0.0: {}
 
