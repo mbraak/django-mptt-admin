@@ -1,6 +1,6 @@
 import { screen, waitFor } from "@testing-library/dom";
-import * as cookie from "cookie";
 import { jQuery } from "jquery";
+import Cookies from 'js-cookie';
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import {
@@ -61,9 +61,6 @@ beforeEach(() => {
     );
 
     document.body.innerHTML = "";
-    document.cookie = cookie.serialize("csrf", "", {
-        expires: new Date("1970-01-01"),
-    });
 });
 
 const createTreeElement = (dataUrl = "/tree") => {
@@ -242,7 +239,7 @@ describe("tree.move event", () => {
     });
 
     test("sets the csrf cookie with a crsf cookie", async () => {
-        document.cookie = cookie.serialize("csrf", "csrf1");
+        Cookies.set("csrf", "csrf1");
 
         const treeElement = createTreeElement();
         initTestTree(treeElement);
@@ -257,7 +254,8 @@ describe("tree.move event", () => {
     });
 
     test("sets the csrf cookie with a crsf cookie and a csrfCookieName parameter", async () => {
-        document.cookie = cookie.serialize("otherName", "value1");
+        Cookies.remove('csrf');
+        Cookies.set("otherName", "value1");
 
         const treeElement = createTreeElement();
         initTestTree(treeElement, { csrfCookieName: "otherName" });
@@ -272,7 +270,7 @@ describe("tree.move event", () => {
     });
 
     test("sets the csrf cookie with a crsf cookie and an empty csrfCookieName parameter", async () => {
-        document.cookie = cookie.serialize("csrf", "testcsrf");
+        Cookies.set("csrf", "testcsrf");
 
         const treeElement = createTreeElement();
         initTestTree(treeElement, { csrfCookieName: undefined });
@@ -287,6 +285,8 @@ describe("tree.move event", () => {
     });
 
     test("sets the csrf cookie with a hidden csrf input", async () => {
+        Cookies.remove('csrf');
+
         const csrfInput = document.createElement("input");
         csrfInput.setAttribute("name", "csrfmiddlewaretoken");
         csrfInput.setAttribute("value", "csrf_test");

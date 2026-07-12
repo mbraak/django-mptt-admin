@@ -1,4 +1,4 @@
-import * as cookie from "cookie";
+import Cookies from 'js-cookie';
 import "jqtree";
 
 export interface InitTreeOptions {
@@ -96,7 +96,7 @@ function initTree(
             if (!csrfCookieName) {
                 return null;
             } else {
-                return cookie.parse(document.cookie)[csrfCookieName];
+                return Cookies.get(csrfCookieName);
             }
         }
 
