@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       jqtree:
-        specifier: ^1.8.11
-        version: 1.8.11(jquery@4.0.0)
+        specifier: git@github.com:mbraak/jqTree.git#replace-jquery
+        version: https://codeload.github.com/mbraak/jqTree/tar.gz/a43e76a4009e329893faa63c013289af09663ace(jquery@4.0.0)
       jquery:
         specifier: '>= 3'
         version: 4.0.0
@@ -2007,8 +2007,9 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
 
-  jqtree@1.8.11:
-    resolution: {integrity: sha512-PZlNPr0m/4+19r6feLAWQ82rpgrRnh0HOxDtZg2vglolx0TGVRPoIEuFojlNjXB24K/brf0plf6W0Yzof9nLGg==}
+  jqtree@https://codeload.github.com/mbraak/jqTree/tar.gz/a43e76a4009e329893faa63c013289af09663ace:
+    resolution: {gitHosted: true, integrity: sha512-/IE6LtNQ295mILtEB4LFNTBpvY0Vo7N9Uxq8rW1QvO8g3WBrZsgWOAPCIfEgTBmHP+DeHPlc1f3tZlGBfqst/g==, tarball: https://codeload.github.com/mbraak/jqTree/tar.gz/a43e76a4009e329893faa63c013289af09663ace}
+    version: 1.8.11
     peerDependencies:
       jquery: '>= 3'
 
@@ -2356,10 +2357,6 @@ packages:
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
-
-  picomatch@4.0.4:
-    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
-    engines: {node: '>=12'}
 
   picomatch@4.0.5:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
@@ -4799,7 +4796,7 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jqtree@1.8.11(jquery@4.0.0):
+  jqtree@https://codeload.github.com/mbraak/jqTree/tar.gz/a43e76a4009e329893faa63c013289af09663ace(jquery@4.0.0):
     dependencies:
       jquery: 4.0.0
 
@@ -5073,8 +5070,6 @@ snapshots:
   pathe@2.0.3: {}
 
   picocolors@1.1.1: {}
-
-  picomatch@4.0.4: {}
 
   picomatch@4.0.5: {}
 
@@ -5397,7 +5392,7 @@ snapshots:
   vite@8.0.13(@types/node@25.9.5)(sass@1.101.0)(terser@5.49.0):
     dependencies:
       lightningcss: 1.32.0
-      picomatch: 4.0.4
+      picomatch: 4.0.5
       postcss: 8.5.16
       rolldown: 1.0.1
       tinyglobby: 0.2.17
