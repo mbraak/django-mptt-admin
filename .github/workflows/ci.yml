@@ -35,7 +35,7 @@ jobs:
             example_project/**/*.py
           incremental_files_only: false
       - name: Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "20"
       - name: Install pnpm
