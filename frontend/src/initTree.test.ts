@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/dom";
+import { screen, waitFor, within } from "@testing-library/dom";
 import { jQuery } from "jquery";
 import Cookies from 'js-cookie';
 import { http, HttpResponse } from "msw";
@@ -305,3 +305,71 @@ describe("tree.move event", () => {
         expect(csrfTokenInRequest).toEqual("csrf_test");
     });
 });
+
+describe("tree.select event", () => {
+    const getNodeElement = (name: string): HTMLElement => {
+        const nodeElement = screen
+            .getByRole("treeitem", { name })
+            .closest("li");
+
+        if (!nodeElement) {
+            throw new Error(`Node element not found for '${name}'`);
+        }
+
+        return nodeElement;
+    };
+
+    const triggerTreeSelect = (
+        treeElement: HTMLElement,
+        node: null | object,
+        deselected_node: null | object = null
+    ) => {
+        jQuery(treeElement).trigger(
+            jQuery.Event("tree.select", { deselected_node, node })
+        );
+    };
+
+    test("sets the tabindex of the edit links when a node is selected", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const africaElement = getNodeElement("Africa");
+        const editLinks = within(africaElement).getAllByRole("link");
+
+        for (const editLink of editLinks) {
+            expect(editLink).toHaveAttribute("tabindex", "-1");
+        }
+
+        triggerTreeSelect(treeElement, { element: africaElement, id: 2 });
+
+        for (const editLink of editLinks) {
+            expect(editLink).toHaveAttribute("tabindex", "0");
+        }
+    });
+
+    test("resets the tabindex of the edit links when a node is deselected", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const africaElement = getNodeElement("Africa");
+        const editLinks = within(africaElement).getAllByRole("link");
+
+        triggerTreeSelect(treeElement, { element: africaElement, id: 2 });
+
+        for (const editLink of editLinks) {
+            expect(editLink).toHaveAttribute("tabindex", "0");
+        }
+
+        triggerTreeSelect(treeElement, null, {
+            element: africaElement,
+            id: 2,
+        });
+
+        for (const editLink of editLinks) {
+            expect(editLink).toHaveAttribute("tabindex", "-1");
+        }
+    });
+});
+
