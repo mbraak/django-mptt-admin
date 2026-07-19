@@ -33,7 +33,7 @@ interface JQTreeMoveEvent extends JQuery.Event {
 
 interface JQTreeSelectEvent extends JQuery.Event {
     deselected_node: INode | null;
-    node: INode;
+    node: INode | null;
 }
 
 function initTree(
@@ -221,7 +221,7 @@ function initTree(
         }
 
         // selected: add tabindex
-        if (node.element) {
+        if (node?.element) {
             jQuery(node.element).find(".edit").attr("tabindex", 0);
         }
     }
