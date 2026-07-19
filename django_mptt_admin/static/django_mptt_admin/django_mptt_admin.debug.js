@@ -332,7 +332,7 @@ function initTree($tree, {
     }
 
     // selected: add tabindex
-    if (node.element) {
+    if (node?.element) {
       jQuery(node.element).find(".edit").attr("tabindex", 0);
     }
   }
