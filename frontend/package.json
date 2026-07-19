@@ -60,7 +60,7 @@
         "webpack-cli": "^7.2.1"
     },
     "dependencies": {
-        "jqtree": "git@github.com:mbraak/jqTree.git#replace-jquery",
+        "jqtree": "git@github.com:mbraak/jqTree.git#dev",
         "js-cookie": "^3.0.8"
     }
 }
