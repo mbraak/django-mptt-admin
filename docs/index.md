@@ -148,6 +148,7 @@ Also see the example project for a complete continent filter.
 
 - Issue #768. Use js-cookie. Everything should still work the same.
 - Issue #777. Do not raise an exception when a node is deselected.
+- Issue #778. FIx the tab index when a node is selected and then deselected.
 
 **2.9.0** (december 2025)
 
