@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/dom";
+import { screen, waitFor, within } from "@testing-library/dom";
 import { jQuery } from "jquery";
 import Cookies from 'js-cookie';
 import { http, HttpResponse } from "msw";
@@ -305,3 +305,151 @@ describe("tree.move event", () => {
         expect(csrfTokenInRequest).toEqual("csrf_test");
     });
 });
+
+describe("tree.select event", () => {
+    const getNodeElement = (name: string): HTMLElement => {
+        const nodeElement = screen
+            .getByRole("treeitem", { name })
+            .closest("li");
+
+        if (!nodeElement) {
+            throw new Error(`Node element not found for '${name}'`);
+        }
+
+        return nodeElement;
+    };
+
+    const getNodeLinks = (nodeElement: HTMLElement) => {
+        const elementDiv = nodeElement.querySelector<HTMLElement>(
+            ":scope > .jqtree-element"
+        );
+
+        if (!elementDiv) {
+            throw new Error("Element div not found");
+        }
+
+        return {
+            addLink: within(elementDiv).getByRole("link", { name: "(add)" }),
+            editLink: within(elementDiv).getByRole("link", { name: "(edit)" }),
+        };
+    };
+
+    const triggerTreeSelect = (
+        treeElement: HTMLElement,
+        {
+            deselected_node = null,
+            node = null,
+            previous_node = null,
+        }: {
+            deselected_node?: null | object;
+            node?: null | object;
+            previous_node?: null | object;
+        }
+    ) => {
+        jQuery(treeElement).trigger(
+            jQuery.Event("tree.select", { deselected_node, node, previous_node })
+        );
+    };
+
+    test("sets the tabindex of the edit links when a node is selected", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const africaElement = getNodeElement("Africa");
+        const editLink = within(africaElement).getByRole("link", {
+            name: "(edit)",
+        });
+        const addLink = within(africaElement).getByRole("link", {
+            name: "(add)",
+        });
+
+        expect(editLink).toHaveAttribute("tabindex", "-1");
+        expect(addLink).toHaveAttribute("tabindex", "-1");
+
+        triggerTreeSelect(treeElement, {
+            node: { element: africaElement, id: 2 },
+        });
+
+        expect(editLink).toHaveAttribute("tabindex", "0");
+        expect(addLink).toHaveAttribute("tabindex", "0");
+    });
+
+    test("resets the tabindex of the edit links when a node is deselected", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const africaElement = getNodeElement("Africa");
+        const { addLink, editLink } = getNodeLinks(africaElement);
+
+        triggerTreeSelect(treeElement, {
+            node: { element: africaElement, id: 2 },
+        });
+
+        expect(editLink).toHaveAttribute("tabindex", "0");
+        expect(addLink).toHaveAttribute("tabindex", "0");
+
+        triggerTreeSelect(treeElement, {
+            deselected_node: { element: africaElement, id: 2 },
+        });
+
+        expect(editLink).toHaveAttribute("tabindex", "-1");
+        expect(addLink).toHaveAttribute("tabindex", "-1");
+    });
+
+    test("resets the tabindex of the edit links using previous_node when deselected_node is empty", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const africaElement = getNodeElement("Africa");
+        const { addLink, editLink } = getNodeLinks(africaElement);
+
+        triggerTreeSelect(treeElement, {
+            node: { element: africaElement, id: 2 },
+        });
+
+        expect(editLink).toHaveAttribute("tabindex", "0");
+        expect(addLink).toHaveAttribute("tabindex", "0");
+
+        triggerTreeSelect(treeElement, {
+            previous_node: { element: africaElement, id: 2 },
+        });
+
+        expect(editLink).toHaveAttribute("tabindex", "-1");
+        expect(addLink).toHaveAttribute("tabindex", "-1");
+    });
+
+    test("doesn't change the tabindex of the edit links of child nodes", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const rootElement = getNodeElement("root");
+        const africaElement = getNodeElement("Africa");
+
+        const rootLinks = getNodeLinks(rootElement);
+        const africaLinks = getNodeLinks(africaElement);
+
+        triggerTreeSelect(treeElement, {
+            node: { element: rootElement, id: 1 },
+        });
+
+        expect(rootLinks.editLink).toHaveAttribute("tabindex", "0");
+        expect(rootLinks.addLink).toHaveAttribute("tabindex", "0");
+        expect(africaLinks.editLink).toHaveAttribute("tabindex", "-1");
+        expect(africaLinks.addLink).toHaveAttribute("tabindex", "-1");
+
+        triggerTreeSelect(treeElement, {
+            deselected_node: { element: rootElement, id: 1 },
+            node: { element: africaElement, id: 2 },
+        });
+
+        expect(rootLinks.editLink).toHaveAttribute("tabindex", "-1");
+        expect(rootLinks.addLink).toHaveAttribute("tabindex", "-1");
+        expect(africaLinks.editLink).toHaveAttribute("tabindex", "0");
+        expect(africaLinks.addLink).toHaveAttribute("tabindex", "0");
+    });
+});
+
