@@ -144,7 +144,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.9.1** (july 20 2026)
 
 - Issue #768. Use js-cookie. Everything should still work the same.
 - Issue #777. Do not raise an exception when a node is deselected.
