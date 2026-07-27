@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       jqtree:
-        specifier: ^1.8.11
-        version: 1.8.11(jquery@4.0.0)
+        specifier: ^1.9.0
+        version: 1.9.0(jquery@4.0.0)
       jquery:
         specifier: '>= 3'
         version: 4.0.0
@@ -2003,8 +2003,8 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
 
-  jqtree@1.8.11:
-    resolution: {integrity: sha512-PZlNPr0m/4+19r6feLAWQ82rpgrRnh0HOxDtZg2vglolx0TGVRPoIEuFojlNjXB24K/brf0plf6W0Yzof9nLGg==}
+  jqtree@1.9.0:
+    resolution: {integrity: sha512-64zUtuhMWHYmYl/UGSGBH668/dwKJuikvv77km0KQZG48ky4Oo0evIR1z9pt0R7xvFF1EP17YBhDhkvtBuXSxQ==}
     peerDependencies:
       jquery: '>= 3'
 
@@ -4790,7 +4790,7 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jqtree@1.8.11(jquery@4.0.0):
+  jqtree@1.9.0(jquery@4.0.0):
     dependencies:
       jquery: 4.0.0
 
