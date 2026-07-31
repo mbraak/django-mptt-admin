@@ -60,29 +60,49 @@ function initTree(
             return;
         }
 
-        // Create edit link
-        const $title = $li.find(".jqtree-title");
+        const liElement = $li.get(0);
 
+        if (!liElement) {
+            return;
+        }
+
+        const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title")
+
+        if (!titleElement) {
+            return;
+        }
+
+        // Create edit link
         insertAtUrl.searchParams.set("insert_at", node.id.toString());
 
         const insertUrlString = insertAtUrl
             .toString()
             .substring(baseUrl.length);
 
-        const tabindex = isSelected ? "0" : "-1";
+        const tabindex = isSelected ? 0 : -1;
         const editCaption = hasChangePermission
             ? gettext("edit")
             : gettext("view");
 
-        $title.after(
-            `<a href="${node.url as string
-            }" class="edit" tabindex="${tabindex}">(${editCaption})</a>`,
-            hasAddPermission
-                ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
-                    "add"
-                )})</a>`
-                : ""
-        );
+        const editElement = document.createElement("a");
+        editElement.className = "edit";
+        editElement.href = node.url as string;
+        editElement.tabIndex = tabindex;
+        editElement.text = `(${editCaption})`;
+
+        titleElement.after(editElement);
+
+        if (hasAddPermission) {
+            const addElement = document.createElement("a");
+            addElement.className = "edit";
+            addElement.href = insertUrlString;
+            addElement.tabIndex = tabindex;
+
+            const addCaption = gettext("add");
+            addElement.text = `(${addCaption})`;
+
+            titleElement.after(addElement);
+        }
     }
 
     function getCsrfToken() {
