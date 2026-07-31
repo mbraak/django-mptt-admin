@@ -215,10 +215,14 @@ function initTree($tree, {
       return;
     }
     const liElement = $li.get(0);
+
+    /* istanbul ignore if */
     if (!liElement) {
       return;
     }
     const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title");
+
+    /* istanbul ignore if */
     if (!titleElement) {
       return;
     }
@@ -265,34 +269,38 @@ function initTree($tree, {
       return;
     }
     const htmlElement = info.moved_node.element;
-    const data = {
+    const body = new URLSearchParams({
       position: info.position,
-      target_id: info.target_node.id
-    };
+      target_id: String(info.target_node.id)
+    });
     handleLoading(null);
     removeErrorMessage();
     e.preventDefault();
-    void jQuery.ajax({
-      beforeSend: xhr => {
+    function handleError() {
+      handleLoaded(null);
+      const errorElement = document.createElement("span");
+      errorElement.className = "mptt-admin-error";
+      errorElement.textContent = gettext("move failed");
+      const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+      nodeElement?.append(errorElement);
+      errorNode = info.moved_node;
+    }
+    void fetch(info.moved_node.move_url, {
+      body,
+      headers: {
         // Set Django csrf token
-        xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+        "X-CSRFToken": getCsrfToken()
       },
-      data,
-      error: () => {
-        handleLoaded(null);
-        const errorElement = document.createElement("span");
-        errorElement.className = "mptt-admin-error";
-        errorElement.textContent = gettext("move failed");
-        const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
-        nodeElement?.append(errorElement);
-        errorNode = info.moved_node;
-      },
-      success: () => {
+      method: "POST"
+    }).then(response => {
+      if (response.ok) {
         info.do_move();
         handleLoaded(null);
-      },
-      type: "POST",
-      url: info.moved_node.move_url
+      } else {
+        handleError();
+      }
+    }, () => {
+      handleError();
     });
     function removeErrorMessage() {
       if (errorNode?.element) {
@@ -304,9 +312,12 @@ function initTree($tree, {
   }
   function handleLoadFailed() {
     const treeElement = $tree.get(0);
-    if (treeElement) {
-      treeElement.textContent = gettext("Error while loading the data from the server");
+
+    /* istanbul ignore if */
+    if (!treeElement) {
+      return;
     }
+    treeElement.textContent = gettext("Error while loading the data from the server");
   }
   const spinners = {};
   function getSpinnerId(node) {
