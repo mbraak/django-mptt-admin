@@ -552,4 +552,3 @@ describe("tree.select event", () => {
         expect(africaLinks.addLink).toHaveAttribute("tabindex", "0");
     });
 });
-
