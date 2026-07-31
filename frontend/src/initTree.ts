@@ -62,12 +62,14 @@ function initTree(
 
         const liElement = $li.get(0);
 
+        /* istanbul ignore if */
         if (!liElement) {
             return;
         }
 
         const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title")
 
+        /* istanbul ignore if */
         if (!titleElement) {
             return;
         }
