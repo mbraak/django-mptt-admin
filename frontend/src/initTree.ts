@@ -136,10 +136,10 @@ function initTree(
 
         const htmlElement = info.moved_node.element;
 
-        const data = {
+        const body = new URLSearchParams({
             position: info.position,
-            target_id: info.target_node.id,
-        };
+            target_id: String(info.target_node.id),
+        });
 
         handleLoading(null);
 
@@ -147,30 +147,38 @@ function initTree(
 
         e.preventDefault();
 
-        void jQuery.ajax({
-            beforeSend: (xhr) => {
+        function handleError() {
+            handleLoaded(null);
+            const errorElement = document.createElement("span");
+            errorElement.className = "mptt-admin-error";
+            errorElement.textContent = gettext("move failed");
+
+            const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+            nodeElement?.append(errorElement);
+
+            errorNode = info.moved_node;
+        }
+
+        void fetch(info.moved_node.move_url as string, {
+            body,
+            headers: {
                 // Set Django csrf token
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                "X-CSRFToken": getCsrfToken(),
             },
-            data,
-            error: () => {
-                handleLoaded(null);
-                const errorElement = document.createElement("span");
-                errorElement.className = "mptt-admin-error";
-                errorElement.textContent = gettext("move failed");
-
-                const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
-                nodeElement?.append(errorElement);
-
-                errorNode = info.moved_node;
+            method: "POST",
+        }).then(
+            (response) => {
+                if (response.ok) {
+                    info.do_move();
+                    handleLoaded(null);
+                } else {
+                    handleError();
+                }
             },
-            success: () => {
-                info.do_move();
-                handleLoaded(null);
-            },
-            type: "POST",
-            url: info.moved_node.move_url as string,
-        });
+            () => {
+                handleError();
+            }
+        );
 
         function removeErrorMessage() {
             if (errorNode?.element) {
