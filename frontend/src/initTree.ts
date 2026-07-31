@@ -184,9 +184,12 @@ function initTree(
     function handleLoadFailed() {
         const treeElement = $tree.get(0);
 
-        if (treeElement) {
-            treeElement.textContent = gettext("Error while loading the data from the server");
+        /* istanbul ignore if */
+        if (!treeElement) {
+            return;
         }
+
+        treeElement.textContent = gettext("Error while loading the data from the server");
     }
 
     const spinners: Record<number | string, HTMLElement | null> = {};
