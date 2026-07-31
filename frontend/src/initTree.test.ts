@@ -94,6 +94,16 @@ const initTestTree = (
     initTree($tree, options);
 };
 
+const getNodeElement = (name: string): HTMLElement => {
+    const nodeElement = screen.getByRole("treeitem", { name }).closest("li");
+
+    if (!nodeElement) {
+        throw new Error(`Node element not found for '${name}'`);
+    }
+
+    return nodeElement;
+};
+
 test("initializes the tree", async () => {
     initTestTree(createTreeElement());
 
@@ -202,7 +212,7 @@ test("renders a link for a closed node with rtl is true", async () => {
 describe("tree.move event", () => {
     const triggerTreeMove = (treeElement: HTMLElement) => {
         const doMove = vi.fn();
-        const africaElement = screen.getByRole("treeitem", { name: "Africa" });
+        const africaElement = getNodeElement("Africa");
         const movedNode = {
             element: africaElement,
             id: 1,
@@ -284,6 +294,47 @@ describe("tree.move event", () => {
         expect(csrfTokenInRequest).toEqual("");
     });
 
+    test("displays an error message when the move fails", async () => {
+        server.use(
+            http.post("/move", () => new HttpResponse(null, { status: 500 }))
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = triggerTreeMove(treeElement);
+
+        const africaElement = getNodeElement("Africa");
+        expect(
+            await within(africaElement).findByText("move failed")
+        ).toBeInTheDocument();
+        expect(doMove).not.toHaveBeenCalled();
+    });
+
+    test("removes the error message when the node is moved again", async () => {
+        server.use(
+            http.post("/move", () => new HttpResponse(null, { status: 500 }))
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        triggerTreeMove(treeElement);
+        expect(await screen.findByText("move failed")).toBeInTheDocument();
+
+        server.use(http.post("/move", () => HttpResponse.json({})));
+
+        const doMove = triggerTreeMove(treeElement);
+
+        expect(screen.queryByText("move failed")).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+    });
+
     test("sets the csrf cookie with a hidden csrf input", async () => {
         Cookies.remove('csrf');
 
@@ -307,18 +358,6 @@ describe("tree.move event", () => {
 });
 
 describe("tree.select event", () => {
-    const getNodeElement = (name: string): HTMLElement => {
-        const nodeElement = screen
-            .getByRole("treeitem", { name })
-            .closest("li");
-
-        if (!nodeElement) {
-            throw new Error(`Node element not found for '${name}'`);
-        }
-
-        return nodeElement;
-    };
-
     const getNodeLinks = (nodeElement: HTMLElement) => {
         const elementDiv = nodeElement.querySelector<HTMLElement>(
             ":scope > .jqtree-element"
