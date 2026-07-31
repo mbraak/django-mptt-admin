@@ -214,14 +214,35 @@ function initTree($tree, {
     if (node.id == null) {
       return;
     }
+    const liElement = $li.get(0);
+    if (!liElement) {
+      return;
+    }
+    const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title");
+    if (!titleElement) {
+      return;
+    }
 
     // Create edit link
-    const $title = $li.find(".jqtree-title");
     insertAtUrl.searchParams.set("insert_at", node.id.toString());
     const insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
-    const tabindex = isSelected ? "0" : "-1";
+    const tabindex = isSelected ? 0 : -1;
     const editCaption = hasChangePermission ? gettext("edit") : gettext("view");
-    $title.after(`<a href="${node.url}" class="edit" tabindex="${tabindex}">(${editCaption})</a>`, hasAddPermission ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext("add")})</a>` : "");
+    const editElement = document.createElement("a");
+    editElement.className = "edit";
+    editElement.href = node.url;
+    editElement.tabIndex = tabindex;
+    editElement.text = `(${editCaption})`;
+    titleElement.after(editElement);
+    if (hasAddPermission) {
+      const addElement = document.createElement("a");
+      addElement.className = "edit";
+      addElement.href = insertUrlString;
+      addElement.tabIndex = tabindex;
+      const addCaption = gettext("add");
+      addElement.text = `(${addCaption})`;
+      titleElement.after(addElement);
+    }
   }
   function getCsrfToken() {
     function getFromMiddleware() {
@@ -243,7 +264,7 @@ function initTree($tree, {
     if (!info.moved_node.element) {
       return;
     }
-    const $el = jQuery(info.moved_node.element);
+    const htmlElement = info.moved_node.element;
     const data = {
       position: info.position,
       target_id: info.target_node.id
@@ -259,8 +280,11 @@ function initTree($tree, {
       data,
       error: () => {
         handleLoaded(null);
-        const $node = $el.find(".jqtree-element");
-        $node.append(`<span class="mptt-admin-error">${gettext("move failed")}</span>`);
+        const errorElement = document.createElement("span");
+        errorElement.className = "mptt-admin-error";
+        errorElement.textContent = gettext("move failed");
+        const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+        nodeElement?.append(errorElement);
         errorNode = info.moved_node;
       },
       success: () => {
@@ -272,13 +296,17 @@ function initTree($tree, {
     });
     function removeErrorMessage() {
       if (errorNode?.element) {
-        jQuery(errorNode.element).find(".mptt-admin-error").remove();
+        const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
+        errorElement?.remove();
         errorNode = null;
       }
     }
   }
   function handleLoadFailed() {
-    $tree.html(gettext("Error while loading the data from the server"));
+    const treeElement = $tree.get(0);
+    if (treeElement) {
+      treeElement.textContent = gettext("Error while loading the data from the server");
+    }
   }
   const spinners = {};
   function getSpinnerId(node) {
@@ -330,12 +358,18 @@ function initTree($tree, {
     const deselectedElement = deselected_node?.element ?? previous_node?.element;
     if (deselectedElement) {
       // deselected node: remove tabindex
-      jQuery(deselectedElement).find("> .jqtree-element .edit").attr("tabindex", -1);
+      const editElements = deselectedElement.querySelectorAll(":scope > .jqtree-element > .edit");
+      for (const editElement of editElements) {
+        editElement.tabIndex = -1;
+      }
     }
 
     // selected: add tabindex
     if (node?.element) {
-      jQuery(node.element).find("> .jqtree-element .edit").attr("tabindex", 0);
+      const editElements = node.element.querySelectorAll(":scope > .jqtree-element > .edit");
+      for (const editElement of editElements) {
+        editElement.tabIndex = 0;
+      }
     }
   }
   function handleLoadingEvent(e) {
