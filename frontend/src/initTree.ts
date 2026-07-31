@@ -132,7 +132,7 @@ function initTree(
             return;
         }
 
-        const $el = jQuery(info.moved_node.element);
+        const htmlElement = info.moved_node.element;
 
         const data = {
             position: info.position,
@@ -153,12 +153,12 @@ function initTree(
             data,
             error: () => {
                 handleLoaded(null);
-                const $node = $el.find(".jqtree-element");
-                $node.append(
-                    `<span class="mptt-admin-error">${gettext(
-                        "move failed"
-                    )}</span>`
-                );
+                const errorElement = document.createElement("span");
+                errorElement.className = "mptt-admin-error";
+                errorElement.textContent = gettext("move failed");
+
+                const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+                nodeElement?.append(errorElement);
 
                 errorNode = info.moved_node;
             },
@@ -172,14 +172,19 @@ function initTree(
 
         function removeErrorMessage() {
             if (errorNode?.element) {
-                jQuery(errorNode.element).find(".mptt-admin-error").remove();
+                const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
+                errorElement?.remove();
                 errorNode = null;
             }
         }
     }
 
     function handleLoadFailed() {
-        $tree.html(gettext("Error while loading the data from the server"));
+        const treeElement = $tree.get(0);
+
+        if (treeElement) {
+            treeElement.textContent = gettext("Error while loading the data from the server");
+        }
     }
 
     const spinners: Record<number | string, HTMLElement | null> = {};
@@ -239,12 +244,20 @@ function initTree(
         const deselectedElement = deselected_node?.element ?? previous_node?.element;
         if (deselectedElement) {
             // deselected node: remove tabindex
-            jQuery(deselectedElement).find("> .jqtree-element .edit").attr("tabindex", -1);
+            const editElements = deselectedElement.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+
+            for (const editElement of editElements) {
+                editElement.tabIndex = -1;
+            }
         }
 
         // selected: add tabindex
         if (node?.element) {
-            jQuery(node.element).find("> .jqtree-element .edit").attr("tabindex", 0);
+            const editElements = node.element.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+
+            for (const editElement of editElements) {
+                editElement.tabIndex = 0;
+            }
         }
     }
 
