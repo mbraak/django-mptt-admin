@@ -236,6 +236,34 @@ describe("tree.move event", () => {
         return doMove;
     };
 
+    test("sends a move request to the server", async () => {
+        const moveRequests: { body: string; url: string }[] = [];
+
+        server.use(
+            http.post("/move", async ({ request }) => {
+                moveRequests.push({
+                    body: await request.text(),
+                    url: request.url,
+                });
+                return HttpResponse.json({});
+            })
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        triggerTreeMove(treeElement);
+
+        await waitFor(() => {
+            expect(moveRequests).toHaveLength(1);
+        });
+        expect(moveRequests[0]).toEqual({
+            body: "position=after&target_id=2",
+            url: "http://localhost:3000/move",
+        });
+    });
+
     test("calls do_move", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
