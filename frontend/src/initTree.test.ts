@@ -210,13 +210,16 @@ test("renders a link for a closed node with rtl is true", async () => {
 });
 
 describe("tree.move event", () => {
-    const triggerTreeMove = (treeElement: HTMLElement) => {
+    const triggerTreeMove = (
+        treeElement: HTMLElement,
+        movedNodeOverrides?: { element?: HTMLElement; move_url?: string }
+    ) => {
         const doMove = vi.fn();
-        const africaElement = getNodeElement("Africa");
         const movedNode = {
-            element: africaElement,
+            element: getNodeElement("Africa"),
             id: 1,
             move_url: "/move",
+            ...movedNodeOverrides,
         };
         const targetNode = {
             id: 2,
@@ -262,6 +265,36 @@ describe("tree.move event", () => {
             body: "position=after&target_id=2",
             url: "http://localhost:3000/move",
         });
+    });
+
+    test("doesn't send a request when the moved node has no element", async () => {
+        const requestPaths: string[] = [];
+
+        server.use(
+            http.post("*", ({ request }) => {
+                requestPaths.push(new URL(request.url).pathname);
+                return HttpResponse.json({});
+            })
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        // this move is ignored, because the node has no element
+        triggerTreeMove(treeElement, {
+            element: undefined,
+            move_url: "/move_without_element",
+        });
+
+        // do a second move that is valid; when its request is handled, a
+        // request for the first move would already have been recorded
+        const doMove = triggerTreeMove(treeElement);
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+        expect(requestPaths).toEqual(["/move"]);
     });
 
     test("calls do_move", async () => {
