@@ -15,6 +15,5 @@ jobs:
       - name: Check compressed size
         uses: preactjs/compressed-size-action@v3
         with:
-          build-script: pnpm run production
           pattern: "django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js"
           compression: "none"
