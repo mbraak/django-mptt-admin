@@ -1,0 +1,20 @@
+name: Compressed Size
+on: [pull_request]
+
+jobs:
+  size-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v7
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - name: Check compressed size
+        uses: preactjs/compressed-size-action@v3
+        with:
+          build-script: pnpm run production
+          pattern: "django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js"
+          compression: "none"
