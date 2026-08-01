@@ -12,8 +12,14 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: "24"
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install packages
+        run: pnpm install
+        working-directory: ./frontend
       - name: Check compressed size
         uses: preactjs/compressed-size-action@v3
         with:
+          build-script: cd frontend; pnpm run build
           pattern: "django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js"
           compression: "none"
