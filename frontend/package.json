@@ -60,7 +60,7 @@
         "webpack-cli": "^7.2.1"
     },
     "dependencies": {
-        "jqtree": "^1.8.11",
+        "jqtree": "^1.9.0",
         "js-cookie": "^3.0.8"
     }
 }
