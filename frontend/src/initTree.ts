@@ -33,7 +33,8 @@ interface JQTreeMoveEvent extends JQuery.Event {
 
 interface JQTreeSelectEvent extends JQuery.Event {
     deselected_node: INode | null;
-    node: INode;
+    node: INode | null;
+    previous_node: INode | null;
 }
 
 function initTree(
@@ -213,16 +214,17 @@ function initTree(
 
     function handleSelect(eventParam: JQuery.Event) {
         const e = eventParam as JQTreeSelectEvent;
-        const { deselected_node, node } = e;
+        const { deselected_node, node, previous_node } = e;
 
-        if (deselected_node?.element) {
+        const deselectedElement = deselected_node?.element ?? previous_node?.element;
+        if (deselectedElement) {
             // deselected node: remove tabindex
-            jQuery(deselected_node.element).find(".edit").attr("tabindex", -1);
+            jQuery(deselectedElement).find("> .jqtree-element .edit").attr("tabindex", -1);
         }
 
         // selected: add tabindex
-        if (node.element) {
-            jQuery(node.element).find(".edit").attr("tabindex", 0);
+        if (node?.element) {
+            jQuery(node.element).find("> .jqtree-element .edit").attr("tabindex", 0);
         }
     }
 
