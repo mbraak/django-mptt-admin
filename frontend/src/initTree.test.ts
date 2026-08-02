@@ -94,6 +94,16 @@ const initTestTree = (
     initTree($tree, options);
 };
 
+const getNodeElement = (name: string): HTMLElement => {
+    const nodeElement = screen.getByRole("treeitem", { name }).closest("li");
+
+    if (!nodeElement) {
+        throw new Error(`Node element not found for '${name}'`);
+    }
+
+    return nodeElement;
+};
+
 test("initializes the tree", async () => {
     initTestTree(createTreeElement());
 
@@ -200,13 +210,16 @@ test("renders a link for a closed node with rtl is true", async () => {
 });
 
 describe("tree.move event", () => {
-    const triggerTreeMove = (treeElement: HTMLElement) => {
+    const triggerTreeMove = (
+        treeElement: HTMLElement,
+        movedNodeOverrides?: { element?: HTMLElement; move_url?: string }
+    ) => {
         const doMove = vi.fn();
-        const africaElement = screen.getByRole("treeitem", { name: "Africa" });
         const movedNode = {
-            element: africaElement,
+            element: getNodeElement("Africa"),
             id: 1,
             move_url: "/move",
+            ...movedNodeOverrides,
         };
         const targetNode = {
             id: 2,
@@ -225,6 +238,64 @@ describe("tree.move event", () => {
 
         return doMove;
     };
+
+    test("sends a move request to the server", async () => {
+        const moveRequests: { body: string; url: string }[] = [];
+
+        server.use(
+            http.post("/move", async ({ request }) => {
+                moveRequests.push({
+                    body: await request.text(),
+                    url: request.url,
+                });
+                return HttpResponse.json({});
+            })
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        triggerTreeMove(treeElement);
+
+        await waitFor(() => {
+            expect(moveRequests).toHaveLength(1);
+        });
+        expect(moveRequests[0]).toEqual({
+            body: "position=after&target_id=2",
+            url: "http://localhost:3000/move",
+        });
+    });
+
+    test("doesn't send a request when the moved node has no element", async () => {
+        const requestPaths: string[] = [];
+
+        server.use(
+            http.post("*", ({ request }) => {
+                requestPaths.push(new URL(request.url).pathname);
+                return HttpResponse.json({});
+            })
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        // this move is ignored, because the node has no element
+        triggerTreeMove(treeElement, {
+            element: undefined,
+            move_url: "/move_without_element",
+        });
+
+        // do a second move that is valid; when its request is handled, a
+        // request for the first move would already have been recorded
+        const doMove = triggerTreeMove(treeElement);
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+        expect(requestPaths).toEqual(["/move"]);
+    });
 
     test("calls do_move", async () => {
         const treeElement = createTreeElement();
@@ -284,6 +355,47 @@ describe("tree.move event", () => {
         expect(csrfTokenInRequest).toEqual("");
     });
 
+    test("displays an error message when the move fails", async () => {
+        server.use(
+            http.post("/move", () => new HttpResponse(null, { status: 500 }))
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = triggerTreeMove(treeElement);
+
+        const africaElement = getNodeElement("Africa");
+        expect(
+            await within(africaElement).findByText("move failed")
+        ).toBeInTheDocument();
+        expect(doMove).not.toHaveBeenCalled();
+    });
+
+    test("removes the error message when the node is moved again", async () => {
+        server.use(
+            http.post("/move", () => new HttpResponse(null, { status: 500 }))
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        triggerTreeMove(treeElement);
+        expect(await screen.findByText("move failed")).toBeInTheDocument();
+
+        server.use(http.post("/move", () => HttpResponse.json({})));
+
+        const doMove = triggerTreeMove(treeElement);
+
+        expect(screen.queryByText("move failed")).not.toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+    });
+
     test("sets the csrf cookie with a hidden csrf input", async () => {
         Cookies.remove('csrf');
 
@@ -307,18 +419,6 @@ describe("tree.move event", () => {
 });
 
 describe("tree.select event", () => {
-    const getNodeElement = (name: string): HTMLElement => {
-        const nodeElement = screen
-            .getByRole("treeitem", { name })
-            .closest("li");
-
-        if (!nodeElement) {
-            throw new Error(`Node element not found for '${name}'`);
-        }
-
-        return nodeElement;
-    };
-
     const getNodeLinks = (nodeElement: HTMLElement) => {
         const elementDiv = nodeElement.querySelector<HTMLElement>(
             ":scope > .jqtree-element"
@@ -452,4 +552,3 @@ describe("tree.select event", () => {
         expect(africaLinks.addLink).toHaveAttribute("tabindex", "0");
     });
 });
-
