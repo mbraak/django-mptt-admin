@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       jqtree:
-        specifier: ^1.8.11
-        version: 1.8.11(jquery@4.0.0)
+        specifier: git@github.com:mbraak/jqTree.git#dev
+        version: https://codeload.github.com/mbraak/jqTree/tar.gz/542962da745eb787146577087b1a40eddb29c943(jquery@4.0.0)
       jquery:
         specifier: '>= 3'
         version: 4.0.0
@@ -2003,8 +2003,9 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
 
-  jqtree@1.8.11:
-    resolution: {integrity: sha512-PZlNPr0m/4+19r6feLAWQ82rpgrRnh0HOxDtZg2vglolx0TGVRPoIEuFojlNjXB24K/brf0plf6W0Yzof9nLGg==}
+  jqtree@https://codeload.github.com/mbraak/jqTree/tar.gz/542962da745eb787146577087b1a40eddb29c943:
+    resolution: {gitHosted: true, integrity: sha512-eqFiCnzjPgxW4RIMyyXwjOADf/qF+2v7nkyMkHnKGADx14gsVqoLy5V5BE4ruBuz/Mth79/XrlztDrYuWrBlxw==, tarball: https://codeload.github.com/mbraak/jqTree/tar.gz/542962da745eb787146577087b1a40eddb29c943}
+    version: 1.8.11
     peerDependencies:
       jquery: '>= 3'
 
@@ -4790,7 +4791,7 @@ snapshots:
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jqtree@1.8.11(jquery@4.0.0):
+  jqtree@https://codeload.github.com/mbraak/jqTree/tar.gz/542962da745eb787146577087b1a40eddb29c943(jquery@4.0.0):
     dependencies:
       jquery: 4.0.0
 
