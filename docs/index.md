@@ -147,7 +147,7 @@ Also see the example project for a complete continent filter.
 
 **development version**
 
-- Issue #754. Support Django 6.1.
+- Issue #754. Support Django 6.1. Drop support for Django 4.2.
 
 **2.9.1** (july 20 2026)
 
