@@ -60,29 +60,51 @@ function initTree(
             return;
         }
 
-        // Create edit link
-        const $title = $li.find(".jqtree-title");
+        const liElement = $li.get(0);
 
+        /* istanbul ignore if */
+        if (!liElement) {
+            return;
+        }
+
+        const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title")
+
+        /* istanbul ignore if */
+        if (!titleElement) {
+            return;
+        }
+
+        // Create edit link
         insertAtUrl.searchParams.set("insert_at", node.id.toString());
 
         const insertUrlString = insertAtUrl
             .toString()
             .substring(baseUrl.length);
 
-        const tabindex = isSelected ? "0" : "-1";
+        const tabindex = isSelected ? 0 : -1;
         const editCaption = hasChangePermission
             ? gettext("edit")
             : gettext("view");
 
-        $title.after(
-            `<a href="${node.url as string
-            }" class="edit" tabindex="${tabindex}">(${editCaption})</a>`,
-            hasAddPermission
-                ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
-                    "add"
-                )})</a>`
-                : ""
-        );
+        const editElement = document.createElement("a");
+        editElement.className = "edit";
+        editElement.href = node.url as string;
+        editElement.tabIndex = tabindex;
+        editElement.text = `(${editCaption})`;
+
+        titleElement.after(editElement);
+
+        if (hasAddPermission) {
+            const addElement = document.createElement("a");
+            addElement.className = "edit";
+            addElement.href = insertUrlString;
+            addElement.tabIndex = tabindex;
+
+            const addCaption = gettext("add");
+            addElement.text = `(${addCaption})`;
+
+            titleElement.after(addElement);
+        }
     }
 
     function getCsrfToken() {
@@ -112,12 +134,12 @@ function initTree(
             return;
         }
 
-        const $el = jQuery(info.moved_node.element);
+        const htmlElement = info.moved_node.element;
 
-        const data = {
+        const body = new URLSearchParams({
             position: info.position,
-            target_id: info.target_node.id,
-        };
+            target_id: String(info.target_node.id),
+        });
 
         handleLoading(null);
 
@@ -125,41 +147,57 @@ function initTree(
 
         e.preventDefault();
 
-        void jQuery.ajax({
-            beforeSend: (xhr) => {
-                // Set Django csrf token
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-            data,
-            error: () => {
-                handleLoaded(null);
-                const $node = $el.find(".jqtree-element");
-                $node.append(
-                    `<span class="mptt-admin-error">${gettext(
-                        "move failed"
-                    )}</span>`
-                );
+        function handleError() {
+            handleLoaded(null);
+            const errorElement = document.createElement("span");
+            errorElement.className = "mptt-admin-error";
+            errorElement.textContent = gettext("move failed");
 
-                errorNode = info.moved_node;
+            const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+            nodeElement?.append(errorElement);
+
+            errorNode = info.moved_node;
+        }
+
+        void fetch(info.moved_node.move_url as string, {
+            body,
+            headers: {
+                // Set Django csrf token
+                "X-CSRFToken": getCsrfToken(),
             },
-            success: () => {
-                info.do_move();
-                handleLoaded(null);
+            method: "POST",
+        }).then(
+            (response) => {
+                if (response.ok) {
+                    info.do_move();
+                    handleLoaded(null);
+                } else {
+                    handleError();
+                }
             },
-            type: "POST",
-            url: info.moved_node.move_url as string,
-        });
+            () => {
+                handleError();
+            }
+        );
 
         function removeErrorMessage() {
             if (errorNode?.element) {
-                jQuery(errorNode.element).find(".mptt-admin-error").remove();
+                const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
+                errorElement?.remove();
                 errorNode = null;
             }
         }
     }
 
     function handleLoadFailed() {
-        $tree.html(gettext("Error while loading the data from the server"));
+        const treeElement = $tree.get(0);
+
+        /* istanbul ignore if */
+        if (!treeElement) {
+            return;
+        }
+
+        treeElement.textContent = gettext("Error while loading the data from the server");
     }
 
     const spinners: Record<number | string, HTMLElement | null> = {};
@@ -219,12 +257,20 @@ function initTree(
         const deselectedElement = deselected_node?.element ?? previous_node?.element;
         if (deselectedElement) {
             // deselected node: remove tabindex
-            jQuery(deselectedElement).find("> .jqtree-element .edit").attr("tabindex", -1);
+            const editElements = deselectedElement.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+
+            for (const editElement of editElements) {
+                editElement.tabIndex = -1;
+            }
         }
 
         // selected: add tabindex
         if (node?.element) {
-            jQuery(node.element).find("> .jqtree-element .edit").attr("tabindex", 0);
+            const editElements = node.element.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+
+            for (const editElement of editElements) {
+                editElement.tabIndex = 0;
+            }
         }
     }
 
