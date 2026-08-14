@@ -7,7 +7,7 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-version = '2.9.1'
+version = '2.10.0'
 
 setup(
     name='django-mptt-admin',
@@ -26,9 +26,9 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Django",
-        "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.2",
         "Framework :: Django :: 6.0",
+        "Framework :: Django :: 6.1",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.10",
