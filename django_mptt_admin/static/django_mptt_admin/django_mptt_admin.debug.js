@@ -95,7 +95,6 @@ class DataLoader {
 }
 
 
-//# sourceMappingURL=dataLoader.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/positionUtils.js
 // Get the top position of the HTML element.
@@ -111,7 +110,6 @@ const getElementPosition = element => {
 };
 
 
-//# sourceMappingURL=positionUtils.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/binarySearch.js
 function binarySearch(items, compareFn) {
@@ -136,7 +134,6 @@ function binarySearch(items, compareFn) {
 }
 
 
-//# sourceMappingURL=binarySearch.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/dragElement.js
 class DragElement {
@@ -176,7 +173,6 @@ class DragElement {
 }
 
 
-//# sourceMappingURL=dragElement.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/iterateVisibleNodes.js
 const iterateVisibleNodes = (tree, {
@@ -232,7 +228,6 @@ const iterateVisibleNodes = (tree, {
 };
 
 
-//# sourceMappingURL=iterateVisibleNodes.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/generateHitAreas.js
 
@@ -364,7 +359,6 @@ const generateHitAreasFromPositions = (hitPositions, treeBottom) => {
 const generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPositions(generateHitPositions(tree, currentNode), treeBottom);
 
 
-//# sourceMappingURL=generateHitAreas.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/index.js
 
@@ -673,14 +667,12 @@ class DragAndDropHandler {
 }
 
 
-//# sourceMappingURL=index.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/util.js
 const isInt = n => typeof n === "number" && n % 1 === 0;
 const getBoolString = value => value ? "true" : "false";
 
 
-//# sourceMappingURL=util.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/elementsRenderer.js
 
@@ -930,7 +922,6 @@ class ElementsRenderer {
 }
 
 
-//# sourceMappingURL=elementsRenderer.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/keyHandler.js
 class KeyHandler {
@@ -1039,7 +1030,6 @@ class KeyHandler {
 }
 
 
-//# sourceMappingURL=keyHandler.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/mouseUtils.js
 const getPositionInfoFromMouseEvent = e => ({
@@ -1056,7 +1046,6 @@ const getPositionInfoFromTouch = (touch, e) => ({
 });
 
 
-//# sourceMappingURL=mouseUtils.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/mouseHandler.js
 
@@ -1338,13 +1327,11 @@ class MouseHandler {
 }
 
 
-//# sourceMappingURL=mouseHandler.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeUtils.js
 const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
 
 
-//# sourceMappingURL=nodeUtils.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/node.js
 
@@ -1880,7 +1867,6 @@ class Node {
 }
 
 
-//# sourceMappingURL=node.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/borderDropHint.js
 class BorderDropHint {
@@ -1906,7 +1892,6 @@ class BorderDropHint {
 }
 
 
-//# sourceMappingURL=borderDropHint.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/ghostDropHint.js
 class GhostDropHint {
@@ -1967,7 +1952,6 @@ class GhostDropHint {
 }
 
 
-//# sourceMappingURL=ghostDropHint.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/index.js
 
@@ -2032,7 +2016,6 @@ class NodeElement {
 }
 
 
-//# sourceMappingURL=index.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/animation.js
 const getAnimationDuration = duration => {
@@ -2073,7 +2056,6 @@ const slideUp = (element, animationSpeed, onFinished) => {
 };
 
 
-//# sourceMappingURL=animation.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/folderElement.js
 
@@ -2172,7 +2154,6 @@ class FolderElement extends NodeElement {
 }
 
 
-//# sourceMappingURL=folderElement.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/requestUrl.js
 // Url class for absolute and relative urls.
@@ -2211,7 +2192,6 @@ class RequestUrl {
 }
 
 
-//# sourceMappingURL=requestUrl.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/saveStateHandler.js
 
@@ -2415,7 +2395,6 @@ class SaveStateHandler {
 }
 
 
-//# sourceMappingURL=saveStateHandler.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/scrollParent.js
 class ScrollParent {
@@ -2496,7 +2475,6 @@ class ScrollParent {
 }
 
 
-//# sourceMappingURL=scrollParent.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/containerScrollParent.js
 
@@ -2547,7 +2525,6 @@ class ContainerScrollParent extends ScrollParent {
 }
 
 
-//# sourceMappingURL=containerScrollParent.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/documentScrollParent.js
 
@@ -2620,7 +2597,6 @@ class DocumentScrollParent extends ScrollParent {
 }
 
 
-//# sourceMappingURL=documentScrollParent.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/createScrollParent.js
 
@@ -2660,7 +2636,6 @@ const createScrollParent = (treeElement, refreshHitAreas) => {
 };
 
 
-//# sourceMappingURL=createScrollParent.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler.js
 
@@ -2703,7 +2678,6 @@ class ScrollHandler {
 }
 
 
-//# sourceMappingURL=scrollHandler.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/selectNodeHandler.js
 class SelectNodeHandler {
@@ -2797,7 +2771,6 @@ class SelectNodeHandler {
 }
 
 
-//# sourceMappingURL=selectNodeHandler.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/setDefaultOptions.js
 
@@ -2880,7 +2853,6 @@ const getRtlOptionFromHTMLElement = htmlElement => {
 };
 
 
-//# sourceMappingURL=setDefaultOptions.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/triggerCustomEvent.js
 // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
@@ -2895,7 +2867,6 @@ const triggerCustomEvent = (element, eventName, values) => {
 };
 
 
-//# sourceMappingURL=triggerCustomEvent.js.map
 
 ;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/index.js
 /*
@@ -3758,7 +3729,6 @@ class HtmlTree {
 }
 
 
-//# sourceMappingURL=index.js.map
 
 ;// ./node_modules/.pnpm/js-cookie@3.0.8/node_modules/js-cookie/dist/js.cookie.mjs
 /*! js-cookie v3.0.8 | MIT */
@@ -4190,4 +4160,3 @@ addEventListener("DOMContentLoaded", () => {
 });
 /******/ })()
 ;
-//# sourceMappingURL=django_mptt_admin.debug.js.map
