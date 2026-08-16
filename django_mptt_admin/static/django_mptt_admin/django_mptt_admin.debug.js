@@ -420,9 +420,11 @@ function initTree(treeElement, {
   $tree.tree(treeOptions);
 }
 /* harmony default export */ const src_initTree = (initTree);
-;// ./src/djangoMpttAdmin.ts
-
+;// ./src/parseTreeOptions.ts
 const parseAnimationSpeed = value => {
+  if (!value) {
+    return undefined;
+  }
   const numberValue = parseNumber(value);
   if (numberValue === undefined) {
     return value;
@@ -454,35 +456,42 @@ const parseNumber = value => {
     return numberValue;
   }
 };
+const parseTreeOptions = treeElement => {
+  const animationSpeed = parseAnimationSpeed(treeElement.dataset.treeAnimationSpeed);
+  const autoOpen = parseAutoOpen(treeElement.dataset.auto_open) ?? false;
+  const autoEscape = parseBoolean(treeElement.dataset.autoescape) ?? true;
+  const csrfCookieName = treeElement.dataset.csrfCookieName ?? "csrf";
+  const dragAndDrop = parseBoolean(treeElement.dataset.dragAndDrop) ?? false;
+  const hasAddPermission = parseBoolean(treeElement.dataset.hasAddPermission) ?? false;
+  const hasChangePermission = parseBoolean(treeElement.dataset.hasChangePermission) ?? false;
+  const insertAtUrl = treeElement.dataset.insert_at_url;
+  const mouseDelay = parseNumber(treeElement.dataset.treeMouseDelay);
+  const rtl = treeElement.dataset.rtl !== undefined;
+  const saveState = treeElement.dataset.save_state;
+  const useContextMenu = parseBoolean(treeElement.dataset.use_context_menu);
+  return {
+    animationSpeed,
+    autoEscape,
+    autoOpen,
+    csrfCookieName,
+    dragAndDrop,
+    hasAddPermission,
+    hasChangePermission,
+    insertAtUrl,
+    mouseDelay,
+    rtl,
+    saveState,
+    useContextMenu
+  };
+};
+/* harmony default export */ const src_parseTreeOptions = (parseTreeOptions);
+;// ./src/djangoMpttAdmin.ts
+
+
 addEventListener("DOMContentLoaded", () => {
   const treeElement = document.getElementById("tree");
   if (treeElement) {
-    const animationSpeed = parseAnimationSpeed(treeElement.dataset["tree-animation-speed"]);
-    const autoOpen = parseAutoOpen(treeElement.dataset.auto_open) ?? false;
-    const autoEscape = parseBoolean(treeElement.dataset.autoescape) ?? true;
-    const csrfCookieName = treeElement.dataset["csrf-cookie-name"] ?? "csrf";
-    const dragAndDrop = parseBoolean(treeElement.dataset["drag-and-drop"]) ?? false;
-    const hasAddPermission = parseBoolean(treeElement.dataset["has-add-permission"]) ?? false;
-    const hasChangePermission = parseBoolean(treeElement.dataset["has-change-permission"]) ?? false;
-    const insertAtUrl = treeElement.dataset.insert_at_url;
-    const mouseDelay = parseNumber(treeElement.dataset["tree-mouse-delay"]);
-    const rtl = treeElement.dataset.rtl === "1";
-    const saveState = treeElement.dataset.save_state;
-    const useContextMenu = parseBoolean(treeElement.dataset.use_context_menu);
-    src_initTree(treeElement, {
-      animationSpeed,
-      autoEscape,
-      autoOpen,
-      csrfCookieName,
-      dragAndDrop,
-      hasAddPermission,
-      hasChangePermission,
-      insertAtUrl,
-      mouseDelay,
-      rtl,
-      saveState,
-      useContextMenu
-    });
+    src_initTree(treeElement, src_parseTreeOptions(treeElement));
   }
 });
 })();
