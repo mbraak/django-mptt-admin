@@ -16,6 +16,7 @@ const getOutputFilename = () => {
 const minimize = !skipCompressJs && !coverage;
 
 module.exports = {
+    devtool: false,
     entry: {
         django_mptt_admin: ["./src/djangoMpttAdmin.ts"],
     },
@@ -42,12 +43,15 @@ module.exports = {
                     },
                 },
             },
+            {
+                test: /\.js$/,
+                use: path.resolve(__dirname, "stripSourceMapComments.js"),
+            },
         ].filter(Boolean),
     },
     resolve: {
         extensions: [".ts", ".js"],
     },
-    devtool: "source-map",
     optimization: {
         minimize,
     },
