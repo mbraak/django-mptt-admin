@@ -8,9 +8,9 @@ importers:
 
   .:
     dependencies:
-      jqtree:
-        specifier: ^1.8.11
-        version: 1.8.11(jquery@4.0.0)
+      html-tree:
+        specifier: file:/Users/marcobraak/upload/html-tree/package
+        version: file:../../upload/html-tree/package
       jquery:
         specifier: '>= 3'
         version: 4.0.0
@@ -1913,6 +1913,9 @@ packages:
   html-escaper@2.0.2:
     resolution: {integrity: sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==}
 
+  html-tree@file:../../upload/html-tree/package:
+    resolution: {directory: ../../upload/html-tree/package, type: directory}
+
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
@@ -2002,11 +2005,6 @@ packages:
   jest-worker@27.5.1:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
-
-  jqtree@1.8.11:
-    resolution: {integrity: sha512-PZlNPr0m/4+19r6feLAWQ82rpgrRnh0HOxDtZg2vglolx0TGVRPoIEuFojlNjXB24K/brf0plf6W0Yzof9nLGg==}
-    peerDependencies:
-      jquery: '>= 3'
 
   jquery@4.0.0:
     resolution: {integrity: sha512-TXCHVR3Lb6TZdtw1l3RTLf8RBWVGexdxL6AC8/e0xZKEpBflBsjh9/8LXw+dkNFuOyW9B7iB3O1sP7hS0Kiacg==}
@@ -4708,6 +4706,8 @@ snapshots:
 
   html-escaper@2.0.2: {}
 
+  html-tree@file:../../upload/html-tree/package: {}
+
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
@@ -4789,10 +4789,6 @@ snapshots:
       '@types/node': 25.9.5
       merge-stream: 2.0.0
       supports-color: 8.1.1
-
-  jqtree@1.8.11(jquery@4.0.0):
-    dependencies:
-      jquery: 4.0.0
 
   jquery@4.0.0: {}
 
