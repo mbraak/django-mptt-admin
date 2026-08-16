@@ -314,12 +314,6 @@ function initTree(treeElement, {
     }
   }
   function handleLoadFailed() {
-    const treeElement = $tree.get(0);
-
-    /* istanbul ignore if */
-    if (!treeElement) {
-      return;
-    }
     treeElement.textContent = gettext("Error while loading the data from the server");
   }
   const spinners = {};
@@ -339,7 +333,7 @@ function initTree(treeElement, {
       if (node) {
         return node.element;
       } else {
-        return $tree.get(0);
+        return treeElement;
       }
     }
     const container = getContainer();

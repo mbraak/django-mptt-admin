@@ -196,13 +196,6 @@ function initTree(
     }
 
     function handleLoadFailed() {
-        const treeElement = $tree.get(0);
-
-        /* istanbul ignore if */
-        if (!treeElement) {
-            return;
-        }
-
         treeElement.textContent = gettext("Error while loading the data from the server");
     }
 
@@ -225,7 +218,7 @@ function initTree(
             if (node) {
                 return node.element;
             } else {
-                return $tree.get(0);
+                return treeElement;
             }
         }
 
