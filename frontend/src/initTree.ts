@@ -225,7 +225,7 @@ function initTree(
         }
 
         const spinner = document.createElement("span");
-        spinner.className = "jqtree-spin";
+        spinner.className = "html-tree-spin";
         container.append(spinner);
         spinners[spinnerId] = spinner;
     }

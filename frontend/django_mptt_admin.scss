@@ -1,4 +1,4 @@
-@use "node_modules/jqtree/jqtree";
+@use "node_modules/html-tree/html_tree";
 
 @keyframes jqtree-spin {
     0% {
@@ -20,8 +20,8 @@
         margin-left: 8px;
     }
 
-    ul.jqtree-tree {
-        .jqtree-toggler {
+    ul.html-tree {
+        .html-tree-toggler {
             top: 10%;
             color: var(--link-fg);
             text-decoration: none;
@@ -33,15 +33,15 @@
             color: var(--link-fg);
         }
 
-        ul.jqtree_common {
+        ul.html-tree-common {
             margin-top: 0;
         }
 
-        li.jqtree_common {
+        li.html-tree-common {
             padding: 0;
         }
 
-        &.jqtree-rtl {
+        &.html-tree-rtl {
             .edit {
                 margin-left: 0;
                 margin-right: 0.5em;
@@ -49,7 +49,7 @@
         }
     }
 
-    .jqtree-spin {
+    .html-tree-spin {
         margin-left: 1em;
         width: 1em;
         height: 1em;
@@ -63,36 +63,36 @@
     }
 
     &.block-style {
-        ul.jqtree-tree {
+        ul.html-tree {
             margin-left: 0;
             margin-right: 0;
 
-            ul.jqtree_common {
+            ul.html-tree-common {
                 margin-left: 2em;
             }
 
-            .jqtree-element {
+            .html-tree-element {
                 margin-bottom: 8px;
                 background-color: var(--darkened-bg);
                 padding: 8px;
 
-                .jqtree-title {
+                .html-tree-title {
                     color: var(--body-fg);
                     margin-left: 0;
                     margin-right: 0;
                 }
 
-                .jqtree-toggler.jqtree-toggler-right {
+                .html-tree-toggler.html-tree-toggler-right {
                     margin-left: 1em;
                 }
             }
 
-            li.jqtree-selected > .jqtree-element {
+            li.html-tree-selected > .html-tree-element {
                 background: var(--breadcrumbs-bg);
                 color: var(--header-color);
                 text-shadow: none;
 
-                .jqtree-title {
+                .html-tree-title {
                     color: var(--breadcrumbs-link-fg);
                 }
 
@@ -101,13 +101,13 @@
                 }
             }
 
-            &.jqtree-rtl {
-                ul.jqtree_common {
+            &.html-tree-rtl {
+                ul.html-tree-common {
                     margin-left: 0;
                     margin-right: 2em;
                 }
 
-                .jqtree-toggler.jqtree-toggler-right {
+                .html-tree-toggler.html-tree-toggler-right {
                     margin-left: 0;
                     margin-right: 1em;
                 }

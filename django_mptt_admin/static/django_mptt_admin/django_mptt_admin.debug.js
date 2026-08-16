@@ -1,11 +1,2905 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
+/******/ 	"use strict";
 
-/***/ 751
-() {
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dataLoader.js
+class DataLoader {
+  _dataFilter;
+  _loadData;
+  _onLoadFailed;
+  _onLoading;
+  _treeElement;
+  _triggerEvent;
+  constructor({
+    dataFilter,
+    loadData,
+    onLoadFailed,
+    onLoading,
+    treeElement,
+    triggerEvent
+  }) {
+    this._dataFilter = dataFilter;
+    this._loadData = loadData;
+    this._onLoadFailed = onLoadFailed;
+    this._onLoading = onLoading;
+    this._treeElement = treeElement;
+    this._triggerEvent = triggerEvent;
+  }
+  loadFromUrl(url, parentNode, onFinished) {
+    const element = this._getDomElement(parentNode);
+    this._addLoadingClass(element);
+    this._notifyLoading(true, element, parentNode);
+    const stopLoading = () => {
+      this._removeLoadingClass(element);
+      this._notifyLoading(false, element, parentNode);
+    };
+    const handleSuccess = data => {
+      stopLoading();
+      this._loadData(this._parseData(data), parentNode);
+      if (onFinished && typeof onFinished === "function") {
+        onFinished();
+      }
+    };
+    const handleError = response => {
+      stopLoading();
+      if (this._onLoadFailed) {
+        this._onLoadFailed(response);
+      }
+    };
+    void this._submitRequest(url, handleSuccess, handleError);
+  }
+  _addLoadingClass(element) {
+    element.classList.add("html-tree-loading");
+  }
+  _getDomElement(parentNode) {
+    if (parentNode?.element) {
+      return parentNode.element;
+    } else {
+      return this._treeElement;
+    }
+  }
+  _notifyLoading(isLoading, element, node) {
+    if (this._onLoading) {
+      this._onLoading(isLoading, node, element);
+    }
+    this._triggerEvent("tree.loading_data", {
+      element,
+      isLoading,
+      node: node ?? null
+    });
+  }
+  _parseData(data) {
+    if (this._dataFilter) {
+      return this._dataFilter(data);
+    } else {
+      return data;
+    }
+  }
+  _removeLoadingClass(element) {
+    element.classList.remove("html-tree-loading");
+  }
+  async _submitRequest(url, handleSuccess, handleError) {
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    url.setSearchParam("_", Date.now().toString());
+    const response = await fetch(url.toString(), {
+      headers
+    });
+    if (response.ok) {
+      const data = await response.json();
+      handleSuccess(data);
+    } else {
+      handleError(response);
+    }
+  }
+}
+
+
+//# sourceMappingURL=dataLoader.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/positionUtils.js
+// Get the top position of the HTML element.
+const getOffsetTop = element => getElementPosition(element).top;
+
+// Get the top left position of the HTML element.
+const getElementPosition = element => {
+  const rect = element.getBoundingClientRect();
+  return {
+    left: rect.x + window.scrollX,
+    top: rect.y + window.scrollY
+  };
+};
+
+
+//# sourceMappingURL=positionUtils.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/binarySearch.js
+function binarySearch(items, compareFn) {
+  let low = 0;
+  let high = items.length;
+  while (low < high) {
+    const mid = low + high >> 1;
+    const item = items[mid];
+    if (item === undefined) {
+      return null;
+    }
+    const compareResult = compareFn(item);
+    if (compareResult > 0) {
+      high = mid;
+    } else if (compareResult < 0) {
+      low = mid + 1;
+    } else {
+      return item;
+    }
+  }
+  return null;
+}
+
+
+//# sourceMappingURL=binarySearch.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/dragElement.js
+class DragElement {
+  _element;
+  _offsetX;
+  _offsetY;
+  constructor({
+    autoEscape,
+    nodeName,
+    offsetX,
+    offsetY,
+    treeElement
+  }) {
+    this._offsetX = offsetX;
+    this._offsetY = offsetY;
+    this._element = this._createElement(nodeName, autoEscape);
+    treeElement.appendChild(this._element);
+  }
+  move(pageX, pageY) {
+    this._element.style.left = `${pageX - this._offsetX}px`;
+    this._element.style.top = `${pageY - this._offsetY}px`;
+  }
+  remove() {
+    this._element.remove();
+  }
+  _createElement(nodeName, autoEscape) {
+    const element = document.createElement("span");
+    element.classList.add("html-tree-title", "html-tree-dragging");
+    if (autoEscape) {
+      element.textContent = nodeName;
+    } else {
+      element.innerHTML = nodeName;
+    }
+    element.style.position = "absolute";
+    return element;
+  }
+}
+
+
+//# sourceMappingURL=dragElement.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/iterateVisibleNodes.js
+const iterateVisibleNodes = (tree, {
+  handleAfterOpenFolder,
+  handleClosedFolder,
+  handleFirstNode,
+  handleNode,
+  handleOpenFolder
+}) => {
+  let isFirstNode = true;
+  const iterate = (node, nextNode) => {
+    let mustIterateInside = (node.is_open === true || !node.element) && node.hasChildren();
+    let element = null;
+
+    // Is the element visible?
+    if (node.element?.offsetParent) {
+      element = node.element;
+      if (isFirstNode) {
+        handleFirstNode(node);
+        isFirstNode = false;
+      }
+      if (!node.hasChildren()) {
+        handleNode(node, nextNode, node.element);
+      } else if (node.is_open) {
+        if (!handleOpenFolder(node, node.element)) {
+          mustIterateInside = false;
+        }
+      } else {
+        handleClosedFolder(node, nextNode, element);
+      }
+    }
+    if (mustIterateInside) {
+      const childrenLength = node.children.length;
+      node.children.forEach((_, i) => {
+        const child = node.children[i];
+        if (child) {
+          if (i === childrenLength - 1) {
+            iterate(child, null);
+          } else {
+            const nextChild = node.children[i + 1];
+            if (nextChild) {
+              iterate(child, nextChild);
+            }
+          }
+        }
+      });
+      if (node.is_open && element) {
+        handleAfterOpenFolder(node, nextNode);
+      }
+    }
+  };
+  iterate(tree, null);
+};
+
+
+//# sourceMappingURL=iterateVisibleNodes.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/generateHitAreas.js
+
+
+
+const generateHitPositions = (tree, currentNode) => {
+  const hitPositions = [];
+  let lastTop = 0;
+  const addHitPosition = (node, position, top) => {
+    hitPositions.push({
+      node,
+      position,
+      top
+    });
+    lastTop = top;
+  };
+  const handleAfterOpenFolder = (node, nextNode) => {
+    if (node === currentNode || nextNode === currentNode) {
+      // Cannot move before or after current item
+      addHitPosition(node, null, lastTop);
+    } else {
+      addHitPosition(node, "after", lastTop);
+    }
+  };
+  const handleClosedFolder = (node, nextNode, element) => {
+    const top = getOffsetTop(element);
+    if (node === currentNode) {
+      // Cannot move after current item
+      addHitPosition(node, null, top);
+    } else {
+      addHitPosition(node, "inside", top);
+
+      // Cannot move before current item
+      if (nextNode !== currentNode) {
+        addHitPosition(node, "after", top);
+      }
+    }
+  };
+  const handleFirstNode = node => {
+    if (node !== currentNode && node.element) {
+      addHitPosition(node, "before", getOffsetTop(node.element));
+    }
+  };
+  const handleNode = (node, nextNode, element) => {
+    const top = getOffsetTop(element);
+    if (node === currentNode) {
+      // Cannot move inside current item
+      addHitPosition(node, null, top);
+    } else {
+      addHitPosition(node, "inside", top);
+    }
+    if (nextNode === currentNode || node === currentNode) {
+      // Cannot move before or after current item
+      addHitPosition(node, null, top);
+    } else {
+      addHitPosition(node, "after", top);
+    }
+  };
+  const handleOpenFolder = (node, element) => {
+    if (node === currentNode) {
+      // Cannot move inside current item
+
+      // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
+      const top = getOffsetTop(element);
+      const height = element.clientHeight;
+      addHitPosition(node, null, top);
+      if (height > 5) {
+        // Subtract 5 pixels to allow more space for the next element.
+        addHitPosition(node, null, top + height - 5);
+      }
+
+      // Stop iterating
+      return false;
+    }
+
+    // Cannot move before current item
+    if (node.children[0] !== currentNode) {
+      addHitPosition(node, "inside", getOffsetTop(element));
+    }
+
+    // Continue iterating
+    return true;
+  };
+  iterateVisibleNodes(tree, {
+    handleAfterOpenFolder,
+    handleClosedFolder,
+    handleFirstNode,
+    handleNode,
+    handleOpenFolder
+  });
+  return hitPositions;
+};
+const generateHitAreasForGroup = (hitAreas, positionsInGroup, top, bottom) => {
+  // limit positions in group
+  const positionCount = Math.min(positionsInGroup.length, 4);
+  const areaHeight = Math.round((bottom - top) / positionCount);
+  let areaTop = top;
+  for (let i = 0; i < positionCount; i++) {
+    const position = positionsInGroup[i];
+    if (position.position) {
+      hitAreas.push({
+        bottom: areaTop + areaHeight,
+        node: position.node,
+        position: position.position,
+        top: areaTop
+      });
+    }
+    areaTop += areaHeight;
+  }
+};
+const generateHitAreasFromPositions = (hitPositions, treeBottom) => {
+  if (!hitPositions.length) {
+    return [];
+  }
+  let previousTop = hitPositions[0].top;
+  let group = [];
+  const hitAreas = [];
+  for (const position of hitPositions) {
+    if (position.top !== previousTop && group.length) {
+      generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
+      previousTop = position.top;
+      group = [];
+    }
+    group.push(position);
+  }
+  generateHitAreasForGroup(hitAreas, group, previousTop, treeBottom);
+  return hitAreas;
+};
+const generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPositions(generateHitPositions(tree, currentNode), treeBottom);
+
+
+//# sourceMappingURL=generateHitAreas.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/index.js
+
+
+
+
+
+class DragAndDropHandler {
+  currentItem;
+  hitAreas;
+  hoveredArea;
+  isDragging;
+  _autoEscape;
+  _dragElement;
+  _getNodeElement;
+  _getNodeElementForNode;
+  _getScrollLeft;
+  _getTree;
+  _onCanMove;
+  _onCanMoveTo;
+  _onDragMove;
+  _onDragStop;
+  _onIsMoveHandle;
+  _openFolderDelay;
+  _openFolderTimer;
+  _openNode;
+  _previousGhost;
+  _refreshElements;
+  _slide;
+  _treeElement;
+  _triggerEvent;
+  constructor({
+    autoEscape,
+    getNodeElement,
+    getNodeElementForNode,
+    getScrollLeft,
+    getTree,
+    onCanMove,
+    onCanMoveTo,
+    onDragMove,
+    onDragStop,
+    onIsMoveHandle,
+    openFolderDelay,
+    openNode,
+    refreshElements,
+    slide,
+    treeElement,
+    triggerEvent
+  }) {
+    this._autoEscape = autoEscape;
+    this._getNodeElement = getNodeElement;
+    this._getNodeElementForNode = getNodeElementForNode;
+    this._getScrollLeft = getScrollLeft;
+    this._getTree = getTree;
+    this._onCanMove = onCanMove;
+    this._onCanMoveTo = onCanMoveTo;
+    this._onDragMove = onDragMove;
+    this._onDragStop = onDragStop;
+    this._onIsMoveHandle = onIsMoveHandle;
+    this._openFolderDelay = openFolderDelay;
+    this._openNode = openNode;
+    this._refreshElements = refreshElements;
+    this._slide = slide;
+    this._treeElement = treeElement;
+    this._triggerEvent = triggerEvent;
+    this.hoveredArea = null;
+    this.hitAreas = [];
+    this.isDragging = false;
+    this.currentItem = null;
+    this._dragElement = null;
+    this._openFolderTimer = null;
+    this._previousGhost = null;
+  }
+  mouseCapture(positionInfo) {
+    const element = positionInfo.target;
+    if (!this._mustCaptureElement(element)) {
+      return null;
+    }
+    if (this._onIsMoveHandle && !this._onIsMoveHandle(element)) {
+      return null;
+    }
+    let nodeElement = this._getNodeElement(element);
+    if (nodeElement && this._onCanMove) {
+      if (!this._onCanMove(nodeElement.node)) {
+        nodeElement = null;
+      }
+    }
+    this.currentItem = nodeElement;
+    return this.currentItem != null;
+  }
+  mouseDrag(positionInfo) {
+    if (!this.currentItem || !this._dragElement) {
+      return false;
+    }
+    this._dragElement.move(positionInfo.pageX, positionInfo.pageY);
+    const area = this._findHoveredArea(positionInfo.pageX, positionInfo.pageY);
+    if (area && this._canMoveToArea(area, this.currentItem)) {
+      if (!area.node.isFolder()) {
+        this._stopOpenFolderTimer();
+      }
+      if (this.hoveredArea !== area) {
+        this.hoveredArea = area;
+
+        // If this is a closed folder, start timer to open it
+        if (this._mustOpenFolderTimer(area)) {
+          this._startOpenFolderTimer(area.node);
+        } else {
+          this._stopOpenFolderTimer();
+        }
+        this._updateDropHint();
+      }
+    } else {
+      this._removeDropHint();
+      this._stopOpenFolderTimer();
+      this.hoveredArea = area;
+    }
+    if (!area) {
+      if (this._onDragMove) {
+        this._onDragMove(this.currentItem.node, positionInfo.originalEvent);
+      }
+    }
+    return true;
+  }
+  mouseStart(positionInfo) {
+    if (!this.currentItem) {
+      return false;
+    }
+    this.refresh();
+    const {
+      left,
+      top
+    } = getElementPosition(positionInfo.target);
+    const node = this.currentItem.node;
+    this._dragElement = new DragElement({
+      autoEscape: this._autoEscape ?? true,
+      nodeName: node.name,
+      offsetX: positionInfo.pageX - left,
+      offsetY: positionInfo.pageY - top,
+      treeElement: this._treeElement
+    });
+    this.isDragging = true;
+    this.currentItem.element.classList.add("html-tree-moving");
+    return true;
+  }
+  mouseStop(positionInfo) {
+    this._moveItem(positionInfo);
+    this._clear();
+    this._removeHover();
+    this._removeDropHint();
+    this._removeHitAreas();
+    const currentItem = this.currentItem;
+    if (this.currentItem) {
+      this.currentItem.element.classList.remove("html-tree-moving");
+      this.currentItem = null;
+    }
+    this.isDragging = false;
+    if (!this.hoveredArea && currentItem) {
+      if (this._onDragStop) {
+        this._onDragStop(currentItem.node, positionInfo.originalEvent);
+      }
+    }
+    return false;
+  }
+  refresh() {
+    this._removeHitAreas();
+    if (this.currentItem) {
+      const currentNode = this.currentItem.node;
+      this._generateHitAreas(currentNode);
+      this.currentItem = this._getNodeElementForNode(currentNode);
+      if (this.isDragging) {
+        this.currentItem.element.classList.add("html-tree-moving");
+      }
+    }
+  }
+  _canMoveToArea(area, currentItem) {
+    if (!this._onCanMoveTo) {
+      return true;
+    }
+    return this._onCanMoveTo(currentItem.node, area.node, area.position);
+  }
+  _clear() {
+    if (this._dragElement) {
+      this._dragElement.remove();
+      this._dragElement = null;
+    }
+  }
+  _findHoveredArea(x, y) {
+    const dimensions = this._getTreeDimensions();
+    if (x < dimensions.left || y < dimensions.top || x > dimensions.right || y > dimensions.bottom) {
+      return null;
+    }
+    return binarySearch(this.hitAreas, area => {
+      if (y < area.top) {
+        return 1;
+      } else if (y > area.bottom) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+  }
+  _generateHitAreas(currentNode) {
+    const tree = this._getTree();
+    if (!tree) {
+      this.hitAreas = [];
+    } else {
+      this.hitAreas = generateHitAreas(tree, currentNode, this._getTreeDimensions().bottom);
+    }
+  }
+  _getTreeDimensions() {
+    // Return the dimensions of the tree. Add a margin to the bottom to allow
+    // to drag-and-drop after the last element.
+    const treePosition = getElementPosition(this._treeElement);
+    const left = treePosition.left + this._getScrollLeft();
+    const top = treePosition.top;
+    return {
+      bottom: top + this._treeElement.clientHeight + 16,
+      left,
+      right: left + this._treeElement.clientWidth,
+      top
+    };
+  }
+
+  /* Move the dragged node to the selected position in the tree. */
+  _moveItem(positionInfo) {
+    if (this.currentItem && this.hoveredArea?.position && this._canMoveToArea(this.hoveredArea, this.currentItem)) {
+      const movedNode = this.currentItem.node;
+      const targetNode = this.hoveredArea.node;
+      const position = this.hoveredArea.position;
+      const previousParent = movedNode.parent;
+      if (position === "inside") {
+        this.hoveredArea.node.is_open = true;
+      }
+      const doMove = () => {
+        const tree = this._getTree();
+        if (tree) {
+          tree.moveNode(movedNode, targetNode, position);
+          this._treeElement.textContent = "";
+          this._refreshElements(null);
+        }
+      };
+      if (this._triggerEvent("tree.move", {
+        move_info: {
+          do_move: doMove,
+          moved_node: movedNode,
+          original_event: positionInfo.originalEvent,
+          position,
+          previous_parent: previousParent,
+          target_node: targetNode
+        }
+      })) {
+        doMove();
+      }
+    }
+  }
+  _mustCaptureElement(element) {
+    const nodeName = element.nodeName;
+    return nodeName !== "INPUT" && nodeName !== "SELECT" && nodeName !== "TEXTAREA";
+  }
+  _mustOpenFolderTimer(area) {
+    const node = area.node;
+    return node.isFolder() && !node.is_open && area.position === "inside";
+  }
+  _removeDropHint() {
+    if (this._previousGhost) {
+      this._previousGhost.remove();
+    }
+  }
+  _removeHitAreas() {
+    this.hitAreas = [];
+  }
+  _removeHover() {
+    this.hoveredArea = null;
+  }
+  _startOpenFolderTimer(folder) {
+    const openFolder = () => {
+      this._openNode(folder, this._slide, () => {
+        this.refresh();
+        this._updateDropHint();
+      });
+    };
+    this._stopOpenFolderTimer();
+    const openFolderDelay = this._openFolderDelay;
+    if (openFolderDelay !== false) {
+      this._openFolderTimer = window.setTimeout(openFolder, openFolderDelay);
+    }
+  }
+  _stopOpenFolderTimer() {
+    if (this._openFolderTimer) {
+      clearTimeout(this._openFolderTimer);
+      this._openFolderTimer = null;
+    }
+  }
+  _updateDropHint() {
+    if (!this.hoveredArea) {
+      return;
+    }
+
+    // remove previous drop hint
+    this._removeDropHint();
+
+    // add new drop hint
+    const nodeElement = this._getNodeElementForNode(this.hoveredArea.node);
+    this._previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
+  }
+}
+
+
+//# sourceMappingURL=index.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/util.js
+const isInt = n => typeof n === "number" && n % 1 === 0;
+const getBoolString = value => value ? "true" : "false";
+
+
+//# sourceMappingURL=util.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/elementsRenderer.js
+
+
+class ElementsRenderer {
+  closedIconElement;
+  openedIconElement;
+  _autoEscape;
+  _buttonLeft;
+  _dragAndDrop;
+  _getTree;
+  _htmlElement;
+  _isNodeSelected;
+  _onCreateLi;
+  _rtl;
+  _setNodeElement;
+  _showEmptyFolder;
+  _tabIndex;
+  constructor({
+    autoEscape,
+    buttonLeft,
+    closedIcon,
+    dragAndDrop,
+    getTree,
+    htmlElement,
+    isNodeSelected,
+    onCreateLi,
+    openedIcon,
+    rtl,
+    setNodeElement,
+    showEmptyFolder,
+    tabIndex
+  }) {
+    this._autoEscape = autoEscape;
+    this._buttonLeft = buttonLeft;
+    this._dragAndDrop = dragAndDrop;
+    this._getTree = getTree;
+    this._htmlElement = htmlElement;
+    this._isNodeSelected = isNodeSelected;
+    this._onCreateLi = onCreateLi;
+    this._rtl = rtl;
+    this._setNodeElement = setNodeElement;
+    this._showEmptyFolder = showEmptyFolder;
+    this._tabIndex = tabIndex;
+    this.openedIconElement = this._createButtonElement(openedIcon ?? "+");
+    this.closedIconElement = this._createButtonElement(closedIcon ?? "-");
+  }
+  render(fromNode) {
+    if (fromNode?.parent) {
+      this.renderFromNode(fromNode);
+    } else {
+      this.renderFromRoot();
+    }
+  }
+  renderFromNode(node) {
+    if (!node.element) {
+      return;
+    }
+    const currentLi = node.element;
+    const newLi = this._createLi(node, node.getLevel());
+    currentLi.replaceWith(newLi);
+
+    // create children
+    this._createDomElements(newLi, node.children, false, node.getLevel() + 1);
+  }
+  renderFromRoot() {
+    this._htmlElement.textContent = '';
+    const tree = this._getTree();
+    if (tree) {
+      this._createDomElements(this._htmlElement, tree.children, true, 1);
+    }
+  }
+  _attachNodeData(node, li) {
+    node.element = li;
+    this._setNodeElement(li, node);
+  }
+  _createButtonElement(value) {
+    if (typeof value === "string") {
+      // convert value to html
+      const div = document.createElement("div");
+      div.innerHTML = value;
+      return document.createTextNode(div.innerHTML);
+    } else if (value.nodeType) {
+      return value;
+    } else {
+      return undefined;
+    }
+  }
+  _createDomElements(element, children, isRootNode, level) {
+    const ul = this._createUl(isRootNode);
+    element.appendChild(ul);
+    for (const child of children) {
+      const li = this._createLi(child, level);
+      ul.appendChild(li);
+      if (child.hasChildren()) {
+        this._createDomElements(li, child.children, false, level + 1);
+      }
+    }
+  }
+  _createFolderLi(node, level, isSelected) {
+    const buttonClasses = this._getButtonClasses(node);
+    const folderClasses = this._getFolderClasses(node, isSelected);
+    const iconElement = node.is_open ? this.openedIconElement : this.closedIconElement;
+
+    // li
+    const li = document.createElement("li");
+    li.className = `html-tree-common ${folderClasses}`;
+    li.setAttribute("role", "none");
+
+    // div
+    const div = document.createElement("div");
+    div.className = "html-tree-element html-tree-common";
+    div.setAttribute("role", "none");
+    li.appendChild(div);
+
+    // button link
+    const buttonLink = document.createElement("a");
+    buttonLink.className = buttonClasses;
+    if (iconElement) {
+      buttonLink.appendChild(iconElement.cloneNode(true));
+    }
+    if (this._buttonLeft) {
+      div.appendChild(buttonLink);
+    }
+
+    // title span
+    const titleSpan = this._createTitleSpan(node.name, isSelected, true, level);
+    titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
+    div.appendChild(titleSpan);
+    if (!this._buttonLeft) {
+      div.appendChild(buttonLink);
+    }
+    return li;
+  }
+
+  /* Create the <li> element
+   * Attach it to node.element.
+   * Call onCreateLi
+   */
+  _createLi(node, level) {
+    const isSelected = this._isNodeSelected(node);
+    const mustShowFolder = node.isFolder() || node.isEmptyFolder && this._showEmptyFolder;
+    const li = mustShowFolder ? this._createFolderLi(node, level, isSelected) : this._createNodeLi(node, level, isSelected);
+    this._attachNodeData(node, li);
+    if (this._onCreateLi) {
+      this._onCreateLi(node, li, isSelected);
+    }
+    return li;
+  }
+  _createNodeLi(node, level, isSelected) {
+    const liClasses = ["html-tree-common"];
+    if (isSelected) {
+      liClasses.push("html-tree-selected");
+    }
+    const classString = liClasses.join(" ");
+
+    // li
+    const li = document.createElement("li");
+    li.className = classString;
+    li.setAttribute("role", "none");
+
+    // div
+    const div = document.createElement("div");
+    div.className = "html-tree-element html-tree-common";
+    div.setAttribute("role", "none");
+    li.appendChild(div);
+
+    // title span
+    const titleSpan = this._createTitleSpan(node.name, isSelected, false, level);
+    div.appendChild(titleSpan);
+    return li;
+  }
+  _createTitleSpan(nodeName, isSelected, isFolder, level) {
+    const titleSpan = document.createElement("span");
+    let classes = "html-tree-title html-tree-common";
+    if (isFolder) {
+      classes += " html-tree-title-folder";
+    }
+    classes += ` html-tree-title-button-${this._buttonLeft ? "left" : "right"}`;
+    titleSpan.className = classes;
+    if (isSelected) {
+      const tabIndex = this._tabIndex;
+      if (tabIndex !== undefined) {
+        titleSpan.setAttribute("tabindex", `${tabIndex}`);
+      }
+    }
+    this._setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
+    if (this._autoEscape) {
+      titleSpan.textContent = nodeName;
+    } else {
+      titleSpan.innerHTML = nodeName;
+    }
+    return titleSpan;
+  }
+  _createUl(isRootNode) {
+    let classString;
+    let role;
+    if (!isRootNode) {
+      classString = "";
+      role = "group";
+    } else {
+      classString = "html-tree";
+      role = "tree";
+      if (this._rtl) {
+        classString += " html-tree-rtl";
+      }
+    }
+    if (this._dragAndDrop) {
+      classString += " html-tree-dnd";
+    }
+    const ul = document.createElement("ul");
+    ul.className = `html-tree-common ${classString}`;
+    ul.setAttribute("role", role);
+    return ul;
+  }
+  _getButtonClasses(node) {
+    const classes = ["html-tree-toggler", "html-tree-common"];
+    if (!node.is_open) {
+      classes.push("html-tree-closed");
+    }
+    if (this._buttonLeft) {
+      classes.push("html-tree-toggler-left");
+    } else {
+      classes.push("html-tree-toggler-right");
+    }
+    return classes.join(" ");
+  }
+  _getFolderClasses(node, isSelected) {
+    const classes = ["html-tree-folder"];
+    if (!node.is_open) {
+      classes.push("html-tree-closed");
+    }
+    if (isSelected) {
+      classes.push("html-tree-selected");
+    }
+    if (node.is_loading) {
+      classes.push("html-tree-loading");
+    }
+    return classes.join(" ");
+  }
+  _setTreeItemAriaAttributes(element, name, level, isSelected) {
+    element.setAttribute("aria-label", name);
+    element.setAttribute("aria-level", `${level}`);
+    element.setAttribute("aria-selected", getBoolString(isSelected));
+    element.setAttribute("role", "treeitem");
+  }
+}
+
+
+//# sourceMappingURL=elementsRenderer.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/keyHandler.js
+class KeyHandler {
+  _closeNode;
+  _getSelectedNode;
+  _isFocusOnTree;
+  _keyboardSupport;
+  _openNode;
+  _originalSelectNode;
+  constructor({
+    closeNode,
+    getSelectedNode,
+    isFocusOnTree,
+    keyboardSupport,
+    openNode,
+    selectNode
+  }) {
+    this._closeNode = closeNode;
+    this._getSelectedNode = getSelectedNode;
+    this._isFocusOnTree = isFocusOnTree;
+    this._keyboardSupport = keyboardSupport;
+    this._openNode = openNode;
+    this._originalSelectNode = selectNode;
+    if (keyboardSupport) {
+      document.addEventListener("keydown", this._handleKeyDown);
+    }
+  }
+  deinit() {
+    if (this._keyboardSupport) {
+      document.removeEventListener("keydown", this._handleKeyDown);
+    }
+  }
+  moveDown(selectedNode) {
+    return this._selectNode(selectedNode.getNextVisibleNode());
+  }
+  moveUp(selectedNode) {
+    return this._selectNode(selectedNode.getPreviousVisibleNode());
+  }
+  _canHandleKeyboard() {
+    return this._keyboardSupport && this._isFocusOnTree();
+  }
+  _handleKeyDown = e => {
+    if (!this._canHandleKeyboard()) {
+      return;
+    }
+    let isKeyHandled = false;
+    const selectedNode = this._getSelectedNode();
+    if (selectedNode) {
+      switch (e.key) {
+        case "ArrowDown":
+          isKeyHandled = this.moveDown(selectedNode);
+          break;
+        case "ArrowLeft":
+          isKeyHandled = this._moveLeft(selectedNode);
+          break;
+        case "ArrowRight":
+          isKeyHandled = this._moveRight(selectedNode);
+          break;
+        case "ArrowUp":
+          isKeyHandled = this.moveUp(selectedNode);
+          break;
+      }
+    }
+    if (isKeyHandled) {
+      e.preventDefault();
+    }
+  };
+  _moveLeft(selectedNode) {
+    if (selectedNode.isFolder() && selectedNode.is_open) {
+      // Left on an open node closes the node
+      this._closeNode(selectedNode);
+      return true;
+    } else {
+      // Left on a closed or end node moves focus to the node's parent
+      return this._selectNode(selectedNode.getParent());
+    }
+  }
+  _moveRight(selectedNode) {
+    if (!selectedNode.isFolder()) {
+      return false;
+    } else {
+      // folder node
+      if (selectedNode.is_open) {
+        // Right moves to the first child of an open node
+        return this._selectNode(selectedNode.getNextVisibleNode());
+      } else {
+        // Right expands a closed node
+        this._openNode(selectedNode);
+        return true;
+      }
+    }
+  }
+
+  /* Select the node.
+   * Don't do anything if the node is null.
+   * Result: a different node was selected.
+   */
+  _selectNode(node) {
+    if (!node) {
+      return false;
+    } else {
+      this._originalSelectNode(node);
+      return true;
+    }
+  }
+}
+
+
+//# sourceMappingURL=keyHandler.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/mouseUtils.js
+const getPositionInfoFromMouseEvent = e => ({
+  originalEvent: e,
+  pageX: e.pageX,
+  pageY: e.pageY,
+  target: e.target
+});
+const getPositionInfoFromTouch = (touch, e) => ({
+  originalEvent: e,
+  pageX: touch.pageX,
+  pageY: touch.pageY,
+  target: touch.target
+});
+
+
+//# sourceMappingURL=mouseUtils.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/mouseHandler.js
+
+
+class MouseHandler {
+  _element;
+  _getMouseDelay;
+  _getNode;
+  _isMouseDelayMet;
+  _isMouseStarted;
+  _mouseDelayTimer;
+  _mouseDownInfo;
+  _onClickButton;
+  _onClickTitle;
+  _onMouseCapture;
+  _onMouseDrag;
+  _onMouseStart;
+  _onMouseStop;
+  _triggerEvent;
+  _useContextMenu;
+  constructor({
+    element,
+    getMouseDelay,
+    getNode,
+    onClickButton,
+    onClickTitle,
+    onMouseCapture,
+    onMouseDrag,
+    onMouseStart,
+    onMouseStop,
+    triggerEvent,
+    useContextMenu
+  }) {
+    this._element = element;
+    this._getMouseDelay = getMouseDelay;
+    this._getNode = getNode;
+    this._onClickButton = onClickButton;
+    this._onClickTitle = onClickTitle;
+    this._onMouseCapture = onMouseCapture;
+    this._onMouseDrag = onMouseDrag;
+    this._onMouseStart = onMouseStart;
+    this._onMouseStop = onMouseStop;
+    this._triggerEvent = triggerEvent;
+    this._useContextMenu = useContextMenu;
+    element.addEventListener("click", this._handleClick);
+    element.addEventListener("dblclick", this._handleDblclick);
+    element.addEventListener("mousedown", this._mouseDown, {
+      passive: false
+    });
+    element.addEventListener("touchstart", this._touchStart, {
+      passive: false
+    });
+    if (useContextMenu) {
+      element.addEventListener("contextmenu", this._handleContextmenu);
+    }
+    this._isMouseStarted = false;
+    this._mouseDelayTimer = null;
+    this._isMouseDelayMet = false;
+    this._mouseDownInfo = null;
+  }
+  deinit() {
+    this._element.removeEventListener("click", this._handleClick);
+    this._element.removeEventListener("dblclick", this._handleDblclick);
+    if (this._useContextMenu) {
+      this._element.removeEventListener("contextmenu", this._handleContextmenu);
+    }
+    this._element.removeEventListener("mousedown", this._mouseDown);
+    this._element.removeEventListener("touchstart", this._touchStart);
+    this._removeMouseMoveEventListeners();
+  }
+  _getClickTarget(element) {
+    const button = element.closest(".html-tree-toggler");
+    if (button) {
+      const node = this._getNode(button);
+      if (node) {
+        return {
+          node,
+          type: "button"
+        };
+      }
+    } else {
+      const treeElement = element.closest(".html-tree-element");
+      if (treeElement) {
+        const node = this._getNode(treeElement);
+        if (node) {
+          return {
+            node,
+            type: "label"
+          };
+        }
+      }
+    }
+    return null;
+  }
+  _handleClick = e => {
+    if (!e.target) {
+      return;
+    }
+    const clickTarget = this._getClickTarget(e.target);
+    if (!clickTarget) {
+      return;
+    }
+    switch (clickTarget.type) {
+      case "button":
+        this._onClickButton(clickTarget.node);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      case "label":
+        {
+          if (this._triggerEvent("tree.click", {
+            click_event: e,
+            node: clickTarget.node
+          })) {
+            this._onClickTitle(clickTarget.node);
+          }
+          break;
+        }
+    }
+  };
+  _handleContextmenu = e => {
+    if (!e.target) {
+      return;
+    }
+    const div = e.target.closest("ul.html-tree .html-tree-element");
+    if (div) {
+      const node = this._getNode(div);
+      if (node) {
+        e.preventDefault();
+        e.stopPropagation();
+        this._triggerEvent("tree.contextmenu", {
+          click_event: e,
+          node
+        });
+        return false;
+      }
+    }
+    return null;
+  };
+  _handleDblclick = e => {
+    if (!e.target) {
+      return;
+    }
+    const clickTarget = this._getClickTarget(e.target);
+    if (clickTarget?.type === "label") {
+      this._triggerEvent("tree.dblclick", {
+        click_event: e,
+        node: clickTarget.node
+      });
+    }
+  };
+  _handleMouseDown(positionInfo) {
+    // We may have missed mouseup (out of window)
+    if (this._isMouseStarted) {
+      this._handleMouseUp(positionInfo);
+    }
+    this._mouseDownInfo = positionInfo;
+    if (!this._onMouseCapture(positionInfo)) {
+      return false;
+    }
+    this._handleStartMouse();
+    return true;
+  }
+  _handleMouseMove(e, positionInfo) {
+    if (this._isMouseStarted) {
+      this._onMouseDrag(positionInfo);
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      return;
+    }
+    if (!this._isMouseDelayMet) {
+      return;
+    }
+    if (this._mouseDownInfo) {
+      this._isMouseStarted = this._onMouseStart(this._mouseDownInfo);
+    }
+    if (this._isMouseStarted) {
+      this._onMouseDrag(positionInfo);
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+    } else {
+      this._handleMouseUp(positionInfo);
+    }
+  }
+  _handleMouseUp(positionInfo) {
+    this._removeMouseMoveEventListeners();
+    this._isMouseDelayMet = false;
+    this._mouseDownInfo = null;
+    if (this._isMouseStarted) {
+      this._isMouseStarted = false;
+      this._onMouseStop(positionInfo);
+    }
+  }
+  _handleStartMouse() {
+    document.addEventListener("mousemove", this._mouseMove, {
+      passive: false
+    });
+    document.addEventListener("touchmove", this._touchMove, {
+      passive: false
+    });
+    document.addEventListener("mouseup", this._mouseUp, {
+      passive: false
+    });
+    document.addEventListener("touchend", this._touchEnd, {
+      passive: false
+    });
+    const mouseDelay = this._getMouseDelay();
+    if (mouseDelay) {
+      this._startMouseDelayTimer(mouseDelay);
+    } else {
+      this._isMouseDelayMet = true;
+    }
+  }
+  _mouseDown = e => {
+    // Left mouse button?
+    if (e.button !== 0) {
+      return;
+    }
+    const result = this._handleMouseDown(getPositionInfoFromMouseEvent(e));
+    if (result && e.cancelable) {
+      e.preventDefault();
+    }
+  };
+  _mouseMove = e => {
+    this._handleMouseMove(e, getPositionInfoFromMouseEvent(e));
+  };
+  _mouseUp = e => {
+    this._handleMouseUp(getPositionInfoFromMouseEvent(e));
+  };
+  _removeMouseMoveEventListeners() {
+    document.removeEventListener("mousemove", this._mouseMove);
+    document.removeEventListener("touchmove", this._touchMove);
+    document.removeEventListener("mouseup", this._mouseUp);
+    document.removeEventListener("touchend", this._touchEnd);
+  }
+  _startMouseDelayTimer(mouseDelay) {
+    if (this._mouseDelayTimer) {
+      clearTimeout(this._mouseDelayTimer);
+    }
+    this._mouseDelayTimer = window.setTimeout(() => {
+      if (this._mouseDownInfo) {
+        this._isMouseDelayMet = true;
+      }
+    }, mouseDelay);
+    this._isMouseDelayMet = false;
+  }
+  _touchEnd = e => {
+    if (e.touches.length > 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) {
+      return;
+    }
+    this._handleMouseUp(getPositionInfoFromTouch(touch, e));
+  };
+  _touchMove = e => {
+    if (e.touches.length > 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) {
+      return;
+    }
+    this._handleMouseMove(e, getPositionInfoFromTouch(touch, e));
+  };
+  _touchStart = e => {
+    if (e.touches.length > 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) {
+      return;
+    }
+    this._handleMouseDown(getPositionInfoFromTouch(touch, e));
+  };
+}
+
+
+//# sourceMappingURL=mouseHandler.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeUtils.js
+const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
+
+
+//# sourceMappingURL=nodeUtils.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/node.js
+
 
 /*
-JqTree 1.8.11
+A node reads and writes the private members of other nodes (node.setParent),
+so the `_` prefix that the build adds cannot be limited to `this.`:
+
+prefix-private-members: all
+*/
+
+class Node {
+  children;
+  element;
+  id;
+  idMapping;
+  is_loading;
+  is_open;
+  isEmptyFolder;
+  load_on_demand;
+  name;
+  nodeClass;
+  parent;
+  tree;
+  constructor(nodeData = null, isRoot = false, nodeClass = Node) {
+    this.name = "";
+    this.load_on_demand = false;
+    this.isEmptyFolder = nodeData != null && isNodeRecordWithChildren(nodeData) && nodeData.children.length === 0;
+    this.setData(nodeData);
+    this.children = [];
+    this.parent = null;
+    this.is_loading = undefined;
+    this.is_open ??= undefined;
+    if (isRoot) {
+      this.idMapping = new Map();
+      this.tree = this;
+      this.nodeClass = nodeClass;
+    } else {
+      this.idMapping = undefined;
+    }
+  }
+  addAfter(nodeInfo) {
+    if (!this.parent) {
+      return null;
+    } else {
+      const node = this._createNode(nodeInfo);
+      const childIndex = this.parent.getChildIndex(this);
+      this.parent.addChildAtPosition(node, childIndex + 1);
+      node._loadChildrenFromData(nodeInfo);
+      return node;
+    }
+  }
+  addBefore(nodeInfo) {
+    if (!this.parent) {
+      return null;
+    } else {
+      const node = this._createNode(nodeInfo);
+      const childIndex = this.parent.getChildIndex(this);
+      this.parent.addChildAtPosition(node, childIndex);
+      node._loadChildrenFromData(nodeInfo);
+      return node;
+    }
+  }
+
+  /*
+  Add child.
+   tree.addChild(
+      new Node('child1')
+  );
+  */
+  addChild(node) {
+    this.children.push(node);
+    node._setParent(this);
+  }
+
+  /*
+  Add child at position. Index starts at 0.
+   tree.addChildAtPosition(
+      new Node('abc'),
+      1
+  );
+  */
+  addChildAtPosition(node, index) {
+    this.children.splice(index, 0, node);
+    node._setParent(this);
+  }
+  addNodeToIndex(node) {
+    if (node.id != null) {
+      this.idMapping?.set(node.id, node);
+    }
+  }
+  addParent(nodeInfo) {
+    if (!this.parent) {
+      return null;
+    } else {
+      const newParent = this._createNode(nodeInfo);
+      if (this.tree) {
+        newParent._setParent(this.tree);
+      }
+      const originalParent = this.parent;
+      for (const child of originalParent.children) {
+        newParent.addChild(child);
+      }
+      originalParent.children = [];
+      originalParent.addChild(newParent);
+      return newParent;
+    }
+  }
+  append(nodeInfo) {
+    const node = this._createNode(nodeInfo);
+    this.addChild(node);
+    node._loadChildrenFromData(nodeInfo);
+    return node;
+  }
+  filter(f) {
+    const result = [];
+    this.iterate(node => {
+      if (f(node)) {
+        result.push(node);
+      }
+      return true;
+    });
+    return result;
+  }
+
+  /*
+  Get child index.
+   var index = getChildIndex(node);
+  */
+  getChildIndex(node) {
+    return this.children.indexOf(node);
+  }
+
+  /*
+  Get the tree as data.
+  */
+  getData(includeParent = false) {
+    const getDataFromNodes = nodes => {
+      return nodes.map(node => {
+        const tmpNode = {};
+        for (const k in node) {
+          if (["parent", "children", "element", "idMapping", "load_on_demand", "nodeClass", "tree", "isEmptyFolder"].indexOf(k) === -1 && Object.prototype.hasOwnProperty.call(node, k)) {
+            const v = node[k];
+            tmpNode[k] = v;
+          }
+        }
+        if (node.hasChildren()) {
+          tmpNode.children = getDataFromNodes(node.children);
+        }
+        return tmpNode;
+      });
+    };
+    if (includeParent) {
+      return getDataFromNodes([this]);
+    } else {
+      return getDataFromNodes(this.children);
+    }
+  }
+  getLastChild() {
+    if (!this.hasChildren()) {
+      return null;
+    } else {
+      const lastChild = this.children[this.children.length - 1];
+      if (!(lastChild.hasChildren() && lastChild.is_open)) {
+        return lastChild;
+      } else {
+        return lastChild.getLastChild();
+      }
+    }
+  }
+  getLevel() {
+    let level = 0;
+    let node = this; // eslint-disable-line @typescript-eslint/no-this-alias
+
+    while (node.parent) {
+      level += 1;
+      node = node.parent;
+    }
+    return level;
+  }
+  getNextNode(includeChildren = true) {
+    if (includeChildren && this.hasChildren()) {
+      return this.children[0] ?? null;
+    } else if (!this.parent) {
+      return null;
+    } else {
+      const nextSibling = this.getNextSibling();
+      if (nextSibling) {
+        return nextSibling;
+      } else {
+        return this.parent.getNextNode(false);
+      }
+    }
+  }
+  getNextSibling() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const nextIndex = this.parent.getChildIndex(this) + 1;
+      if (nextIndex < this.parent.children.length) {
+        return this.parent.children[nextIndex] ?? null;
+      } else {
+        return null;
+      }
+    }
+  }
+  getNextVisibleNode() {
+    if (this.hasChildren() && this.is_open) {
+      // First child
+      return this.children[0] ?? null;
+    } else {
+      if (!this.parent) {
+        return null;
+      } else {
+        const nextSibling = this.getNextSibling();
+        if (nextSibling) {
+          // Next sibling
+          return nextSibling;
+        } else {
+          // Next node of parent
+          return this.parent.getNextNode(false);
+        }
+      }
+    }
+  }
+  getNodeByCallback(callback) {
+    let result = null;
+    this.iterate(node => {
+      if (result) {
+        return false;
+      } else if (callback(node)) {
+        result = node;
+        return false;
+      } else {
+        return true;
+      }
+    });
+    return result;
+  }
+  getNodeById(nodeId) {
+    return this.idMapping?.get(nodeId) ?? null;
+  }
+  getNodeByName(name) {
+    return this.getNodeByCallback(node => node.name === name);
+  }
+  getNodeByNameMustExist(name) {
+    const node = this.getNodeByCallback(n => n.name === name);
+    if (!node) {
+      throw new Error(`Node with name ${name} not found`);
+    }
+    return node;
+  }
+  getNodesByProperty(key, value) {
+    return this.filter(node => node[key] === value);
+  }
+  getParent() {
+    // Return parent except if it is the root node
+    if (!this.parent) {
+      return null;
+    } else if (!this.parent.parent) {
+      // Root node -> null
+      return null;
+    } else {
+      return this.parent;
+    }
+  }
+  getPreviousNode() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const previousSibling = this.getPreviousSibling();
+      if (!previousSibling) {
+        return this.getParent();
+      } else if (previousSibling.hasChildren()) {
+        return previousSibling.getLastChild();
+      } else {
+        return previousSibling;
+      }
+    }
+  }
+  getPreviousSibling() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const previousIndex = this.parent.getChildIndex(this) - 1;
+      if (previousIndex >= 0) {
+        return this.parent.children[previousIndex] ?? null;
+      } else {
+        return null;
+      }
+    }
+  }
+  getPreviousVisibleNode() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const previousSibling = this.getPreviousSibling();
+      if (!previousSibling) {
+        return this.getParent();
+      } else if (!previousSibling.hasChildren() || !previousSibling.is_open) {
+        // Previous sibling
+        return previousSibling;
+      } else {
+        // Last child of previous sibling
+        return previousSibling.getLastChild();
+      }
+    }
+  }
+
+  /*
+  Does the tree have children?
+   if (tree.hasChildren()) {
+      //
+  }
+  */
+  hasChildren() {
+    return this.children.length !== 0;
+  }
+
+  // Init Node from data without making it the root of the tree
+  initFromData(data) {
+    const addNode = nodeData => {
+      this.setData(nodeData);
+      if (isNodeRecordWithChildren(nodeData) && nodeData.children.length) {
+        addChildren(nodeData.children);
+      }
+    };
+    const addChildren = childrenData => {
+      for (const child of childrenData) {
+        const node = this._createNode();
+        node.initFromData(child);
+        this.addChild(node);
+      }
+    };
+    addNode(data);
+  }
+  isFolder() {
+    return this.hasChildren() || this.load_on_demand;
+  }
+  isParentOf(node) {
+    let parent = node.parent;
+    while (parent) {
+      if (parent === this) {
+        return true;
+      }
+      parent = parent.parent;
+    }
+    return false;
+  }
+
+  /*
+  Iterate over all the nodes in the tree.
+   Calls callback with (node, level).
+   The callback must return true to continue the iteration on current node.
+   tree.iterate(
+      function(node, level) {
+         console.log(node.name);
+          // stop iteration after level 2
+         return (level <= 2);
+      }
+  );
+   */
+  iterate(callback) {
+    const _iterate = (node, level) => {
+      for (const child of node.children) {
+        const result = callback(child, level);
+        if (result && child.hasChildren()) {
+          _iterate(child, level + 1);
+        }
+      }
+    };
+    _iterate(this, 0);
+  }
+
+  /*
+  Create tree from data.
+   Structure of data is:
+  [
+      {
+          name: 'node1',
+          children: [
+              { name: 'child1' },
+              { name: 'child2' }
+          ]
+      },
+      {
+          name: 'node2'
+      }
+  ]
+  */
+  loadFromData(data) {
+    this.removeChildren();
+    for (const childData of data) {
+      const node = this._createNode(childData);
+      this.addChild(node);
+      if (isNodeRecordWithChildren(childData)) {
+        node.loadFromData(childData.children);
+      }
+    }
+    return this;
+  }
+
+  /*
+  Move node relative to another node.
+   Argument position: Position.BEFORE, Position.AFTER or Position.Inside
+   // move node1 after node2
+  tree.moveNode(node1, node2, Position.AFTER);
+  */
+  moveNode(movedNode, targetNode, position) {
+    if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
+      // - Node is parent of target node
+      // - Or, parent is empty
+      return false;
+    } else {
+      movedNode.parent._doRemoveChild(movedNode);
+      switch (position) {
+        case "after":
+          {
+            if (targetNode.parent) {
+              targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+              return true;
+            }
+            return false;
+          }
+        case "before":
+          {
+            if (targetNode.parent) {
+              targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+              return true;
+            }
+            return false;
+          }
+        case "inside":
+          {
+            // move inside as first child
+            targetNode.addChildAtPosition(movedNode, 0);
+            return true;
+          }
+      }
+    }
+  }
+  prepend(nodeInfo) {
+    const node = this._createNode(nodeInfo);
+    this.addChildAtPosition(node, 0);
+    node._loadChildrenFromData(nodeInfo);
+    return node;
+  }
+  remove() {
+    if (this.parent) {
+      this.parent.removeChild(this);
+      this.parent = null;
+    }
+  }
+
+  /*
+  Remove child. This also removes the children of the node.
+   tree.removeChild(tree.children[0]);
+  */
+  removeChild(node) {
+    // remove children from the index
+    node.removeChildren();
+    this._doRemoveChild(node);
+  }
+  removeChildren() {
+    this.iterate(child => {
+      this.tree?.removeNodeFromIndex(child);
+      return true;
+    });
+    this.children = [];
+  }
+  removeNodeFromIndex(node) {
+    if (node.id != null) {
+      this.idMapping?.delete(node.id);
+    }
+  }
+
+  /*
+  Set the data of this node.
+   setData(string): set the name of the node
+  setData(object): set attributes of the node
+   Examples:
+      setData('node1')
+       setData({ name: 'node1', id: 1});
+       setData({ name: 'node2', id: 2, color: 'green'});
+   * This is an internal function; it is not in the docs
+  * Does not remove existing node values
+  */
+  setData(o) {
+    if (!o) {
+      return;
+    } else if (typeof o === "string") {
+      this.name = o;
+    } else if (typeof o === "object") {
+      for (const key in o) {
+        if (Object.prototype.hasOwnProperty.call(o, key)) {
+          const value = o[key];
+          if (key === "label" || key === "name") {
+            // You can use the 'label' key instead of 'name'; this is a legacy feature
+            if (typeof value === "string") {
+              this.name = value;
+            }
+          } else if (key !== "children" && key !== "parent") {
+            // You can't update the children or the parent using this function
+            this[key] = value;
+          }
+        }
+      }
+    }
+  }
+  _createNode(nodeData) {
+    const nodeClass = this._getNodeClass();
+    return new nodeClass(nodeData);
+  }
+  _doRemoveChild(node) {
+    this.children.splice(this.getChildIndex(node), 1);
+    this.tree?.removeNodeFromIndex(node);
+  }
+  _getNodeClass() {
+    return this.nodeClass ?? this.tree?.nodeClass ?? Node;
+  }
+
+  // Load children data from nodeInfo if it has children
+  _loadChildrenFromData(nodeInfo) {
+    if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+      this.loadFromData(nodeInfo.children);
+    }
+  }
+  _setParent(parent) {
+    this.parent = parent;
+    this.tree = parent.tree;
+    this.tree?.addNodeToIndex(this);
+  }
+}
+
+
+//# sourceMappingURL=node.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/borderDropHint.js
+class BorderDropHint {
+  _hint;
+  constructor(element, scrollLeft) {
+    const div = element.querySelector(":scope > .html-tree-element");
+    if (!div) {
+      this._hint = undefined;
+      return;
+    }
+    const width = Math.max(element.offsetWidth + scrollLeft - 4, 0);
+    const height = Math.max(element.clientHeight - 4, 0);
+    const hint = document.createElement("span");
+    hint.className = "html-tree-border";
+    hint.style.width = `${width}px`;
+    hint.style.height = `${height}px`;
+    this._hint = hint;
+    div.append(this._hint);
+  }
+  remove() {
+    this._hint?.remove();
+  }
+}
+
+
+//# sourceMappingURL=borderDropHint.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/ghostDropHint.js
+class GhostDropHint {
+  _element;
+  _ghost;
+  _node;
+  constructor(node, element, position) {
+    this._element = element;
+    this._node = node;
+    this._ghost = this._createGhostElement();
+    switch (position) {
+      case "after":
+        this._moveAfter();
+        break;
+      case "before":
+        this._moveBefore();
+        break;
+      case "inside":
+        {
+          if (node.isFolder() && node.is_open) {
+            this._moveInsideOpenFolder();
+          } else {
+            this._moveInside();
+          }
+        }
+    }
+  }
+  remove() {
+    this._ghost.remove();
+  }
+  _createGhostElement() {
+    const ghost = document.createElement("li");
+    ghost.className = "html-tree-common html-tree-ghost";
+    const circleSpan = document.createElement("span");
+    circleSpan.className = "html-tree-common html-tree-circle";
+    ghost.append(circleSpan);
+    const lineSpan = document.createElement("span");
+    lineSpan.className = "html-tree-common html-tree-line";
+    ghost.append(lineSpan);
+    return ghost;
+  }
+  _moveAfter() {
+    this._element.after(this._ghost);
+  }
+  _moveBefore() {
+    this._element.before(this._ghost);
+  }
+  _moveInside() {
+    this._element.after(this._ghost);
+    this._ghost.classList.add("html-tree-inside");
+  }
+  _moveInsideOpenFolder() {
+    const childElement = this._node.children[0]?.element;
+    if (childElement) {
+      childElement.before(this._ghost);
+    }
+  }
+}
+
+
+//# sourceMappingURL=ghostDropHint.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/index.js
+
+
+
+class NodeElement {
+  element;
+  node;
+  _getScrollLeft;
+  _tabIndex;
+  _treeElement;
+  constructor({
+    getScrollLeft,
+    node,
+    tabIndex,
+    treeElement
+  }) {
+    this._getScrollLeft = getScrollLeft;
+    this.node = node;
+    this._tabIndex = tabIndex;
+    this._treeElement = treeElement;
+    node.element ??= this._treeElement;
+    this.element = node.element;
+  }
+  addDropHint(position) {
+    if (this._mustShowBorderDropHint(position)) {
+      return new BorderDropHint(this.element, this._getScrollLeft());
+    } else {
+      return new GhostDropHint(this.node, this.element, position);
+    }
+  }
+  deselect() {
+    this.element.classList.remove("html-tree-selected");
+    const titleSpan = this._getTitleSpan();
+    titleSpan.removeAttribute("tabindex");
+    titleSpan.setAttribute("aria-selected", "false");
+    titleSpan.blur();
+  }
+  select(mustSetFocus) {
+    this.element.classList.add("html-tree-selected");
+    const titleSpan = this._getTitleSpan();
+    const tabIndex = this._tabIndex;
+
+    // Check for null or undefined
+    if (tabIndex != null) {
+      titleSpan.setAttribute("tabindex", tabIndex.toString());
+    }
+    titleSpan.setAttribute("aria-selected", "true");
+    if (mustSetFocus) {
+      titleSpan.focus();
+    }
+  }
+  _getTitleSpan() {
+    return this.element.querySelector(":scope > .html-tree-element > span.html-tree-title");
+  }
+  _getUl() {
+    return this.element.querySelector(":scope > ul");
+  }
+  _mustShowBorderDropHint(position) {
+    return position === "inside";
+  }
+}
+
+
+//# sourceMappingURL=index.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/animation.js
+const getAnimationDuration = duration => {
+  if (typeof duration === "number") {
+    return duration;
+  }
+  return duration === "slow" ? 600 : 200;
+};
+const slideDown = (element, animationSpeed, onFinished) => {
+  element.style.display = "block";
+  const animation = element.animate([{
+    height: "0",
+    overflow: "hidden"
+  }, {
+    height: `${element.scrollHeight}px`,
+    overflow: "hidden"
+  }], {
+    duration: getAnimationDuration(animationSpeed)
+  });
+  animation.onfinish = () => {
+    onFinished();
+  };
+};
+const slideUp = (element, animationSpeed, onFinished) => {
+  const animation = element.animate([{
+    height: `${element.scrollHeight}px`,
+    overflow: "hidden"
+  }, {
+    height: "0",
+    overflow: "hidden"
+  }], {
+    duration: getAnimationDuration(animationSpeed)
+  });
+  animation.onfinish = () => {
+    element.style.display = "none";
+    onFinished();
+  };
+};
+
+
+//# sourceMappingURL=animation.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/folderElement.js
+
+
+
+class FolderElement extends NodeElement {
+  _closedIconElement;
+  _openedIconElement;
+  _triggerEvent;
+  constructor({
+    closedIconElement,
+    getScrollLeft,
+    node,
+    openedIconElement,
+    tabIndex,
+    treeElement,
+    triggerEvent
+  }) {
+    super({
+      getScrollLeft,
+      node,
+      tabIndex,
+      treeElement
+    });
+    this._closedIconElement = closedIconElement;
+    this._openedIconElement = openedIconElement;
+    this._triggerEvent = triggerEvent;
+  }
+  close(slide, animationSpeed) {
+    if (!this.node.is_open) {
+      return;
+    }
+    this.node.is_open = false;
+    const button = this._getButton();
+    button.classList.add("html-tree-closed");
+    button.innerHTML = "";
+    const closedIconElement = this._closedIconElement;
+    if (closedIconElement) {
+      const icon = closedIconElement.cloneNode(true);
+      button.appendChild(icon);
+    }
+    const doClose = () => {
+      this.element.classList.add("html-tree-closed");
+      const titleSpan = this._getTitleSpan();
+      titleSpan.setAttribute("aria-expanded", "false");
+      this._triggerEvent("tree.close", {
+        node: this.node
+      });
+    };
+    const ul = this._getUl();
+    if (slide) {
+      slideUp(ul, animationSpeed, doClose);
+    } else {
+      ul.style.display = "none";
+      doClose();
+    }
+  }
+  open(onFinished, slide, animationSpeed) {
+    if (this.node.is_open) {
+      return;
+    }
+    this.node.is_open = true;
+    const button = this._getButton();
+    button.classList.remove("html-tree-closed");
+    button.innerHTML = "";
+    const openedIconElement = this._openedIconElement;
+    if (openedIconElement) {
+      const icon = openedIconElement.cloneNode(true);
+      button.appendChild(icon);
+    }
+    const doOpen = () => {
+      this.element.classList.remove("html-tree-closed");
+      const titleSpan = this._getTitleSpan();
+      titleSpan.setAttribute("aria-expanded", "true");
+      if (onFinished) {
+        onFinished(this.node);
+      }
+      this._triggerEvent("tree.open", {
+        node: this.node
+      });
+    };
+    const ul = this._getUl();
+    if (slide) {
+      slideDown(ul, animationSpeed, doOpen);
+    } else {
+      ul.style.display = "block";
+      doOpen();
+    }
+  }
+  _mustShowBorderDropHint(position) {
+    return !this.node.is_open && position === "inside";
+  }
+  _getButton() {
+    return this.element.querySelector(":scope > .html-tree-element > a.html-tree-toggler");
+  }
+}
+
+
+//# sourceMappingURL=folderElement.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/requestUrl.js
+// Url class for absolute and relative urls.
+
+const isAbsoluteUrl = inputUrl => {
+  try {
+    new URL(inputUrl);
+    return true;
+  } catch {
+    return false;
+  }
+};
+const LOCALHOST = "http://localhost";
+class RequestUrl {
+  _isAbsolute;
+  _url;
+  constructor(inputUrl) {
+    if (isAbsoluteUrl(inputUrl)) {
+      this._url = new URL(inputUrl);
+      this._isAbsolute = true;
+    } else {
+      this._url = new URL(inputUrl, LOCALHOST);
+      this._isAbsolute = false;
+    }
+  }
+  setSearchParam(key, value) {
+    this._url.searchParams.set(key, value);
+  }
+  toString() {
+    if (this._isAbsolute) {
+      return this._url.href;
+    } else {
+      return this._url.href.slice(LOCALHOST.length);
+    }
+  }
+}
+
+
+//# sourceMappingURL=requestUrl.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/saveStateHandler.js
+
+
+class SaveStateHandler {
+  _addToSelection;
+  _getNodeById;
+  _getSelectedNodes;
+  _getTree;
+  _onGetStateFromStorage;
+  _onSetStateFromStorage;
+  _openNode;
+  _refreshElements;
+  _removeFromSelection;
+  _saveStateOption;
+  constructor({
+    addToSelection,
+    getNodeById,
+    getSelectedNodes,
+    getTree,
+    onGetStateFromStorage,
+    onSetStateFromStorage,
+    openNode,
+    refreshElements,
+    removeFromSelection,
+    saveState
+  }) {
+    this._addToSelection = addToSelection;
+    this._getNodeById = getNodeById;
+    this._getSelectedNodes = getSelectedNodes;
+    this._getTree = getTree;
+    this._onGetStateFromStorage = onGetStateFromStorage;
+    this._onSetStateFromStorage = onSetStateFromStorage;
+    this._openNode = openNode;
+    this._refreshElements = refreshElements;
+    this._removeFromSelection = removeFromSelection;
+    this._saveStateOption = saveState;
+  }
+  getNodeIdToBeSelected() {
+    const state = this.getStateFromStorage();
+    if (state?.selected_node) {
+      return state.selected_node[0] ?? null;
+    } else {
+      return null;
+    }
+  }
+  getState() {
+    const getOpenNodeIds = () => {
+      const openNodes = [];
+      this._getTree()?.iterate(node => {
+        if (node.is_open && node.id && node.hasChildren()) {
+          openNodes.push(node.id);
+        }
+        return true;
+      });
+      return openNodes;
+    };
+    const getSelectedNodeIds = () => {
+      const selectedNodeIds = [];
+      this._getSelectedNodes().forEach(node => {
+        if (node.id != null) {
+          selectedNodeIds.push(node.id);
+        }
+      });
+      return selectedNodeIds;
+    };
+    return {
+      open_nodes: getOpenNodeIds(),
+      selected_node: getSelectedNodeIds()
+    };
+  }
+  getStateFromStorage() {
+    const jsonData = this._loadFromStorage();
+    if (jsonData) {
+      return this._parseState(jsonData);
+    } else {
+      return null;
+    }
+  }
+  saveState() {
+    const state = JSON.stringify(this.getState());
+    if (this._onSetStateFromStorage) {
+      this._onSetStateFromStorage(state);
+    } else {
+      localStorage.setItem(this._getKeyName(), state);
+    }
+  }
+
+  /*
+  Set initial state
+  Don't handle nodes that are loaded on demand
+   result: must load on demand (boolean)
+  */
+  setInitialState(state) {
+    let mustLoadOnDemand = false;
+    if (state.open_nodes) {
+      mustLoadOnDemand = this._openInitialNodes(state.open_nodes);
+    }
+    this._resetSelection();
+    if (state.selected_node) {
+      this._selectInitialNodes(state.selected_node);
+    }
+    return mustLoadOnDemand;
+  }
+  setInitialStateOnDemand(state, cbFinished) {
+    let loadingCount = 0;
+    let nodeIds = state.open_nodes;
+    const openNodes = () => {
+      if (!nodeIds) {
+        return;
+      }
+      const newNodesIds = [];
+      for (const nodeId of nodeIds) {
+        const node = this._getNodeById(nodeId);
+        if (!node) {
+          newNodesIds.push(nodeId);
+        } else {
+          if (!node.is_loading) {
+            if (node.load_on_demand) {
+              loadAndOpenNode(node);
+            } else {
+              this._openNode(node, false);
+            }
+          }
+        }
+      }
+      nodeIds = newNodesIds;
+      if (state.selected_node) {
+        if (this._selectInitialNodes(state.selected_node)) {
+          this._refreshElements(null);
+        }
+      }
+      if (loadingCount === 0) {
+        cbFinished();
+      }
+    };
+    const loadAndOpenNode = node => {
+      loadingCount += 1;
+      this._openNode(node, false, () => {
+        loadingCount -= 1;
+        openNodes();
+      });
+    };
+    openNodes();
+  }
+  _getKeyName() {
+    if (typeof this._saveStateOption === "string") {
+      return this._saveStateOption;
+    } else {
+      return "tree";
+    }
+  }
+  _loadFromStorage() {
+    if (this._onGetStateFromStorage) {
+      return this._onGetStateFromStorage();
+    } else {
+      return localStorage.getItem(this._getKeyName());
+    }
+  }
+  _openInitialNodes(nodeIds) {
+    let mustLoadOnDemand = false;
+    for (const nodeId of nodeIds) {
+      const node = this._getNodeById(nodeId);
+      if (node) {
+        if (!node.load_on_demand) {
+          node.is_open = true;
+        } else {
+          mustLoadOnDemand = true;
+        }
+      }
+    }
+    return mustLoadOnDemand;
+  }
+  _parseState(jsonData) {
+    const state = JSON.parse(jsonData);
+
+    // Check if selected_node is an int (instead of an array)
+    if (state.selected_node && isInt(state.selected_node)) {
+      // Convert to array
+      state.selected_node = [state.selected_node];
+    }
+    return state;
+  }
+  _resetSelection() {
+    const selectedNodes = this._getSelectedNodes();
+    selectedNodes.forEach(node => {
+      this._removeFromSelection(node);
+    });
+  }
+  _selectInitialNodes(nodeIds) {
+    let selectCount = 0;
+    for (const nodeId of nodeIds) {
+      const node = this._getNodeById(nodeId);
+      if (node) {
+        selectCount += 1;
+        this._addToSelection(node);
+      }
+    }
+    return selectCount !== 0;
+  }
+}
+
+
+//# sourceMappingURL=saveStateHandler.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/scrollParent.js
+class ScrollParent {
+  _container;
+  _horizontalScrollDirection;
+  _horizontalScrollTimeout;
+  _refreshHitAreas;
+  _verticalScrollDirection;
+  _verticalScrollTimeout;
+  constructor({
+    container,
+    refreshHitAreas
+  }) {
+    this._container = container;
+    this._refreshHitAreas = refreshHitAreas;
+  }
+  checkHorizontalScrolling(pageX) {
+    const newHorizontalScrollDirection = this._getNewHorizontalScrollDirection(pageX);
+    if (this._horizontalScrollDirection !== newHorizontalScrollDirection) {
+      this._horizontalScrollDirection = newHorizontalScrollDirection;
+      if (this._horizontalScrollTimeout != null) {
+        window.clearTimeout(this._horizontalScrollTimeout);
+      }
+      if (newHorizontalScrollDirection) {
+        this._horizontalScrollTimeout = window.setTimeout(this._scrollHorizontally.bind(this), 40);
+      }
+    }
+  }
+  checkVerticalScrolling(pageY) {
+    const newVerticalScrollDirection = this._getNewVerticalScrollDirection(pageY);
+    if (this._verticalScrollDirection !== newVerticalScrollDirection) {
+      this._verticalScrollDirection = newVerticalScrollDirection;
+      if (this._verticalScrollTimeout != null) {
+        window.clearTimeout(this._verticalScrollTimeout);
+        this._verticalScrollTimeout = undefined;
+      }
+      if (newVerticalScrollDirection) {
+        this._verticalScrollTimeout = window.setTimeout(this._scrollVertically.bind(this), 40);
+      }
+    }
+  }
+  getScrollLeft() {
+    return this._container.scrollLeft;
+  }
+  scrollToY(top) {
+    this._container.scrollTop = top;
+  }
+  stopScrolling() {
+    this._horizontalScrollDirection = undefined;
+    this._verticalScrollDirection = undefined;
+  }
+  _scrollHorizontally() {
+    if (!this._horizontalScrollDirection) {
+      return;
+    }
+    const distance = this._horizontalScrollDirection === "left" ? -20 : 20;
+    this._container.scrollBy({
+      behavior: "instant",
+      left: distance,
+      top: 0
+    });
+    this._refreshHitAreas();
+    setTimeout(this._scrollHorizontally.bind(this), 40);
+  }
+  _scrollVertically() {
+    if (!this._verticalScrollDirection) {
+      return;
+    }
+    const distance = this._verticalScrollDirection === "top" ? -20 : 20;
+    this._container.scrollBy({
+      behavior: "instant",
+      left: 0,
+      top: distance
+    });
+    this._refreshHitAreas();
+    setTimeout(this._scrollVertically.bind(this), 40);
+  }
+}
+
+
+//# sourceMappingURL=scrollParent.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/containerScrollParent.js
+
+
+
+class ContainerScrollParent extends ScrollParent {
+  _scrollParentBottom;
+  _scrollParentTop;
+  stopScrolling() {
+    super.stopScrolling();
+    this._horizontalScrollDirection = undefined;
+    this._verticalScrollDirection = undefined;
+  }
+  _getNewHorizontalScrollDirection(pageX) {
+    const scrollParentOffset = getElementPosition(this._container);
+    const containerWidth = this._container.getBoundingClientRect().width;
+    const rightEdge = scrollParentOffset.left + containerWidth;
+    const leftEdge = scrollParentOffset.left;
+    const isNearRightEdge = pageX > rightEdge - 20;
+    const isNearLeftEdge = pageX < leftEdge + 20;
+    if (isNearRightEdge) {
+      return "right";
+    } else if (isNearLeftEdge) {
+      return "left";
+    }
+    return undefined;
+  }
+  _getNewVerticalScrollDirection(pageY) {
+    if (pageY < this._getScrollParentTop()) {
+      return "top";
+    }
+    if (pageY > this._getScrollParentBottom()) {
+      return "bottom";
+    }
+    return undefined;
+  }
+  _getScrollParentBottom() {
+    if (this._scrollParentBottom == null) {
+      const containerHeight = this._container.getBoundingClientRect().height;
+      this._scrollParentBottom = this._getScrollParentTop() + containerHeight;
+    }
+    return this._scrollParentBottom;
+  }
+  _getScrollParentTop() {
+    this._scrollParentTop ??= getOffsetTop(this._container);
+    return this._scrollParentTop;
+  }
+}
+
+
+//# sourceMappingURL=containerScrollParent.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/documentScrollParent.js
+
+
+
+class DocumentScrollParent extends ScrollParent {
+  _documentScrollHeight;
+  _documentScrollWidth;
+  _treeElement;
+  constructor({
+    refreshHitAreas,
+    treeElement
+  }) {
+    super({
+      container: document.documentElement,
+      refreshHitAreas
+    });
+    this._treeElement = treeElement;
+  }
+  scrollToY(top) {
+    const treeTop = getOffsetTop(this._treeElement);
+    super.scrollToY(top + treeTop);
+  }
+  stopScrolling() {
+    super.stopScrolling();
+    this._documentScrollHeight = undefined;
+    this._documentScrollWidth = undefined;
+  }
+  _getNewHorizontalScrollDirection(pageX) {
+    const scrollLeft = this._container.scrollLeft;
+    const windowWidth = window.innerWidth;
+    const isNearRightEdge = pageX > windowWidth - 20;
+    const isNearLeftEdge = pageX - scrollLeft < 20;
+    if (isNearRightEdge && this._canScrollRight()) {
+      return "right";
+    }
+    if (isNearLeftEdge) {
+      return "left";
+    }
+    return undefined;
+  }
+  _getNewVerticalScrollDirection(pageY) {
+    const scrollTop = this._container.scrollTop;
+    const distanceTop = pageY - scrollTop;
+    if (distanceTop < 20) {
+      return "top";
+    }
+    const windowHeight = window.innerHeight;
+    if (windowHeight - (pageY - scrollTop) < 20 && this._canScrollDown()) {
+      return "bottom";
+    }
+    return undefined;
+  }
+  _canScrollDown() {
+    return this._container.scrollTop + this._container.clientHeight < this._getDocumentScrollHeight();
+  }
+  _canScrollRight() {
+    return this._container.scrollLeft + this._container.clientWidth < this._getDocumentScrollWidth();
+  }
+  _getDocumentScrollHeight() {
+    // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
+    this._documentScrollHeight ??= this._container.scrollHeight;
+    return this._documentScrollHeight;
+  }
+  _getDocumentScrollWidth() {
+    // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
+    this._documentScrollWidth ??= this._container.scrollWidth;
+    return this._documentScrollWidth;
+  }
+}
+
+
+//# sourceMappingURL=documentScrollParent.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/createScrollParent.js
+
+
+
+const isOverflow = overflowValue => overflowValue === "auto" || overflowValue === "scroll";
+const hasOverFlow = element => {
+  const style = getComputedStyle(element);
+  return isOverflow(style.overflowX) || isOverflow(style.overflowY);
+};
+const getParentWithOverflow = treeElement => {
+  if (hasOverFlow(treeElement)) {
+    return treeElement;
+  }
+  let parent = treeElement.parentElement;
+  while (parent) {
+    if (hasOverFlow(parent)) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+  return null;
+};
+const createScrollParent = (treeElement, refreshHitAreas) => {
+  const container = getParentWithOverflow(treeElement);
+  if (container && container.tagName !== "HTML") {
+    return new ContainerScrollParent({
+      container,
+      refreshHitAreas
+    });
+  } else {
+    return new DocumentScrollParent({
+      refreshHitAreas,
+      treeElement
+    });
+  }
+};
+
+
+//# sourceMappingURL=createScrollParent.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler.js
+
+
+class ScrollHandler {
+  _refreshHitAreas;
+  _scrollParent;
+  _treeElement;
+  constructor({
+    refreshHitAreas,
+    treeElement
+  }) {
+    this._refreshHitAreas = refreshHitAreas;
+    this._scrollParent = undefined;
+    this._treeElement = treeElement;
+  }
+  checkScrolling(positionInfo) {
+    this._checkVerticalScrolling(positionInfo);
+    this._checkHorizontalScrolling(positionInfo);
+  }
+  getScrollLeft() {
+    return this._getScrollParent().getScrollLeft();
+  }
+  scrollToY(top) {
+    this._getScrollParent().scrollToY(top);
+  }
+  stopScrolling() {
+    this._getScrollParent().stopScrolling();
+  }
+  _checkHorizontalScrolling(positionInfo) {
+    this._getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
+  }
+  _checkVerticalScrolling(positionInfo) {
+    this._getScrollParent().checkVerticalScrolling(positionInfo.pageY);
+  }
+  _getScrollParent() {
+    this._scrollParent ??= createScrollParent(this._treeElement, this._refreshHitAreas);
+    return this._scrollParent;
+  }
+}
+
+
+//# sourceMappingURL=scrollHandler.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/selectNodeHandler.js
+class SelectNodeHandler {
+  _getNodeById;
+  _selectedNodes;
+  _selectedSingleNode;
+  constructor({
+    getNodeById
+  }) {
+    this._getNodeById = getNodeById;
+    this._selectedNodes = new Set();
+    this._selectedSingleNode = null;
+  }
+  addToSelection(node) {
+    if (node.id != null) {
+      this._selectedNodes.add(node.id);
+    } else {
+      this._selectedSingleNode = node;
+    }
+  }
+  clear() {
+    this._selectedNodes.clear();
+    this._selectedSingleNode = null;
+  }
+  getSelectedNode() {
+    const selectedNodes = this.getSelectedNodes();
+    if (selectedNodes.length) {
+      return selectedNodes[0] ?? false;
+    } else {
+      return false;
+    }
+  }
+  getSelectedNodes() {
+    if (this._selectedSingleNode) {
+      return [this._selectedSingleNode];
+    } else {
+      const selectedNodes = [];
+      this._selectedNodes.forEach(id => {
+        const node = this._getNodeById(id);
+        if (node) {
+          selectedNodes.push(node);
+        }
+      });
+      return selectedNodes;
+    }
+  }
+  getSelectedNodesUnder(parent) {
+    if (this._selectedSingleNode) {
+      if (parent.isParentOf(this._selectedSingleNode)) {
+        return [this._selectedSingleNode];
+      } else {
+        return [];
+      }
+    } else {
+      const selectedNodes = [];
+      this._selectedNodes.forEach(id => {
+        const node = this._getNodeById(id);
+        if (node && parent.isParentOf(node)) {
+          selectedNodes.push(node);
+        }
+      });
+      return selectedNodes;
+    }
+  }
+  isNodeSelected(node) {
+    if (node.id != null) {
+      return this._selectedNodes.has(node.id);
+    } else if (this._selectedSingleNode) {
+      return this._selectedSingleNode.element === node.element;
+    } else {
+      return false;
+    }
+  }
+  removeFromSelection(node, includeChildren = false) {
+    if (node.id == null) {
+      if (this._selectedSingleNode && node.element === this._selectedSingleNode.element) {
+        this._selectedSingleNode = null;
+      }
+    } else {
+      this._selectedNodes.delete(node.id);
+      if (includeChildren) {
+        node.iterate(() => {
+          if (node.id != null) {
+            this._selectedNodes.delete(node.id);
+          }
+          return true;
+        });
+      }
+    }
+  }
+}
+
+
+//# sourceMappingURL=selectNodeHandler.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/setDefaultOptions.js
+
+
+const defaults = {
+  animationSpeed: "fast",
+  autoEscape: true,
+  autoOpen: false,
+  // true / false / int (open n levels starting at 0)
+  buttonLeft: true,
+  // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
+  // http://www.fileformat.info/info/unicode/char/25ba/index.htm
+  closedIcon: undefined,
+  data: undefined,
+  dataFilter: undefined,
+  dataUrl: undefined,
+  dragAndDrop: false,
+  keyboardSupport: true,
+  nodeClass: Node,
+  onCanMove: undefined,
+  // Can this node be moved?
+  onCanMoveTo: undefined,
+  // Can this node be moved to this position? function(moved_node, target_node, position)
+  onCanSelectNode: undefined,
+  onCreateLi: undefined,
+  onDragMove: undefined,
+  onDragStop: undefined,
+  onGetStateFromStorage: undefined,
+  onIsMoveHandle: undefined,
+  onLoadFailed: undefined,
+  onLoading: undefined,
+  onSetStateFromStorage: undefined,
+  openedIcon: undefined,
+  openFolderDelay: 500,
+  // The delay for opening a folder during drag and drop; the value is in milliseconds
+  // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+  // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+  rtl: undefined,
+  // right-to-left support; true / false (default)
+  saveState: false,
+  // true / false / string (local storage key; the default key is "tree")
+  selectable: true,
+  showEmptyFolder: false,
+  slide: true,
+  // must display slide animation?
+  startDndDelay: 300,
+  // The delay for starting dnd (in milliseconds)
+  tabIndex: 0,
+  useContextMenu: true
+};
+const setDefaultOptions = (htmlElement, inputOptions) => {
+  const options = {
+    ...defaults,
+    ...inputOptions
+  };
+  options.dataUrl ??= htmlElement.dataset.url;
+  options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
+  options.closedIcon ??= getDefaultClosedIcon(options);
+  options.openedIcon ??= "&#x25bc;";
+  return options;
+};
+const getDefaultClosedIcon = options => {
+  if (options.rtl) {
+    // triangle to the left
+    return "&#x25c0;";
+  } else {
+    // triangle to the right
+    return "&#x25ba;";
+  }
+};
+const getRtlOptionFromHTMLElement = htmlElement => {
+  const dataRtl = htmlElement.dataset.rtl;
+  if (dataRtl == "") {
+    return true;
+  } else if (dataRtl === "false") {
+    return false;
+  } else {
+    return Boolean(dataRtl);
+  }
+};
+
+
+//# sourceMappingURL=setDefaultOptions.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/triggerCustomEvent.js
+// Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
+const triggerCustomEvent = (element, eventName, values) => {
+  const event = new CustomEvent(eventName, {
+    bubbles: true,
+    cancelable: true,
+    detail: values
+  });
+  element.dispatchEvent(event);
+  return !event.defaultPrevented;
+};
+
+
+//# sourceMappingURL=triggerCustomEvent.js.map
+
+;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/index.js
+/*
+Html-tree 0.1.0
 
 Copyright 2026 Marco Braak
 
@@ -23,42 +2917,848 @@ limitations under the License.
 @license
 
 */
-var jqtree=function(e){"use strict";class t{constructor({dataFilter:e,loadData:t,onLoadFailed:o,onLoading:n,treeElement:s,triggerEvent:r}){this.dataFilter=e,this.loadData=t,this.onLoadFailed=o,this.onLoading=n,this.treeElement=s,this.triggerEvent=r}loadFromUrl(e,t,o){if(!e)return;const n=this.getDomElement(t);this.addLoadingClass(n),this.notifyLoading(!0,t,n);const s=()=>{this.removeLoadingClass(n),this.notifyLoading(!1,t,n)};this.submitRequest(e,e=>{s(),this.loadData(this.parseData(e),t),o&&"function"==typeof o&&o()},e=>{s(),this.onLoadFailed&&this.onLoadFailed(e)})}addLoadingClass(e){e.classList.add("jqtree-loading")}getDomElement(e){return e?.element?e.element:this.treeElement}notifyLoading(e,t,o){const n=jQuery(o);this.onLoading&&this.onLoading(e,t,n),this.triggerEvent("tree.loading_data",{$el:n,isLoading:e,node:t})}parseData(e){const t="string"==typeof e?JSON.parse(e):e;return this.dataFilter?this.dataFilter(t):t}removeLoadingClass(e){e.classList.remove("jqtree-loading")}submitRequest(e,t,o){const n={cache:!1,dataType:"json",error:o,method:"GET",success:t,..."string"==typeof e?{url:e}:e};n.method=n.method?.toUpperCase()??"GET",jQuery.ajax(n)}}const o=e=>e?"true":"false",n=e=>s(e).top,s=e=>{const t=e.getBoundingClientRect();return{left:t.x+window.scrollX,top:t.y+window.scrollY}};class r{constructor({autoEscape:e,nodeName:t,offsetX:o,offsetY:n,treeElement:s}){this.offsetX=o,this.offsetY=n,this.element=this.createElement(t,e),s.appendChild(this.element)}move(e,t){this.element.style.left=e-this.offsetX+"px",this.element.style.top=t-this.offsetY+"px"}remove(){this.element.remove()}createElement(e,t){const o=document.createElement("span");return o.classList.add("jqtree-title","jqtree-dragging"),t?o.textContent=e:o.innerHTML=e,o.style.position="absolute",o}}const i=(e,t,o,n)=>{const s=Math.min(t.length,4),r=Math.round((n-o)/s);let i=o;for(let o=0;o<s;o++){const n=t[o];n.position&&e.push({bottom:i+r,node:n.node,position:n.position,top:i}),i+=r}},l=(e,t,o)=>((e,t)=>{if(!e.length)return[];let o=e[0].top,n=[];const s=[];for(const t of e)t.top!==o&&n.length&&(i(s,n,o,t.top),o=t.top,n=[]),n.push(t);return i(s,n,o,t),s})(((e,t)=>{const o=[];let s=0;const r=(e,t,n)=>{o.push({node:e,position:t,top:n}),s=n};return((e,{handleAfterOpenFolder:t,handleClosedFolder:o,handleFirstNode:n,handleNode:s,handleOpenFolder:r})=>{let i=!0;const l=(e,d)=>{let a=(e.is_open||!e.element)&&e.hasChildren(),h=null;if(e.element?.offsetParent&&(h=e.element,i&&(n(e),i=!1),e.hasChildren()?e.is_open?r(e,e.element)||(a=!1):o(e,d,h):s(e,d,e.element)),a){const o=e.children.length;e.children.forEach((t,n)=>{const s=e.children[n];if(s)if(n===o-1)l(s,null);else{const t=e.children[n+1];t&&l(s,t)}}),e.is_open&&h&&t(e,d)}};l(e,null)})(e,{handleAfterOpenFolder:(e,o)=>{r(e,e===t||o===t?null:"after",s)},handleClosedFolder:(e,o,s)=>{const i=n(s);e===t?r(e,null,i):(r(e,"inside",i),o!==t&&r(e,"after",i))},handleFirstNode:e=>{e!==t&&e.element&&r(e,"before",n(e.element))},handleNode:(e,o,s)=>{const i=n(s);r(e,e===t?null:"inside",i),r(e,o===t||e===t?null:"after",i)},handleOpenFolder:(e,o)=>{if(e===t){const t=n(o),s=o.clientHeight;return r(e,null,t),s>5&&r(e,null,t+s-5),!1}return e.children[0]!==t&&r(e,"inside",n(o)),!0}}),o})(e,t),o);class d{constructor({autoEscape:e,getNodeElement:t,getNodeElementForNode:o,getScrollLeft:n,getTree:s,onCanMove:r,onCanMoveTo:i,onDragMove:l,onDragStop:d,onIsMoveHandle:a,openFolderDelay:h,openNode:c,refreshElements:u,slide:m,treeElement:g,triggerEvent:p}){this.autoEscape=e,this.getNodeElement=t,this.getNodeElementForNode=o,this.getScrollLeft=n,this.getTree=s,this.onCanMove=r,this.onCanMoveTo=i,this.onDragMove=l,this.onDragStop=d,this.onIsMoveHandle=a,this.openFolderDelay=h,this.openNode=c,this.refreshElements=u,this.slide=m,this.treeElement=g,this.triggerEvent=p,this.hoveredArea=null,this.hitAreas=[],this.isDragging=!1,this.currentItem=null}mouseCapture(e){const t=e.target;if(!this.mustCaptureElement(t))return null;if(this.onIsMoveHandle&&!this.onIsMoveHandle(jQuery(t)))return null;let o=this.getNodeElement(t);return o&&this.onCanMove&&(this.onCanMove(o.node)||(o=null)),this.currentItem=o,null!=this.currentItem}mouseDrag(e){if(!this.currentItem||!this.dragElement)return!1;this.dragElement.move(e.pageX,e.pageY);const t=this.findHoveredArea(e.pageX,e.pageY);return t&&this.canMoveToArea(t,this.currentItem)?(t.node.isFolder()||this.stopOpenFolderTimer(),this.hoveredArea!==t&&(this.hoveredArea=t,this.mustOpenFolderTimer(t)?this.startOpenFolderTimer(t.node):this.stopOpenFolderTimer(),this.updateDropHint())):(this.removeDropHint(),this.stopOpenFolderTimer(),this.hoveredArea=t),t||this.onDragMove&&this.onDragMove(this.currentItem.node,e.originalEvent),!0}mouseStart(e){if(!this.currentItem)return!1;this.refresh();const{left:t,top:o}=s(e.target),n=this.currentItem.node;return this.dragElement=new r({autoEscape:this.autoEscape??!0,nodeName:n.name,offsetX:e.pageX-t,offsetY:e.pageY-o,treeElement:this.treeElement}),this.isDragging=!0,this.currentItem.element.classList.add("jqtree-moving"),!0}mouseStop(e){this.moveItem(e),this.clear(),this.removeHover(),this.removeDropHint(),this.removeHitAreas();const t=this.currentItem;return this.currentItem&&(this.currentItem.element.classList.remove("jqtree-moving"),this.currentItem=null),this.isDragging=!1,!this.hoveredArea&&t&&this.onDragStop&&this.onDragStop(t.node,e.originalEvent),!1}refresh(){if(this.removeHitAreas(),this.currentItem){const e=this.currentItem.node;this.generateHitAreas(e),this.currentItem=this.getNodeElementForNode(e),this.isDragging&&this.currentItem.element.classList.add("jqtree-moving")}}canMoveToArea(e,t){return!this.onCanMoveTo||this.onCanMoveTo(t.node,e.node,e.position)}clear(){this.dragElement&&(this.dragElement.remove(),this.dragElement=null)}findHoveredArea(e,t){const o=this.getTreeDimensions();return e<o.left||t<o.top||e>o.right||t>o.bottom?null:function(e,t){let o=0,n=e.length;for(;o<n;){const s=o+n>>1,r=e[s];if(void 0===r)return null;const i=t(r);if(i>0)n=s;else{if(!(i<0))return r;o=s+1}}return null}(this.hitAreas,e=>t<e.top?1:t>e.bottom?-1:0)}generateHitAreas(e){const t=this.getTree();this.hitAreas=t?l(t,e,this.getTreeDimensions().bottom):[]}getTreeDimensions(){const e=s(this.treeElement),t=e.left+this.getScrollLeft(),o=e.top;return{bottom:o+this.treeElement.clientHeight+16,left:t,right:t+this.treeElement.clientWidth,top:o}}moveItem(e){if(this.currentItem&&this.hoveredArea?.position&&this.canMoveToArea(this.hoveredArea,this.currentItem)){const t=this.currentItem.node,o=this.hoveredArea.node,n=this.hoveredArea.position,s=t.parent;"inside"===n&&(this.hoveredArea.node.is_open=!0);const r=()=>{const e=this.getTree();e&&(e.moveNode(t,o,n),this.treeElement.textContent="",this.refreshElements(null))};this.triggerEvent("tree.move",{move_info:{do_move:r,moved_node:t,original_event:e.originalEvent,position:n,previous_parent:s,target_node:o}}).isDefaultPrevented()||r()}}mustCaptureElement(e){const t=e.nodeName;return"INPUT"!==t&&"SELECT"!==t&&"TEXTAREA"!==t}mustOpenFolderTimer(e){const t=e.node;return t.isFolder()&&!t.is_open&&"inside"===e.position}removeDropHint(){this.previousGhost&&this.previousGhost.remove()}removeHitAreas(){this.hitAreas=[]}removeHover(){this.hoveredArea=null}startOpenFolderTimer(e){const t=()=>{this.openNode(e,this.slide,()=>{this.refresh(),this.updateDropHint()})};this.stopOpenFolderTimer();const o=this.openFolderDelay;!1!==o&&(this.openFolderTimer=window.setTimeout(t,o))}stopOpenFolderTimer(){this.openFolderTimer&&(clearTimeout(this.openFolderTimer),this.openFolderTimer=null)}updateDropHint(){if(!this.hoveredArea)return;this.removeDropHint();const e=this.getNodeElementForNode(this.hoveredArea.node);this.previousGhost=e.addDropHint(this.hoveredArea.position)}}class a{constructor({$element:e,autoEscape:t,buttonLeft:o,closedIcon:n,dragAndDrop:s,getTree:r,isNodeSelected:i,onCreateLi:l,openedIcon:d,rtl:a,showEmptyFolder:h,tabIndex:c}){this.autoEscape=t,this.buttonLeft=o,this.dragAndDrop=s,this.$element=e,this.getTree=r,this.isNodeSelected=i,this.onCreateLi=l,this.rtl=a,this.showEmptyFolder=h,this.tabIndex=c,this.openedIconElement=this.createButtonElement(d??"+"),this.closedIconElement=this.createButtonElement(n??"-")}render(e){e?.parent?this.renderFromNode(e):this.renderFromRoot()}renderFromNode(e){if(!e.element)return;const t=jQuery(e.element),o=this.createLi(e,e.getLevel());t.after(o),t.remove(),this.createDomElements(o,e.children,!1,e.getLevel()+1)}renderFromRoot(){this.$element.empty();const e=this.getTree();this.$element[0]&&e&&this.createDomElements(this.$element[0],e.children,!0,1)}attachNodeData(e,t){e.element=t,jQuery(t).data("node",e)}createButtonElement(e){if("string"==typeof e){const t=document.createElement("div");return t.innerHTML=e,document.createTextNode(t.innerHTML)}return e.nodeType?e:jQuery(e)[0]}createDomElements(e,t,o,n){const s=this.createUl(o);e.appendChild(s);for(const e of t){const t=this.createLi(e,n);s.appendChild(t),e.hasChildren()&&this.createDomElements(t,e.children,!1,n+1)}}createFolderLi(e,t,n){const s=this.getButtonClasses(e),r=this.getFolderClasses(e,n),i=e.is_open?this.openedIconElement:this.closedIconElement,l=document.createElement("li");l.className=`jqtree_common ${r}`,l.setAttribute("role","none");const d=document.createElement("div");d.className="jqtree-element jqtree_common",d.setAttribute("role","none"),l.appendChild(d);const a=document.createElement("a");a.className=s,i&&a.appendChild(i.cloneNode(!0)),this.buttonLeft&&d.appendChild(a);const h=this.createTitleSpan(e.name,n,!0,t);return h.setAttribute("aria-expanded",o(e.is_open)),d.appendChild(h),this.buttonLeft||d.appendChild(a),l}createLi(e,t){const o=this.isNodeSelected(e),n=e.isFolder()||e.isEmptyFolder&&this.showEmptyFolder?this.createFolderLi(e,t,o):this.createNodeLi(e,t,o);return this.attachNodeData(e,n),this.onCreateLi&&this.onCreateLi(e,jQuery(n),o),n}createNodeLi(e,t,o){const n=["jqtree_common"];o&&n.push("jqtree-selected");const s=n.join(" "),r=document.createElement("li");r.className=s,r.setAttribute("role","none");const i=document.createElement("div");i.className="jqtree-element jqtree_common",i.setAttribute("role","none"),r.appendChild(i);const l=this.createTitleSpan(e.name,o,!1,t);return i.appendChild(l),r}createTitleSpan(e,t,o,n){const s=document.createElement("span");let r="jqtree-title jqtree_common";if(o&&(r+=" jqtree-title-folder"),r+=" jqtree-title-button-"+(this.buttonLeft?"left":"right"),s.className=r,t){const e=this.tabIndex;void 0!==e&&s.setAttribute("tabindex",`${e}`)}return this.setTreeItemAriaAttributes(s,e,n,t),this.autoEscape?s.textContent=e:s.innerHTML=e,s}createUl(e){let t,o;e?(t="jqtree-tree",o="tree",this.rtl&&(t+=" jqtree-rtl")):(t="",o="group"),this.dragAndDrop&&(t+=" jqtree-dnd");const n=document.createElement("ul");return n.className=`jqtree_common ${t}`,n.setAttribute("role",o),n}getButtonClasses(e){const t=["jqtree-toggler","jqtree_common"];return e.is_open||t.push("jqtree-closed"),this.buttonLeft?t.push("jqtree-toggler-left"):t.push("jqtree-toggler-right"),t.join(" ")}getFolderClasses(e,t){const o=["jqtree-folder"];return e.is_open||o.push("jqtree-closed"),t&&o.push("jqtree-selected"),e.is_loading&&o.push("jqtree-loading"),o.join(" ")}setTreeItemAriaAttributes(e,t,n,s){e.setAttribute("aria-label",t),e.setAttribute("aria-level",`${n}`),e.setAttribute("aria-selected",o(s)),e.setAttribute("role","treeitem")}}class h{constructor({closeNode:e,getSelectedNode:t,isFocusOnTree:o,keyboardSupport:n,openNode:s,selectNode:r}){this.closeNode=e,this.getSelectedNode=t,this.isFocusOnTree=o,this.keyboardSupport=n,this.openNode=s,this.originalSelectNode=r,n&&document.addEventListener("keydown",this.handleKeyDown)}deinit(){this.keyboardSupport&&document.removeEventListener("keydown",this.handleKeyDown)}moveDown(e){return this.selectNode(e.getNextVisibleNode())}moveUp(e){return this.selectNode(e.getPreviousVisibleNode())}canHandleKeyboard(){return this.keyboardSupport&&this.isFocusOnTree()}handleKeyDown=e=>{if(!this.canHandleKeyboard())return;let t=!1;const o=this.getSelectedNode();if(o)switch(e.key){case"ArrowDown":t=this.moveDown(o);break;case"ArrowLeft":t=this.moveLeft(o);break;case"ArrowRight":t=this.moveRight(o);break;case"ArrowUp":t=this.moveUp(o)}t&&e.preventDefault()};moveLeft(e){return e.isFolder()&&e.is_open?(this.closeNode(e),!0):this.selectNode(e.getParent())}moveRight(e){return!!e.isFolder()&&(e.is_open?this.selectNode(e.getNextVisibleNode()):(this.openNode(e),!0))}selectNode(e){return!!e&&(this.originalSelectNode(e),!0)}}const c=e=>({originalEvent:e,pageX:e.pageX,pageY:e.pageY,target:e.target}),u=(e,t)=>({originalEvent:t,pageX:e.pageX,pageY:e.pageY,target:e.target});class m{constructor({element:e,getMouseDelay:t,getNode:o,onClickButton:n,onClickTitle:s,onMouseCapture:r,onMouseDrag:i,onMouseStart:l,onMouseStop:d,triggerEvent:a,useContextMenu:h}){this.element=e,this.getMouseDelay=t,this.getNode=o,this.onClickButton=n,this.onClickTitle=s,this.onMouseCapture=r,this.onMouseDrag=i,this.onMouseStart=l,this.onMouseStop=d,this.triggerEvent=a,this.useContextMenu=h,e.addEventListener("click",this.handleClick),e.addEventListener("dblclick",this.handleDblclick),e.addEventListener("mousedown",this.mouseDown,{passive:!1}),e.addEventListener("touchstart",this.touchStart,{passive:!1}),h&&e.addEventListener("contextmenu",this.handleContextmenu),this.isMouseStarted=!1,this.mouseDelayTimer=null,this.isMouseDelayMet=!1,this.mouseDownInfo=null}deinit(){this.element.removeEventListener("click",this.handleClick),this.element.removeEventListener("dblclick",this.handleDblclick),this.useContextMenu&&this.element.removeEventListener("contextmenu",this.handleContextmenu),this.element.removeEventListener("mousedown",this.mouseDown),this.element.removeEventListener("touchstart",this.touchStart),this.removeMouseMoveEventListeners()}getClickTarget(e){const t=e.closest(".jqtree-toggler");if(t){const e=this.getNode(t);if(e)return{node:e,type:"button"}}else{const t=e.closest(".jqtree-element");if(t){const e=this.getNode(t);if(e)return{node:e,type:"label"}}}return null}handleClick=e=>{if(!e.target)return;const t=this.getClickTarget(e.target);if(t)switch(t.type){case"button":this.onClickButton(t.node),e.preventDefault(),e.stopPropagation();break;case"label":this.triggerEvent("tree.click",{click_event:e,node:t.node}).isDefaultPrevented()||this.onClickTitle(t.node);break}};handleContextmenu=e=>{if(!e.target)return;const t=e.target.closest("ul.jqtree-tree .jqtree-element");if(t){const o=this.getNode(t);if(o)return e.preventDefault(),e.stopPropagation(),this.triggerEvent("tree.contextmenu",{click_event:e,node:o}),!1}return null};handleDblclick=e=>{if(!e.target)return;const t=this.getClickTarget(e.target);"label"===t?.type&&this.triggerEvent("tree.dblclick",{click_event:e,node:t.node})};handleMouseDown(e){return this.isMouseStarted&&this.handleMouseUp(e),this.mouseDownInfo=e,!!this.onMouseCapture(e)&&(this.handleStartMouse(),!0)}handleMouseMove(e,t){if(this.isMouseStarted)return this.onMouseDrag(t),void(e.cancelable&&e.preventDefault());this.isMouseDelayMet&&(this.mouseDownInfo&&(this.isMouseStarted=this.onMouseStart(this.mouseDownInfo)),this.isMouseStarted?(this.onMouseDrag(t),e.cancelable&&e.preventDefault()):this.handleMouseUp(t))}handleMouseUp(e){this.removeMouseMoveEventListeners(),this.isMouseDelayMet=!1,this.mouseDownInfo=null,this.isMouseStarted&&(this.isMouseStarted=!1,this.onMouseStop(e))}handleStartMouse(){document.addEventListener("mousemove",this.mouseMove,{passive:!1}),document.addEventListener("touchmove",this.touchMove,{passive:!1}),document.addEventListener("mouseup",this.mouseUp,{passive:!1}),document.addEventListener("touchend",this.touchEnd,{passive:!1});const e=this.getMouseDelay();e?this.startMouseDelayTimer(e):this.isMouseDelayMet=!0}mouseDown=e=>{if(0!==e.button)return;this.handleMouseDown(c(e))&&e.cancelable&&e.preventDefault()};mouseMove=e=>{this.handleMouseMove(e,c(e))};mouseUp=e=>{this.handleMouseUp(c(e))};removeMouseMoveEventListeners(){document.removeEventListener("mousemove",this.mouseMove),document.removeEventListener("touchmove",this.touchMove),document.removeEventListener("mouseup",this.mouseUp),document.removeEventListener("touchend",this.touchEnd)}startMouseDelayTimer(e){this.mouseDelayTimer&&clearTimeout(this.mouseDelayTimer),this.mouseDelayTimer=window.setTimeout(()=>{this.mouseDownInfo&&(this.isMouseDelayMet=!0)},e),this.isMouseDelayMet=!1}touchEnd=e=>{if(e.touches.length>1)return;const t=e.touches[0];t&&this.handleMouseUp(u(t,e))};touchMove=e=>{if(e.touches.length>1)return;const t=e.touches[0];t&&this.handleMouseMove(e,u(t,e))};touchStart=e=>{if(e.touches.length>1)return;const t=e.touches[0];t&&this.handleMouseDown(u(t,e))}}const g=e=>"object"==typeof e&&"children"in e&&e.children instanceof Array;class p{constructor(e=null,t=!1,o=p){this.name="",this.load_on_demand=!1,this.isEmptyFolder=null!=e&&g(e)&&0===e.children.length,this.setData(e),this.children=[],this.parent=null,t&&(this.idMapping=new Map,this.tree=this,this.nodeClass=o)}addAfter(e){if(this.parent){const t=this.createNode(e),o=this.parent.getChildIndex(this);return this.parent.addChildAtPosition(t,o+1),t.loadChildrenFromData(e),t}return null}addBefore(e){if(this.parent){const t=this.createNode(e),o=this.parent.getChildIndex(this);return this.parent.addChildAtPosition(t,o),t.loadChildrenFromData(e),t}return null}addChild(e){this.children.push(e),e.setParent(this)}addChildAtPosition(e,t){this.children.splice(t,0,e),e.setParent(this)}addNodeToIndex(e){null!=e.id&&this.idMapping.set(e.id,e)}addParent(e){if(this.parent){const t=this.createNode(e);this.tree&&t.setParent(this.tree);const o=this.parent;for(const e of o.children)t.addChild(e);return o.children=[],o.addChild(t),t}return null}append(e){const t=this.createNode(e);return this.addChild(t),t.loadChildrenFromData(e),t}filter(e){const t=[];return this.iterate(o=>(e(o)&&t.push(o),!0)),t}getChildIndex(e){return this.children.indexOf(e)}getData(e=!1){const t=e=>e.map(e=>{const o={};for(const t in e)if(-1===["parent","children","element","idMapping","load_on_demand","nodeClass","tree","isEmptyFolder"].indexOf(t)&&Object.prototype.hasOwnProperty.call(e,t)){const n=e[t];o[t]=n}return e.hasChildren()&&(o.children=t(e.children)),o});return t(e?[this]:this.children)}getLastChild(){if(this.hasChildren()){const e=this.children[this.children.length-1];return e.hasChildren()&&e.is_open?e.getLastChild():e}return null}getLevel(){let e=0,t=this;for(;t.parent;)e+=1,t=t.parent;return e}getNextNode(e=!0){if(e&&this.hasChildren())return this.children[0]??null;if(this.parent){const e=this.getNextSibling();return e||this.parent.getNextNode(!1)}return null}getNextSibling(){if(this.parent){const e=this.parent.getChildIndex(this)+1;return e<this.parent.children.length?this.parent.children[e]??null:null}return null}getNextVisibleNode(){if(this.hasChildren()&&this.is_open)return this.children[0]??null;if(this.parent){const e=this.getNextSibling();return e||this.parent.getNextNode(!1)}return null}getNodeByCallback(e){let t=null;return this.iterate(o=>!t&&(!e(o)||(t=o,!1))),t}getNodeById(e){return this.idMapping.get(e)??null}getNodeByName(e){return this.getNodeByCallback(t=>t.name===e)}getNodeByNameMustExist(e){const t=this.getNodeByCallback(t=>t.name===e);if(!t)throw new Error(`Node with name ${e} not found`);return t}getNodesByProperty(e,t){return this.filter(o=>o[e]===t)}getParent(){return this.parent&&this.parent.parent?this.parent:null}getPreviousNode(){if(this.parent){const e=this.getPreviousSibling();return e?e.hasChildren()?e.getLastChild():e:this.getParent()}return null}getPreviousSibling(){if(this.parent){const e=this.parent.getChildIndex(this)-1;return e>=0?this.parent.children[e]??null:null}return null}getPreviousVisibleNode(){if(this.parent){const e=this.getPreviousSibling();return e?e.hasChildren()&&e.is_open?e.getLastChild():e:this.getParent()}return null}hasChildren(){return 0!==this.children.length}initFromData(e){const t=e=>{for(const t of e){const e=this.createNode();e.initFromData(t),this.addChild(e)}};(e=>{this.setData(e),g(e)&&e.children.length&&t(e.children)})(e)}isFolder(){return this.hasChildren()||this.load_on_demand}isParentOf(e){let t=e.parent;for(;t;){if(t===this)return!0;t=t.parent}return!1}iterate(e){const t=(o,n)=>{for(const s of o.children){e(s,n)&&s.hasChildren()&&t(s,n+1)}};t(this,0)}loadFromData(e){this.removeChildren();for(const t of e){const e=this.createNode(t);this.addChild(e),g(t)&&e.loadFromData(t.children)}return this}moveNode(e,t,o){if(!e.parent||e.isParentOf(t))return!1;switch(e.parent.doRemoveChild(e),o){case"after":return!!t.parent&&(t.parent.addChildAtPosition(e,t.parent.getChildIndex(t)+1),!0);case"before":return!!t.parent&&(t.parent.addChildAtPosition(e,t.parent.getChildIndex(t)),!0);case"inside":return t.addChildAtPosition(e,0),!0}}prepend(e){const t=this.createNode(e);return this.addChildAtPosition(t,0),t.loadChildrenFromData(e),t}remove(){this.parent&&(this.parent.removeChild(this),this.parent=null)}removeChild(e){e.removeChildren(),this.doRemoveChild(e)}removeChildren(){this.iterate(e=>(this.tree?.removeNodeFromIndex(e),!0)),this.children=[]}removeNodeFromIndex(e){null!=e.id&&this.idMapping.delete(e.id)}setData(e){if(e)if("string"==typeof e)this.name=e;else if("object"==typeof e)for(const t in e)if(Object.prototype.hasOwnProperty.call(e,t)){const o=e[t];"label"===t||"name"===t?"string"==typeof o&&(this.name=o):"children"!==t&&"parent"!==t&&(this[t]=o)}}createNode(e){return new(this.getNodeClass())(e)}doRemoveChild(e){this.children.splice(this.getChildIndex(e),1),this.tree?.removeNodeFromIndex(e)}getNodeClass(){return this.nodeClass??this.tree?.nodeClass??p}loadChildrenFromData(e){g(e)&&e.children.length&&this.loadFromData(e.children)}setParent(e){this.parent=e,this.tree=e.tree,this.tree?.addNodeToIndex(this)}}class f{constructor(e,t){const o=e.querySelector(":scope > .jqtree-element");if(!o)return void(this.hint=void 0);const n=Math.max(e.offsetWidth+t-4,0),s=Math.max(e.clientHeight-4,0),r=document.createElement("span");r.className="jqtree-border",r.style.width=`${n}px`,r.style.height=`${s}px`,this.hint=r,o.append(this.hint)}remove(){this.hint?.remove()}}class S{constructor(e,t,o){switch(this.element=t,this.node=e,this.ghost=this.createGhostElement(),o){case"after":this.moveAfter();break;case"before":this.moveBefore();break;case"inside":e.isFolder()&&e.is_open?this.moveInsideOpenFolder():this.moveInside()}}remove(){this.ghost.remove()}createGhostElement(){const e=document.createElement("li");e.className="jqtree_common jqtree-ghost";const t=document.createElement("span");t.className="jqtree_common jqtree-circle",e.append(t);const o=document.createElement("span");return o.className="jqtree_common jqtree-line",e.append(o),e}moveAfter(){this.element.after(this.ghost)}moveBefore(){this.element.before(this.ghost)}moveInside(){this.element.after(this.ghost),this.ghost.classList.add("jqtree-inside")}moveInsideOpenFolder(){const e=this.node.children[0]?.element;e&&e.before(this.ghost)}}class v{constructor({getScrollLeft:e,node:t,tabIndex:o,treeElement:n}){this.getScrollLeft=e,this.tabIndex=o,this.treeElement=n,this.init(t)}addDropHint(e){return this.mustShowBorderDropHint(e)?new f(this.element,this.getScrollLeft()):new S(this.node,this.element,e)}deselect(){this.element.classList.remove("jqtree-selected");const e=this.getTitleSpan();e.removeAttribute("tabindex"),e.setAttribute("aria-selected","false"),e.blur()}init(e){this.node=e,e.element??=this.treeElement,this.element=e.element}select(e){this.element.classList.add("jqtree-selected");const t=this.getTitleSpan(),o=this.tabIndex;null!=o&&t.setAttribute("tabindex",o.toString()),t.setAttribute("aria-selected","true"),e&&t.focus()}getTitleSpan(){return this.element.querySelector(":scope > .jqtree-element > span.jqtree-title")}getUl(){return this.element.querySelector(":scope > ul")}mustShowBorderDropHint(e){return"inside"===e}}class N extends v{constructor({closedIconElement:e,getScrollLeft:t,node:o,openedIconElement:n,tabIndex:s,treeElement:r,triggerEvent:i}){super({getScrollLeft:t,node:o,tabIndex:s,treeElement:r}),this.closedIconElement=e,this.openedIconElement=n,this.triggerEvent=i}close(e,t){if(!this.node.is_open)return;this.node.is_open=!1;const o=this.getButton();o.classList.add("jqtree-closed"),o.innerHTML="";const n=this.closedIconElement;if(n){const e=n.cloneNode(!0);o.appendChild(e)}const s=()=>{this.element.classList.add("jqtree-closed");this.getTitleSpan().setAttribute("aria-expanded","false"),this.triggerEvent("tree.close",{node:this.node})};e?jQuery(this.getUl()).slideUp(t,s):(jQuery(this.getUl()).hide(),s())}open(e,t,o){if(this.node.is_open)return;this.node.is_open=!0;const n=this.getButton();n.classList.remove("jqtree-closed"),n.innerHTML="";const s=this.openedIconElement;if(s){const e=s.cloneNode(!0);n.appendChild(e)}const r=()=>{this.element.classList.remove("jqtree-closed");this.getTitleSpan().setAttribute("aria-expanded","true"),e&&e(this.node),this.triggerEvent("tree.open",{node:this.node})};t?jQuery(this.getUl()).slideDown(o,r):(jQuery(this.getUl()).show(),r())}mustShowBorderDropHint(e){return!this.node.is_open&&"inside"===e}getButton(){return this.element.querySelector(":scope > .jqtree-element > a.jqtree-toggler")}}class E{constructor({addToSelection:e,getNodeById:t,getSelectedNodes:o,getTree:n,onGetStateFromStorage:s,onSetStateFromStorage:r,openNode:i,refreshElements:l,removeFromSelection:d,saveState:a}){this.addToSelection=e,this.getNodeById=t,this.getSelectedNodes=o,this.getTree=n,this.onGetStateFromStorage=s,this.onSetStateFromStorage=r,this.openNode=i,this.refreshElements=l,this.removeFromSelection=d,this.saveStateOption=a}getNodeIdToBeSelected(){const e=this.getStateFromStorage();return e?.selected_node?e.selected_node[0]??null:null}getState(){return{open_nodes:(()=>{const e=[];return this.getTree()?.iterate(t=>(t.is_open&&t.id&&t.hasChildren()&&e.push(t.id),!0)),e})(),selected_node:(()=>{const e=[];return this.getSelectedNodes().forEach(t=>{null!=t.id&&e.push(t.id)}),e})()}}getStateFromStorage(){const e=this.loadFromStorage();return e?this.parseState(e):null}saveState(){const e=JSON.stringify(this.getState());this.onSetStateFromStorage?this.onSetStateFromStorage(e):localStorage.setItem(this.getKeyName(),e)}setInitialState(e){let t=!1;return e.open_nodes&&(t=this.openInitialNodes(e.open_nodes)),this.resetSelection(),e.selected_node&&this.selectInitialNodes(e.selected_node),t}setInitialStateOnDemand(e,t){let o=0,n=e.open_nodes;const s=()=>{if(!n)return;const s=[];for(const e of n){const t=this.getNodeById(e);t?t.is_loading||(t.load_on_demand?r(t):this.openNode(t,!1)):s.push(e)}n=s,e.selected_node&&this.selectInitialNodes(e.selected_node)&&this.refreshElements(null),0===o&&t()},r=e=>{o+=1,this.openNode(e,!1,()=>{o-=1,s()})};s()}getKeyName(){return"string"==typeof this.saveStateOption?this.saveStateOption:"tree"}loadFromStorage(){return this.onGetStateFromStorage?this.onGetStateFromStorage():localStorage.getItem(this.getKeyName())}openInitialNodes(e){let t=!1;for(const o of e){const e=this.getNodeById(o);e&&(e.load_on_demand?t=!0:e.is_open=!0)}return t}parseState(e){const t=JSON.parse(e);var o;return t.selected_node&&("number"==typeof(o=t.selected_node)&&o%1==0)&&(t.selected_node=[t.selected_node]),t}resetSelection(){this.getSelectedNodes().forEach(e=>{this.removeFromSelection(e)})}selectInitialNodes(e){let t=0;for(const o of e){const e=this.getNodeById(o);e&&(t+=1,this.addToSelection(e))}return 0!==t}}class D{constructor({container:e,refreshHitAreas:t}){this.container=e,this.refreshHitAreas=t}checkHorizontalScrolling(e){const t=this.getNewHorizontalScrollDirection(e);this.horizontalScrollDirection!==t&&(this.horizontalScrollDirection=t,null!=this.horizontalScrollTimeout&&window.clearTimeout(this.horizontalScrollTimeout),t&&(this.horizontalScrollTimeout=window.setTimeout(this.scrollHorizontally.bind(this),40)))}checkVerticalScrolling(e){const t=this.getNewVerticalScrollDirection(e);this.verticalScrollDirection!==t&&(this.verticalScrollDirection=t,null!=this.verticalScrollTimeout&&(window.clearTimeout(this.verticalScrollTimeout),this.verticalScrollTimeout=void 0),t&&(this.verticalScrollTimeout=window.setTimeout(this.scrollVertically.bind(this),40)))}getScrollLeft(){return this.container.scrollLeft}scrollToY(e){this.container.scrollTop=e}stopScrolling(){this.horizontalScrollDirection=void 0,this.verticalScrollDirection=void 0}scrollHorizontally(){if(!this.horizontalScrollDirection)return;const e="left"===this.horizontalScrollDirection?-20:20;this.container.scrollBy({behavior:"instant",left:e,top:0}),this.refreshHitAreas(),setTimeout(this.scrollHorizontally.bind(this),40)}scrollVertically(){if(!this.verticalScrollDirection)return;const e="top"===this.verticalScrollDirection?-20:20;this.container.scrollBy({behavior:"instant",left:0,top:e}),this.refreshHitAreas(),setTimeout(this.scrollVertically.bind(this),40)}}class y extends D{stopScrolling(){super.stopScrolling(),this.horizontalScrollDirection=void 0,this.verticalScrollDirection=void 0}getNewHorizontalScrollDirection(e){const t=s(this.container),o=this.container.getBoundingClientRect().width,n=t.left+o,r=t.left;return e>n-20?"right":e<r+20?"left":void 0}getNewVerticalScrollDirection(e){return e<this.getScrollParentTop()?"top":e>this.getScrollParentBottom()?"bottom":void 0}getScrollParentBottom(){if(null==this.scrollParentBottom){const e=this.container.getBoundingClientRect().height;this.scrollParentBottom=this.getScrollParentTop()+e}return this.scrollParentBottom}getScrollParentTop(){return this.scrollParentTop??=n(this.container),this.scrollParentTop}}class b extends D{constructor({refreshHitAreas:e,treeElement:t}){super({container:document.documentElement,refreshHitAreas:e}),this.treeElement=t}scrollToY(e){const t=n(this.treeElement);super.scrollToY(e+t)}stopScrolling(){super.stopScrolling(),this.documentScrollHeight=void 0,this.documentScrollWidth=void 0}getNewHorizontalScrollDirection(e){const t=e-this.container.scrollLeft<20;return e>window.innerWidth-20&&this.canScrollRight()?"right":t?"left":void 0}getNewVerticalScrollDirection(e){const t=this.container.scrollTop;if(e-t<20)return"top";return window.innerHeight-(e-t)<20&&this.canScrollDown()?"bottom":void 0}canScrollDown(){return this.container.scrollTop+this.container.clientHeight<this.getDocumentScrollHeight()}canScrollRight(){return this.container.scrollLeft+this.container.clientWidth<this.getDocumentScrollWidth()}getDocumentScrollHeight(){return this.documentScrollHeight??=this.container.scrollHeight,this.documentScrollHeight}getDocumentScrollWidth(){return this.documentScrollWidth??=this.container.scrollWidth,this.documentScrollWidth}}const C=e=>"auto"===e||"scroll"===e,F=e=>{const t=getComputedStyle(e);return C(t.overflowX)||C(t.overflowY)},I=(e,t)=>{const o=(e=>{if(F(e))return e;let t=e.parentElement;for(;t;){if(F(t))return t;t=t.parentElement}return null})(e);return o&&"HTML"!==o.tagName?new y({container:o,refreshHitAreas:t}):new b({refreshHitAreas:t,treeElement:e})};class T{constructor({refreshHitAreas:e,treeElement:t}){this.refreshHitAreas=e,this.scrollParent=void 0,this.treeElement=t}checkScrolling(e){this.checkVerticalScrolling(e),this.checkHorizontalScrolling(e)}getScrollLeft(){return this.getScrollParent().getScrollLeft()}scrollToY(e){this.getScrollParent().scrollToY(e)}stopScrolling(){this.getScrollParent().stopScrolling()}checkHorizontalScrolling(e){this.getScrollParent().checkHorizontalScrolling(e.pageX)}checkVerticalScrolling(e){this.getScrollParent().checkVerticalScrolling(e.pageY)}getScrollParent(){return this.scrollParent??=I(this.treeElement,this.refreshHitAreas),this.scrollParent}}class L{constructor({getNodeById:e}){this.getNodeById=e,this.selectedNodes=new Set,this.clear()}addToSelection(e){null!=e.id?this.selectedNodes.add(e.id):this.selectedSingleNode=e}clear(){this.selectedNodes.clear(),this.selectedSingleNode=null}getSelectedNode(){const e=this.getSelectedNodes();return!!e.length&&(e[0]??!1)}getSelectedNodes(){if(this.selectedSingleNode)return[this.selectedSingleNode];{const e=[];return this.selectedNodes.forEach(t=>{const o=this.getNodeById(t);o&&e.push(o)}),e}}getSelectedNodesUnder(e){if(this.selectedSingleNode)return e.isParentOf(this.selectedSingleNode)?[this.selectedSingleNode]:[];{const t=[];return this.selectedNodes.forEach(o=>{const n=this.getNodeById(o);n&&e.isParentOf(n)&&t.push(n)}),t}}isNodeSelected(e){return null!=e.id?this.selectedNodes.has(e.id):!!this.selectedSingleNode&&this.selectedSingleNode.element===e.element}removeFromSelection(e,t=!1){null==e.id?this.selectedSingleNode&&e.element===this.selectedSingleNode.element&&(this.selectedSingleNode=null):(this.selectedNodes.delete(e.id),t&&e.iterate(()=>(null!=e.id&&this.selectedNodes.delete(e.id),!0)))}}const M=(e,t)=>{const o=()=>`simple_widget_${t}`,n=(e,t)=>{const o=jQuery.data(e,t);return o&&o instanceof H?o:null},s=(t,s)=>{const r=o();for(const o of t.get()){if(!n(o,r)){const t=new e(o,s);jQuery.data(o,r)||jQuery.data(o,r,t),t.init()}}return t};jQuery.fn[t]=function(e,...t){if(!e)return s(this,null);if("object"==typeof e){return s(this,e)}if("string"==typeof e&&"_"!==e[0]){const s=e;return"destroy"===e?void(e=>{const t=o();for(const o of e.get()){const e=n(o,t);e&&e.destroy(),jQuery.removeData(o,t)}})(this):((e,t,n)=>{let s=null;for(const r of e.get()){const e=jQuery.data(r,o());if(e&&e instanceof H){const o=e[t];o&&"function"==typeof o&&(s=o.apply(e,n))}}return s})(this,s,t)}}};class H{static defaults={};constructor(e,t){this.$el=jQuery(e);const o=this.constructor.defaults;this.options={...o,...t}}static register(e,t){M(e,t)}deinit(){}destroy(){this.deinit()}init(){}}const w="Node parameter is empty",A="Parameter is empty: ";class _ extends H{static defaults={animationSpeed:"fast",autoEscape:!0,autoOpen:!1,buttonLeft:!0,closedIcon:void 0,data:void 0,dataFilter:void 0,dataUrl:void 0,dragAndDrop:!1,keyboardSupport:!0,nodeClass:p,onCanMove:void 0,onCanMoveTo:void 0,onCanSelectNode:void 0,onCreateLi:void 0,onDragMove:void 0,onDragStop:void 0,onGetStateFromStorage:void 0,onIsMoveHandle:void 0,onLoadFailed:void 0,onLoading:void 0,onSetStateFromStorage:void 0,openedIcon:"&#x25bc;",openFolderDelay:500,rtl:void 0,saveState:!1,selectable:!0,showEmptyFolder:!1,slide:!0,startDndDelay:300,tabIndex:0,useContextMenu:!0};addNodeAfter(e,t){const o=t.addAfter(e);return o&&this.refreshElements(t.parent),o}addNodeBefore(e,t){if(!t)throw Error(A+"existingNode");const o=t.addBefore(e);return o&&this.refreshElements(t.parent),o}addParentNode(e,t){if(!t)throw Error(A+"existingNode");const o=t.addParent(e);return o&&this.refreshElements(o.parent),o}addToSelection(e,t){if(!e)throw Error(w);return this.selectNodeHandler.addToSelection(e),this.openParents(e),this.getNodeElementForNode(e).select(t??!0),this.saveState(),this.element}appendNode(e,t){const o=t??this.tree,n=o.append(e);return this.refreshElements(o),n}closeNode(e,t){if(!e)throw Error(w);const o=t??this.options.slide;return(e.isFolder()||e.isEmptyFolder)&&(this.createFolderElement(e).close(o,this.options.animationSpeed),this.saveState()),this.element}deinit(){this.element.empty(),this.element.off(),this.keyHandler.deinit(),this.mouseHandler.deinit(),this.tree=new p({},!0),super.deinit()}getNodeByCallback(e){return this.tree.getNodeByCallback(e)}getNodeByHtmlElement(e){const t=e instanceof HTMLElement?e:e.get(0);return t?this.getNode(t):null}getNodeById(e){return this.tree.getNodeById(e)}getNodeByName(e){return this.tree.getNodeByName(e)}getNodeByNameMustExist(e){return this.tree.getNodeByNameMustExist(e)}getNodesByProperty(e,t){return this.tree.getNodesByProperty(e,t)}getSelectedNode(){return this.selectNodeHandler.getSelectedNode()}getSelectedNodes(){return this.selectNodeHandler.getSelectedNodes()}getState(){return this.saveStateHandler.getState()}getStateFromStorage(){return this.saveStateHandler.getStateFromStorage()}getTree(){return this.tree}getVersion(){return"1.8.11"}init(){super.init(),this.element=this.$el,this.isInitialized=!1,this.options.rtl=this.getRtlOption(),this.options.closedIcon??=this.getDefaultClosedIcon(),this.connectHandlers(),this.initData()}isDragging(){return this.dndHandler.isDragging}isNodeSelected(e){if(!e)throw Error(w);return this.selectNodeHandler.isNodeSelected(e)}loadData(e,t){return this.doLoadData(e,t),this.element}loadDataFromUrl(e,t,o){return"string"==typeof e?this.doLoadDataFromUrl(e,t,o??null):this.doLoadDataFromUrl(null,e,t),this.element}moveDown(){const e=this.getSelectedNode();return e&&this.keyHandler.moveDown(e),this.element}moveNode(e,t,o){if(!e)throw Error(w);if(!t)throw Error(A+"targetNode");if(!o)throw Error(A+"position");return this.tree.moveNode(e,t,o),this.refreshElements(null),this.element}moveUp(){const e=this.getSelectedNode();return e&&this.keyHandler.moveUp(e),this.element}openNode(e,t,o){if(!e)throw Error(w);const[n,s]=(()=>{let e,n;return"function"==typeof t?(e=t,n=null):(n=t,e=o),n??=this.options.slide,[n,e]})();return this.openNodeInternal(e,n,s),this.element}prependNode(e,t){const o=t??this.tree,n=o.prepend(e);return this.refreshElements(o),n}refresh(){return this.refreshElements(null),this.element}refreshHitAreas(){return this.dndHandler.refresh(),this.element}reload(e){return this.doLoadDataFromUrl(null,null,e),this.element}removeFromSelection(e){if(!e)throw Error(w);return this.selectNodeHandler.removeFromSelection(e),this.getNodeElementForNode(e).deselect(),this.saveState(),this.element}removeNode(e){if(!e)throw Error(w);if(!e.parent)throw Error("Node has no parent");this.selectNodeHandler.removeFromSelection(e,!0);const t=e.parent;return e.remove(),this.refreshElements(t),this.element}scrollToNode(e){if(!e)throw Error(w);if(!e.element)return this.element;const t=n(e.element)-n(this.$el.get(0));return this.scrollHandler.scrollToY(t),this.element}selectNode(e,t){return this.doSelectNode(e,t),this.element}setOption(e,t){return this.options[e]=t,this.element}setState(e){return e&&(this.saveStateHandler.setInitialState(e),this.refreshElements(null)),this.element}toggle(e,t=null){if(!e)throw Error(w);const o=t??this.options.slide;return e.is_open?this.closeNode(e,o):this.openNode(e,o),this.element}toJson(){return JSON.stringify(this.tree.getData())}updateNode(e,t){if(!e)throw Error(w);if(!t)return this.element;const o="object"==typeof t&&t.id&&t.id!==e.id;return o&&this.tree.removeNodeFromIndex(e),e.setData(t),o&&this.tree.addNodeToIndex(e),"object"==typeof t&&t.children&&t.children instanceof Array&&(e.removeChildren(),t.children.length&&e.loadFromData(t.children)),this.refreshElements(e),this.element}connectHandlers(){const{autoEscape:e,buttonLeft:o,closedIcon:n,dataFilter:s,dragAndDrop:r,keyboardSupport:i,onCanMove:l,onCanMoveTo:c,onCreateLi:u,onDragMove:g,onDragStop:p,onGetStateFromStorage:f,onIsMoveHandle:S,onLoadFailed:v,onLoading:N,onSetStateFromStorage:D,openedIcon:y,openFolderDelay:b,rtl:C,saveState:F,showEmptyFolder:I,slide:M,tabIndex:H}=this.options,w=this.closeNode.bind(this),A=this.getNodeElement.bind(this),_=this.getNodeElementForNode.bind(this),j=this.getNodeById.bind(this),x=this.getSelectedNode.bind(this),B=this.getTree.bind(this),P=this.isFocusOnTree.bind(this),q=this.loadData.bind(this),k=this.openNodeInternal.bind(this),O=this.refreshElements.bind(this),U=this.refreshHitAreas.bind(this),z=this.selectNode.bind(this),Q=this.element,Y=this.element.get(0),R=this.triggerEvent.bind(this),$=new L({getNodeById:j}),V=$.addToSelection.bind($),X=$.getSelectedNodes.bind($),G=$.isNodeSelected.bind($),W=$.removeFromSelection.bind($),K=new t({dataFilter:s,loadData:q,onLoadFailed:v,onLoading:N,treeElement:Y,triggerEvent:R}),J=new E({addToSelection:V,getNodeById:j,getSelectedNodes:X,getTree:B,onGetStateFromStorage:f,onSetStateFromStorage:D,openNode:k,refreshElements:O,removeFromSelection:W,saveState:F}),Z=new T({refreshHitAreas:U,treeElement:Y}),ee=Z.getScrollLeft.bind(Z),te=new d({autoEscape:e,getNodeElement:A,getNodeElementForNode:_,getScrollLeft:ee,getTree:B,onCanMove:l,onCanMoveTo:c,onDragMove:g,onDragStop:p,onIsMoveHandle:S,openFolderDelay:b,openNode:k,refreshElements:O,slide:M,treeElement:Y,triggerEvent:R}),oe=new h({closeNode:w,getSelectedNode:x,isFocusOnTree:P,keyboardSupport:i,openNode:k,selectNode:z}),ne=new a({$element:Q,autoEscape:e,buttonLeft:o,closedIcon:n,dragAndDrop:r,getTree:B,isNodeSelected:G,onCreateLi:u,openedIcon:y,rtl:C,showEmptyFolder:I,tabIndex:H}),se=this.getNode.bind(this),re=this.mouseCapture.bind(this),ie=this.mouseDrag.bind(this),le=this.mouseStart.bind(this),de=this.mouseStop.bind(this),ae=new m({element:Y,getMouseDelay:()=>this.options.startDndDelay??0,getNode:se,onClickButton:this.toggle.bind(this),onClickTitle:this.doSelectNode.bind(this),onMouseCapture:re,onMouseDrag:ie,onMouseStart:le,onMouseStop:de,triggerEvent:R,useContextMenu:this.options.useContextMenu});this.dataLoader=K,this.dndHandler=te,this.keyHandler=oe,this.mouseHandler=ae,this.renderer=ne,this.saveStateHandler=J,this.scrollHandler=Z,this.selectNodeHandler=$}containsElement(e){const t=this.getNode(e);return t?.tree===this.tree}createFolderElement(e){const t=this.renderer.closedIconElement,o=this.scrollHandler.getScrollLeft.bind(this.scrollHandler),n=this.renderer.openedIconElement,s=this.options.tabIndex,r=this.element.get(0),i=this.triggerEvent.bind(this);return new N({closedIconElement:t,getScrollLeft:o,node:e,openedIconElement:n,tabIndex:s,treeElement:r,triggerEvent:i})}createNodeElement(e){const t=this.scrollHandler.getScrollLeft.bind(this.scrollHandler),o=this.options.tabIndex,n=this.element.get(0);return new v({getScrollLeft:t,node:e,tabIndex:o,treeElement:n})}deselectCurrentNode(){const e=this.getSelectedNode();e&&this.removeFromSelection(e)}deselectNodes(e){const t=this.selectNodeHandler.getSelectedNodesUnder(e);for(const e of t)this.selectNodeHandler.removeFromSelection(e)}doLoadData(e,t){e&&(t?(this.deselectNodes(t),this.loadSubtree(e,t)):this.initTree(e),this.isDragging()&&this.dndHandler.refresh()),this.triggerEvent("tree.load_data",{parent_node:t,tree_data:e})}doLoadDataFromUrl(e,t,o){const n=e??this.getDataUrlInfo(t);this.dataLoader.loadFromUrl(n,t,o)}doSelectNode(e,t){const o=()=>{this.options.saveState&&this.saveStateHandler.saveState()};if(!e)return this.deselectCurrentNode(),void o();const n={mustSetFocus:!0,mustToggle:!0,...t??{}};if((()=>this.options.onCanSelectNode?this.options.selectable&&this.options.onCanSelectNode(e):this.options.selectable)()){if(this.selectNodeHandler.isNodeSelected(e))n.mustToggle&&(this.deselectCurrentNode(),this.triggerEvent("tree.select",{node:null,previous_node:e}));else{const t=this.getSelectedNode()||null;this.deselectCurrentNode(),this.addToSelection(e,n.mustSetFocus),this.triggerEvent("tree.select",{deselected_node:t,node:e}),this.openParents(e)}o()}}getAutoOpenMaxLevel(){return!0===this.options.autoOpen?-1:"number"==typeof this.options.autoOpen?this.options.autoOpen:"string"==typeof this.options.autoOpen?parseInt(this.options.autoOpen,10):0}getDataUrlInfo(e){const t=this.options.dataUrl??this.element.data("url"),o=t=>{if(e?.id){const o={node:e.id};t.data=o}else{const e=this.getNodeIdToBeSelected();if(e){const o={selected_node:e};t.data=o}}};return"function"==typeof t?t(e):"string"==typeof t?(e=>{const t={url:e};return o(t),t})(t):t&&"object"==typeof t?(o(t),t):null}getDefaultClosedIcon(){return this.options.rtl?"&#x25c0;":"&#x25ba;"}getNode(e){const t=e.closest("li.jqtree_common");return t?jQuery(t).data("node"):null}getNodeElement(e){const t=this.getNode(e);return t?this.getNodeElementForNode(t):null}getNodeElementForNode(e){return e.isFolder()?this.createFolderElement(e):this.createNodeElement(e)}getNodeIdToBeSelected(){return this.options.saveState?this.saveStateHandler.getNodeIdToBeSelected():null}getRtlOption(){if(null!=this.options.rtl)return this.options.rtl;{const e=this.element.data("rtl");return null!==e&&!1!==e&&void 0!==e}}initData(){if(this.options.data)this.doLoadData(this.options.data,null);else{this.getDataUrlInfo(null)?this.doLoadDataFromUrl(null,null,null):this.doLoadData([],null)}}initTree(e){const t=()=>{this.isInitialized||(this.isInitialized=!0,this.triggerEvent("tree.init"))};this.tree=new this.options.nodeClass(null,!0,this.options.nodeClass),this.selectNodeHandler.clear(),this.tree.loadFromData(e);const o=this.setInitialState();this.refreshElements(null),o?this.setInitialStateOnDemand(t):t()}isFocusOnTree(){const e=document.activeElement;return"SPAN"===e?.tagName&&this.containsElement(e)}isSelectedNodeInSubtree(e){const t=this.getSelectedNode();return!!t&&(e===t||e.isParentOf(t))}loadFolderOnDemand(e,t=!0,o){e.is_loading=!0,this.doLoadDataFromUrl(null,e,()=>{this.openNodeInternal(e,t,o)})}loadSubtree(e,t){t.loadFromData(e),t.load_on_demand=!1,t.is_loading=!1,this.refreshElements(t)}mouseCapture(e){return!!this.options.dragAndDrop&&this.dndHandler.mouseCapture(e)}mouseDrag(e){if(this.options.dragAndDrop){const t=this.dndHandler.mouseDrag(e);return this.scrollHandler.checkScrolling(e),t}return!1}mouseStart(e){return!!this.options.dragAndDrop&&this.dndHandler.mouseStart(e)}mouseStop(e){return!!this.options.dragAndDrop&&(this.scrollHandler.stopScrolling(),this.dndHandler.mouseStop(e))}openNodeInternal(e,t=!0,o){const n=(t,o,n)=>{if(!e.children.length)return;this.createFolderElement(t).open(n,o,this.options.animationSpeed)};if(e.isFolder()||e.isEmptyFolder)if(e.load_on_demand)this.loadFolderOnDemand(e,t,o);else{let s=e.parent;for(;s;)s.parent&&n(s,!1),s=s.parent;n(e,t,o),this.saveState()}}openParents(e){const t=e.parent;t?.parent&&!t.is_open&&this.openNode(t,!1)}refreshElements(e){const t=this.isFocusOnTree(),o=!!e&&this.isSelectedNodeInSubtree(e);this.renderer.render(e),o&&this.selectCurrentNode(t),this.triggerEvent("tree.refresh")}saveState(){this.options.saveState&&this.saveStateHandler.saveState()}selectCurrentNode(e){const t=this.getSelectedNode();if(t){this.getNodeElementForNode(t).select(e)}}setInitialState(){const e=()=>{if(!1===this.options.autoOpen)return!1;const e=this.getAutoOpenMaxLevel();let t=!1;return this.tree.iterate((o,n)=>o.load_on_demand?(t=!0,!1):!!o.hasChildren()&&(o.is_open=!0,n!==e)),t};let[t,o]=(()=>{if(this.options.saveState){const e=this.saveStateHandler.getStateFromStorage();if(e){return[!0,this.saveStateHandler.setInitialState(e)]}return[!1,!1]}return[!1,!1]})();return t||(o=e()),o}setInitialStateOnDemand(e){const t=()=>{const t=this.getAutoOpenMaxLevel();let o=0;const n=e=>{o+=1,this.openNodeInternal(e,!1,()=>{o-=1,s()})},s=()=>{this.tree.iterate((e,o)=>e.load_on_demand?(e.is_loading||n(e),!1):(this.openNodeInternal(e,!1),o!==t)),0===o&&e()};s()};(()=>{if(this.options.saveState){const t=this.saveStateHandler.getStateFromStorage();return!!t&&(this.saveStateHandler.setInitialStateOnDemand(t,e),!0)}return!1})()||t()}triggerEvent(e,t){const o=jQuery.Event(e,t);return this.element.trigger(o),o}}return H.register(_,"tree"),e.JqTreeWidget=_,e}({});
-//# sourceMappingURL=tree.jquery.js.map
 
 
-/***/ }
 
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	const __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		const module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
-(() => {
-"use strict";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// The types that appear in the public api. Consumers cannot import them from
+// the submodules directly, because those are not exposed in package.json.
+// Type only, so that the iife build keeps exposing the HtmlTree class itself
+// as its global, instead of an object of named exports.
+
+class HtmlTree {
+  tree;
+  _dataLoader;
+  _dndHandler;
+  _htmlElement;
+  _isInitialized;
+  _keyHandler;
+  _mouseHandler;
+  _nodeMap;
+  _options;
+  _renderer;
+  _saveStateHandler;
+  _scrollHandler;
+  _selectNodeHandler;
+  _triggerEventProvider;
+  constructor({
+    htmlElement,
+    overrideTriggerEventProvider,
+    ...options
+  }) {
+    this._htmlElement = htmlElement;
+    this._options = setDefaultOptions(htmlElement, options);
+    this._triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
+    this._isInitialized = false;
+    this.tree = new Node({}, true);
+    this._nodeMap = new WeakMap();
+    const {
+      autoEscape,
+      buttonLeft,
+      closedIcon,
+      dataFilter,
+      dragAndDrop,
+      keyboardSupport,
+      onCanMove,
+      onCanMoveTo,
+      onCreateLi,
+      onDragMove,
+      onDragStop,
+      onGetStateFromStorage,
+      onIsMoveHandle,
+      onLoadFailed,
+      onLoading,
+      onSetStateFromStorage,
+      openedIcon,
+      openFolderDelay,
+      rtl,
+      saveState,
+      showEmptyFolder,
+      slide,
+      tabIndex
+    } = this._options;
+    const closeNode = this.closeNode.bind(this);
+    const getNodeElement = this._getNodeElement.bind(this);
+    const getNodeElementForNode = this._getNodeElementForNode.bind(this);
+    const getNodeById = this.getNodeById.bind(this);
+    const getSelectedNode = this.getSelectedNode.bind(this);
+    const getTree = this.getTree.bind(this);
+    const isFocusOnTree = this._isFocusOnTree.bind(this);
+    const loadData = this.loadData.bind(this);
+    const openNode = this._openNodeInternal.bind(this);
+    const refreshElements = this._refreshElements.bind(this);
+    const refreshHitAreas = this.refreshHitAreas.bind(this);
+    const selectNode = this.selectNode.bind(this);
+    const setNodeElement = this._setNodeElement.bind(this);
+    const treeElement = this._htmlElement;
+    const triggerEvent = this._triggerEvent.bind(this);
+    const selectNodeHandler = new SelectNodeHandler({
+      getNodeById
+    });
+    const addToSelection = selectNodeHandler.addToSelection.bind(selectNodeHandler);
+    const getSelectedNodes = selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
+    const isNodeSelected = selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
+    const removeFromSelection = selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
+    const getMouseDelay = () => this._options.startDndDelay ?? 0;
+    const dataLoader = new DataLoader({
+      dataFilter,
+      loadData,
+      onLoadFailed,
+      onLoading,
+      treeElement,
+      triggerEvent
+    });
+    const saveStateHandler = new SaveStateHandler({
+      addToSelection,
+      getNodeById,
+      getSelectedNodes,
+      getTree,
+      onGetStateFromStorage,
+      onSetStateFromStorage,
+      openNode,
+      refreshElements,
+      removeFromSelection,
+      saveState
+    });
+    const scrollHandler = new ScrollHandler({
+      refreshHitAreas,
+      treeElement
+    });
+    const getScrollLeft = scrollHandler.getScrollLeft.bind(scrollHandler);
+    const dndHandler = new DragAndDropHandler({
+      autoEscape,
+      getNodeElement,
+      getNodeElementForNode,
+      getScrollLeft,
+      getTree,
+      onCanMove,
+      onCanMoveTo,
+      onDragMove,
+      onDragStop,
+      onIsMoveHandle,
+      openFolderDelay,
+      openNode,
+      refreshElements,
+      slide,
+      treeElement,
+      triggerEvent
+    });
+    const keyHandler = new KeyHandler({
+      closeNode,
+      getSelectedNode,
+      isFocusOnTree,
+      keyboardSupport,
+      openNode,
+      selectNode
+    });
+    const renderer = new ElementsRenderer({
+      autoEscape,
+      buttonLeft,
+      closedIcon,
+      dragAndDrop,
+      getTree,
+      htmlElement: treeElement,
+      isNodeSelected,
+      onCreateLi,
+      openedIcon,
+      rtl,
+      setNodeElement,
+      showEmptyFolder,
+      tabIndex
+    });
+    const getNode = this.getNode.bind(this);
+    const onMouseCapture = this._mouseCapture.bind(this);
+    const onMouseDrag = this._mouseDrag.bind(this);
+    const onMouseStart = this._mouseStart.bind(this);
+    const onMouseStop = this._mouseStop.bind(this);
+    const mouseHandler = new MouseHandler({
+      element: treeElement,
+      getMouseDelay,
+      getNode,
+      onClickButton: this.toggle.bind(this),
+      onClickTitle: this.selectNode.bind(this),
+      onMouseCapture,
+      onMouseDrag,
+      onMouseStart,
+      onMouseStop,
+      triggerEvent,
+      useContextMenu: this._options.useContextMenu
+    });
+    this._dataLoader = dataLoader;
+    this._dndHandler = dndHandler;
+    this._keyHandler = keyHandler;
+    this._mouseHandler = mouseHandler;
+    this._renderer = renderer;
+    this._saveStateHandler = saveStateHandler;
+    this._scrollHandler = scrollHandler;
+    this._selectNodeHandler = selectNodeHandler;
+    this._initData();
+  }
+
+  // Add a node after an existing node.
+  addNodeAfter(newNodeInfo, existingNode) {
+    const newNode = existingNode.addAfter(newNodeInfo);
+    if (newNode) {
+      this._refreshElements(existingNode.parent);
+    }
+    return newNode;
+  }
+
+  // Add a node before another node.
+  addNodeBefore(newNodeInfo, existingNode) {
+    const newNode = existingNode.addBefore(newNodeInfo);
+    if (newNode) {
+      this._refreshElements(existingNode.parent);
+    }
+    return newNode;
+  }
+
+  // Add a node as parent node of an existing node.
+  addParentNode(newNodeInfo, existingNode) {
+    const newNode = existingNode.addParent(newNodeInfo);
+    if (newNode) {
+      this._refreshElements(newNode.parent);
+    }
+    return newNode;
+  }
+  addToSelection(node, mustSetFocus) {
+    this._selectNodeHandler.addToSelection(node);
+    this._openParents(node);
+    this._getNodeElementForNode(node).select(mustSetFocus ?? true);
+    this._saveState();
+  }
+
+  // Add a node as child of another node.
+  appendNode(newNodeInfo, parentNode) {
+    const node = parentNode.append(newNodeInfo);
+    this._refreshElements(parentNode);
+    return node;
+  }
+  closeNode(node, slideParam) {
+    const slide = slideParam ?? this._options.slide;
+    if (node.isFolder() || node.isEmptyFolder) {
+      this._createFolderElement(node).close(slide, this._options.animationSpeed);
+      this._saveState();
+    }
+  }
+  deinit() {
+    this._htmlElement.textContent = '';
+    this._keyHandler.deinit();
+    this._mouseHandler.deinit();
+    this.tree = new Node({}, true);
+  }
+
+  // Return the tree node for an HTMl element.
+  getNode(element) {
+    const liElement = element.closest("li.html-tree-common");
+    if (liElement) {
+      return this._nodeMap.get(liElement) ?? null;
+    } else {
+      return null;
+    }
+  }
+  getNodeByCallback(callback) {
+    return this.tree.getNodeByCallback(callback);
+  }
+  getNodeById(nodeId) {
+    return this.tree.getNodeById(nodeId);
+  }
+  getNodeByName(name) {
+    return this.tree.getNodeByName(name);
+  }
+  getNodeByNameMustExist(name) {
+    return this.tree.getNodeByNameMustExist(name);
+  }
+  getNodesByProperty(key, value) {
+    return this.tree.getNodesByProperty(key, value);
+  }
+
+  // Return the node that is selected.
+  getSelectedNode() {
+    return this._selectNodeHandler.getSelectedNode();
+  }
+  getSelectedNodes() {
+    return this._selectNodeHandler.getSelectedNodes();
+  }
+  getState() {
+    return this._saveStateHandler.getState();
+  }
+  getStateFromStorage() {
+    return this._saveStateHandler.getStateFromStorage();
+  }
+  getTree() {
+    return this.tree;
+  }
+  getVersion() {
+    return (/* inlined export ["default"] */"0.1.0");
+  }
+  isDragging() {
+    return this._dndHandler.isDragging;
+  }
+  isNodeSelected(node) {
+    return this._selectNodeHandler.isNodeSelected(node);
+  }
+  loadData(data, parentNode) {
+    if (data) {
+      if (parentNode) {
+        this._deselectNodes(parentNode);
+        this._loadSubtree(data, parentNode);
+      } else {
+        this._initTree(data);
+      }
+      if (this.isDragging()) {
+        this._dndHandler.refresh();
+      }
+    }
+    this._triggerEvent("tree.load_data", {
+      parent_node: parentNode,
+      tree_data: data
+    });
+  }
+  loadDataFromUrl(inputUrl, parentNode, onFinished) {
+    const url = inputUrl ? new RequestUrl(inputUrl) : this._createRequestUrl(parentNode);
+    if (url) {
+      this._dataLoader.loadFromUrl(url, parentNode, onFinished);
+    }
+  }
+  moveDown() {
+    const selectedNode = this.getSelectedNode();
+    if (selectedNode) {
+      this._keyHandler.moveDown(selectedNode);
+    }
+  }
+
+  // Move a node inside the tree.
+  moveNode(node, targetNode, position) {
+    this.tree.moveNode(node, targetNode, position);
+    this._refreshElements(null);
+  }
+  moveUp() {
+    const selectedNode = this.getSelectedNode();
+    if (selectedNode) {
+      this._keyHandler.moveUp(selectedNode);
+    }
+  }
+  openNode(node, param1, param2) {
+    const parseParams = () => {
+      let onFinished;
+      let slide;
+      if (typeof param1 === "function") {
+        onFinished = param1;
+        slide = null;
+      } else {
+        slide = param1;
+        onFinished = param2;
+      }
+      slide ??= this._options.slide;
+      return [slide, onFinished];
+    };
+    const [slide, onFinished] = parseParams();
+    this._openNodeInternal(node, slide, onFinished);
+  }
+
+  // Add a node before another node.
+  prependNode(newNodeInfo, parentNode) {
+    const node = parentNode.prepend(newNodeInfo);
+    this._refreshElements(parentNode);
+    return node;
+  }
+  refresh() {
+    this._refreshElements(null);
+  }
+  refreshHitAreas() {
+    this._dndHandler.refresh();
+  }
+  removeFromSelection(node) {
+    this._selectNodeHandler.removeFromSelection(node);
+    this._getNodeElementForNode(node).deselect();
+    this._saveState();
+  }
+
+  // Remove the node from the tree.
+  removeNode(node) {
+    this._selectNodeHandler.removeFromSelection(node, true); // including children
+
+    const parent = node.parent;
+    node.remove();
+    this._refreshElements(parent);
+  }
+  scrollToNode(node) {
+    if (!node.element) {
+      return;
+    }
+    const top = getOffsetTop(node.element) - getOffsetTop(this._htmlElement);
+    this._scrollHandler.scrollToY(top);
+  }
+  selectNode(node, optionsParam) {
+    const saveState = () => {
+      if (this._options.saveState) {
+        this._saveStateHandler.saveState();
+      }
+    };
+    if (!node) {
+      // Called with empty node -> deselect current node
+      this._deselectCurrentNode();
+      saveState();
+      return;
+    }
+    const defaultOptions = {
+      mustSetFocus: true,
+      mustToggle: true
+    };
+    const selectOptions = {
+      ...defaultOptions,
+      ...(optionsParam ?? {})
+    };
+    const canSelect = () => {
+      if (this._options.onCanSelectNode) {
+        return this._options.selectable && this._options.onCanSelectNode(node);
+      } else {
+        return this._options.selectable;
+      }
+    };
+    if (!canSelect()) {
+      return;
+    }
+    if (this._selectNodeHandler.isNodeSelected(node)) {
+      if (selectOptions.mustToggle) {
+        this._deselectCurrentNode();
+        this._triggerEvent("tree.select", {
+          node: null,
+          previous_node: node
+        });
+      }
+    } else {
+      const deselectedNode = this.getSelectedNode() || null;
+      this._deselectCurrentNode();
+      this.addToSelection(node, selectOptions.mustSetFocus);
+      this._triggerEvent("tree.select", {
+        deselected_node: deselectedNode,
+        node
+      });
+      this._openParents(node);
+    }
+    saveState();
+  }
+  setOption(option, value) {
+    this._options[option] = value;
+  }
+  setState(state) {
+    this._saveStateHandler.setInitialState(state);
+    this._refreshElements(null);
+  }
+  toggle(node, slideParam = null) {
+    const slide = slideParam ?? this._options.slide;
+    if (node.is_open) {
+      this.closeNode(node, slide);
+    } else {
+      this.openNode(node, slide);
+    }
+  }
+
+  // Return tree as json string.
+  toJson() {
+    return JSON.stringify(this.tree.getData());
+  }
+
+  // Update the data of a node in the tree.
+  updateNode(node, data) {
+    const idIsChanged = typeof data === "object" && data.id && data.id !== node.id;
+    if (idIsChanged) {
+      this.tree.removeNodeFromIndex(node);
+    }
+    node.setData(data);
+    if (idIsChanged) {
+      this.tree.addNodeToIndex(node);
+    }
+    if (typeof data === "object" && data.children && data.children instanceof Array) {
+      node.removeChildren();
+      if (data.children.length) {
+        node.loadFromData(data.children);
+      }
+    }
+    this._refreshElements(node);
+  }
+  _createFolderElement(node) {
+    const closedIconElement = this._renderer.closedIconElement;
+    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
+    const openedIconElement = this._renderer.openedIconElement;
+    const tabIndex = this._options.tabIndex;
+    const treeElement = this._htmlElement;
+    const triggerEvent = this._triggerEvent.bind(this);
+    return new FolderElement({
+      closedIconElement,
+      getScrollLeft,
+      node,
+      openedIconElement,
+      tabIndex,
+      treeElement,
+      triggerEvent
+    });
+  }
+  _createNodeElement(node) {
+    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
+    const tabIndex = this._options.tabIndex;
+    const treeElement = this._htmlElement;
+    return new NodeElement({
+      getScrollLeft,
+      node,
+      tabIndex,
+      treeElement
+    });
+  }
+
+  /* Create a RequestUrl based on the url in the options.
+    * Add a 'node' query parameter for loading on demand
+    * Add a 'selected_node' query parameter if a node is selected.
+  */
+  _createRequestUrl(node) {
+    const dataUrl = this._options.dataUrl;
+    let url;
+    if (typeof dataUrl === "function") {
+      url = dataUrl(node);
+    } else {
+      url = dataUrl;
+    }
+    if (!url) {
+      return null;
+    }
+    const requestUrl = new RequestUrl(url);
+    if (node?.id) {
+      // Load on demand of a subtree; add node parameter
+      requestUrl.setSearchParam('node', node.id.toString());
+    } else {
+      // Add selected_node parameter
+      const selectedNodeId = this._getNodeIdToBeSelected();
+      if (selectedNodeId) {
+        requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+      }
+    }
+    return requestUrl;
+  }
+  _deselectCurrentNode() {
+    const node = this.getSelectedNode();
+    if (node) {
+      this.removeFromSelection(node);
+    }
+  }
+
+  // Deselect the children of the node.
+  _deselectNodes(parentNode) {
+    const selectedNodesUnderParent = this._selectNodeHandler.getSelectedNodesUnder(parentNode);
+    for (const n of selectedNodesUnderParent) {
+      this._selectNodeHandler.removeFromSelection(n);
+    }
+  }
+
+  // Get the maximum level for auto open
+  _getAutoOpenMaxLevel() {
+    if (this._options.autoOpen === true) {
+      return -1;
+    } else if (typeof this._options.autoOpen === "number") {
+      return this._options.autoOpen;
+    } else if (typeof this._options.autoOpen === "string") {
+      return parseInt(this._options.autoOpen, 10);
+    }
+
+    /* istanbul ignore next @preserve */
+    return 0;
+  }
+  _getNodeElement(element) {
+    const node = this.getNode(element);
+    if (node) {
+      return this._getNodeElementForNode(node);
+    } else {
+      return null;
+    }
+  }
+  _getNodeElementForNode(node) {
+    if (node.isFolder()) {
+      return this._createFolderElement(node);
+    } else {
+      return this._createNodeElement(node);
+    }
+  }
+  _getNodeIdToBeSelected() {
+    if (this._options.saveState) {
+      return this._saveStateHandler.getNodeIdToBeSelected();
+    } else {
+      return null;
+    }
+  }
+  _initData() {
+    if (this._options.data) {
+      this.loadData(this._options.data);
+    } else {
+      const dataUrl = this._createRequestUrl();
+      if (dataUrl) {
+        this.loadDataFromUrl();
+      } else {
+        this.loadData([]);
+      }
+    }
+  }
+  _initTree(data) {
+    const doInit = () => {
+      if (!this._isInitialized) {
+        this._isInitialized = true;
+        this._triggerEvent("tree.init");
+      }
+    };
+    this.tree = new this._options.nodeClass(null, true, this._options.nodeClass);
+    this._selectNodeHandler.clear();
+    this.tree.loadFromData(data);
+    const mustLoadOnDemand = this._setInitialState();
+    this._refreshElements(null);
+    if (mustLoadOnDemand) {
+      // Load data on demand and then init the tree
+      this._setInitialStateOnDemand(doInit);
+    } else {
+      doInit();
+    }
+  }
+
+  // Does an HTML element of the tree have the focus?
+  _isFocusOnTree() {
+    const activeElement = document.activeElement;
+
+    /* istanbul ignore if */
+    if (!activeElement) {
+      return false;
+    }
+
+    // The keyboard must still work for input elements.
+    const tagName = activeElement.tagName;
+    if (tagName !== "A" && tagName !== "SPAN") {
+      return false;
+    }
+    const node = this.getNode(activeElement);
+    return node?.tree === this.tree;
+  }
+  _isSelectedNodeInSubtree(subtree) {
+    const selectedNode = this.getSelectedNode();
+    if (!selectedNode) {
+      return false;
+    } else {
+      return subtree === selectedNode || subtree.isParentOf(selectedNode);
+    }
+  }
+  _loadFolderOnDemand(node, slide, onFinished) {
+    node.is_loading = true;
+    this.loadDataFromUrl(undefined, node, () => {
+      this._openNodeInternal(node, slide, onFinished);
+    });
+  }
+  _loadSubtree(data, parentNode) {
+    parentNode.loadFromData(data);
+    parentNode.load_on_demand = false;
+    parentNode.is_loading = false;
+    this._refreshElements(parentNode);
+  }
+  _mouseCapture(positionInfo) {
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    return this._dndHandler.mouseCapture(positionInfo);
+  }
+  _mouseDrag(positionInfo) {
+    /* istanbul ignore if */
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    const result = this._dndHandler.mouseDrag(positionInfo);
+    this._scrollHandler.checkScrolling(positionInfo);
+    return result;
+  }
+  _mouseStart(positionInfo) {
+    /* istanbul ignore if */
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    return this._dndHandler.mouseStart(positionInfo);
+  }
+  _mouseStop(positionInfo) {
+    /* istanbul ignore if */
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    this._scrollHandler.stopScrolling();
+    return this._dndHandler.mouseStop(positionInfo);
+  }
+  _openNodeInternal(node, slide = true, onFinished) {
+    const doOpenNode = (_node, _slide, _onFinished) => {
+      if (!node.children.length) {
+        return;
+      }
+      const folderElement = this._createFolderElement(_node);
+      folderElement.open(_onFinished, _slide, this._options.animationSpeed);
+    };
+    if (node.isFolder() || node.isEmptyFolder) {
+      if (node.load_on_demand) {
+        this._loadFolderOnDemand(node, slide, onFinished);
+      } else {
+        let parent = node.parent;
+        while (parent) {
+          // nb: do not open root element
+          if (parent.parent) {
+            doOpenNode(parent, false);
+          }
+          parent = parent.parent;
+        }
+        doOpenNode(node, slide, onFinished);
+        this._saveState();
+      }
+    }
+  }
+  _openParents(node) {
+    const parent = node.parent;
+    if (parent?.parent && !parent.is_open) {
+      this.openNode(parent, false);
+    }
+  }
+
+  /*
+  Redraw the tree or part of the tree.
+    from_node: redraw this subtree
+  */
+  _refreshElements(fromNode) {
+    const mustSetFocus = this._isFocusOnTree();
+    const mustSelect = fromNode ? this._isSelectedNodeInSubtree(fromNode) : false;
+    this._renderer.render(fromNode);
+    if (mustSelect) {
+      this._selectCurrentNode(mustSetFocus);
+    }
+    this._triggerEvent("tree.refresh");
+  }
+  _saveState() {
+    if (this._options.saveState) {
+      this._saveStateHandler.saveState();
+    }
+  }
+  _selectCurrentNode(mustSetFocus) {
+    const node = this.getSelectedNode();
+    if (node) {
+      const nodeElement = this._getNodeElementForNode(node);
+      nodeElement.select(mustSetFocus);
+    }
+  }
+
+  // Set initial state, either by restoring the state or auto-opening nodes
+  // result: must load nodes on demand?
+  _setInitialState() {
+    const restoreState = () => {
+      // result: is state restored, must load on demand?
+      if (!this._options.saveState) {
+        return [false, false];
+      } else {
+        const state = this._saveStateHandler.getStateFromStorage();
+        if (!state) {
+          return [false, false];
+        } else {
+          const mustLoadOnDemand = this._saveStateHandler.setInitialState(state);
+
+          // return true: the state is restored
+          return [true, mustLoadOnDemand];
+        }
+      }
+    };
+    const autoOpenNodes = () => {
+      // result: must load on demand?
+      if (this._options.autoOpen === false) {
+        return false;
+      }
+      const maxLevel = this._getAutoOpenMaxLevel();
+      let mustLoadOnDemand = false;
+      this.tree.iterate((node, level) => {
+        if (node.load_on_demand) {
+          mustLoadOnDemand = true;
+          return false;
+        } else if (!node.hasChildren()) {
+          return false;
+        } else {
+          node.is_open = true;
+          return level !== maxLevel;
+        }
+      });
+      return mustLoadOnDemand;
+    };
+    let [isRestored, mustLoadOnDemand] = restoreState(); // eslint-disable-line prefer-const
+
+    if (!isRestored) {
+      mustLoadOnDemand = autoOpenNodes();
+    }
+    return mustLoadOnDemand;
+  }
+
+  // Set the initial state for nodes that are loaded on demand
+  // Call cb_finished when done
+  _setInitialStateOnDemand(cbFinished) {
+    const restoreState = () => {
+      const state = this._saveStateHandler.getStateFromStorage();
+      if (!state) {
+        return false;
+      } else {
+        this._saveStateHandler.setInitialStateOnDemand(state, cbFinished);
+        return true;
+      }
+    };
+    const autoOpenNodes = () => {
+      const maxLevel = this._getAutoOpenMaxLevel();
+      let loadingCount = 0;
+      const loadAndOpenNode = node => {
+        loadingCount += 1;
+        this._openNodeInternal(node, false, () => {
+          loadingCount -= 1;
+          openNodes();
+        });
+      };
+      const openNodes = () => {
+        this.tree.iterate((node, level) => {
+          if (node.load_on_demand) {
+            if (!node.is_loading) {
+              loadAndOpenNode(node);
+            }
+            return false;
+          } else {
+            this._openNodeInternal(node, false);
+            return level !== maxLevel;
+          }
+        });
+        if (loadingCount === 0) {
+          cbFinished();
+        }
+      };
+      openNodes();
+    };
+    if (!restoreState()) {
+      autoOpenNodes();
+    }
+  }
+
+  // Set this HTML element to this node in the node map.
+  _setNodeElement(element, node) {
+    this._nodeMap.set(element, node);
+  }
+  _triggerEvent(eventName, values) {
+    return this._triggerEventProvider(this._htmlElement, eventName, values);
+  }
+}
+
+
+//# sourceMappingURL=index.js.map
 
 ;// ./node_modules/.pnpm/js-cookie@3.0.8/node_modules/js-cookie/dist/js.cookie.mjs
 /*! js-cookie v3.0.8 | MIT */
@@ -191,8 +3891,6 @@ var api = init(defaultConverter, { path: '/' });
 
 
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.8.11_jquery@4.0.0/node_modules/jqtree/tree.jquery.js
-var tree_jquery = __webpack_require__(751);
 ;// ./src/initTree.ts
 
 
@@ -213,17 +3911,11 @@ function initTree(treeElement, {
   let errorNode = null;
   const baseUrl = "http://example.com";
   const insertAtUrlObject = insertAtUrl ? new URL(insertAtUrl, baseUrl) : undefined;
-  function createLi(node, $li, isSelected) {
+  function createLi(node, liElement, isSelected) {
     if (node.id == null) {
       return;
     }
-    const liElement = $li.get(0);
-
-    /* istanbul ignore if */
-    if (!liElement) {
-      return;
-    }
-    const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title");
+    const titleElement = liElement.querySelector(":scope > .html-tree-element > .html-tree-title");
 
     /* istanbul ignore if */
     if (!titleElement) {
@@ -267,7 +3959,7 @@ function initTree(treeElement, {
   }
   function handleMove(eventParam) {
     const e = eventParam;
-    const info = e.move_info;
+    const info = e.detail.move_info;
     if (!info.moved_node.element) {
       return;
     }
@@ -284,7 +3976,7 @@ function initTree(treeElement, {
       const errorElement = document.createElement("span");
       errorElement.className = "mptt-admin-error";
       errorElement.textContent = gettext("move failed");
-      const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+      const nodeElement = htmlElement.querySelector(":scope > .html-tree-element");
       nodeElement?.append(errorElement);
       errorNode = info.moved_node;
     }
@@ -307,7 +3999,7 @@ function initTree(treeElement, {
     });
     function removeErrorMessage() {
       if (errorNode?.element) {
-        const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
+        const errorElement = errorNode.element.querySelector(":scope > .html-tree-element > .mptt-admin-error");
         errorElement?.remove();
         errorNode = null;
       }
@@ -342,7 +4034,7 @@ function initTree(treeElement, {
       return;
     }
     const spinner = document.createElement("span");
-    spinner.className = "jqtree-spin";
+    spinner.className = "html-tree-spin";
     container.append(spinner);
     spinners[spinnerId] = spinner;
   }
@@ -362,11 +4054,11 @@ function initTree(treeElement, {
       deselected_node,
       node,
       previous_node
-    } = e;
+    } = e.detail;
     const deselectedElement = deselected_node?.element ?? previous_node?.element;
     if (deselectedElement) {
       // deselected node: remove tabindex
-      const editElements = deselectedElement.querySelectorAll(":scope > .jqtree-element > .edit");
+      const editElements = deselectedElement.querySelectorAll(":scope > .html-tree-element > .edit");
       for (const editElement of editElements) {
         editElement.tabIndex = -1;
       }
@@ -374,7 +4066,7 @@ function initTree(treeElement, {
 
     // selected: add tabindex
     if (node?.element) {
-      const editElements = node.element.querySelectorAll(":scope > .jqtree-element > .edit");
+      const editElements = node.element.querySelectorAll(":scope > .html-tree-element > .edit");
       for (const editElement of editElements) {
         editElement.tabIndex = 0;
       }
@@ -384,7 +4076,7 @@ function initTree(treeElement, {
     const {
       isLoading,
       node
-    } = e;
+    } = e.detail;
     if (isLoading) {
       handleLoading(node);
     }
@@ -392,7 +4084,7 @@ function initTree(treeElement, {
   function handleLoadDataEvent(e) {
     const {
       parent_node
-    } = e;
+    } = e.detail;
     handleLoaded(parent_node);
   }
   const treeOptions = {
@@ -412,12 +4104,14 @@ function initTree(treeElement, {
   if (mouseDelay != null) {
     treeOptions.startDndDelay = mouseDelay;
   }
-  const $tree = jQuery(treeElement);
-  $tree.on("tree.loading_data", handleLoadingEvent);
-  $tree.on("tree.load_data", handleLoadDataEvent);
-  $tree.on("tree.move", handleMove);
-  $tree.on("tree.select", handleSelect);
-  $tree.tree(treeOptions);
+  treeElement.addEventListener("tree.loading_data", handleLoadingEvent);
+  treeElement.addEventListener("tree.load_data", handleLoadDataEvent);
+  treeElement.addEventListener("tree.move", handleMove);
+  treeElement.addEventListener("tree.select", handleSelect);
+  new HtmlTree({
+    ...treeOptions,
+    htmlElement: treeElement
+  });
 }
 /* harmony default export */ const src_initTree = (initTree);
 ;// ./src/parseTreeOptions.ts
@@ -494,8 +4188,6 @@ addEventListener("DOMContentLoaded", () => {
     src_initTree(treeElement, src_parseTreeOptions(treeElement));
   }
 });
-})();
-
 /******/ })()
 ;
 //# sourceMappingURL=django_mptt_admin.debug.js.map
