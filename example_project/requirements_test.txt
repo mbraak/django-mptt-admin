@@ -7,5 +7,5 @@ playwright==1.61.0
 psycopg==3.3.4
 pyquery==2.1.0
 waitress==3.0.2
-WebOb==1.8.10
+WebOb==1.8.11
 WebTest==3.0.7
