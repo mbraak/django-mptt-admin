@@ -1,16 +1,19 @@
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import "jqtree";
 
 export interface InitTreeOptions {
-    animationSpeed: null | number | string;
+    animationSpeed?: number | string;
     autoEscape: boolean;
     autoOpen: boolean | number;
     csrfCookieName: string;
     dragAndDrop: boolean;
     hasAddPermission: boolean;
     hasChangePermission: boolean;
-    mouseDelay: null | number;
+    insertAtUrl?: string;
+    mouseDelay?: number;
     rtl: boolean;
+    saveState?: string;
+    useContextMenu?: boolean;
 }
 
 interface JQTreeLoadDataEvent extends JQuery.Event {
@@ -38,7 +41,7 @@ interface JQTreeSelectEvent extends JQuery.Event {
 }
 
 function initTree(
-    $tree: JQuery,
+    treeElement: HTMLElement,
     {
         animationSpeed,
         autoEscape,
@@ -47,13 +50,16 @@ function initTree(
         dragAndDrop,
         hasAddPermission,
         hasChangePermission,
+        insertAtUrl,
         mouseDelay,
         rtl,
+        saveState,
+        useContextMenu
     }: InitTreeOptions
 ) {
     let errorNode: INode | null = null;
     const baseUrl = "http://example.com";
-    const insertAtUrl = new URL($tree.data("insert_at_url") as string, baseUrl);
+    const insertAtUrlObject = insertAtUrl ? new URL(insertAtUrl, baseUrl) : undefined;
 
     function createLi(node: INode, $li: JQuery, isSelected: boolean) {
         if (node.id == null) {
@@ -75,12 +81,6 @@ function initTree(
         }
 
         // Create edit link
-        insertAtUrl.searchParams.set("insert_at", node.id.toString());
-
-        const insertUrlString = insertAtUrl
-            .toString()
-            .substring(baseUrl.length);
-
         const tabindex = isSelected ? 0 : -1;
         const editCaption = hasChangePermission
             ? gettext("edit")
@@ -94,7 +94,13 @@ function initTree(
 
         titleElement.after(editElement);
 
-        if (hasAddPermission) {
+        if (hasAddPermission && insertAtUrlObject) {
+            insertAtUrlObject.searchParams.set("insert_at", node.id.toString());
+
+            const insertUrlString = insertAtUrlObject
+                .toString()
+                .substring(baseUrl.length);
+
             const addElement = document.createElement("a");
             addElement.className = "edit";
             addElement.href = insertUrlString;
@@ -190,13 +196,6 @@ function initTree(
     }
 
     function handleLoadFailed() {
-        const treeElement = $tree.get(0);
-
-        /* istanbul ignore if */
-        if (!treeElement) {
-            return;
-        }
-
         treeElement.textContent = gettext("Error while loading the data from the server");
     }
 
@@ -219,7 +218,7 @@ function initTree(
             if (node) {
                 return node.element;
             } else {
-                return $tree.get(0);
+                return treeElement;
             }
         }
 
@@ -296,17 +295,19 @@ function initTree(
         dragAndDrop: dragAndDrop && hasChangePermission,
         onCreateLi: createLi,
         onLoadFailed: handleLoadFailed,
-        saveState: $tree.data("save_state") as boolean,
-        useContextMenu: Boolean($tree.data("use_context_menu")),
+        saveState,
+        useContextMenu,
     };
 
-    if (animationSpeed !== null) {
+    if (animationSpeed !== undefined) {
         treeOptions.animationSpeed = animationSpeed;
     }
 
     if (mouseDelay != null) {
         treeOptions.startDndDelay = mouseDelay;
     }
+
+    const $tree = jQuery(treeElement);
 
     $tree.on("tree.loading_data", handleLoadingEvent);
     $tree.on("tree.load_data", handleLoadDataEvent);

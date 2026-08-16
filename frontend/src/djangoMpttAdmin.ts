@@ -1,34 +1,13 @@
 import initTree from "./initTree";
+import parseTreeOptions from "./parseTreeOptions";
 
-jQuery(() => {
-    const $tree = jQuery("#tree");
+addEventListener("DOMContentLoaded", () => {
+    const treeElement = document.getElementById("tree");
 
-    if ($tree.length) {
-        const animationSpeed = $tree.data("tree-animation-speed") as
-            | null
-            | number
-            | string;
-        const autoOpen = $tree.data("auto_open") as boolean | number;
-        const autoEscape = Boolean($tree.data("autoescape"));
-        const hasAddPermission = Boolean($tree.data("has-add-permission"));
-        const hasChangePermission = Boolean(
-            $tree.data("has-change-permission")
+    if (treeElement) {
+        initTree(
+            treeElement,
+            parseTreeOptions(treeElement)
         );
-        const mouseDelay = $tree.data("tree-mouse-delay") as null | number;
-        const dragAndDrop = $tree.data("drag-and-drop") as boolean;
-        const rtl = $tree.data("rtl") === "1";
-        const csrfCookieName = $tree.data("csrf-cookie-name") as string;
-
-        initTree($tree, {
-            animationSpeed,
-            autoEscape,
-            autoOpen,
-            csrfCookieName,
-            dragAndDrop,
-            hasAddPermission,
-            hasChangePermission,
-            mouseDelay,
-            rtl,
-        });
     }
 });

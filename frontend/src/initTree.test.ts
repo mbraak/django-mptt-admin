@@ -61,6 +61,7 @@ beforeEach(() => {
     );
 
     document.body.innerHTML = "";
+    localStorage.clear();
 });
 
 const createTreeElement = (dataUrl = "/tree") => {
@@ -77,21 +78,19 @@ const initTestTree = (
     paramOptions?: Partial<InitTreeOptions>
 ) => {
     const defaultOptions: InitTreeOptions = {
-        animationSpeed: null,
         autoEscape: false,
         autoOpen: false,
         csrfCookieName: "csrf",
         dragAndDrop: false,
         hasAddPermission: true,
         hasChangePermission: true,
-        mouseDelay: null,
+        insertAtUrl: "/add",
         rtl: false,
     };
 
-    const $tree = jQuery(treeElement);
     const options = { ...defaultOptions, ...paramOptions };
 
-    initTree($tree, options);
+    initTree(treeElement, options);
 };
 
 const getNodeElement = (name: string): HTMLElement => {
@@ -207,6 +206,215 @@ test("renders a link for a closed node with rtl is true", async () => {
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
     expect(screen.getByText("◀")).toBeInTheDocument();
+});
+
+describe("autoOpen", () => {
+    test("opens the nodes when autoOpen is true", async () => {
+        initTestTree(createTreeElement(), { autoOpen: true });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+        expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
+            "aria-expanded",
+            "true"
+        );
+    });
+
+    test("opens the nodes up to the level of autoOpen", async () => {
+        initTestTree(createTreeElement(), { autoOpen: 0 });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+        expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
+            "aria-expanded",
+            "true"
+        );
+    });
+
+    test("keeps the nodes closed when autoOpen is false", async () => {
+        initTestTree(createTreeElement(), { autoOpen: false });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+        expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
+            "aria-expanded",
+            "false"
+        );
+    });
+});
+
+describe("autoEscape", () => {
+    beforeEach(() => {
+        treeData = [
+            {
+                children: [],
+                id: 1,
+                name: "<b>root</b>",
+                url: "/edit/1",
+            },
+        ];
+    });
+
+    test("escapes the node name when autoEscape is true", async () => {
+        initTestTree(createTreeElement(), { autoEscape: true });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+        expect(title).toHaveTextContent("<b>root</b>");
+        expect(title.querySelector("b")).toBeNull();
+    });
+
+    test("renders the node name as html when autoEscape is false", async () => {
+        initTestTree(createTreeElement(), { autoEscape: false });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+        expect(title).toHaveTextContent("root");
+        expect(title.querySelector("b")).toBeInTheDocument();
+    });
+});
+
+describe("dragAndDrop", () => {
+    test("enables drag and drop", async () => {
+        initTestTree(createTreeElement(), {
+            dragAndDrop: true,
+            hasChangePermission: true,
+        });
+
+        expect(await screen.findByRole("tree")).toHaveClass("jqtree-dnd");
+    });
+
+    test("doesn't enable drag and drop when dragAndDrop is false", async () => {
+        initTestTree(createTreeElement(), {
+            dragAndDrop: false,
+            hasChangePermission: true,
+        });
+
+        expect(await screen.findByRole("tree")).not.toHaveClass("jqtree-dnd");
+    });
+
+    test("doesn't enable drag and drop without change permission", async () => {
+        initTestTree(createTreeElement(), {
+            dragAndDrop: true,
+            hasChangePermission: false,
+        });
+
+        expect(await screen.findByRole("tree")).not.toHaveClass("jqtree-dnd");
+    });
+});
+
+describe("saveState", () => {
+    test("saves the state of the tree", async () => {
+        initTestTree(createTreeElement(), { saveState: "myapp_mymodel" });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        // open the root node
+        screen.getByText("►").click();
+
+        expect(localStorage.getItem("myapp_mymodel")).toEqual(
+            JSON.stringify({ open_nodes: [1], selected_node: [] })
+        );
+    });
+
+    test("doesn't save the state when saveState is undefined", async () => {
+        initTestTree(createTreeElement(), { saveState: undefined });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        screen.getByText("►").click();
+
+        expect(localStorage).toHaveLength(0);
+    });
+});
+
+describe("useContextMenu", () => {
+    const rightClickNode = (name: string) => {
+        screen.getByRole("treeitem", { name }).dispatchEvent(
+            new MouseEvent("contextmenu", {
+                bubbles: true,
+                cancelable: true,
+            })
+        );
+    };
+
+    test("triggers a contextmenu event when useContextMenu is true", async () => {
+        const treeElement = createTreeElement();
+        const handleContextMenu = vi.fn();
+        jQuery(treeElement).on("tree.contextmenu", handleContextMenu);
+
+        initTestTree(treeElement, { autoOpen: true, useContextMenu: true });
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        rightClickNode("Africa");
+
+        expect(handleContextMenu).toHaveBeenCalledOnce();
+        expect(
+            (handleContextMenu.mock.calls[0]?.[0] as { node: INode }).node.name
+        ).toEqual("Africa");
+    });
+
+    test("doesn't trigger a contextmenu event when useContextMenu is undefined", async () => {
+        const treeElement = createTreeElement();
+        const handleContextMenu = vi.fn();
+        jQuery(treeElement).on("tree.contextmenu", handleContextMenu);
+
+        initTestTree(treeElement, { autoOpen: true });
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        rightClickNode("Africa");
+
+        expect(handleContextMenu).not.toHaveBeenCalled();
+    });
+});
+
+describe("jqtree options", () => {
+    // animationSpeed and mouseDelay have no observable effect on the dom, so
+    // check the options that are passed to jqtree
+    const getTreeOptions = (paramOptions?: Partial<InitTreeOptions>) => {
+        const treeSpy = vi.spyOn(jQuery.fn, "tree");
+
+        try {
+            initTestTree(createTreeElement(), paramOptions);
+
+            return treeSpy.mock.calls[0]?.[0] as unknown as Record<
+                string,
+                unknown
+            >;
+        } finally {
+            treeSpy.mockRestore();
+        }
+    };
+
+    test("passes the animation speed", () => {
+        expect(getTreeOptions({ animationSpeed: 300 })).toMatchObject({
+            animationSpeed: 300,
+        });
+    });
+
+    test("doesn't pass an animation speed when it is undefined", () => {
+        expect(getTreeOptions({ animationSpeed: undefined })).not.toHaveProperty(
+            "animationSpeed"
+        );
+    });
+
+    test("passes the mouse delay as startDndDelay", () => {
+        expect(getTreeOptions({ mouseDelay: 500 })).toMatchObject({
+            startDndDelay: 500,
+        });
+    });
+
+    test("doesn't pass a startDndDelay when the mouse delay is undefined", () => {
+        expect(getTreeOptions({ mouseDelay: undefined })).not.toHaveProperty(
+            "startDndDelay"
+        );
+    });
+
+    test("passes buttonLeft and closedIcon for rtl", () => {
+        expect(getTreeOptions({ rtl: true })).toMatchObject({
+            buttonLeft: true,
+            closedIcon: "&#x25c0;",
+        });
+    });
 });
 
 describe("tree.move event", () => {
