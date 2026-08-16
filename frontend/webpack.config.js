@@ -22,7 +22,7 @@ module.exports = {
     output: {
         path: path.resolve(
             __dirname,
-            "../django_mptt_admin/static/django_mptt_admin/"
+            "../django_mptt_admin/static/django_mptt_admin/",
         ),
         filename: getOutputFilename(),
     },
@@ -50,8 +50,5 @@ module.exports = {
     devtool: "source-map",
     optimization: {
         minimize,
-    },
-    externals: {
-        jquery: "jQuery",
     },
 };
