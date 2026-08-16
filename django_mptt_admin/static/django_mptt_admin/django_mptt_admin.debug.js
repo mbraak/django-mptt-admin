@@ -196,7 +196,7 @@ var tree_jquery = __webpack_require__(751);
 ;// ./src/initTree.ts
 
 
-function initTree($tree, {
+function initTree(treeElement, {
   animationSpeed,
   autoEscape,
   autoOpen,
@@ -204,12 +204,15 @@ function initTree($tree, {
   dragAndDrop,
   hasAddPermission,
   hasChangePermission,
+  insertAtUrl,
   mouseDelay,
-  rtl
+  rtl,
+  saveState,
+  useContextMenu
 }) {
   let errorNode = null;
   const baseUrl = "http://example.com";
-  const insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
+  const insertAtUrlObject = insertAtUrl ? new URL(insertAtUrl, baseUrl) : undefined;
   function createLi(node, $li, isSelected) {
     if (node.id == null) {
       return;
@@ -228,8 +231,6 @@ function initTree($tree, {
     }
 
     // Create edit link
-    insertAtUrl.searchParams.set("insert_at", node.id.toString());
-    const insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
     const tabindex = isSelected ? 0 : -1;
     const editCaption = hasChangePermission ? gettext("edit") : gettext("view");
     const editElement = document.createElement("a");
@@ -238,7 +239,9 @@ function initTree($tree, {
     editElement.tabIndex = tabindex;
     editElement.text = `(${editCaption})`;
     titleElement.after(editElement);
-    if (hasAddPermission) {
+    if (hasAddPermission && insertAtUrlObject) {
+      insertAtUrlObject.searchParams.set("insert_at", node.id.toString());
+      const insertUrlString = insertAtUrlObject.toString().substring(baseUrl.length);
       const addElement = document.createElement("a");
       addElement.className = "edit";
       addElement.href = insertUrlString;
@@ -406,15 +409,16 @@ function initTree($tree, {
     dragAndDrop: dragAndDrop && hasChangePermission,
     onCreateLi: createLi,
     onLoadFailed: handleLoadFailed,
-    saveState: $tree.data("save_state"),
-    useContextMenu: Boolean($tree.data("use_context_menu"))
+    saveState,
+    useContextMenu
   };
-  if (animationSpeed !== null) {
+  if (animationSpeed !== undefined) {
     treeOptions.animationSpeed = animationSpeed;
   }
   if (mouseDelay != null) {
     treeOptions.startDndDelay = mouseDelay;
   }
+  const $tree = jQuery(treeElement);
   $tree.on("tree.loading_data", handleLoadingEvent);
   $tree.on("tree.load_data", handleLoadDataEvent);
   $tree.on("tree.move", handleMove);
@@ -424,19 +428,54 @@ function initTree($tree, {
 /* harmony default export */ const src_initTree = (initTree);
 ;// ./src/djangoMpttAdmin.ts
 
-jQuery(() => {
-  const $tree = jQuery("#tree");
-  if ($tree.length) {
-    const animationSpeed = $tree.data("tree-animation-speed");
-    const autoOpen = $tree.data("auto_open");
-    const autoEscape = Boolean($tree.data("autoescape"));
-    const hasAddPermission = Boolean($tree.data("has-add-permission"));
-    const hasChangePermission = Boolean($tree.data("has-change-permission"));
-    const mouseDelay = $tree.data("tree-mouse-delay");
-    const dragAndDrop = $tree.data("drag-and-drop");
-    const rtl = $tree.data("rtl") === "1";
-    const csrfCookieName = $tree.data("csrf-cookie-name");
-    src_initTree($tree, {
+const parseAnimationSpeed = value => {
+  const numberValue = parseNumber(value);
+  if (numberValue === undefined) {
+    return value;
+  } else {
+    return numberValue;
+  }
+};
+const parseAutoOpen = value => {
+  return parseNumber(value) ?? parseBoolean(value);
+};
+const parseBoolean = value => {
+  switch (value) {
+    case "false":
+      return false;
+    case "true":
+      return true;
+    default:
+      return undefined;
+  }
+};
+const parseNumber = value => {
+  if (!value) {
+    return undefined;
+  }
+  const numberValue = parseInt(value);
+  if (isNaN(numberValue)) {
+    return undefined;
+  } else {
+    return numberValue;
+  }
+};
+addEventListener("DOMContentLoaded", () => {
+  const treeElement = document.getElementById("tree");
+  if (treeElement) {
+    const animationSpeed = parseAnimationSpeed(treeElement.dataset["tree-animation-speed"]);
+    const autoOpen = parseAutoOpen(treeElement.dataset.auto_open) ?? false;
+    const autoEscape = parseBoolean(treeElement.dataset.autoescape) ?? true;
+    const csrfCookieName = treeElement.dataset["csrf-cookie-name"] ?? "csrf";
+    const dragAndDrop = parseBoolean(treeElement.dataset["drag-and-drop"]) ?? false;
+    const hasAddPermission = parseBoolean(treeElement.dataset["has-add-permission"]) ?? false;
+    const hasChangePermission = parseBoolean(treeElement.dataset["has-change-permission"]) ?? false;
+    const insertAtUrl = treeElement.dataset.insert_at_url;
+    const mouseDelay = parseNumber(treeElement.dataset["tree-mouse-delay"]);
+    const rtl = treeElement.dataset.rtl === "1";
+    const saveState = treeElement.dataset.save_state;
+    const useContextMenu = parseBoolean(treeElement.dataset.use_context_menu);
+    src_initTree(treeElement, {
       animationSpeed,
       autoEscape,
       autoOpen,
@@ -444,8 +483,11 @@ jQuery(() => {
       dragAndDrop,
       hasAddPermission,
       hasChangePermission,
+      insertAtUrl,
       mouseDelay,
-      rtl
+      rtl,
+      saveState,
+      useContextMenu
     });
   }
 });

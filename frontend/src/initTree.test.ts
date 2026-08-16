@@ -77,21 +77,19 @@ const initTestTree = (
     paramOptions?: Partial<InitTreeOptions>
 ) => {
     const defaultOptions: InitTreeOptions = {
-        animationSpeed: null,
         autoEscape: false,
         autoOpen: false,
         csrfCookieName: "csrf",
         dragAndDrop: false,
         hasAddPermission: true,
         hasChangePermission: true,
-        mouseDelay: null,
+        insertAtUrl: "/add",
         rtl: false,
     };
 
-    const $tree = jQuery(treeElement);
     const options = { ...defaultOptions, ...paramOptions };
 
-    initTree($tree, options);
+    initTree(treeElement, options);
 };
 
 const getNodeElement = (name: string): HTMLElement => {

@@ -1,34 +1,78 @@
 import initTree from "./initTree";
 
-jQuery(() => {
-    const $tree = jQuery("#tree");
+const parseAnimationSpeed = (value?: string) => {
+    const numberValue = parseNumber(value);
 
-    if ($tree.length) {
-        const animationSpeed = $tree.data("tree-animation-speed") as
-            | null
-            | number
-            | string;
-        const autoOpen = $tree.data("auto_open") as boolean | number;
-        const autoEscape = Boolean($tree.data("autoescape"));
-        const hasAddPermission = Boolean($tree.data("has-add-permission"));
-        const hasChangePermission = Boolean(
-            $tree.data("has-change-permission")
+    if (numberValue === undefined) {
+        return value;
+    } else {
+        return numberValue;
+    }
+}
+
+const parseAutoOpen = (value?: string) => {
+    return parseNumber(value) ?? parseBoolean(value);
+}
+
+const parseBoolean = (value?: string) => {
+    switch (value) {
+        case "false":
+            return false;
+        case "true":
+            return true;
+        default:
+            return undefined;
+    }
+}
+
+const parseNumber = (value?: string) => {
+    if (!value) {
+        return undefined;
+    }
+
+    const numberValue = parseInt(value);
+
+    if (isNaN(numberValue)) {
+        return undefined;
+    } else {
+        return numberValue;
+    }
+}
+
+addEventListener("DOMContentLoaded", () => {
+    const treeElement = document.getElementById("tree");
+
+    if (treeElement) {
+        const animationSpeed = parseAnimationSpeed(treeElement.dataset["tree-animation-speed"]);
+
+        const autoOpen = parseAutoOpen(treeElement.dataset.auto_open) ?? false;
+        const autoEscape = parseBoolean(treeElement.dataset.autoescape) ?? true;
+        const csrfCookieName = treeElement.dataset["csrf-cookie-name"] ?? "csrf";
+        const dragAndDrop = parseBoolean(treeElement.dataset["drag-and-drop"]) ?? false;
+        const hasAddPermission = parseBoolean(treeElement.dataset["has-add-permission"]) ?? false;
+        const hasChangePermission = parseBoolean(treeElement.dataset["has-change-permission"]) ?? false;
+        const insertAtUrl = treeElement.dataset.insert_at_url;
+        const mouseDelay = parseNumber(treeElement.dataset["tree-mouse-delay"]);
+        const rtl = treeElement.dataset.rtl === "1";
+        const saveState = treeElement.dataset.save_state;
+        const useContextMenu = parseBoolean(treeElement.dataset.use_context_menu);
+
+        initTree(
+            treeElement,
+            {
+                animationSpeed,
+                autoEscape,
+                autoOpen,
+                csrfCookieName,
+                dragAndDrop,
+                hasAddPermission,
+                hasChangePermission,
+                insertAtUrl,
+                mouseDelay,
+                rtl,
+                saveState,
+                useContextMenu
+            }
         );
-        const mouseDelay = $tree.data("tree-mouse-delay") as null | number;
-        const dragAndDrop = $tree.data("drag-and-drop") as boolean;
-        const rtl = $tree.data("rtl") === "1";
-        const csrfCookieName = $tree.data("csrf-cookie-name") as string;
-
-        initTree($tree, {
-            animationSpeed,
-            autoEscape,
-            autoOpen,
-            csrfCookieName,
-            dragAndDrop,
-            hasAddPermission,
-            hasChangePermission,
-            mouseDelay,
-            rtl,
-        });
     }
 });
