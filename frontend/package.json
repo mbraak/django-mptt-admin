@@ -28,9 +28,6 @@
         "url": "https://github.com/mbraak/django-mptt-admin/issues"
     },
     "homepage": "https://github.com/mbraak/django-mptt-admin#readme",
-    "peerDependencies": {
-        "jquery": ">= 3"
-    },
     "devDependencies": {
         "@babel/core": "^8.0.1",
         "@babel/plugin-transform-runtime": "^8.0.1",
@@ -39,7 +36,6 @@
         "@eslint/js": "^10.0.1",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/jest-dom": "^7",
-        "@types/jquery": "^4.0.1",
         "@types/js-cookie": "^3.0.6",
         "@types/node": "^25.9.5",
         "@vitest/coverage-istanbul": "^4.1.10",
