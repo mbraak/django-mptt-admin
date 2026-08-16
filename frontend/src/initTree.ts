@@ -1,5 +1,7 @@
+import type { Node } from "html-tree";
+
+import HtmlTree from "html-tree";
 import Cookies from "js-cookie";
-import "jqtree";
 
 export interface InitTreeOptions {
     animationSpeed?: number | string;
@@ -16,28 +18,28 @@ export interface InitTreeOptions {
     useContextMenu?: boolean;
 }
 
-interface JQTreeLoadDataEvent extends JQuery.Event {
-    parent_node: INode | null;
+interface LoadDataEventDetail {
+    parent_node: Node | null;
 }
 
-interface JQTreeLoadingEvent extends JQuery.Event {
+interface LoadingEventDetail {
     isLoading: boolean;
-    node: INode | null;
+    node: Node | null;
 }
 
-interface JQTreeMoveEvent extends JQuery.Event {
+interface MoveEventDetail {
     move_info: {
         do_move: () => void;
-        moved_node: INode;
+        moved_node: Node;
         position: string;
-        target_node: INode;
+        target_node: Node;
     };
 }
 
-interface JQTreeSelectEvent extends JQuery.Event {
-    deselected_node: INode | null;
-    node: INode | null;
-    previous_node: INode | null;
+interface SelectEventDetail {
+    deselected_node?: Node | null;
+    node?: Node | null;
+    previous_node?: Node | null;
 }
 
 function initTree(
@@ -57,23 +59,16 @@ function initTree(
         useContextMenu
     }: InitTreeOptions
 ) {
-    let errorNode: INode | null = null;
+    let errorNode: Node | null = null;
     const baseUrl = "http://example.com";
     const insertAtUrlObject = insertAtUrl ? new URL(insertAtUrl, baseUrl) : undefined;
 
-    function createLi(node: INode, $li: JQuery, isSelected: boolean) {
+    function createLi(node: Node, liElement: HTMLElement, isSelected: boolean) {
         if (node.id == null) {
             return;
         }
 
-        const liElement = $li.get(0);
-
-        /* istanbul ignore if */
-        if (!liElement) {
-            return;
-        }
-
-        const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title")
+        const titleElement = liElement.querySelector(":scope > .html-tree-element > .html-tree-title")
 
         /* istanbul ignore if */
         if (!titleElement) {
@@ -132,9 +127,9 @@ function initTree(
         return getFromCookie() ?? getFromMiddleware() ?? "";
     }
 
-    function handleMove(eventParam: JQuery.Event) {
-        const e = eventParam as JQTreeMoveEvent;
-        const info = e.move_info;
+    function handleMove(eventParam: Event) {
+        const e = eventParam as CustomEvent<MoveEventDetail>;
+        const info = e.detail.move_info;
 
         if (!info.moved_node.element) {
             return;
@@ -159,7 +154,7 @@ function initTree(
             errorElement.className = "mptt-admin-error";
             errorElement.textContent = gettext("move failed");
 
-            const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+            const nodeElement = htmlElement.querySelector(":scope > .html-tree-element");
             nodeElement?.append(errorElement);
 
             errorNode = info.moved_node;
@@ -188,7 +183,7 @@ function initTree(
 
         function removeErrorMessage() {
             if (errorNode?.element) {
-                const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
+                const errorElement = errorNode.element.querySelector(":scope > .html-tree-element > .mptt-admin-error");
                 errorElement?.remove();
                 errorNode = null;
             }
@@ -201,7 +196,7 @@ function initTree(
 
     const spinners: Record<number | string, HTMLElement | null> = {};
 
-    function getSpinnerId(node: INode | null): null | number | string {
+    function getSpinnerId(node: Node | null): null | number | string {
         if (!node) {
             return "__root__";
         } else {
@@ -213,7 +208,7 @@ function initTree(
         }
     }
 
-    function handleLoading(node: INode | null) {
+    function handleLoading(node: Node | null) {
         function getContainer() {
             if (node) {
                 return node.element;
@@ -235,7 +230,7 @@ function initTree(
         spinners[spinnerId] = spinner;
     }
 
-    function handleLoaded(node: INode | null) {
+    function handleLoaded(node: Node | null) {
         const spinnerId = getSpinnerId(node);
 
         if (spinnerId == null) {
@@ -249,14 +244,14 @@ function initTree(
         }
     }
 
-    function handleSelect(eventParam: JQuery.Event) {
-        const e = eventParam as JQTreeSelectEvent;
-        const { deselected_node, node, previous_node } = e;
+    function handleSelect(eventParam: Event) {
+        const e = eventParam as CustomEvent<SelectEventDetail>;
+        const { deselected_node, node, previous_node } = e.detail;
 
         const deselectedElement = deselected_node?.element ?? previous_node?.element;
         if (deselectedElement) {
             // deselected node: remove tabindex
-            const editElements = deselectedElement.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+            const editElements = deselectedElement.querySelectorAll<HTMLElement>(":scope > .html-tree-element > .edit");
 
             for (const editElement of editElements) {
                 editElement.tabIndex = -1;
@@ -265,7 +260,7 @@ function initTree(
 
         // selected: add tabindex
         if (node?.element) {
-            const editElements = node.element.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+            const editElements = node.element.querySelectorAll<HTMLElement>(":scope > .html-tree-element > .edit");
 
             for (const editElement of editElements) {
                 editElement.tabIndex = 0;
@@ -273,16 +268,16 @@ function initTree(
         }
     }
 
-    function handleLoadingEvent(e: JQuery.Event) {
-        const { isLoading, node } = e as JQTreeLoadingEvent;
+    function handleLoadingEvent(e: Event) {
+        const { isLoading, node } = (e as CustomEvent<LoadingEventDetail>).detail;
 
         if (isLoading) {
             handleLoading(node);
         }
     }
 
-    function handleLoadDataEvent(e: JQuery.Event) {
-        const { parent_node } = e as JQTreeLoadDataEvent;
+    function handleLoadDataEvent(e: Event) {
+        const { parent_node } = (e as CustomEvent<LoadDataEventDetail>).detail;
 
         handleLoaded(parent_node);
     }
@@ -307,14 +302,12 @@ function initTree(
         treeOptions.startDndDelay = mouseDelay;
     }
 
-    const $tree = jQuery(treeElement);
+    treeElement.addEventListener("tree.loading_data", handleLoadingEvent);
+    treeElement.addEventListener("tree.load_data", handleLoadDataEvent);
+    treeElement.addEventListener("tree.move", handleMove);
+    treeElement.addEventListener("tree.select", handleSelect);
 
-    $tree.on("tree.loading_data", handleLoadingEvent);
-    $tree.on("tree.load_data", handleLoadDataEvent);
-    $tree.on("tree.move", handleMove);
-    $tree.on("tree.select", handleSelect);
-
-    $tree.tree(treeOptions);
+    new HtmlTree({ ...treeOptions, htmlElement: treeElement })
 }
 
 export default initTree;

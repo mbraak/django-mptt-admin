@@ -1,5 +1,6 @@
+import type { Node } from "html-tree";
+
 import { screen, waitFor, within } from "@testing-library/dom";
-import { jQuery } from "jquery";
 import Cookies from 'js-cookie';
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -15,6 +16,26 @@ import {
 } from "vitest";
 
 import initTree, { InitTreeOptions } from "./initTree";
+
+// Record the parameters of the HtmlTree constructor, so that the tests can
+// check the options that are passed to it. A real tree is created.
+const { treeParameters } = vi.hoisted(() => ({
+    treeParameters: [] as Record<string, unknown>[],
+}));
+
+vi.mock("html-tree", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("html-tree")>();
+
+    return {
+        ...actual,
+        default: class extends actual.default {
+            constructor(params: ConstructorParameters<typeof actual.default>[0]) {
+                treeParameters.push(params as unknown as Record<string, unknown>);
+                super(params);
+            }
+        },
+    };
+});
 
 const defaultTreeData = [
     {
@@ -62,6 +83,7 @@ beforeEach(() => {
 
     document.body.innerHTML = "";
     localStorage.clear();
+    treeParameters.length = 0;
 });
 
 const createTreeElement = (dataUrl = "/tree") => {
@@ -91,6 +113,16 @@ const initTestTree = (
     const options = { ...defaultOptions, ...paramOptions };
 
     initTree(treeElement, options);
+};
+
+const dispatchTreeEvent = (
+    treeElement: HTMLElement,
+    name: string,
+    detail: Record<string, unknown>
+) => {
+    treeElement.dispatchEvent(
+        new CustomEvent(name, { bubbles: true, cancelable: true, detail })
+    );
 };
 
 const getNodeElement = (name: string): HTMLElement => {
@@ -280,7 +312,7 @@ describe("dragAndDrop", () => {
             hasChangePermission: true,
         });
 
-        expect(await screen.findByRole("tree")).toHaveClass("jqtree-dnd");
+        expect(await screen.findByRole("tree")).toHaveClass("html-tree-dnd");
     });
 
     test("doesn't enable drag and drop when dragAndDrop is false", async () => {
@@ -289,7 +321,9 @@ describe("dragAndDrop", () => {
             hasChangePermission: true,
         });
 
-        expect(await screen.findByRole("tree")).not.toHaveClass("jqtree-dnd");
+        expect(await screen.findByRole("tree")).not.toHaveClass(
+            "html-tree-dnd"
+        );
     });
 
     test("doesn't enable drag and drop without change permission", async () => {
@@ -298,7 +332,9 @@ describe("dragAndDrop", () => {
             hasChangePermission: false,
         });
 
-        expect(await screen.findByRole("tree")).not.toHaveClass("jqtree-dnd");
+        expect(await screen.findByRole("tree")).not.toHaveClass(
+            "html-tree-dnd"
+        );
     });
 });
 
@@ -340,7 +376,7 @@ describe("useContextMenu", () => {
     test("triggers a contextmenu event when useContextMenu is true", async () => {
         const treeElement = createTreeElement();
         const handleContextMenu = vi.fn();
-        jQuery(treeElement).on("tree.contextmenu", handleContextMenu);
+        treeElement.addEventListener("tree.contextmenu", handleContextMenu);
 
         initTestTree(treeElement, { autoOpen: true, useContextMenu: true });
         expect(await screen.findByRole("tree")).toBeInTheDocument();
@@ -348,15 +384,17 @@ describe("useContextMenu", () => {
         rightClickNode("Africa");
 
         expect(handleContextMenu).toHaveBeenCalledOnce();
-        expect(
-            (handleContextMenu.mock.calls[0]?.[0] as { node: INode }).node.name
-        ).toEqual("Africa");
+
+        const event = handleContextMenu.mock.calls[0]?.[0] as CustomEvent<{
+            node: Node;
+        }>;
+        expect(event.detail.node.name).toEqual("Africa");
     });
 
     test("doesn't trigger a contextmenu event when useContextMenu is undefined", async () => {
         const treeElement = createTreeElement();
         const handleContextMenu = vi.fn();
-        jQuery(treeElement).on("tree.contextmenu", handleContextMenu);
+        treeElement.addEventListener("tree.contextmenu", handleContextMenu);
 
         initTestTree(treeElement, { autoOpen: true });
         expect(await screen.findByRole("tree")).toBeInTheDocument();
@@ -367,22 +405,13 @@ describe("useContextMenu", () => {
     });
 });
 
-describe("jqtree options", () => {
+describe("html-tree options", () => {
     // animationSpeed and mouseDelay have no observable effect on the dom, so
-    // check the options that are passed to jqtree
+    // check the options that are passed to html-tree
     const getTreeOptions = (paramOptions?: Partial<InitTreeOptions>) => {
-        const treeSpy = vi.spyOn(jQuery.fn, "tree");
+        initTestTree(createTreeElement(), paramOptions);
 
-        try {
-            initTestTree(createTreeElement(), paramOptions);
-
-            return treeSpy.mock.calls[0]?.[0] as unknown as Record<
-                string,
-                unknown
-            >;
-        } finally {
-            treeSpy.mockRestore();
-        }
+        return treeParameters[0];
     };
 
     test("passes the animation speed", () => {
@@ -442,7 +471,7 @@ describe("tree.move event", () => {
             target_node: targetNode,
         };
 
-        jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+        dispatchTreeEvent(treeElement, "tree.move", { move_info });
 
         return doMove;
     };
@@ -629,7 +658,7 @@ describe("tree.move event", () => {
 describe("tree.select event", () => {
     const getNodeLinks = (nodeElement: HTMLElement) => {
         const elementDiv = nodeElement.querySelector<HTMLElement>(
-            ":scope > .jqtree-element"
+            ":scope > .html-tree-element"
         );
 
         if (!elementDiv) {
@@ -654,9 +683,11 @@ describe("tree.select event", () => {
             previous_node?: null | object;
         }
     ) => {
-        jQuery(treeElement).trigger(
-            jQuery.Event("tree.select", { deselected_node, node, previous_node })
-        );
+        dispatchTreeEvent(treeElement, "tree.select", {
+            deselected_node,
+            node,
+            previous_node,
+        });
     };
 
     test("sets the tabindex of the edit links when a node is selected", async () => {
