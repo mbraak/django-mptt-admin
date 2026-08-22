@@ -18,6 +18,10 @@ export interface InitTreeOptions {
     useContextMenu?: boolean;
 }
 
+interface DeselectEventDetail {
+    node: Node;
+}
+
 interface LoadDataEventDetail {
     parent_node: Node | null;
 }
@@ -37,9 +41,8 @@ interface MoveEventDetail {
 }
 
 interface SelectEventDetail {
-    deselected_node?: Node | null;
-    node?: Node | null;
-    previous_node?: Node | null;
+    deselected_node: Node | null;
+    node: Node;
 }
 
 function initTree(
@@ -244,27 +247,37 @@ function initTree(
         }
     }
 
+    function setEditTabIndex(nodeElement: HTMLElement, tabIndex: number) {
+        const editElements = nodeElement.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+
+        for (const editElement of editElements) {
+            editElement.tabIndex = tabIndex;
+        }
+    }
+
     function handleSelect(eventParam: Event) {
         const e = eventParam as CustomEvent<SelectEventDetail>;
-        const { deselected_node, node, previous_node } = e.detail;
+        const { deselected_node, node } = e.detail;
 
-        const deselectedElement = deselected_node?.element ?? previous_node?.element;
-        if (deselectedElement) {
+        if (deselected_node?.element) {
             // deselected node: remove tabindex
-            const editElements = deselectedElement.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
-
-            for (const editElement of editElements) {
-                editElement.tabIndex = -1;
-            }
+            setEditTabIndex(deselected_node.element, -1);
         }
 
         // selected: add tabindex
-        if (node?.element) {
-            const editElements = node.element.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
+        /* istanbul ignore else */
+        if (node.element) {
+            setEditTabIndex(node.element, 0);
+        }
+    }
 
-            for (const editElement of editElements) {
-                editElement.tabIndex = 0;
-            }
+    function handleDeselect(eventParam: Event) {
+        const e = eventParam as CustomEvent<DeselectEventDetail>;
+        const { node } = e.detail;
+
+        /* istanbul ignore else */
+        if (node.element) {
+            setEditTabIndex(node.element, -1);
         }
     }
 
@@ -302,6 +315,7 @@ function initTree(
         treeOptions.startDndDelay = mouseDelay;
     }
 
+    treeElement.addEventListener("tree.deselect", handleDeselect);
     treeElement.addEventListener("tree.loading_data", handleLoadingEvent);
     treeElement.addEventListener("tree.load_data", handleLoadDataEvent);
     treeElement.addEventListener("tree.move", handleMove);

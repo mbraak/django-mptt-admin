@@ -1,6 +1,6 @@
 import type { Node } from "html-tree";
 
-import { screen, waitFor, within } from "@testing-library/dom";
+import { fireEvent, screen, waitFor, within } from "@testing-library/dom";
 import Cookies from 'js-cookie';
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -655,7 +655,7 @@ describe("tree.move event", () => {
     });
 });
 
-describe("tree.select event", () => {
+describe("selecting a node", () => {
     const getNodeLinks = (nodeElement: HTMLElement) => {
         const elementDiv = nodeElement.querySelector<HTMLElement>(
             ":scope > .jqtree-element"
@@ -671,23 +671,8 @@ describe("tree.select event", () => {
         };
     };
 
-    const triggerTreeSelect = (
-        treeElement: HTMLElement,
-        {
-            deselected_node = null,
-            node = null,
-            previous_node = null,
-        }: {
-            deselected_node?: null | object;
-            node?: null | object;
-            previous_node?: null | object;
-        }
-    ) => {
-        dispatchTreeEvent(treeElement, "tree.select", {
-            deselected_node,
-            node,
-            previous_node,
-        });
+    const clickNode = (name: string) => {
+        fireEvent.click(screen.getByRole("treeitem", { name }));
     };
 
     test("sets the tabindex of the edit links when a node is selected", async () => {
@@ -696,19 +681,12 @@ describe("tree.select event", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const africaElement = getNodeElement("Africa");
-        const editLink = within(africaElement).getByRole("link", {
-            name: "(edit)",
-        });
-        const addLink = within(africaElement).getByRole("link", {
-            name: "(add)",
-        });
+        const { addLink, editLink } = getNodeLinks(africaElement);
 
         expect(editLink).toHaveAttribute("tabindex", "-1");
         expect(addLink).toHaveAttribute("tabindex", "-1");
 
-        triggerTreeSelect(treeElement, {
-            node: { element: africaElement, id: 2 },
-        });
+        clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "0");
         expect(addLink).toHaveAttribute("tabindex", "0");
@@ -719,42 +697,15 @@ describe("tree.select event", () => {
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const africaElement = getNodeElement("Africa");
-        const { addLink, editLink } = getNodeLinks(africaElement);
+        const { addLink, editLink } = getNodeLinks(getNodeElement("Africa"));
 
-        triggerTreeSelect(treeElement, {
-            node: { element: africaElement, id: 2 },
-        });
+        clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "0");
         expect(addLink).toHaveAttribute("tabindex", "0");
 
-        triggerTreeSelect(treeElement, {
-            deselected_node: { element: africaElement, id: 2 },
-        });
-
-        expect(editLink).toHaveAttribute("tabindex", "-1");
-        expect(addLink).toHaveAttribute("tabindex", "-1");
-    });
-
-    test("resets the tabindex of the edit links using previous_node when deselected_node is empty", async () => {
-        const treeElement = createTreeElement();
-        initTestTree(treeElement);
-        expect(await screen.findByRole("tree")).toBeInTheDocument();
-
-        const africaElement = getNodeElement("Africa");
-        const { addLink, editLink } = getNodeLinks(africaElement);
-
-        triggerTreeSelect(treeElement, {
-            node: { element: africaElement, id: 2 },
-        });
-
-        expect(editLink).toHaveAttribute("tabindex", "0");
-        expect(addLink).toHaveAttribute("tabindex", "0");
-
-        triggerTreeSelect(treeElement, {
-            previous_node: { element: africaElement, id: 2 },
-        });
+        // clicking the selected node deselects it
+        clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "-1");
         expect(addLink).toHaveAttribute("tabindex", "-1");
@@ -765,25 +716,17 @@ describe("tree.select event", () => {
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const rootElement = getNodeElement("root");
-        const africaElement = getNodeElement("Africa");
+        const rootLinks = getNodeLinks(getNodeElement("root"));
+        const africaLinks = getNodeLinks(getNodeElement("Africa"));
 
-        const rootLinks = getNodeLinks(rootElement);
-        const africaLinks = getNodeLinks(africaElement);
-
-        triggerTreeSelect(treeElement, {
-            node: { element: rootElement, id: 1 },
-        });
+        clickNode("root");
 
         expect(rootLinks.editLink).toHaveAttribute("tabindex", "0");
         expect(rootLinks.addLink).toHaveAttribute("tabindex", "0");
         expect(africaLinks.editLink).toHaveAttribute("tabindex", "-1");
         expect(africaLinks.addLink).toHaveAttribute("tabindex", "-1");
 
-        triggerTreeSelect(treeElement, {
-            deselected_node: { element: rootElement, id: 1 },
-            node: { element: africaElement, id: 2 },
-        });
+        clickNode("Africa");
 
         expect(rootLinks.editLink).toHaveAttribute("tabindex", "-1");
         expect(rootLinks.addLink).toHaveAttribute("tabindex", "-1");
