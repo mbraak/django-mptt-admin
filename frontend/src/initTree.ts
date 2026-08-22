@@ -68,7 +68,7 @@ function initTree(
             return;
         }
 
-        const titleElement = liElement.querySelector(":scope > .html-tree-element > .html-tree-title")
+        const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title")
 
         /* istanbul ignore if */
         if (!titleElement) {
@@ -154,7 +154,7 @@ function initTree(
             errorElement.className = "mptt-admin-error";
             errorElement.textContent = gettext("move failed");
 
-            const nodeElement = htmlElement.querySelector(":scope > .html-tree-element");
+            const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
             nodeElement?.append(errorElement);
 
             errorNode = info.moved_node;
@@ -183,7 +183,7 @@ function initTree(
 
         function removeErrorMessage() {
             if (errorNode?.element) {
-                const errorElement = errorNode.element.querySelector(":scope > .html-tree-element > .mptt-admin-error");
+                const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
                 errorElement?.remove();
                 errorNode = null;
             }
@@ -225,7 +225,7 @@ function initTree(
         }
 
         const spinner = document.createElement("span");
-        spinner.className = "html-tree-spin";
+        spinner.className = "jqtree-spin";
         container.append(spinner);
         spinners[spinnerId] = spinner;
     }
@@ -251,7 +251,7 @@ function initTree(
         const deselectedElement = deselected_node?.element ?? previous_node?.element;
         if (deselectedElement) {
             // deselected node: remove tabindex
-            const editElements = deselectedElement.querySelectorAll<HTMLElement>(":scope > .html-tree-element > .edit");
+            const editElements = deselectedElement.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
 
             for (const editElement of editElements) {
                 editElement.tabIndex = -1;
@@ -260,7 +260,7 @@ function initTree(
 
         // selected: add tabindex
         if (node?.element) {
-            const editElements = node.element.querySelectorAll<HTMLElement>(":scope > .html-tree-element > .edit");
+            const editElements = node.element.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
 
             for (const editElement of editElements) {
                 editElement.tabIndex = 0;
@@ -307,7 +307,13 @@ function initTree(
     treeElement.addEventListener("tree.move", handleMove);
     treeElement.addEventListener("tree.select", handleSelect);
 
-    new HtmlTree({ ...treeOptions, htmlElement: treeElement })
+    new HtmlTree({
+        ...treeOptions,
+        classPrefix: "jqtree",
+        commonClassName: "jqtree_common",
+        htmlElement: treeElement,
+        treeClassName: "jqtree-tree"
+    })
 }
 
 export default initTree;

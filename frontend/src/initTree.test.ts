@@ -312,7 +312,7 @@ describe("dragAndDrop", () => {
             hasChangePermission: true,
         });
 
-        expect(await screen.findByRole("tree")).toHaveClass("html-tree-dnd");
+        expect(await screen.findByRole("tree")).toHaveClass("jqtree-dnd");
     });
 
     test("doesn't enable drag and drop when dragAndDrop is false", async () => {
@@ -322,7 +322,7 @@ describe("dragAndDrop", () => {
         });
 
         expect(await screen.findByRole("tree")).not.toHaveClass(
-            "html-tree-dnd"
+            "jqtree-dnd"
         );
     });
 
@@ -333,7 +333,7 @@ describe("dragAndDrop", () => {
         });
 
         expect(await screen.findByRole("tree")).not.toHaveClass(
-            "html-tree-dnd"
+            "jqtree-dnd"
         );
     });
 });
@@ -658,7 +658,7 @@ describe("tree.move event", () => {
 describe("tree.select event", () => {
     const getNodeLinks = (nodeElement: HTMLElement) => {
         const elementDiv = nodeElement.querySelector<HTMLElement>(
-            ":scope > .html-tree-element"
+            ":scope > .jqtree-element"
         );
 
         if (!elementDiv) {
