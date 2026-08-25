@@ -41,7 +41,7 @@ interface MoveEventDetail {
 }
 
 interface SelectEventDetail {
-    deselected_node: Node | null;
+    deselectedNode: Node | null;
     node: Node;
 }
 
@@ -257,11 +257,11 @@ function initTree(
 
     function handleSelect(eventParam: Event) {
         const e = eventParam as CustomEvent<SelectEventDetail>;
-        const { deselected_node, node } = e.detail;
+        const { deselectedNode, node } = e.detail;
 
-        if (deselected_node?.element) {
+        if (deselectedNode?.element) {
             // deselected node: remove tabindex
-            setEditTabIndex(deselected_node.element, -1);
+            setEditTabIndex(deselectedNode.element, -1);
         }
 
         // selected: add tabindex
