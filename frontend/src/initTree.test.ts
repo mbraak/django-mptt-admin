@@ -145,11 +145,85 @@ test("initializes the tree", async () => {
 });
 
 test("displays a message when the data cannot be loaded", async () => {
-    initTestTree(createTreeElement("/no_data"));
+    const treeElement = createTreeElement("/no_data");
+    initTestTree(treeElement);
+
+    const spinner = treeElement.querySelector(".jqtree-spin");
+    expect(spinner).toBeInTheDocument();
+    expect(spinner?.parentElement).toBe(treeElement);
 
     expect(
         await screen.findByText("Error while loading the data from the server")
     ).toBeInTheDocument();
+
+    // the message replaces the spinner
+    expect(document.querySelector(".jqtree-spin")).not.toBeInTheDocument();
+});
+
+test("displays a spinner while the data is loading", async () => {
+    const treeElement = createTreeElement();
+    initTestTree(treeElement);
+
+    const spinner = treeElement.querySelector(".jqtree-spin");
+    expect(spinner).toBeInTheDocument();
+    expect(spinner?.parentElement).toBe(treeElement);
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+    expect(treeElement.querySelector(".jqtree-spin")).not.toBeInTheDocument();
+});
+
+test("displays a spinner while the data of a node is loading", async () => {
+    treeData = [
+        {
+            id: 1,
+            load_on_demand: true,
+            name: "root",
+            url: "/edit/1",
+        },
+    ];
+
+    // the request for the children of the root node is delayed, so that the
+    // test can check the spinner while the node is loading
+    let sendChildren = () => {
+        // do nothing
+    };
+    const childrenRequested = new Promise<void>((resolve) => {
+        sendChildren = resolve;
+    });
+
+    server.use(
+        http.get("/tree", async ({ request }) => {
+            const nodeId = new URL(request.url).searchParams.get("node");
+
+            if (nodeId !== "1") {
+                return HttpResponse.json(treeData);
+            }
+
+            await childrenRequested;
+            return HttpResponse.json([
+                { id: 2, name: "Africa", url: "/edit/2" },
+            ]);
+        })
+    );
+
+    // autoOpen opens the root node, which loads its children from the server
+    initTestTree(createTreeElement(), { autoOpen: true });
+
+    // the spinner is displayed next to the title of the node
+    await waitFor(() => {
+        expect(
+            getNodeElement("root").querySelector(
+                ":scope > .jqtree-element > .jqtree-spin"
+            )
+        ).toBeInTheDocument();
+    });
+
+    sendChildren();
+
+    expect(
+        await screen.findByRole("treeitem", { name: "Africa" })
+    ).toBeInTheDocument();
+    expect(document.querySelector(".jqtree-spin")).not.toBeInTheDocument();
 });
 
 test("adds edit links when hasChangePermission is true", async () => {

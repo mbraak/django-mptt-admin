@@ -23,7 +23,7 @@ interface DeselectEventDetail {
 }
 
 interface LoadDataEventDetail {
-    parent_node: Node | null;
+    parentNode: Node | null;
 }
 
 interface LoadingEventDetail {
@@ -214,7 +214,8 @@ function initTree(
     function handleLoading(node: Node | null) {
         function getContainer() {
             if (node) {
-                return node.element;
+                // display the spinner next to the title of the node
+                return node.element?.querySelector(":scope > .jqtree-element");
             } else {
                 return treeElement;
             }
@@ -290,9 +291,9 @@ function initTree(
     }
 
     function handleLoadDataEvent(e: Event) {
-        const { parent_node } = (e as CustomEvent<LoadDataEventDetail>).detail;
+        const { parentNode } = (e as CustomEvent<LoadDataEventDetail>).detail;
 
-        handleLoaded(parent_node);
+        handleLoaded(parentNode);
     }
 
     const treeOptions: Record<string, unknown> = {
