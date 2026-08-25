@@ -1,4 +1,4 @@
-import type { Node } from "html-tree";
+import type { Node, TreeEvents } from "html-tree";
 
 import HtmlTree from "html-tree";
 import Cookies from "js-cookie";
@@ -18,19 +18,6 @@ export interface InitTreeOptions {
     useContextMenu?: boolean;
 }
 
-interface DeselectEventDetail {
-    node: Node;
-}
-
-interface LoadDataEventDetail {
-    parentNode: Node | null;
-}
-
-interface LoadingEventDetail {
-    isLoading: boolean;
-    node: Node | null;
-}
-
 interface MoveEventDetail {
     move_info: {
         do_move: () => void;
@@ -38,11 +25,6 @@ interface MoveEventDetail {
         position: string;
         target_node: Node;
     };
-}
-
-interface SelectEventDetail {
-    deselectedNode: Node | null;
-    node: Node;
 }
 
 function initTree(
@@ -145,14 +127,14 @@ function initTree(
             target_id: String(info.target_node.id),
         });
 
-        handleLoading(null);
+        handleLoading();
 
         removeErrorMessage();
 
         e.preventDefault();
 
         function handleError() {
-            handleLoaded(null);
+            handleLoaded();
             const errorElement = document.createElement("span");
             errorElement.className = "mptt-admin-error";
             errorElement.textContent = gettext("move failed");
@@ -174,7 +156,7 @@ function initTree(
             (response) => {
                 if (response.ok) {
                     info.do_move();
-                    handleLoaded(null);
+                    handleLoaded();
                 } else {
                     handleError();
                 }
@@ -199,7 +181,7 @@ function initTree(
 
     const spinners: Record<number | string, HTMLElement | null> = {};
 
-    function getSpinnerId(node: Node | null): null | number | string {
+    function getSpinnerId(node: Node | undefined): null | number | string {
         if (!node) {
             return "__root__";
         } else {
@@ -211,7 +193,7 @@ function initTree(
         }
     }
 
-    function handleLoading(node: Node | null) {
+    function handleLoading(node?: Node) {
         function getContainer() {
             if (node) {
                 // display the spinner next to the title of the node
@@ -234,7 +216,7 @@ function initTree(
         spinners[spinnerId] = spinner;
     }
 
-    function handleLoaded(node: Node | null) {
+    function handleLoaded(node?: Node) {
         const spinnerId = getSpinnerId(node);
 
         if (spinnerId == null) {
@@ -256,8 +238,7 @@ function initTree(
         }
     }
 
-    function handleSelect(eventParam: Event) {
-        const e = eventParam as CustomEvent<SelectEventDetail>;
+    function handleSelect(e: CustomEvent<TreeEvents["tree.select"]>) {
         const { deselectedNode, node } = e.detail;
 
         if (deselectedNode?.element) {
@@ -272,8 +253,7 @@ function initTree(
         }
     }
 
-    function handleDeselect(eventParam: Event) {
-        const e = eventParam as CustomEvent<DeselectEventDetail>;
+    function handleDeselect(e: CustomEvent<TreeEvents["tree.deselect"]>) {
         const { node } = e.detail;
 
         /* istanbul ignore else */
@@ -282,16 +262,16 @@ function initTree(
         }
     }
 
-    function handleLoadingEvent(e: Event) {
-        const { isLoading, node } = (e as CustomEvent<LoadingEventDetail>).detail;
+    function handleLoadingEvent(e: CustomEvent<TreeEvents["tree.loading_data"]>) {
+        const { isLoading, node } = e.detail;
 
         if (isLoading) {
-            handleLoading(node);
+            handleLoading(node ?? undefined);
         }
     }
 
-    function handleLoadDataEvent(e: Event) {
-        const { parentNode } = (e as CustomEvent<LoadDataEventDetail>).detail;
+    function handleLoadDataEvent(e: CustomEvent<TreeEvents["tree.load_data"]>) {
+        const { parentNode } = e.detail;
 
         handleLoaded(parentNode);
     }
