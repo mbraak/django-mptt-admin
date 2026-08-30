@@ -421,9 +421,11 @@ describe("saveState", () => {
         // open the root node
         screen.getByText("►").click();
 
-        expect(localStorage.getItem("myapp_mymodel")).toEqual(
-            JSON.stringify({ open_nodes: [1], selected_node: [] })
-        );
+        await waitFor(() => {
+            expect(localStorage.getItem("myapp_mymodel")).toEqual(
+                JSON.stringify({ open_nodes: [1], selected_node: [] })
+            );
+        });
     });
 
     test("doesn't save the state when saveState is undefined", async () => {
