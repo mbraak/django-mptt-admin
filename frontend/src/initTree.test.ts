@@ -1,6 +1,7 @@
 import type { Node } from "html-tree";
 
-import { fireEvent, screen, waitFor, within } from "@testing-library/dom";
+import { screen, waitFor, within } from "@testing-library/dom";
+import userEvent, { type UserEvent } from "@testing-library/user-event";
 import Cookies from 'js-cookie';
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -53,6 +54,7 @@ const defaultTreeData = [
 ];
 let treeData = {};
 let csrfTokenInRequest: null | string = null;
+let user: UserEvent;
 
 const server = setupServer();
 
@@ -84,6 +86,7 @@ beforeEach(() => {
     document.body.innerHTML = "";
     localStorage.clear();
     treeParameters.length = 0;
+    user = userEvent.setup();
 });
 
 const createTreeElement = (dataUrl = "/tree") => {
@@ -419,7 +422,7 @@ describe("saveState", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         // open the root node
-        screen.getByText("►").click();
+        await user.click(screen.getByText("►"));
 
         await waitFor(() => {
             expect(localStorage.getItem("myapp_mymodel")).toEqual(
@@ -433,20 +436,18 @@ describe("saveState", () => {
 
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        screen.getByText("►").click();
+        await user.click(screen.getByText("►"));
 
         expect(localStorage).toHaveLength(0);
     });
 });
 
 describe("useContextMenu", () => {
-    const rightClickNode = (name: string) => {
-        screen.getByRole("treeitem", { name }).dispatchEvent(
-            new MouseEvent("contextmenu", {
-                bubbles: true,
-                cancelable: true,
-            })
-        );
+    const rightClickNode = async (name: string) => {
+        await user.pointer({
+            keys: "[MouseRight]",
+            target: screen.getByRole("treeitem", { name }),
+        });
     };
 
     test("triggers a contextmenu event when useContextMenu is true", async () => {
@@ -457,7 +458,7 @@ describe("useContextMenu", () => {
         initTestTree(treeElement, { autoOpen: true, useContextMenu: true });
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        rightClickNode("Africa");
+        await rightClickNode("Africa");
 
         expect(handleContextMenu).toHaveBeenCalledOnce();
 
@@ -475,7 +476,7 @@ describe("useContextMenu", () => {
         initTestTree(treeElement, { autoOpen: true });
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        rightClickNode("Africa");
+        await rightClickNode("Africa");
 
         expect(handleContextMenu).not.toHaveBeenCalled();
     });
@@ -747,8 +748,8 @@ describe("selecting a node", () => {
         };
     };
 
-    const clickNode = (name: string) => {
-        fireEvent.click(screen.getByRole("treeitem", { name }));
+    const clickNode = async (name: string) => {
+        await user.click(screen.getByRole("treeitem", { name }));
     };
 
     test("sets the tabindex of the edit links when a node is selected", async () => {
@@ -762,7 +763,7 @@ describe("selecting a node", () => {
         expect(editLink).toHaveAttribute("tabindex", "-1");
         expect(addLink).toHaveAttribute("tabindex", "-1");
 
-        clickNode("Africa");
+        await clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "0");
         expect(addLink).toHaveAttribute("tabindex", "0");
@@ -775,13 +776,13 @@ describe("selecting a node", () => {
 
         const { addLink, editLink } = getNodeLinks(getNodeElement("Africa"));
 
-        clickNode("Africa");
+        await clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "0");
         expect(addLink).toHaveAttribute("tabindex", "0");
 
         // clicking the selected node deselects it
-        clickNode("Africa");
+        await clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "-1");
         expect(addLink).toHaveAttribute("tabindex", "-1");
@@ -795,14 +796,14 @@ describe("selecting a node", () => {
         const rootLinks = getNodeLinks(getNodeElement("root"));
         const africaLinks = getNodeLinks(getNodeElement("Africa"));
 
-        clickNode("root");
+        await clickNode("root");
 
         expect(rootLinks.editLink).toHaveAttribute("tabindex", "0");
         expect(rootLinks.addLink).toHaveAttribute("tabindex", "0");
         expect(africaLinks.editLink).toHaveAttribute("tabindex", "-1");
         expect(africaLinks.addLink).toHaveAttribute("tabindex", "-1");
 
-        clickNode("Africa");
+        await clickNode("Africa");
 
         expect(rootLinks.editLink).toHaveAttribute("tabindex", "-1");
         expect(rootLinks.addLink).toHaveAttribute("tabindex", "-1");

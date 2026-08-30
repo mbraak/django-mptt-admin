@@ -35,6 +35,7 @@
         "@eslint/js": "^10.0.1",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/jest-dom": "^7",
+        "@testing-library/user-event": "^14.6.6",
         "@types/js-cookie": "^3.0.6",
         "@types/node": "^25.9.5",
         "@vitest/coverage-istanbul": "^4.1.10",
