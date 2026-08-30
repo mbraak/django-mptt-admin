@@ -296,6 +296,28 @@ test("renders a link for a closed node with rtl is true", async () => {
     expect(screen.getByText("◀")).toBeInTheDocument();
 });
 
+test("renders the button on the left when rtl is true", async () => {
+    initTestTree(createTreeElement(), { rtl: true });
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    // the button is placed before the title of the node
+    const button = screen.getByText("◀");
+    expect(button).toHaveClass("jqtree-toggler-left");
+    expect(button.parentElement?.firstElementChild).toBe(button);
+});
+
+test("renders the button on the right when rtl is false", async () => {
+    initTestTree(createTreeElement(), { rtl: false });
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    // the button is placed after the title of the node
+    const button = screen.getByText("►");
+    expect(button).toHaveClass("jqtree-toggler-right");
+    expect(button.parentElement?.lastElementChild).toBe(button);
+});
+
 describe("autoOpen", () => {
     test("opens the nodes when autoOpen is true", async () => {
         initTestTree(createTreeElement(), { autoOpen: true });
