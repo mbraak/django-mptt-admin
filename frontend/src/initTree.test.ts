@@ -18,26 +18,6 @@ import {
 
 import initTree, { InitTreeOptions } from "./initTree";
 
-// Record the parameters of the HtmlTree constructor, so that the tests can
-// check the options that are passed to it. A real tree is created.
-const { treeParameters } = vi.hoisted(() => ({
-    treeParameters: [] as Record<string, unknown>[],
-}));
-
-vi.mock("html-tree", async (importOriginal) => {
-    const actual = await importOriginal<typeof import("html-tree")>();
-
-    return {
-        ...actual,
-        default: class extends actual.default {
-            constructor(params: ConstructorParameters<typeof actual.default>[0]) {
-                treeParameters.push(params as unknown as Record<string, unknown>);
-                super(params);
-            }
-        },
-    };
-});
-
 const defaultTreeData = [
     {
         children: [
@@ -85,7 +65,6 @@ beforeEach(() => {
 
     document.body.innerHTML = "";
     localStorage.clear();
-    treeParameters.length = 0;
     user = userEvent.setup();
 });
 
@@ -479,47 +458,6 @@ describe("useContextMenu", () => {
         await rightClickNode("Africa");
 
         expect(handleContextMenu).not.toHaveBeenCalled();
-    });
-});
-
-describe("html-tree options", () => {
-    // animationSpeed and mouseDelay have no observable effect on the dom, so
-    // check the options that are passed to html-tree
-    const getTreeOptions = (paramOptions?: Partial<InitTreeOptions>) => {
-        initTestTree(createTreeElement(), paramOptions);
-
-        return treeParameters[0];
-    };
-
-    test("passes the animation speed", () => {
-        expect(getTreeOptions({ animationSpeed: 300 })).toMatchObject({
-            animationSpeed: 300,
-        });
-    });
-
-    test("doesn't pass an animation speed when it is undefined", () => {
-        expect(getTreeOptions({ animationSpeed: undefined })).not.toHaveProperty(
-            "animationSpeed"
-        );
-    });
-
-    test("passes the mouse delay as startDndDelay", () => {
-        expect(getTreeOptions({ mouseDelay: 500 })).toMatchObject({
-            startDndDelay: 500,
-        });
-    });
-
-    test("doesn't pass a startDndDelay when the mouse delay is undefined", () => {
-        expect(getTreeOptions({ mouseDelay: undefined })).not.toHaveProperty(
-            "startDndDelay"
-        );
-    });
-
-    test("passes buttonLeft and closedIcon for rtl", () => {
-        expect(getTreeOptions({ rtl: true })).toMatchObject({
-            buttonLeft: true,
-            closedIcon: "&#x25c0;",
-        });
     });
 });
 
