@@ -263,17 +263,11 @@ function initTree(
     }
 
     function handleLoadingEvent(e: CustomEvent<TreeEvents["tree.loading_data"]>) {
-        const { isLoading, node } = e.detail;
-
-        if (isLoading) {
-            handleLoading(node ?? undefined);
-        }
+        handleLoading(e.detail.node);
     }
 
-    function handleLoadDataEvent(e: CustomEvent<TreeEvents["tree.load_data"]>) {
-        const { parentNode } = e.detail;
-
-        handleLoaded(parentNode);
+    function handleLoadedDataEvent(e: CustomEvent<TreeEvents["tree.loaded_data"]>) {
+        handleLoaded(e.detail.node);
     }
 
     const treeOptions: Record<string, unknown> = {
@@ -283,7 +277,6 @@ function initTree(
         closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
         dragAndDrop: dragAndDrop && hasChangePermission,
         onCreateLi: createLi,
-        onLoadFailed: handleLoadFailed,
         saveState,
         useContextMenu,
     };
@@ -297,8 +290,9 @@ function initTree(
     }
 
     treeElement.addEventListener("tree.deselect", handleDeselect);
+    treeElement.addEventListener("tree.load_failed", handleLoadFailed);
     treeElement.addEventListener("tree.loading_data", handleLoadingEvent);
-    treeElement.addEventListener("tree.load_data", handleLoadDataEvent);
+    treeElement.addEventListener("tree.loaded_data", handleLoadedDataEvent);
     treeElement.addEventListener("tree.move", handleMove);
     treeElement.addEventListener("tree.select", handleSelect);
 
