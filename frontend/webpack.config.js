@@ -1,4 +1,5 @@
 const path = require("path");
+const MinimizerPlugin = require("minimizer-webpack-plugin");
 
 const skipCompressJs = Boolean(process.env.SKIP_COMPRESS_JS);
 const coverage = Boolean(process.env.COVERAGE);
@@ -54,5 +55,18 @@ module.exports = {
     },
     optimization: {
         minimize,
+        minimizer: [
+            new MinimizerPlugin({
+                // Terser is the default minifier. Also mangle property names
+                // that start with an underscore (internal/private members).
+                minimizerOptions: {
+                    mangle: {
+                        properties: {
+                            regex: /^_/,
+                        },
+                    },
+                },
+            }),
+        ],
     },
 };
