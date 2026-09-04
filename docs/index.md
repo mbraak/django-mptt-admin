@@ -145,6 +145,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Issue #782. Use CSS animations (instead of jQuery animations).
+
 **2.10.0** (august 6 2026)
 
 - Issue #754. Support Django 6.1. Drop support for Django 4.2.
