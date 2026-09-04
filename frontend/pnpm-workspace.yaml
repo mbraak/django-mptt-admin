@@ -1,11 +1,11 @@
 allowBuilds:
-  "@parcel/watcher": true
-  esbuild: true
-  msw: true
-  unrs-resolver: true
+    "@parcel/watcher": true
+    esbuild: true
+    msw: true
+    unrs-resolver: true
 minimumReleaseAgeExclude:
-  - jqtree@1.9.0
+    - jqtree@1.9.0
 onlyBuiltDependencies:
-  - "@parcel/watcher"
-  - esbuild
-  - msw
+    - "@parcel/watcher"
+    - esbuild
+    - msw
