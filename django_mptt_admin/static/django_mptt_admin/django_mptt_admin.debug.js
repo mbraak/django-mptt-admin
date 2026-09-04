@@ -1,102 +1,248 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dataLoader.js
+;// ./node_modules/.pnpm/js-cookie@3.0.8/node_modules/js-cookie/dist/js.cookie.mjs
+/*! js-cookie v3.0.8 | MIT */
+function js_cookie_assign (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+    for (var key in source) {
+      if (key === '__proto__') continue
+      target[key] = source[key];
+    }
+  }
+  return target
+}
+
+var defaultConverter = {
+  read: function (value) {
+    if (value[0] === '"') {
+      value = value.slice(1, -1);
+    }
+    return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)
+  },
+  write: function (value) {
+    return encodeURIComponent(value).replace(
+      /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
+      decodeURIComponent
+    )
+  }
+};
+
+function init(converter, defaultAttributes) {
+  function set(name, value, attributes) {
+    if (typeof document === 'undefined') {
+      return
+    }
+
+    attributes = js_cookie_assign({}, defaultAttributes, attributes);
+
+    if (typeof attributes.expires === 'number') {
+      attributes.expires = new Date(Date.now() + attributes.expires * 864e5);
+    }
+    if (attributes.expires) {
+      attributes.expires = attributes.expires.toUTCString();
+    }
+
+    name = encodeURIComponent(name)
+      .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
+      .replace(/[()]/g, escape);
+
+    var stringifiedAttributes = '';
+    for (var attributeName in attributes) {
+      if (!attributes[attributeName]) {
+        continue
+      }
+
+      stringifiedAttributes += '; ' + attributeName;
+
+      if (attributes[attributeName] === true) {
+        continue
+      }
+
+      // Considers RFC 6265 section 5.2:
+      // ...
+      // 3.  If the remaining unparsed-attributes contains a %x3B (";")
+      //     character:
+      // Consume the characters of the unparsed-attributes up to,
+      // not including, the first %x3B (";") character.
+      // ...
+      stringifiedAttributes += '=' + attributes[attributeName].split(';')[0];
+    }
+
+    return (document.cookie =
+      name + '=' + converter.write(value, name) + stringifiedAttributes)
+  }
+
+  function get(name) {
+    if (typeof document === 'undefined' || (arguments.length && !name)) {
+      return
+    }
+
+    // To prevent the for loop in the first place assign an empty array
+    // in case there are no cookies at all.
+    var cookies = document.cookie ? document.cookie.split('; ') : [];
+    var jar = {};
+    for (var i = 0; i < cookies.length; i++) {
+      var parts = cookies[i].split('=');
+      var value = parts.slice(1).join('=');
+
+      try {
+        var found = decodeURIComponent(parts[0]);
+        if (!(found in jar)) jar[found] = converter.read(value, found);
+        if (name === found) {
+          break
+        }
+      } catch (_e) {
+        // Do nothing...
+      }
+    }
+
+    return name ? jar[name] : jar
+  }
+
+  return Object.create(
+    {
+      set: set,
+      get: get,
+      remove: function (name, attributes) {
+        set(
+          name,
+          '',
+          js_cookie_assign({}, attributes, {
+            expires: -1
+          })
+        );
+      },
+      withAttributes: function (attributes) {
+        return init(this.converter, js_cookie_assign({}, this.attributes, attributes))
+      },
+      withConverter: function (converter) {
+        return init(js_cookie_assign({}, this.converter, converter), this.attributes)
+      }
+    },
+    {
+      attributes: { value: Object.freeze(defaultAttributes) },
+      converter: { value: Object.freeze(converter) }
+    }
+  )
+}
+
+var api = init(defaultConverter, { path: '/' });
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/classNames.js
+const DEFAULT_CLASS_PREFIX = "tree-element";
+
+/* Create the class names that the widget puts on the elements it creates.
+ * They are all derived from classPrefix, except for the class of the root
+ * element and the class that every element gets, which have an option of
+ * their own.
+ */
+const createClassNames = ({
+  classPrefix,
+  commonClassName,
+  treeClassName
+}) => ({
+  border: `${classPrefix}-border`,
+  circle: `${classPrefix}-circle`,
+  closed: `${classPrefix}-closed`,
+  common: commonClassName ?? `${classPrefix}-common`,
+  dnd: `${classPrefix}-dnd`,
+  dragging: `${classPrefix}-dragging`,
+  element: `${classPrefix}-element`,
+  folder: `${classPrefix}-folder`,
+  ghost: `${classPrefix}-ghost`,
+  inside: `${classPrefix}-inside`,
+  line: `${classPrefix}-line`,
+  loading: `${classPrefix}-loading`,
+  moving: `${classPrefix}-moving`,
+  rtl: `${classPrefix}-rtl`,
+  selected: `${classPrefix}-selected`,
+  title: `${classPrefix}-title`,
+  titleButtonLeft: `${classPrefix}-title-button-left`,
+  titleButtonRight: `${classPrefix}-title-button-right`,
+  titleFolder: `${classPrefix}-title-folder`,
+  toggler: `${classPrefix}-toggler`,
+  togglerLeft: `${classPrefix}-toggler-left`,
+  togglerRight: `${classPrefix}-toggler-right`,
+  tree: treeClassName ?? classPrefix
+});
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dataLoader.js
 class DataLoader {
+  _abortController;
+  _classNames;
   _dataFilter;
   _loadData;
-  _onLoadFailed;
-  _onLoading;
   _treeElement;
   _triggerEvent;
   constructor({
+    classNames,
     dataFilter,
     loadData,
-    onLoadFailed,
-    onLoading,
     treeElement,
     triggerEvent
   }) {
+    this._abortController = new AbortController();
+    this._classNames = classNames;
     this._dataFilter = dataFilter;
     this._loadData = loadData;
-    this._onLoadFailed = onLoadFailed;
-    this._onLoading = onLoading;
     this._treeElement = treeElement;
     this._triggerEvent = triggerEvent;
   }
-  loadFromUrl(url, parentNode, onFinished) {
-    const element = this._getDomElement(parentNode);
-    this._addLoadingClass(element);
-    this._notifyLoading(true, element, parentNode);
-    const stopLoading = () => {
-      this._removeLoadingClass(element);
-      this._notifyLoading(false, element, parentNode);
-    };
-    const handleSuccess = data => {
-      stopLoading();
-      this._loadData(this._parseData(data), parentNode);
-      if (onFinished && typeof onFinished === "function") {
-        onFinished();
-      }
-    };
-    const handleError = response => {
-      stopLoading();
-      if (this._onLoadFailed) {
-        this._onLoadFailed(response);
-      }
-    };
-    void this._submitRequest(url, handleSuccess, handleError);
+  deinit() {
+    this._abortController.abort();
   }
-  _addLoadingClass(element) {
-    element.classList.add("html-tree-loading");
-  }
-  _getDomElement(parentNode) {
-    if (parentNode?.element) {
-      return parentNode.element;
-    } else {
-      return this._treeElement;
-    }
-  }
-  _notifyLoading(isLoading, element, node) {
-    if (this._onLoading) {
-      this._onLoading(isLoading, node, element);
-    }
+  async loadFromUrl(url, node) {
+    const element = node?.element ?? this._treeElement;
+    element.classList.add(this._classNames.loading);
     this._triggerEvent("tree.loading_data", {
       element,
-      isLoading,
-      node: node ?? null
+      node
     });
-  }
-  _parseData(data) {
-    if (this._dataFilter) {
-      return this._dataFilter(data);
-    } else {
-      return data;
-    }
-  }
-  _removeLoadingClass(element) {
-    element.classList.remove("html-tree-loading");
-  }
-  async _submitRequest(url, handleSuccess, handleError) {
-    const headers = {
-      "Content-Type": "application/json"
+    const stopLoading = () => {
+      element.classList.remove(this._classNames.loading);
+      this._triggerEvent("tree.loaded_data", {
+        element,
+        node
+      });
     };
+    const handleResponse = async response => {
+      if (response.ok) {
+        const data = await response.json();
+        stopLoading();
+        this._loadData(this._dataFilter ? this._dataFilter(data) : data, node);
+      } else {
+        stopLoading();
+        this._triggerEvent("tree.load_failed", {
+          response
+        });
+      }
+    };
+    const signal = this._abortController.signal;
     url.setSearchParam("_", Date.now().toString());
-    const response = await fetch(url.toString(), {
-      headers
+    return fetch(url.toString(), {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      signal
+    }).then(handleResponse).catch(error => {
+      if (this._abortController.signal.aborted) {
+        // The request was aborted by deinit.
+        return;
+      }
+      throw error;
     });
-    if (response.ok) {
-      const data = await response.json();
-      handleSuccess(data);
-    } else {
-      handleError(response);
-    }
   }
 }
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/positionUtils.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/positionUtils.js
 // Get the top position of the HTML element.
 const getOffsetTop = element => getElementPosition(element).top;
 
@@ -111,7 +257,7 @@ const getElementPosition = element => {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/binarySearch.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
 function binarySearch(items, compareFn) {
   let low = 0;
   let high = items.length;
@@ -135,13 +281,14 @@ function binarySearch(items, compareFn) {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/dragElement.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
 class DragElement {
   _element;
   _offsetX;
   _offsetY;
   constructor({
     autoEscape,
+    classNames,
     nodeName,
     offsetX,
     offsetY,
@@ -149,7 +296,7 @@ class DragElement {
   }) {
     this._offsetX = offsetX;
     this._offsetY = offsetY;
-    this._element = this._createElement(nodeName, autoEscape);
+    this._element = this._createElement(nodeName, autoEscape, classNames);
     treeElement.appendChild(this._element);
   }
   move(pageX, pageY) {
@@ -159,9 +306,9 @@ class DragElement {
   remove() {
     this._element.remove();
   }
-  _createElement(nodeName, autoEscape) {
+  _createElement(nodeName, autoEscape, classNames) {
     const element = document.createElement("span");
-    element.classList.add("html-tree-title", "html-tree-dragging");
+    element.classList.add(classNames.title, classNames.dragging);
     if (autoEscape) {
       element.textContent = nodeName;
     } else {
@@ -174,7 +321,7 @@ class DragElement {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/iterateVisibleNodes.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
 const iterateVisibleNodes = (tree, {
   handleAfterOpenFolder,
   handleClosedFolder,
@@ -229,7 +376,7 @@ const iterateVisibleNodes = (tree, {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/generateHitAreas.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
 
 
 
@@ -360,7 +507,7 @@ const generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFrom
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/dragAndDropHandler/index.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/index.js
 
 
 
@@ -372,6 +519,7 @@ class DragAndDropHandler {
   hoveredArea;
   isDragging;
   _autoEscape;
+  _classNames;
   _dragElement;
   _getNodeElement;
   _getNodeElementForNode;
@@ -392,6 +540,7 @@ class DragAndDropHandler {
   _triggerEvent;
   constructor({
     autoEscape,
+    classNames,
     getNodeElement,
     getNodeElementForNode,
     getScrollLeft,
@@ -409,6 +558,7 @@ class DragAndDropHandler {
     triggerEvent
   }) {
     this._autoEscape = autoEscape;
+    this._classNames = classNames;
     this._getNodeElement = getNodeElement;
     this._getNodeElementForNode = getNodeElementForNode;
     this._getScrollLeft = getScrollLeft;
@@ -494,13 +644,14 @@ class DragAndDropHandler {
     const node = this.currentItem.node;
     this._dragElement = new DragElement({
       autoEscape: this._autoEscape ?? true,
+      classNames: this._classNames,
       nodeName: node.name,
       offsetX: positionInfo.pageX - left,
       offsetY: positionInfo.pageY - top,
       treeElement: this._treeElement
     });
     this.isDragging = true;
-    this.currentItem.element.classList.add("html-tree-moving");
+    this.currentItem.element.classList.add(this._classNames.moving);
     return true;
   }
   mouseStop(positionInfo) {
@@ -511,7 +662,7 @@ class DragAndDropHandler {
     this._removeHitAreas();
     const currentItem = this.currentItem;
     if (this.currentItem) {
-      this.currentItem.element.classList.remove("html-tree-moving");
+      this.currentItem.element.classList.remove(this._classNames.moving);
       this.currentItem = null;
     }
     this.isDragging = false;
@@ -529,7 +680,7 @@ class DragAndDropHandler {
       this._generateHitAreas(currentNode);
       this.currentItem = this._getNodeElementForNode(currentNode);
       if (this.isDragging) {
-        this.currentItem.element.classList.add("html-tree-moving");
+        this.currentItem.element.classList.add(this._classNames.moving);
       }
     }
   }
@@ -601,13 +752,13 @@ class DragAndDropHandler {
         }
       };
       if (this._triggerEvent("tree.move", {
-        move_info: {
-          do_move: doMove,
-          moved_node: movedNode,
-          original_event: positionInfo.originalEvent,
+        moveInfo: {
+          doMove,
+          movedNode,
+          originalEvent: positionInfo.originalEvent,
           position,
-          previous_parent: previousParent,
-          target_node: targetNode
+          previousParent,
+          targetNode
         }
       })) {
         doMove();
@@ -635,7 +786,7 @@ class DragAndDropHandler {
   }
   _startOpenFolderTimer(folder) {
     const openFolder = () => {
-      this._openNode(folder, this._slide, () => {
+      void this._openNode(folder, this._slide).then(() => {
         this.refresh();
         this._updateDropHint();
       });
@@ -668,13 +819,13 @@ class DragAndDropHandler {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/util.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/util.js
 const isInt = n => typeof n === "number" && n % 1 === 0;
 const getBoolString = value => value ? "true" : "false";
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/elementsRenderer.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/elementsRenderer.js
 
 
 class ElementsRenderer {
@@ -682,6 +833,7 @@ class ElementsRenderer {
   openedIconElement;
   _autoEscape;
   _buttonLeft;
+  _classNames;
   _dragAndDrop;
   _getTree;
   _htmlElement;
@@ -694,6 +846,7 @@ class ElementsRenderer {
   constructor({
     autoEscape,
     buttonLeft,
+    classNames,
     closedIcon,
     dragAndDrop,
     getTree,
@@ -708,6 +861,7 @@ class ElementsRenderer {
   }) {
     this._autoEscape = autoEscape;
     this._buttonLeft = buttonLeft;
+    this._classNames = classNames;
     this._dragAndDrop = dragAndDrop;
     this._getTree = getTree;
     this._htmlElement = htmlElement;
@@ -779,12 +933,12 @@ class ElementsRenderer {
 
     // li
     const li = document.createElement("li");
-    li.className = `html-tree-common ${folderClasses}`;
+    li.className = `${this._classNames.common} ${folderClasses}`;
     li.setAttribute("role", "none");
 
     // div
     const div = document.createElement("div");
-    div.className = "html-tree-element html-tree-common";
+    div.className = `${this._classNames.element} ${this._classNames.common}`;
     div.setAttribute("role", "none");
     li.appendChild(div);
 
@@ -823,9 +977,9 @@ class ElementsRenderer {
     return li;
   }
   _createNodeLi(node, level, isSelected) {
-    const liClasses = ["html-tree-common"];
+    const liClasses = [this._classNames.common];
     if (isSelected) {
-      liClasses.push("html-tree-selected");
+      liClasses.push(this._classNames.selected);
     }
     const classString = liClasses.join(" ");
 
@@ -836,7 +990,7 @@ class ElementsRenderer {
 
     // div
     const div = document.createElement("div");
-    div.className = "html-tree-element html-tree-common";
+    div.className = `${this._classNames.element} ${this._classNames.common}`;
     div.setAttribute("role", "none");
     li.appendChild(div);
 
@@ -847,11 +1001,11 @@ class ElementsRenderer {
   }
   _createTitleSpan(nodeName, isSelected, isFolder, level) {
     const titleSpan = document.createElement("span");
-    let classes = "html-tree-title html-tree-common";
+    let classes = `${this._classNames.title} ${this._classNames.common}`;
     if (isFolder) {
-      classes += " html-tree-title-folder";
+      classes += ` ${this._classNames.titleFolder}`;
     }
-    classes += ` html-tree-title-button-${this._buttonLeft ? "left" : "right"}`;
+    classes += ` ${this._buttonLeft ? this._classNames.titleButtonLeft : this._classNames.titleButtonRight}`;
     titleSpan.className = classes;
     if (isSelected) {
       const tabIndex = this._tabIndex;
@@ -874,42 +1028,42 @@ class ElementsRenderer {
       classString = "";
       role = "group";
     } else {
-      classString = "html-tree";
+      classString = this._classNames.tree;
       role = "tree";
       if (this._rtl) {
-        classString += " html-tree-rtl";
+        classString += ` ${this._classNames.rtl}`;
       }
     }
     if (this._dragAndDrop) {
-      classString += " html-tree-dnd";
+      classString += ` ${this._classNames.dnd}`;
     }
     const ul = document.createElement("ul");
-    ul.className = `html-tree-common ${classString}`;
+    ul.className = `${this._classNames.common} ${classString}`;
     ul.setAttribute("role", role);
     return ul;
   }
   _getButtonClasses(node) {
-    const classes = ["html-tree-toggler", "html-tree-common"];
+    const classes = [this._classNames.toggler, this._classNames.common];
     if (!node.is_open) {
-      classes.push("html-tree-closed");
+      classes.push(this._classNames.closed);
     }
     if (this._buttonLeft) {
-      classes.push("html-tree-toggler-left");
+      classes.push(this._classNames.togglerLeft);
     } else {
-      classes.push("html-tree-toggler-right");
+      classes.push(this._classNames.togglerRight);
     }
     return classes.join(" ");
   }
   _getFolderClasses(node, isSelected) {
-    const classes = ["html-tree-folder"];
+    const classes = [this._classNames.folder];
     if (!node.is_open) {
-      classes.push("html-tree-closed");
+      classes.push(this._classNames.closed);
     }
     if (isSelected) {
-      classes.push("html-tree-selected");
+      classes.push(this._classNames.selected);
     }
     if (node.is_loading) {
-      classes.push("html-tree-loading");
+      classes.push(this._classNames.loading);
     }
     return classes.join(" ");
   }
@@ -923,7 +1077,7 @@ class ElementsRenderer {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/keyHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/keyHandler.js
 class KeyHandler {
   _closeNode;
   _getSelectedNode;
@@ -1009,7 +1163,7 @@ class KeyHandler {
         return this._selectNode(selectedNode.getNextVisibleNode());
       } else {
         // Right expands a closed node
-        this._openNode(selectedNode);
+        void this._openNode(selectedNode);
         return true;
       }
     }
@@ -1031,7 +1185,7 @@ class KeyHandler {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/mouseUtils.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/mouseUtils.js
 const getPositionInfoFromMouseEvent = e => ({
   originalEvent: e,
   pageX: e.pageX,
@@ -1047,10 +1201,11 @@ const getPositionInfoFromTouch = (touch, e) => ({
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/mouseHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/mouseHandler.js
 
 
 class MouseHandler {
+  _classNames;
   _element;
   _getMouseDelay;
   _getNode;
@@ -1067,6 +1222,7 @@ class MouseHandler {
   _triggerEvent;
   _useContextMenu;
   constructor({
+    classNames,
     element,
     getMouseDelay,
     getNode,
@@ -1079,6 +1235,7 @@ class MouseHandler {
     triggerEvent,
     useContextMenu
   }) {
+    this._classNames = classNames;
     this._element = element;
     this._getMouseDelay = getMouseDelay;
     this._getNode = getNode;
@@ -1117,7 +1274,7 @@ class MouseHandler {
     this._removeMouseMoveEventListeners();
   }
   _getClickTarget(element) {
-    const button = element.closest(".html-tree-toggler");
+    const button = element.closest(`.${this._classNames.toggler}`);
     if (button) {
       const node = this._getNode(button);
       if (node) {
@@ -1127,7 +1284,7 @@ class MouseHandler {
         };
       }
     } else {
-      const treeElement = element.closest(".html-tree-element");
+      const treeElement = element.closest(`.${this._classNames.element}`);
       if (treeElement) {
         const node = this._getNode(treeElement);
         if (node) {
@@ -1157,8 +1314,8 @@ class MouseHandler {
       case "label":
         {
           if (this._triggerEvent("tree.click", {
-            click_event: e,
-            node: clickTarget.node
+            node: clickTarget.node,
+            originalEvent: e
           })) {
             this._onClickTitle(clickTarget.node);
           }
@@ -1170,15 +1327,15 @@ class MouseHandler {
     if (!e.target) {
       return;
     }
-    const div = e.target.closest("ul.html-tree .html-tree-element");
+    const div = e.target.closest(`ul.${this._classNames.tree} .${this._classNames.element}`);
     if (div) {
       const node = this._getNode(div);
       if (node) {
         e.preventDefault();
         e.stopPropagation();
         this._triggerEvent("tree.contextmenu", {
-          click_event: e,
-          node
+          node,
+          originalEvent: e
         });
         return false;
       }
@@ -1192,8 +1349,8 @@ class MouseHandler {
     const clickTarget = this._getClickTarget(e.target);
     if (clickTarget?.type === "label") {
       this._triggerEvent("tree.dblclick", {
-        click_event: e,
-        node: clickTarget.node
+        node: clickTarget.node,
+        originalEvent: e
       });
     }
   };
@@ -1328,12 +1485,12 @@ class MouseHandler {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeUtils.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeUtils.js
 const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/node.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/node.js
 
 
 /*
@@ -1343,19 +1500,53 @@ so the `_` prefix that the build adds cannot be limited to `this.`:
 prefix-private-members: all
 */
 
+/**
+ * @groupDescription Properties
+ * Any other key in the node data is copied onto the node, so
+ * `{ name: "node1", color: "green" }` gives you `node.color`.
+ *
+ * @groupDescription Searching
+ * These work on any node, and search that node's subtree. Called on the root
+ * node, they search the whole tree — which is what the tree's own methods of
+ * the same name do.
+ *
+ * @groupDescription Changing the tree
+ * ::: warning
+ * These methods change the data without re-rendering. The tree's
+ * [methods](/reference/methods) — `appendNode`, `removeNode`, `moveNode` and
+ * friends — do the same and refresh the display, so prefer those. If you do
+ * use these, call `tree.refresh()` afterwards.
+ * :::
+ */
 class Node {
+  /** @hidden */
+
+  /** The child nodes. */
   children;
+  /** The `li` element, once the node is rendered. */
   element;
+  /** The id from the node data. */
   id;
+  /** @hidden */
   idMapping;
+  /** Whether the node's children are being fetched. */
   is_loading;
+  /** Whether the folder is open. */
   is_open;
+  /** Whether the node data had an empty `children` array. */
   isEmptyFolder;
+  /** Whether the children still have to be fetched. */
   load_on_demand;
+  /** The label. Also settable from the `label` key in node data. */
   name;
+  /** @hidden */
   nodeClass;
+  /** The parent; `null` for the root node. */
   parent;
+  /** The root node. */
   tree;
+
+  /** @hidden */
   constructor(nodeData = null, isRoot = false, nodeClass = Node) {
     this.name = "";
     this.load_on_demand = false;
@@ -1373,6 +1564,13 @@ class Node {
       this.idMapping = undefined;
     }
   }
+
+  /**
+   * Adds a sibling after this node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
   addAfter(nodeInfo) {
     if (!this.parent) {
       return null;
@@ -1384,6 +1582,13 @@ class Node {
       return node;
     }
   }
+
+  /**
+   * Adds a sibling before this node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
   addBefore(nodeInfo) {
     if (!this.parent) {
       return null;
@@ -1396,33 +1601,40 @@ class Node {
     }
   }
 
-  /*
-  Add child.
-   tree.addChild(
-      new Node('child1')
-  );
-  */
+  /**
+   * Adds an existing `Node` object as the last child.
+   *
+   * @group Changing the tree
+   */
   addChild(node) {
     this.children.push(node);
     node._setParent(this);
   }
 
-  /*
-  Add child at position. Index starts at 0.
-   tree.addChildAtPosition(
-      new Node('abc'),
-      1
-  );
-  */
+  /**
+   * Adds an existing `Node` object as a child, at this position in
+   * `children`. The index starts at `0`.
+   *
+   * @group Changing the tree
+   */
   addChildAtPosition(node, index) {
     this.children.splice(index, 0, node);
     node._setParent(this);
   }
+
+  /** @hidden */
   addNodeToIndex(node) {
     if (node.id != null) {
       this.idMapping?.set(node.id, node);
     }
   }
+
+  /**
+   * Inserts a new parent between this node and its current parent.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
   addParent(nodeInfo) {
     if (!this.parent) {
       return null;
@@ -1440,12 +1652,31 @@ class Node {
       return newParent;
     }
   }
+
+  /**
+   * Adds a child at the end.
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
   append(nodeInfo) {
     const node = this._createNode(nodeInfo);
     this.addChild(node);
     node._loadChildrenFromData(nodeInfo);
     return node;
   }
+
+  /**
+   * Returns all nodes in the subtree for which the callback returns
+   * `true`.
+   *
+   * @example
+   * ```js
+   * const folders = tree.getTree().filter((node) => node.isFolder());
+   * ```
+   *
+   * @group Searching
+   */
   filter(f) {
     const result = [];
     this.iterate(node => {
@@ -1457,17 +1688,30 @@ class Node {
     return result;
   }
 
-  /*
-  Get child index.
-   var index = getChildIndex(node);
-  */
+  /**
+   * Returns the position of a child in `children`, or `-1`.
+   *
+   * @group Inspecting a node
+   */
   getChildIndex(node) {
     return this.children.indexOf(node);
   }
 
-  /*
-  Get the tree as data.
-  */
+  /**
+   * Returns the subtree as plain data, ready for `JSON.stringify`.
+   * Internal properties (`parent`, `children`, `element`, `tree`,
+   * `idMapping`, `nodeClass`, `load_on_demand`, `isEmptyFolder`) are left
+   * out; your own properties are kept.
+   *
+   * ```js
+   * tree.getTree().getData();
+   * // [{ name: "node1", id: 1, children: [{ name: "child1", id: 2 }] }]
+   * ```
+   *
+   * @param includeParent - Make the result the node itself rather than its
+   * children. Default `false`.
+   * @group Reading data back
+   */
   getData(includeParent = false) {
     const getDataFromNodes = nodes => {
       return nodes.map(node => {
@@ -1490,6 +1734,13 @@ class Node {
       return getDataFromNodes(this.children);
     }
   }
+
+  /**
+   * Returns the last child, or `null`. When that child is an open folder,
+   * its own last child, and so on.
+   *
+   * @group Moving around the tree
+   */
   getLastChild() {
     if (!this.hasChildren()) {
       return null;
@@ -1502,6 +1753,12 @@ class Node {
       }
     }
   }
+
+  /**
+   * Returns the depth of the node, counting the top level as `1`.
+   *
+   * @group Inspecting a node
+   */
   getLevel() {
     let level = 0;
     let node = this; // eslint-disable-line @typescript-eslint/no-this-alias
@@ -1512,6 +1769,13 @@ class Node {
     }
     return level;
   }
+
+  /**
+   * Returns the next node in the tree, regardless of whether it is
+   * visible. `getNextNode(false)` skips the node's own children.
+   *
+   * @group Moving around the tree
+   */
   getNextNode(includeChildren = true) {
     if (includeChildren && this.hasChildren()) {
       return this.children[0] ?? null;
@@ -1526,6 +1790,12 @@ class Node {
       }
     }
   }
+
+  /**
+   * Returns the next sibling, or `null`.
+   *
+   * @group Moving around the tree
+   */
   getNextSibling() {
     if (!this.parent) {
       return null;
@@ -1538,6 +1808,13 @@ class Node {
       }
     }
   }
+
+  /**
+   * Like `getNextNode`, but skipping nodes inside closed folders — this is
+   * what the arrow keys use.
+   *
+   * @group Moving around the tree
+   */
   getNextVisibleNode() {
     if (this.hasChildren() && this.is_open) {
       // First child
@@ -1557,6 +1834,12 @@ class Node {
       }
     }
   }
+
+  /**
+   * Returns the first node for which the callback returns `true`.
+   *
+   * @group Searching
+   */
   getNodeByCallback(callback) {
     let result = null;
     this.iterate(node => {
@@ -1571,12 +1854,31 @@ class Node {
     });
     return result;
   }
+
+  /**
+   * Returns the node with this id. Only available on the root node, which
+   * keeps the id index.
+   *
+   * @group Searching
+   */
   getNodeById(nodeId) {
     return this.idMapping?.get(nodeId) ?? null;
   }
+
+  /**
+   * Returns the first node with this name.
+   *
+   * @group Searching
+   */
   getNodeByName(name) {
     return this.getNodeByCallback(node => node.name === name);
   }
+
+  /**
+   * Like `getNodeByName`, but throws when there is no such node.
+   *
+   * @group Searching
+   */
   getNodeByNameMustExist(name) {
     const node = this.getNodeByCallback(n => n.name === name);
     if (!node) {
@@ -1584,9 +1886,22 @@ class Node {
     }
     return node;
   }
+
+  /**
+   * Returns all nodes with this property value.
+   *
+   * @group Searching
+   */
   getNodesByProperty(key, value) {
     return this.filter(node => node[key] === value);
   }
+
+  /**
+   * Returns the parent: `null` for a top-level node — the root node is not
+   * returned.
+   *
+   * @group Moving around the tree
+   */
   getParent() {
     // Return parent except if it is the root node
     if (!this.parent) {
@@ -1598,6 +1913,13 @@ class Node {
       return this.parent;
     }
   }
+
+  /**
+   * Returns the previous node in the tree, regardless of whether it is
+   * visible.
+   *
+   * @group Moving around the tree
+   */
   getPreviousNode() {
     if (!this.parent) {
       return null;
@@ -1612,6 +1934,12 @@ class Node {
       }
     }
   }
+
+  /**
+   * Returns the previous sibling, or `null`.
+   *
+   * @group Moving around the tree
+   */
   getPreviousSibling() {
     if (!this.parent) {
       return null;
@@ -1624,6 +1952,13 @@ class Node {
       }
     }
   }
+
+  /**
+   * Like `getPreviousNode`, but skipping nodes inside closed folders —
+   * this is what the arrow keys use.
+   *
+   * @group Moving around the tree
+   */
   getPreviousVisibleNode() {
     if (!this.parent) {
       return null;
@@ -1641,17 +1976,20 @@ class Node {
     }
   }
 
-  /*
-  Does the tree have children?
-   if (tree.hasChildren()) {
-      //
-  }
-  */
+  /**
+   * Whether the node has children.
+   *
+   * @group Inspecting a node
+   */
   hasChildren() {
     return this.children.length !== 0;
   }
 
-  // Init Node from data without making it the root of the tree
+  /**
+   * Init Node from data without making it the root of the tree.
+   *
+   * @hidden
+   */
   initFromData(data) {
     const addNode = nodeData => {
       this.setData(nodeData);
@@ -1668,9 +2006,21 @@ class Node {
     };
     addNode(data);
   }
+
+  /**
+   * `true` when the node has children, or is marked `load_on_demand`.
+   *
+   * @group Inspecting a node
+   */
   isFolder() {
     return this.hasChildren() || this.load_on_demand;
   }
+
+  /**
+   * Whether this node is an ancestor of the other node.
+   *
+   * @group Inspecting a node
+   */
   isParentOf(node) {
     let parent = node.parent;
     while (parent) {
@@ -1682,17 +2032,18 @@ class Node {
     return false;
   }
 
-  /*
-  Iterate over all the nodes in the tree.
-   Calls callback with (node, level).
-   The callback must return true to continue the iteration on current node.
-   tree.iterate(
-      function(node, level) {
-         console.log(node.name);
-          // stop iteration after level 2
-         return (level <= 2);
-      }
-  );
+  /**
+   * Walks the subtree, calling the callback with `(node, level)`. Return
+   * `false` from the callback to stop descending into that node:
+   *
+   * ```js
+   * tree.getTree().iterate((node, level) => {
+   *   console.log(" ".repeat(level) + node.name);
+   *   return level <= 2; // don't go deeper than level 2
+   * });
+   * ```
+   *
+   * @group Searching
    */
   iterate(callback) {
     const _iterate = (node, level) => {
@@ -1706,22 +2057,11 @@ class Node {
     _iterate(this, 0);
   }
 
-  /*
-  Create tree from data.
-   Structure of data is:
-  [
-      {
-          name: 'node1',
-          children: [
-              { name: 'child1' },
-              { name: 'child2' }
-          ]
-      },
-      {
-          name: 'node2'
-      }
-  ]
-  */
+  /**
+   * Replaces the children with new node data.
+   *
+   * @group Changing the tree
+   */
   loadFromData(data) {
     this.removeChildren();
     for (const childData of data) {
@@ -1734,12 +2074,14 @@ class Node {
     return this;
   }
 
-  /*
-  Move node relative to another node.
-   Argument position: Position.BEFORE, Position.AFTER or Position.Inside
-   // move node1 after node2
-  tree.moveNode(node1, node2, Position.AFTER);
-  */
+  /**
+   * Moves a node relative to another node. Called on the root node.
+   *
+   * @param position - `"before"`, `"after"` or `"inside"`.
+   * @returns `false` when the move is impossible, for instance moving a
+   * node into its own subtree.
+   * @group Changing the tree
+   */
   moveNode(movedNode, targetNode, position) {
     if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
       // - Node is parent of target node
@@ -1773,12 +2115,25 @@ class Node {
       }
     }
   }
+
+  /**
+   * Adds a child at the start.
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
   prepend(nodeInfo) {
     const node = this._createNode(nodeInfo);
     this.addChildAtPosition(node, 0);
     node._loadChildrenFromData(nodeInfo);
     return node;
   }
+
+  /**
+   * Removes this node from its parent.
+   *
+   * @group Changing the tree
+   */
   remove() {
     if (this.parent) {
       this.parent.removeChild(this);
@@ -1786,15 +2141,22 @@ class Node {
     }
   }
 
-  /*
-  Remove child. This also removes the children of the node.
-   tree.removeChild(tree.children[0]);
-  */
+  /**
+   * Removes a child and its children.
+   *
+   * @group Changing the tree
+   */
   removeChild(node) {
     // remove children from the index
     node.removeChildren();
     this._doRemoveChild(node);
   }
+
+  /**
+   * Removes all children.
+   *
+   * @group Changing the tree
+   */
   removeChildren() {
     this.iterate(child => {
       this.tree?.removeNodeFromIndex(child);
@@ -1802,23 +2164,21 @@ class Node {
     });
     this.children = [];
   }
+
+  /** @hidden */
   removeNodeFromIndex(node) {
     if (node.id != null) {
       this.idMapping?.delete(node.id);
     }
   }
 
-  /*
-  Set the data of this node.
-   setData(string): set the name of the node
-  setData(object): set attributes of the node
-   Examples:
-      setData('node1')
-       setData({ name: 'node1', id: 1});
-       setData({ name: 'node2', id: 2, color: 'green'});
-   * This is an internal function; it is not in the docs
-  * Does not remove existing node values
-  */
+  /**
+   * Updates the node's properties from node data. `children` and `parent`
+   * are ignored. A string sets the name. Existing node values are not
+   * removed.
+   *
+   * @group Changing the tree
+   */
   setData(o) {
     if (!o) {
       return;
@@ -1868,11 +2228,11 @@ class Node {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/borderDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/borderDropHint.js
 class BorderDropHint {
   _hint;
-  constructor(element, scrollLeft) {
-    const div = element.querySelector(":scope > .html-tree-element");
+  constructor(element, scrollLeft, classNames) {
+    const div = element.querySelector(`:scope > .${classNames.element}`);
     if (!div) {
       this._hint = undefined;
       return;
@@ -1880,7 +2240,7 @@ class BorderDropHint {
     const width = Math.max(element.offsetWidth + scrollLeft - 4, 0);
     const height = Math.max(element.clientHeight - 4, 0);
     const hint = document.createElement("span");
-    hint.className = "html-tree-border";
+    hint.className = classNames.border;
     hint.style.width = `${width}px`;
     hint.style.height = `${height}px`;
     this._hint = hint;
@@ -1893,12 +2253,14 @@ class BorderDropHint {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/ghostDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
 class GhostDropHint {
+  _classNames;
   _element;
   _ghost;
   _node;
-  constructor(node, element, position) {
+  constructor(node, element, position, classNames) {
+    this._classNames = classNames;
     this._element = element;
     this._node = node;
     this._ghost = this._createGhostElement();
@@ -1923,13 +2285,19 @@ class GhostDropHint {
     this._ghost.remove();
   }
   _createGhostElement() {
+    const {
+      circle,
+      common,
+      ghost: ghostClass,
+      line
+    } = this._classNames;
     const ghost = document.createElement("li");
-    ghost.className = "html-tree-common html-tree-ghost";
+    ghost.className = `${common} ${ghostClass}`;
     const circleSpan = document.createElement("span");
-    circleSpan.className = "html-tree-common html-tree-circle";
+    circleSpan.className = `${common} ${circle}`;
     ghost.append(circleSpan);
     const lineSpan = document.createElement("span");
-    lineSpan.className = "html-tree-common html-tree-line";
+    lineSpan.className = `${common} ${line}`;
     ghost.append(lineSpan);
     return ghost;
   }
@@ -1941,7 +2309,7 @@ class GhostDropHint {
   }
   _moveInside() {
     this._element.after(this._ghost);
-    this._ghost.classList.add("html-tree-inside");
+    this._ghost.classList.add(this._classNames.inside);
   }
   _moveInsideOpenFolder() {
     const childElement = this._node.children[0]?.element;
@@ -1953,22 +2321,25 @@ class GhostDropHint {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/index.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/index.js
 
 
 
 class NodeElement {
   element;
   node;
+  _classNames;
   _getScrollLeft;
   _tabIndex;
   _treeElement;
   constructor({
+    classNames,
     getScrollLeft,
     node,
     tabIndex,
     treeElement
   }) {
+    this._classNames = classNames;
     this._getScrollLeft = getScrollLeft;
     this.node = node;
     this._tabIndex = tabIndex;
@@ -1978,20 +2349,20 @@ class NodeElement {
   }
   addDropHint(position) {
     if (this._mustShowBorderDropHint(position)) {
-      return new BorderDropHint(this.element, this._getScrollLeft());
+      return new BorderDropHint(this.element, this._getScrollLeft(), this._classNames);
     } else {
-      return new GhostDropHint(this.node, this.element, position);
+      return new GhostDropHint(this.node, this.element, position, this._classNames);
     }
   }
   deselect() {
-    this.element.classList.remove("html-tree-selected");
+    this.element.classList.remove(this._classNames.selected);
     const titleSpan = this._getTitleSpan();
     titleSpan.removeAttribute("tabindex");
     titleSpan.setAttribute("aria-selected", "false");
     titleSpan.blur();
   }
   select(mustSetFocus) {
-    this.element.classList.add("html-tree-selected");
+    this.element.classList.add(this._classNames.selected);
     const titleSpan = this._getTitleSpan();
     const tabIndex = this._tabIndex;
 
@@ -2005,7 +2376,7 @@ class NodeElement {
     }
   }
   _getTitleSpan() {
-    return this.element.querySelector(":scope > .html-tree-element > span.html-tree-title");
+    return this.element.querySelector(`:scope > .${this._classNames.element} > span.${this._classNames.title}`);
   }
   _getUl() {
     return this.element.querySelector(":scope > ul");
@@ -2017,7 +2388,7 @@ class NodeElement {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/animation.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/animation.js
 const getAnimationDuration = duration => {
   if (typeof duration === "number") {
     return duration;
@@ -2057,7 +2428,7 @@ const slideUp = (element, animationSpeed, onFinished) => {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/nodeElement/folderElement.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/folderElement.js
 
 
 
@@ -2066,6 +2437,7 @@ class FolderElement extends NodeElement {
   _openedIconElement;
   _triggerEvent;
   constructor({
+    classNames,
     closedIconElement,
     getScrollLeft,
     node,
@@ -2075,6 +2447,7 @@ class FolderElement extends NodeElement {
     triggerEvent
   }) {
     super({
+      classNames,
       getScrollLeft,
       node,
       tabIndex,
@@ -2090,7 +2463,7 @@ class FolderElement extends NodeElement {
     }
     this.node.is_open = false;
     const button = this._getButton();
-    button.classList.add("html-tree-closed");
+    button.classList.add(this._classNames.closed);
     button.innerHTML = "";
     const closedIconElement = this._closedIconElement;
     if (closedIconElement) {
@@ -2098,7 +2471,7 @@ class FolderElement extends NodeElement {
       button.appendChild(icon);
     }
     const doClose = () => {
-      this.element.classList.add("html-tree-closed");
+      this.element.classList.add(this._classNames.closed);
       const titleSpan = this._getTitleSpan();
       titleSpan.setAttribute("aria-expanded", "false");
       this._triggerEvent("tree.close", {
@@ -2113,49 +2486,50 @@ class FolderElement extends NodeElement {
       doClose();
     }
   }
-  open(onFinished, slide, animationSpeed) {
-    if (this.node.is_open) {
-      return;
-    }
-    this.node.is_open = true;
-    const button = this._getButton();
-    button.classList.remove("html-tree-closed");
-    button.innerHTML = "";
-    const openedIconElement = this._openedIconElement;
-    if (openedIconElement) {
-      const icon = openedIconElement.cloneNode(true);
-      button.appendChild(icon);
-    }
-    const doOpen = () => {
-      this.element.classList.remove("html-tree-closed");
-      const titleSpan = this._getTitleSpan();
-      titleSpan.setAttribute("aria-expanded", "true");
-      if (onFinished) {
-        onFinished(this.node);
+  async open(slide, animationSpeed) {
+    return new Promise(resolve => {
+      if (this.node.is_open) {
+        resolve();
+        return;
       }
-      this._triggerEvent("tree.open", {
-        node: this.node
-      });
-    };
-    const ul = this._getUl();
-    if (slide) {
-      slideDown(ul, animationSpeed, doOpen);
-    } else {
-      ul.style.display = "block";
-      doOpen();
-    }
+      this.node.is_open = true;
+      const button = this._getButton();
+      button.classList.remove(this._classNames.closed);
+      button.innerHTML = "";
+      const openedIconElement = this._openedIconElement;
+      if (openedIconElement) {
+        const icon = openedIconElement.cloneNode(true);
+        button.appendChild(icon);
+      }
+      const doOpen = () => {
+        this.element.classList.remove(this._classNames.closed);
+        const titleSpan = this._getTitleSpan();
+        titleSpan.setAttribute("aria-expanded", "true");
+        this._triggerEvent("tree.open", {
+          node: this.node
+        });
+        resolve();
+      };
+      const ul = this._getUl();
+      if (slide) {
+        slideDown(ul, animationSpeed, doOpen);
+      } else {
+        ul.style.display = "block";
+        doOpen();
+      }
+    });
   }
   _mustShowBorderDropHint(position) {
     return !this.node.is_open && position === "inside";
   }
   _getButton() {
-    return this.element.querySelector(":scope > .html-tree-element > a.html-tree-toggler");
+    return this.element.querySelector(`:scope > .${this._classNames.element} > a.${this._classNames.toggler}`);
   }
 }
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/requestUrl.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/requestUrl.js
 // Url class for absolute and relative urls.
 
 const isAbsoluteUrl = inputUrl => {
@@ -2193,7 +2567,7 @@ class RequestUrl {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/saveStateHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/saveStateHandler.js
 
 
 class SaveStateHandler {
@@ -2231,6 +2605,9 @@ class SaveStateHandler {
     this._saveStateOption = saveState;
   }
   getNodeIdToBeSelected() {
+    if (!this._saveStateOption) {
+      return null;
+    }
     const state = this.getStateFromStorage();
     if (state?.selected_node) {
       return state.selected_node[0] ?? null;
@@ -2264,6 +2641,9 @@ class SaveStateHandler {
     };
   }
   getStateFromStorage() {
+    if (!this._saveStateOption) {
+      return null;
+    }
     const jsonData = this._loadFromStorage();
     if (jsonData) {
       return this._parseState(jsonData);
@@ -2272,6 +2652,9 @@ class SaveStateHandler {
     }
   }
   saveState() {
+    if (!this._saveStateOption) {
+      return;
+    }
     const state = JSON.stringify(this.getState());
     if (this._onSetStateFromStorage) {
       this._onSetStateFromStorage(state);
@@ -2296,10 +2679,9 @@ class SaveStateHandler {
     }
     return mustLoadOnDemand;
   }
-  setInitialStateOnDemand(state, cbFinished) {
-    let loadingCount = 0;
+  async setInitialStateOnDemand(state) {
     let nodeIds = state.open_nodes;
-    const openNodes = () => {
+    const openNodes = async () => {
       if (!nodeIds) {
         return;
       }
@@ -2311,9 +2693,9 @@ class SaveStateHandler {
         } else {
           if (!node.is_loading) {
             if (node.load_on_demand) {
-              loadAndOpenNode(node);
+              await loadAndOpenNode(node);
             } else {
-              this._openNode(node, false);
+              await this._openNode(node, false);
             }
           }
         }
@@ -2324,18 +2706,12 @@ class SaveStateHandler {
           this._refreshElements(null);
         }
       }
-      if (loadingCount === 0) {
-        cbFinished();
-      }
     };
-    const loadAndOpenNode = node => {
-      loadingCount += 1;
-      this._openNode(node, false, () => {
-        loadingCount -= 1;
-        openNodes();
-      });
+    const loadAndOpenNode = async node => {
+      await this._openNode(node, false);
+      await openNodes();
     };
-    openNodes();
+    await openNodes();
   }
   _getKeyName() {
     if (typeof this._saveStateOption === "string") {
@@ -2396,7 +2772,7 @@ class SaveStateHandler {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/scrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/scrollParent.js
 class ScrollParent {
   _container;
   _horizontalScrollDirection;
@@ -2476,7 +2852,7 @@ class ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/containerScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
 
 
 
@@ -2526,7 +2902,7 @@ class ContainerScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/documentScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
 
 
 
@@ -2598,7 +2974,7 @@ class DocumentScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler/createScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
 
 
 
@@ -2637,7 +3013,7 @@ const createScrollParent = (treeElement, refreshHitAreas) => {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/scrollHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler.js
 
 
 class ScrollHandler {
@@ -2679,17 +3055,35 @@ class ScrollHandler {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/selectNodeHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/selectNodeHandler.js
 class SelectNodeHandler {
   _getNodeById;
+  _getNodeElementForNode;
+  _getOnCanSelectNode;
+  _getSelectable;
+  _openParents;
+  _saveState;
   _selectedNodes;
   _selectedSingleNode;
+  _triggerEvent;
   constructor({
-    getNodeById
+    getNodeById,
+    getNodeElementForNode,
+    getOnCanSelectNode,
+    getSelectable,
+    openParents,
+    saveState,
+    triggerEvent
   }) {
     this._getNodeById = getNodeById;
+    this._getNodeElementForNode = getNodeElementForNode;
+    this._getOnCanSelectNode = getOnCanSelectNode;
+    this._getSelectable = getSelectable;
+    this._openParents = openParents;
+    this._saveState = saveState;
     this._selectedNodes = new Set();
     this._selectedSingleNode = null;
+    this._triggerEvent = triggerEvent;
   }
   addToSelection(node) {
     if (node.id != null) {
@@ -2768,11 +3162,68 @@ class SelectNodeHandler {
       }
     }
   }
+
+  /* Select a single node.
+  * Renders the changed elements.
+  * Deselects if the node is currently selected (if the mustToggle is on).
+  * Deselects the previously selected node.
+  * Check if the node is selectable.
+  * Saves the state.
+  * Options:
+    * mustSetFocus: set the focus to the selected node
+    * mustToggle: support deselecting the selected node
+  */
+  selectSingleNode(node, optionsParam) {
+    const defaultOptions = {
+      mustSetFocus: true,
+      mustToggle: true
+    };
+    const selectOptions = {
+      ...defaultOptions,
+      ...(optionsParam ?? {})
+    };
+    const canSelect = () => {
+      if (!this._getSelectable()) {
+        return false;
+      }
+      const onCanSelectNode = this._getOnCanSelectNode();
+      return onCanSelectNode ? onCanSelectNode(node) : true;
+    };
+    if (!canSelect()) {
+      return;
+    }
+    const deselectCurrentNode = deselectedNode => {
+      this.removeFromSelection(deselectedNode);
+      this._getNodeElementForNode(deselectedNode).deselect();
+    };
+    if (this.isNodeSelected(node)) {
+      if (selectOptions.mustToggle) {
+        deselectCurrentNode(node);
+        this._triggerEvent("tree.deselect", {
+          node
+        });
+      }
+    } else {
+      const deselectedNode = this.getSelectedNode();
+      if (deselectedNode) {
+        deselectCurrentNode(deselectedNode);
+      }
+      this.addToSelection(node);
+      this._openParents(node);
+      this._getNodeElementForNode(node).select(selectOptions.mustSetFocus);
+      this._triggerEvent("tree.select", {
+        deselectedNode: deselectedNode || null,
+        node
+      });
+    }
+    this._saveState();
+  }
 }
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/setDefaultOptions.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/setDefaultOptions.js
+
 
 
 const defaults = {
@@ -2781,9 +3232,13 @@ const defaults = {
   autoOpen: false,
   // true / false / int (open n levels starting at 0)
   buttonLeft: true,
+  classPrefix: DEFAULT_CLASS_PREFIX,
+  // the prefix of all css classes
   // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
   // http://www.fileformat.info/info/unicode/char/25ba/index.htm
   closedIcon: undefined,
+  commonClassName: undefined,
+  // the class of every element; the default is "<classPrefix>-common"
   data: undefined,
   dataFilter: undefined,
   dataUrl: undefined,
@@ -2800,8 +3255,6 @@ const defaults = {
   onDragStop: undefined,
   onGetStateFromStorage: undefined,
   onIsMoveHandle: undefined,
-  onLoadFailed: undefined,
-  onLoading: undefined,
   onSetStateFromStorage: undefined,
   openedIcon: undefined,
   openFolderDelay: 500,
@@ -2819,6 +3272,8 @@ const defaults = {
   startDndDelay: 300,
   // The delay for starting dnd (in milliseconds)
   tabIndex: 0,
+  treeClassName: undefined,
+  // the class of the root element; the default is classPrefix
   useContextMenu: true
 };
 const setDefaultOptions = (htmlElement, inputOptions) => {
@@ -2854,7 +3309,7 @@ const getRtlOptionFromHTMLElement = htmlElement => {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/triggerCustomEvent.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/triggerCustomEvent.js
 // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
 const triggerCustomEvent = (element, eventName, values) => {
   const event = new CustomEvent(eventName, {
@@ -2868,7 +3323,7 @@ const triggerCustomEvent = (element, eventName, values) => {
 
 
 
-;// ./node_modules/.pnpm/html-tree@file+..+..+upload+html-tree+package/node_modules/html-tree/lib/index.js
+;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/index.js
 /*
 Html-tree 0.1.0
 
@@ -2905,13 +3360,16 @@ limitations under the License.
 
 
 
+
 // The types that appear in the public api. Consumers cannot import them from
 // the submodules directly, because those are not exposed in package.json.
-// Type only, so that the iife build keeps exposing the HtmlTree class itself
+// Type only, so that the iife build keeps exposing the TreeElement class itself
 // as its global, instead of an object of named exports.
 
-class HtmlTree {
+class TreeElement {
+  /** @hidden */
   tree;
+  _classNames;
   _dataLoader;
   _dndHandler;
   _htmlElement;
@@ -2925,6 +3383,8 @@ class HtmlTree {
   _scrollHandler;
   _selectNodeHandler;
   _triggerEventProvider;
+
+  /** @hidden */
   constructor({
     htmlElement,
     overrideTriggerEventProvider,
@@ -2932,6 +3392,7 @@ class HtmlTree {
   }) {
     this._htmlElement = htmlElement;
     this._options = setDefaultOptions(htmlElement, options);
+    this._classNames = createClassNames(this._options);
     this._triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
     this._isInitialized = false;
     this.tree = new Node({}, true);
@@ -2950,17 +3411,16 @@ class HtmlTree {
       onDragStop,
       onGetStateFromStorage,
       onIsMoveHandle,
-      onLoadFailed,
-      onLoading,
       onSetStateFromStorage,
       openedIcon,
       openFolderDelay,
       rtl,
-      saveState,
+      saveState: saveStateOption,
       showEmptyFolder,
       slide,
       tabIndex
     } = this._options;
+    const classNames = this._classNames;
     const closeNode = this.closeNode.bind(this);
     const getNodeElement = this._getNodeElement.bind(this);
     const getNodeElementForNode = this._getNodeElementForNode.bind(this);
@@ -2969,26 +3429,35 @@ class HtmlTree {
     const getTree = this.getTree.bind(this);
     const isFocusOnTree = this._isFocusOnTree.bind(this);
     const loadData = this.loadData.bind(this);
-    const openNode = this._openNodeInternal.bind(this);
+    const openNode = this.openNode.bind(this);
+    const openParents = this._openParents.bind(this);
     const refreshElements = this._refreshElements.bind(this);
     const refreshHitAreas = this.refreshHitAreas.bind(this);
-    const selectNode = this.selectNode.bind(this);
     const setNodeElement = this._setNodeElement.bind(this);
     const treeElement = this._htmlElement;
     const triggerEvent = this._triggerEvent.bind(this);
+    const saveState = () => {
+      saveStateHandler.saveState();
+    };
     const selectNodeHandler = new SelectNodeHandler({
-      getNodeById
+      getNodeById,
+      getNodeElementForNode,
+      getOnCanSelectNode: () => this._options.onCanSelectNode,
+      getSelectable: () => this._options.selectable,
+      openParents,
+      saveState,
+      triggerEvent
     });
     const addToSelection = selectNodeHandler.addToSelection.bind(selectNodeHandler);
     const getSelectedNodes = selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
     const isNodeSelected = selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
     const removeFromSelection = selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
+    const selectNode = selectNodeHandler.selectSingleNode.bind(selectNodeHandler);
     const getMouseDelay = () => this._options.startDndDelay ?? 0;
     const dataLoader = new DataLoader({
+      classNames,
       dataFilter,
       loadData,
-      onLoadFailed,
-      onLoading,
       treeElement,
       triggerEvent
     });
@@ -3002,7 +3471,7 @@ class HtmlTree {
       openNode,
       refreshElements,
       removeFromSelection,
-      saveState
+      saveState: saveStateOption
     });
     const scrollHandler = new ScrollHandler({
       refreshHitAreas,
@@ -3011,6 +3480,7 @@ class HtmlTree {
     const getScrollLeft = scrollHandler.getScrollLeft.bind(scrollHandler);
     const dndHandler = new DragAndDropHandler({
       autoEscape,
+      classNames,
       getNodeElement,
       getNodeElementForNode,
       getScrollLeft,
@@ -3038,6 +3508,7 @@ class HtmlTree {
     const renderer = new ElementsRenderer({
       autoEscape,
       buttonLeft,
+      classNames,
       closedIcon,
       dragAndDrop,
       getTree,
@@ -3056,11 +3527,12 @@ class HtmlTree {
     const onMouseStart = this._mouseStart.bind(this);
     const onMouseStop = this._mouseStop.bind(this);
     const mouseHandler = new MouseHandler({
+      classNames,
       element: treeElement,
       getMouseDelay,
       getNode,
       onClickButton: this.toggle.bind(this),
-      onClickTitle: this.selectNode.bind(this),
+      onClickTitle: selectNode,
       onMouseCapture,
       onMouseDrag,
       onMouseStart,
@@ -3079,32 +3551,55 @@ class HtmlTree {
     this._initData();
   }
 
-  // Add a node after an existing node.
-  addNodeAfter(newNodeInfo, existingNode) {
-    const newNode = existingNode.addAfter(newNodeInfo);
+  /**
+   * Adds a sibling after a node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addNodeAfter(nodeData, existingNode) {
+    const newNode = existingNode.addAfter(nodeData);
     if (newNode) {
       this._refreshElements(existingNode.parent);
     }
     return newNode;
   }
 
-  // Add a node before another node.
-  addNodeBefore(newNodeInfo, existingNode) {
-    const newNode = existingNode.addBefore(newNodeInfo);
+  /**
+   * Adds a sibling before a node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addNodeBefore(nodeData, existingNode) {
+    const newNode = existingNode.addBefore(nodeData);
     if (newNode) {
       this._refreshElements(existingNode.parent);
     }
     return newNode;
   }
 
-  // Add a node as parent node of an existing node.
-  addParentNode(newNodeInfo, existingNode) {
-    const newNode = existingNode.addParent(newNodeInfo);
+  /**
+   * Inserts a new node between a node and its parent, taking the node as its
+   * child.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addParentNode(nodeData, existingNode) {
+    const newNode = existingNode.addParent(nodeData);
     if (newNode) {
       this._refreshElements(newNode.parent);
     }
     return newNode;
   }
+
+  /**
+   * Adds a node to the selection instead of replacing it.
+   *
+   * @param mustSetFocus - Move the focus to the node. Default `true`.
+   * @group Selection
+   */
   addToSelection(node, mustSetFocus) {
     this._selectNodeHandler.addToSelection(node);
     this._openParents(node);
@@ -3112,76 +3607,206 @@ class HtmlTree {
     this._saveState();
   }
 
-  // Add a node as child of another node.
-  appendNode(newNodeInfo, parentNode) {
-    const node = parentNode.append(newNodeInfo);
+  /**
+   * Adds a node as the last child of a parent.
+   *
+   * @example
+   * ```js
+   * tree.appendNode({ name: "child", id: 5 }, tree.getNodeById(1));
+   * ```
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
+  appendNode(nodeData, parentNode) {
+    const node = parentNode.append(nodeData);
     this._refreshElements(parentNode);
     return node;
   }
-  closeNode(node, slideParam) {
-    const slide = slideParam ?? this._options.slide;
+
+  /**
+   * Closes a folder.
+   *
+   * @param slide - Override the `slide` option for this call.
+   * @group Opening and closing
+   */
+  closeNode(node, slide) {
     if (node.isFolder() || node.isEmptyFolder) {
-      this._createFolderElement(node).close(slide, this._options.animationSpeed);
+      this._createFolderElement(node).close(slide ?? this._options.slide, this._options.animationSpeed);
       this._saveState();
     }
   }
+
+  /**
+   * Empties the element and removes the tree's document-level keyboard
+   * listener. Call it when you remove the tree from the page.
+   *
+   * @group Other
+   */
   deinit() {
     this._htmlElement.textContent = '';
+    this._dataLoader.deinit();
     this._keyHandler.deinit();
     this._mouseHandler.deinit();
     this.tree = new Node({}, true);
   }
 
-  // Return the tree node for an HTMl element.
+  /**
+   * Returns the node that belongs to a `li` element the tree rendered.
+   *
+   * @group Finding nodes
+   */
   getNode(element) {
-    const liElement = element.closest("li.html-tree-common");
+    const liElement = element.closest(`li.${this._classNames.common}`);
     if (liElement) {
       return this._nodeMap.get(liElement) ?? null;
     } else {
       return null;
     }
   }
+
+  /**
+   * Returns the first node for which the callback returns `true`.
+   *
+   * @example
+   * ```js
+   * const node = tree.getNodeByCallback((node) => node.children.length > 3);
+   * ```
+   *
+   * @group Finding nodes
+   */
   getNodeByCallback(callback) {
     return this.tree.getNodeByCallback(callback);
   }
-  getNodeById(nodeId) {
-    return this.tree.getNodeById(nodeId);
+
+  /**
+   * Returns the node with this id.
+   *
+   * @example
+   * ```js
+   * const node = tree.getNodeById(1);
+   * ```
+   *
+   * @group Finding nodes
+   */
+  getNodeById(id) {
+    return this.tree.getNodeById(id);
   }
+
+  /**
+   * Returns the first node with this name.
+   *
+   * @group Finding nodes
+   */
   getNodeByName(name) {
     return this.tree.getNodeByName(name);
   }
+
+  /**
+   * Like `getNodeByName`, but throws when there is no such node. Convenient
+   * in tests and when a missing node is a bug.
+   *
+   * @group Finding nodes
+   */
   getNodeByNameMustExist(name) {
     return this.tree.getNodeByNameMustExist(name);
   }
+
+  /**
+   * Returns all nodes with this property value.
+   *
+   * @example
+   * ```js
+   * tree.getNodesByProperty("color", "green");
+   * ```
+   *
+   * @group Finding nodes
+   */
   getNodesByProperty(key, value) {
     return this.tree.getNodesByProperty(key, value);
   }
 
-  // Return the node that is selected.
+  /**
+   * Returns the selected node, or `false` when nothing is selected.
+   *
+   * @group Selection
+   */
   getSelectedNode() {
     return this._selectNodeHandler.getSelectedNode();
   }
+
+  /**
+   * Returns the selected nodes.
+   *
+   * @group Selection
+   */
   getSelectedNodes() {
     return this._selectNodeHandler.getSelectedNodes();
   }
+
+  /**
+   * Returns the current state — `open_nodes` and `selected_node` — whether or
+   * not `saveState` is enabled.
+   *
+   * @group State
+   */
   getState() {
     return this._saveStateHandler.getState();
   }
+
+  /**
+   * Returns the state as it is stored.
+   *
+   * @group State
+   */
   getStateFromStorage() {
     return this._saveStateHandler.getStateFromStorage();
   }
+
+  /**
+   * Returns the root node. It is not rendered; its `children` are the
+   * top-level nodes. Also available as the `tree` property.
+   *
+   * @group Finding nodes
+   */
   getTree() {
     return this.tree;
   }
+
+  /**
+   * Returns the version of tree-element.
+   *
+   * @group Other
+   */
   getVersion() {
     return (/* inlined export ["default"] */"0.1.0");
   }
+
+  /**
+   * Returns whether the user is dragging a node.
+   *
+   * @group Other
+   */
   isDragging() {
     return this._dndHandler.isDragging;
   }
+
+  /**
+   * Returns whether the node is selected.
+   *
+   * @group Selection
+   */
   isNodeSelected(node) {
     return this._selectNodeHandler.isNodeSelected(node);
   }
+
+  /**
+   * Loads data into the tree.
+   *
+   * @param parentNode - Replace this node's children instead of the whole
+   * tree.
+   * @group Loading data
+   */
   loadData(data, parentNode) {
     if (data) {
       if (parentNode) {
@@ -3194,17 +3819,30 @@ class HtmlTree {
         this._dndHandler.refresh();
       }
     }
-    this._triggerEvent("tree.load_data", {
-      parent_node: parentNode,
-      tree_data: data
+    this._triggerEvent("tree.set_data", {
+      node: parentNode,
+      treeData: data ?? undefined
     });
   }
-  loadDataFromUrl(inputUrl, parentNode, onFinished) {
-    const url = inputUrl ? new RequestUrl(inputUrl) : this._createRequestUrl(parentNode);
-    if (url) {
-      this._dataLoader.loadFromUrl(url, parentNode, onFinished);
+
+  /**
+   * Fetches data and loads it into the tree, or into `parentNode`.
+   *
+   * @param url - Defaults to the `dataUrl` option.
+   * @group Loading data
+   */
+  async loadDataFromUrl(url, parentNode) {
+    const requestUrl = url ? new RequestUrl(url) : this._createRequestUrl(parentNode);
+    if (requestUrl) {
+      await this._dataLoader.loadFromUrl(requestUrl, parentNode);
     }
   }
+
+  /**
+   * Selects the next visible node, like the down arrow key.
+   *
+   * @group Selection
+   */
   moveDown() {
     const selectedNode = this.getSelectedNode();
     if (selectedNode) {
@@ -3212,54 +3850,123 @@ class HtmlTree {
     }
   }
 
-  // Move a node inside the tree.
+  /**
+   * Moves a node inside the tree.
+   *
+   * @example
+   * ```js
+   * tree.moveNode(tree.getNodeById(2), tree.getNodeById(1), "inside");
+   * ```
+   *
+   * @param position - `"before"`, `"after"` or `"inside"`.
+   * @group Changing the tree
+   */
   moveNode(node, targetNode, position) {
     this.tree.moveNode(node, targetNode, position);
     this._refreshElements(null);
   }
+
+  /**
+   * Selects the previous visible node, like the up arrow key.
+   *
+   * @group Selection
+   */
   moveUp() {
     const selectedNode = this.getSelectedNode();
     if (selectedNode) {
       this._keyHandler.moveUp(selectedNode);
     }
   }
-  openNode(node, param1, param2) {
-    const parseParams = () => {
-      let onFinished;
-      let slide;
-      if (typeof param1 === "function") {
-        onFinished = param1;
-        slide = null;
-      } else {
-        slide = param1;
-        onFinished = param2;
+
+  /**
+   * Opens a folder, and the folders above it. A node marked `load_on_demand`
+   * is fetched first, so await the promise when you need to know it is really
+   * open.
+   *
+   * @example
+   * ```js
+   * await tree.openNode(node);
+   * console.log("open");
+   * ```
+   *
+   * @param slide - Override the `slide` option for this call.
+   * @group Opening and closing
+   */
+  async openNode(node, slide) {
+    const mustSlide = slide ?? this._options.slide;
+    const doOpenNode = async (openedNode, slideOption) => {
+      if (!node.children.length) {
+        return;
       }
-      slide ??= this._options.slide;
-      return [slide, onFinished];
+      const folderElement = this._createFolderElement(openedNode);
+      await folderElement.open(slideOption, this._options.animationSpeed);
     };
-    const [slide, onFinished] = parseParams();
-    this._openNodeInternal(node, slide, onFinished);
+    if (node.isFolder() || node.isEmptyFolder) {
+      if (node.load_on_demand) {
+        await this._loadFolderOnDemand(node, mustSlide);
+      } else {
+        let parent = node.parent;
+        while (parent) {
+          // nb: do not open root element
+          if (parent.parent) {
+            await doOpenNode(parent, false);
+          }
+          parent = parent.parent;
+        }
+        await doOpenNode(node, mustSlide);
+        this._saveState();
+      }
+    }
   }
 
-  // Add a node before another node.
-  prependNode(newNodeInfo, parentNode) {
-    const node = parentNode.prepend(newNodeInfo);
+  /**
+   * Adds a node as the first child of a parent.
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
+  prependNode(nodeData, parentNode) {
+    const node = parentNode.prepend(nodeData);
     this._refreshElements(parentNode);
     return node;
   }
+
+  /**
+   * Re-renders the whole tree. Needed after changing node data directly
+   * instead of through these methods.
+   *
+   * @group Changing the tree
+   */
   refresh() {
     this._refreshElements(null);
   }
+
+  /**
+   * Recomputes the drop targets. Call this if the layout changes during a
+   * drag.
+   *
+   * @group Other
+   */
   refreshHitAreas() {
     this._dndHandler.refresh();
   }
+
+  /**
+   * Removes a node from the selection.
+   *
+   * @group Selection
+   */
   removeFromSelection(node) {
     this._selectNodeHandler.removeFromSelection(node);
     this._getNodeElementForNode(node).deselect();
     this._saveState();
   }
 
-  // Remove the node from the tree.
+  /**
+   * Removes a node and its children.
+   *
+   * @group Changing the tree
+   */
   removeNode(node) {
     this._selectNodeHandler.removeFromSelection(node, true); // including children
 
@@ -3267,6 +3974,12 @@ class HtmlTree {
     node.remove();
     this._refreshElements(parent);
   }
+
+  /**
+   * Scrolls the node into view.
+   *
+   * @group Selection
+   */
   scrollToNode(node) {
     if (!node.element) {
       return;
@@ -3274,78 +3987,86 @@ class HtmlTree {
     const top = getOffsetTop(node.element) - getOffsetTop(this._htmlElement);
     this._scrollHandler.scrollToY(top);
   }
-  selectNode(node, optionsParam) {
-    const saveState = () => {
-      if (this._options.saveState) {
-        this._saveStateHandler.saveState();
-      }
-    };
+
+  /**
+   * Replaces the selection, and opens the parents of the node.
+   *
+   * @param node - `null` clears the selection.
+   * @param options - `mustSetFocus`: move focus to the node, default `true`.
+   * `mustToggle`: deselect the node if it is already selected, default
+   * `false`.
+   * @group Selection
+   */
+  selectNode(node, options) {
     if (!node) {
       // Called with empty node -> deselect current node
       this._deselectCurrentNode();
-      saveState();
+      this._saveStateHandler.saveState();
       return;
     }
-    const defaultOptions = {
-      mustSetFocus: true,
-      mustToggle: true
-    };
-    const selectOptions = {
-      ...defaultOptions,
-      ...(optionsParam ?? {})
-    };
-    const canSelect = () => {
-      if (this._options.onCanSelectNode) {
-        return this._options.selectable && this._options.onCanSelectNode(node);
-      } else {
-        return this._options.selectable;
-      }
-    };
-    if (!canSelect()) {
-      return;
-    }
-    if (this._selectNodeHandler.isNodeSelected(node)) {
-      if (selectOptions.mustToggle) {
-        this._deselectCurrentNode();
-        this._triggerEvent("tree.select", {
-          node: null,
-          previous_node: node
-        });
-      }
-    } else {
-      const deselectedNode = this.getSelectedNode() || null;
-      this._deselectCurrentNode();
-      this.addToSelection(node, selectOptions.mustSetFocus);
-      this._triggerEvent("tree.select", {
-        deselected_node: deselectedNode,
-        node
-      });
-      this._openParents(node);
-    }
-    saveState();
+    this._selectNodeHandler.selectSingleNode(node, options);
   }
+
+  /**
+   * Changes an option after construction. See
+   * [Options](/reference/options#changing-an-option-later) for the caveats.
+   *
+   * @group Other
+   */
   setOption(option, value) {
     this._options[option] = value;
   }
+
+  /**
+   * Applies a state to the tree.
+   *
+   * @group State
+   */
   setState(state) {
     this._saveStateHandler.setInitialState(state);
     this._refreshElements(null);
   }
-  toggle(node, slideParam = null) {
-    const slide = slideParam ?? this._options.slide;
+
+  /**
+   * Closes an open node and opens a closed one.
+   *
+   * @param slide - Override the `slide` option for this call.
+   * @group Opening and closing
+   */
+  toggle(node, slide = null) {
+    const mustSlide = slide ?? this._options.slide;
     if (node.is_open) {
-      this.closeNode(node, slide);
+      this.closeNode(node, mustSlide);
     } else {
-      this.openNode(node, slide);
+      void this.openNode(node, mustSlide);
     }
   }
 
-  // Return tree as json string.
+  /**
+   * Returns the tree as a json string, including changes made through the
+   * api.
+   *
+   * @group Other
+   */
   toJson() {
     return JSON.stringify(this.tree.getData());
   }
 
-  // Update the data of a node in the tree.
+  /**
+   * Updates the data of a node and re-renders it. A string updates just the
+   * name.
+   *
+   * Changing the `id` re-indexes the node. `children` and `parent` are
+   * ignored — use `loadData` or `moveNode` for those.
+   *
+   * @example
+   * ```js
+   * tree.updateNode(node, "new name");
+   * tree.updateNode(node, { name: "new name", color: "red" });
+   * ```
+   *
+   * @group Changing the tree
+   */
   updateNode(node, data) {
     const idIsChanged = typeof data === "object" && data.id && data.id !== node.id;
     if (idIsChanged) {
@@ -3364,6 +4085,7 @@ class HtmlTree {
     this._refreshElements(node);
   }
   _createFolderElement(node) {
+    const classNames = this._classNames;
     const closedIconElement = this._renderer.closedIconElement;
     const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
     const openedIconElement = this._renderer.openedIconElement;
@@ -3371,6 +4093,7 @@ class HtmlTree {
     const treeElement = this._htmlElement;
     const triggerEvent = this._triggerEvent.bind(this);
     return new FolderElement({
+      classNames,
       closedIconElement,
       getScrollLeft,
       node,
@@ -3381,10 +4104,12 @@ class HtmlTree {
     });
   }
   _createNodeElement(node) {
+    const classNames = this._classNames;
     const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
     const tabIndex = this._options.tabIndex;
     const treeElement = this._htmlElement;
     return new NodeElement({
+      classNames,
       getScrollLeft,
       node,
       tabIndex,
@@ -3464,11 +4189,7 @@ class HtmlTree {
     }
   }
   _getNodeIdToBeSelected() {
-    if (this._options.saveState) {
-      return this._saveStateHandler.getNodeIdToBeSelected();
-    } else {
-      return null;
-    }
+    return this._saveStateHandler.getNodeIdToBeSelected();
   }
   _initData() {
     if (this._options.data) {
@@ -3476,7 +4197,7 @@ class HtmlTree {
     } else {
       const dataUrl = this._createRequestUrl();
       if (dataUrl) {
-        this.loadDataFromUrl();
+        void this.loadDataFromUrl();
       } else {
         this.loadData([]);
       }
@@ -3496,7 +4217,7 @@ class HtmlTree {
     this._refreshElements(null);
     if (mustLoadOnDemand) {
       // Load data on demand and then init the tree
-      this._setInitialStateOnDemand(doInit);
+      void this._setInitialStateOnDemand().then(doInit);
     } else {
       doInit();
     }
@@ -3527,11 +4248,10 @@ class HtmlTree {
       return subtree === selectedNode || subtree.isParentOf(selectedNode);
     }
   }
-  _loadFolderOnDemand(node, slide, onFinished) {
+  async _loadFolderOnDemand(node, slide) {
     node.is_loading = true;
-    this.loadDataFromUrl(undefined, node, () => {
-      this._openNodeInternal(node, slide, onFinished);
-    });
+    await this.loadDataFromUrl(undefined, node);
+    await this.openNode(node, slide);
   }
   _loadSubtree(data, parentNode) {
     parentNode.loadFromData(data);
@@ -3569,35 +4289,10 @@ class HtmlTree {
     this._scrollHandler.stopScrolling();
     return this._dndHandler.mouseStop(positionInfo);
   }
-  _openNodeInternal(node, slide = true, onFinished) {
-    const doOpenNode = (_node, _slide, _onFinished) => {
-      if (!node.children.length) {
-        return;
-      }
-      const folderElement = this._createFolderElement(_node);
-      folderElement.open(_onFinished, _slide, this._options.animationSpeed);
-    };
-    if (node.isFolder() || node.isEmptyFolder) {
-      if (node.load_on_demand) {
-        this._loadFolderOnDemand(node, slide, onFinished);
-      } else {
-        let parent = node.parent;
-        while (parent) {
-          // nb: do not open root element
-          if (parent.parent) {
-            doOpenNode(parent, false);
-          }
-          parent = parent.parent;
-        }
-        doOpenNode(node, slide, onFinished);
-        this._saveState();
-      }
-    }
-  }
   _openParents(node) {
     const parent = node.parent;
     if (parent?.parent && !parent.is_open) {
-      this.openNode(parent, false);
+      void this.openNode(parent, false);
     }
   }
 
@@ -3615,9 +4310,7 @@ class HtmlTree {
     this._triggerEvent("tree.refresh");
   }
   _saveState() {
-    if (this._options.saveState) {
-      this._saveStateHandler.saveState();
-    }
+    this._saveStateHandler.saveState();
   }
   _selectCurrentNode(mustSetFocus) {
     const node = this.getSelectedNode();
@@ -3632,18 +4325,14 @@ class HtmlTree {
   _setInitialState() {
     const restoreState = () => {
       // result: is state restored, must load on demand?
-      if (!this._options.saveState) {
+      const state = this._saveStateHandler.getStateFromStorage();
+      if (!state) {
         return [false, false];
       } else {
-        const state = this._saveStateHandler.getStateFromStorage();
-        if (!state) {
-          return [false, false];
-        } else {
-          const mustLoadOnDemand = this._saveStateHandler.setInitialState(state);
+        const mustLoadOnDemand = this._saveStateHandler.setInitialState(state);
 
-          // return true: the state is restored
-          return [true, mustLoadOnDemand];
-        }
+        // return true: the state is restored
+        return [true, mustLoadOnDemand];
       }
     };
     const autoOpenNodes = () => {
@@ -3675,48 +4364,51 @@ class HtmlTree {
   }
 
   // Set the initial state for nodes that are loaded on demand
-  // Call cb_finished when done
-  _setInitialStateOnDemand(cbFinished) {
-    const restoreState = () => {
-      const state = this._saveStateHandler.getStateFromStorage();
-      if (!state) {
-        return false;
-      } else {
-        this._saveStateHandler.setInitialStateOnDemand(state, cbFinished);
-        return true;
-      }
-    };
-    const autoOpenNodes = () => {
-      const maxLevel = this._getAutoOpenMaxLevel();
-      let loadingCount = 0;
-      const loadAndOpenNode = node => {
-        loadingCount += 1;
-        this._openNodeInternal(node, false, () => {
-          loadingCount -= 1;
-          openNodes();
-        });
-      };
-      const openNodes = () => {
-        this.tree.iterate((node, level) => {
-          if (node.load_on_demand) {
-            if (!node.is_loading) {
-              loadAndOpenNode(node);
-            }
-            return false;
-          } else {
-            this._openNodeInternal(node, false);
-            return level !== maxLevel;
-          }
-        });
-        if (loadingCount === 0) {
-          cbFinished();
+  async _setInitialStateOnDemand() {
+    return new Promise(resolve => {
+      const restoreState = () => {
+        const state = this._saveStateHandler.getStateFromStorage();
+        if (!state) {
+          return false;
+        } else {
+          void this._saveStateHandler.setInitialStateOnDemand(state).then(() => {
+            resolve();
+          });
+          return true;
         }
       };
-      openNodes();
-    };
-    if (!restoreState()) {
-      autoOpenNodes();
-    }
+      const autoOpenNodes = () => {
+        const maxLevel = this._getAutoOpenMaxLevel();
+        let loadingCount = 0;
+        const loadAndOpenNode = node => {
+          loadingCount += 1;
+          void this.openNode(node, false).then(() => {
+            loadingCount -= 1;
+            openNodes();
+          });
+        };
+        const openNodes = () => {
+          this.tree.iterate((node, level) => {
+            if (node.load_on_demand) {
+              if (!node.is_loading) {
+                loadAndOpenNode(node);
+              }
+              return false;
+            } else {
+              void this.openNode(node, false);
+              return level !== maxLevel;
+            }
+          });
+          if (loadingCount === 0) {
+            resolve();
+          }
+        };
+        openNodes();
+      };
+      if (!restoreState()) {
+        autoOpenNodes();
+      }
+    });
   }
 
   // Set this HTML element to this node in the node map.
@@ -3727,137 +4419,6 @@ class HtmlTree {
     return this._triggerEventProvider(this._htmlElement, eventName, values);
   }
 }
-
-
-
-;// ./node_modules/.pnpm/js-cookie@3.0.8/node_modules/js-cookie/dist/js.cookie.mjs
-/*! js-cookie v3.0.8 | MIT */
-function js_cookie_assign (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-    for (var key in source) {
-      if (key === '__proto__') continue
-      target[key] = source[key];
-    }
-  }
-  return target
-}
-
-var defaultConverter = {
-  read: function (value) {
-    if (value[0] === '"') {
-      value = value.slice(1, -1);
-    }
-    return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)
-  },
-  write: function (value) {
-    return encodeURIComponent(value).replace(
-      /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
-      decodeURIComponent
-    )
-  }
-};
-
-function init(converter, defaultAttributes) {
-  function set(name, value, attributes) {
-    if (typeof document === 'undefined') {
-      return
-    }
-
-    attributes = js_cookie_assign({}, defaultAttributes, attributes);
-
-    if (typeof attributes.expires === 'number') {
-      attributes.expires = new Date(Date.now() + attributes.expires * 864e5);
-    }
-    if (attributes.expires) {
-      attributes.expires = attributes.expires.toUTCString();
-    }
-
-    name = encodeURIComponent(name)
-      .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
-      .replace(/[()]/g, escape);
-
-    var stringifiedAttributes = '';
-    for (var attributeName in attributes) {
-      if (!attributes[attributeName]) {
-        continue
-      }
-
-      stringifiedAttributes += '; ' + attributeName;
-
-      if (attributes[attributeName] === true) {
-        continue
-      }
-
-      // Considers RFC 6265 section 5.2:
-      // ...
-      // 3.  If the remaining unparsed-attributes contains a %x3B (";")
-      //     character:
-      // Consume the characters of the unparsed-attributes up to,
-      // not including, the first %x3B (";") character.
-      // ...
-      stringifiedAttributes += '=' + attributes[attributeName].split(';')[0];
-    }
-
-    return (document.cookie =
-      name + '=' + converter.write(value, name) + stringifiedAttributes)
-  }
-
-  function get(name) {
-    if (typeof document === 'undefined' || (arguments.length && !name)) {
-      return
-    }
-
-    // To prevent the for loop in the first place assign an empty array
-    // in case there are no cookies at all.
-    var cookies = document.cookie ? document.cookie.split('; ') : [];
-    var jar = {};
-    for (var i = 0; i < cookies.length; i++) {
-      var parts = cookies[i].split('=');
-      var value = parts.slice(1).join('=');
-
-      try {
-        var found = decodeURIComponent(parts[0]);
-        if (!(found in jar)) jar[found] = converter.read(value, found);
-        if (name === found) {
-          break
-        }
-      } catch (_e) {
-        // Do nothing...
-      }
-    }
-
-    return name ? jar[name] : jar
-  }
-
-  return Object.create(
-    {
-      set: set,
-      get: get,
-      remove: function (name, attributes) {
-        set(
-          name,
-          '',
-          js_cookie_assign({}, attributes, {
-            expires: -1
-          })
-        );
-      },
-      withAttributes: function (attributes) {
-        return init(this.converter, js_cookie_assign({}, this.attributes, attributes))
-      },
-      withConverter: function (converter) {
-        return init(js_cookie_assign({}, this.converter, converter), this.attributes)
-      }
-    },
-    {
-      attributes: { value: Object.freeze(defaultAttributes) },
-      converter: { value: Object.freeze(converter) }
-    }
-  )
-}
-
-var api = init(defaultConverter, { path: '/' });
 
 
 
@@ -3885,7 +4446,7 @@ function initTree(treeElement, {
     if (node.id == null) {
       return;
     }
-    const titleElement = liElement.querySelector(":scope > .html-tree-element > .html-tree-title");
+    const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title");
 
     /* istanbul ignore if */
     if (!titleElement) {
@@ -3938,15 +4499,15 @@ function initTree(treeElement, {
       position: info.position,
       target_id: String(info.target_node.id)
     });
-    handleLoading(null);
+    handleLoading();
     removeErrorMessage();
     e.preventDefault();
     function handleError() {
-      handleLoaded(null);
+      handleLoaded();
       const errorElement = document.createElement("span");
       errorElement.className = "mptt-admin-error";
       errorElement.textContent = gettext("move failed");
-      const nodeElement = htmlElement.querySelector(":scope > .html-tree-element");
+      const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
       nodeElement?.append(errorElement);
       errorNode = info.moved_node;
     }
@@ -3960,7 +4521,7 @@ function initTree(treeElement, {
     }).then(response => {
       if (response.ok) {
         info.do_move();
-        handleLoaded(null);
+        handleLoaded();
       } else {
         handleError();
       }
@@ -3969,7 +4530,7 @@ function initTree(treeElement, {
     });
     function removeErrorMessage() {
       if (errorNode?.element) {
-        const errorElement = errorNode.element.querySelector(":scope > .html-tree-element > .mptt-admin-error");
+        const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
         errorElement?.remove();
         errorNode = null;
       }
@@ -3993,7 +4554,8 @@ function initTree(treeElement, {
   function handleLoading(node) {
     function getContainer() {
       if (node) {
-        return node.element;
+        // display the spinner next to the title of the node
+        return node.element?.querySelector(":scope > .jqtree-element");
       } else {
         return treeElement;
       }
@@ -4004,7 +4566,7 @@ function initTree(treeElement, {
       return;
     }
     const spinner = document.createElement("span");
-    spinner.className = "html-tree-spin";
+    spinner.className = "jqtree-spin";
     container.append(spinner);
     spinners[spinnerId] = spinner;
   }
@@ -4018,44 +4580,43 @@ function initTree(treeElement, {
       spinner.remove();
     }
   }
-  function handleSelect(eventParam) {
-    const e = eventParam;
+  function setEditTabIndex(nodeElement, tabIndex) {
+    const editElements = nodeElement.querySelectorAll(":scope > .jqtree-element > .edit");
+    for (const editElement of editElements) {
+      editElement.tabIndex = tabIndex;
+    }
+  }
+  function handleSelect(e) {
     const {
-      deselected_node,
-      node,
-      previous_node
+      deselectedNode,
+      node
     } = e.detail;
-    const deselectedElement = deselected_node?.element ?? previous_node?.element;
-    if (deselectedElement) {
+    if (deselectedNode?.element) {
       // deselected node: remove tabindex
-      const editElements = deselectedElement.querySelectorAll(":scope > .html-tree-element > .edit");
-      for (const editElement of editElements) {
-        editElement.tabIndex = -1;
-      }
+      setEditTabIndex(deselectedNode.element, -1);
     }
 
     // selected: add tabindex
-    if (node?.element) {
-      const editElements = node.element.querySelectorAll(":scope > .html-tree-element > .edit");
-      for (const editElement of editElements) {
-        editElement.tabIndex = 0;
-      }
+    /* istanbul ignore else */
+    if (node.element) {
+      setEditTabIndex(node.element, 0);
+    }
+  }
+  function handleDeselect(e) {
+    const {
+      node
+    } = e.detail;
+
+    /* istanbul ignore else */
+    if (node.element) {
+      setEditTabIndex(node.element, -1);
     }
   }
   function handleLoadingEvent(e) {
-    const {
-      isLoading,
-      node
-    } = e.detail;
-    if (isLoading) {
-      handleLoading(node);
-    }
+    handleLoading(e.detail.node);
   }
-  function handleLoadDataEvent(e) {
-    const {
-      parent_node
-    } = e.detail;
-    handleLoaded(parent_node);
+  function handleLoadedDataEvent(e) {
+    handleLoaded(e.detail.node);
   }
   const treeOptions = {
     autoEscape,
@@ -4064,7 +4625,6 @@ function initTree(treeElement, {
     closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
     dragAndDrop: dragAndDrop && hasChangePermission,
     onCreateLi: createLi,
-    onLoadFailed: handleLoadFailed,
     saveState,
     useContextMenu
   };
@@ -4074,13 +4634,18 @@ function initTree(treeElement, {
   if (mouseDelay != null) {
     treeOptions.startDndDelay = mouseDelay;
   }
+  treeElement.addEventListener("tree.deselect", handleDeselect);
+  treeElement.addEventListener("tree.load_failed", handleLoadFailed);
   treeElement.addEventListener("tree.loading_data", handleLoadingEvent);
-  treeElement.addEventListener("tree.load_data", handleLoadDataEvent);
+  treeElement.addEventListener("tree.loaded_data", handleLoadedDataEvent);
   treeElement.addEventListener("tree.move", handleMove);
   treeElement.addEventListener("tree.select", handleSelect);
-  new HtmlTree({
+  new TreeElement({
     ...treeOptions,
-    htmlElement: treeElement
+    classPrefix: "jqtree",
+    commonClassName: "jqtree_common",
+    htmlElement: treeElement,
+    treeClassName: "jqtree-tree"
   });
 }
 /* harmony default export */ const src_initTree = (initTree);
