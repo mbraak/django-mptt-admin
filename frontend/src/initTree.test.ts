@@ -499,16 +499,16 @@ describe("tree.move event", () => {
             id: 2,
         };
 
-        const move_info = {
-            do_move: doMove,
-            moved_node: movedNode,
-            original_event: {},
+        const moveInfo = {
+            doMove,
+            movedNode,
+            originalEvent: {},
             position: "after",
-            previous_parent: null,
-            target_node: targetNode,
+            previousParent: null,
+            targetNode,
         };
 
-        dispatchTreeEvent(treeElement, "tree.move", { move_info });
+        dispatchTreeEvent(treeElement, "tree.move", { moveInfo });
 
         return doMove;
     };
@@ -571,7 +571,7 @@ describe("tree.move event", () => {
         expect(requestPaths).toEqual(["/move"]);
     });
 
-    test("calls do_move", async () => {
+    test("calls doMove", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();

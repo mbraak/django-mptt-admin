@@ -1,4 +1,4 @@
-import type { Node, TreeEvents } from "tree-element";
+import type { Node, TreeEvent, TreeEvents } from "tree-element";
 
 import Cookies from "js-cookie";
 import TreeElement from "tree-element";
@@ -16,15 +16,6 @@ export interface InitTreeOptions {
     rtl: boolean;
     saveState?: string;
     useContextMenu?: boolean;
-}
-
-interface MoveEventDetail {
-    move_info: {
-        do_move: () => void;
-        moved_node: Node;
-        position: string;
-        target_node: Node;
-    };
 }
 
 function initTree(
@@ -113,18 +104,18 @@ function initTree(
     }
 
     function handleMove(eventParam: Event) {
-        const e = eventParam as CustomEvent<MoveEventDetail>;
-        const info = e.detail.move_info;
+        const e = eventParam as TreeEvent<"tree.move">;
+        const info = e.detail.moveInfo;
 
-        if (!info.moved_node.element) {
+        if (!info.movedNode.element) {
             return;
         }
 
-        const htmlElement = info.moved_node.element;
+        const htmlElement = info.movedNode.element;
 
         const body = new URLSearchParams({
             position: info.position,
-            target_id: String(info.target_node.id),
+            target_id: String(info.targetNode.id),
         });
 
         handleLoading();
@@ -142,10 +133,10 @@ function initTree(
             const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
             nodeElement?.append(errorElement);
 
-            errorNode = info.moved_node;
+            errorNode = info.movedNode;
         }
 
-        void fetch(info.moved_node.move_url as string, {
+        void fetch(info.movedNode.move_url as string, {
             body,
             headers: {
                 // Set Django csrf token
@@ -155,7 +146,7 @@ function initTree(
         }).then(
             (response) => {
                 if (response.ok) {
-                    info.do_move();
+                    info.doMove();
                     handleLoaded();
                 } else {
                     handleError();
