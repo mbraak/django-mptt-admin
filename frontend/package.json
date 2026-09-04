@@ -41,7 +41,7 @@
         "@testing-library/jest-dom": "^7.0.1",
         "@types/jquery": "^4.0.1",
         "@types/js-cookie": "^3.0.6",
-        "@types/node": "^26.4.0",
+        "@types/node": "^26.4.1",
         "@vitest/coverage-istanbul": "^4.1.11",
         "@vitest/eslint-plugin": "^1.6.27",
         "babel-loader": "^10.1.1",
@@ -49,15 +49,15 @@
         "eslint": "^10.9.1",
         "eslint-import-resolver-typescript": "^4.4.5",
         "eslint-plugin-import-x": "^4.17.1",
-        "eslint-plugin-perfectionist": "^5.10.1",
+        "eslint-plugin-perfectionist": "^5.11.0",
         "jsdom": "^30.0.1",
         "msw": "^2.15.0",
         "sass": "^1.103.1",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.68.0",
+        "typescript-eslint": "^8.69.0",
         "vitest": "^4.1.11",
-        "webpack": "^5.109.2",
-        "webpack-cli": "^7.2.2"
+        "webpack": "^5.110.3",
+        "webpack-cli": "^7.2.3"
     },
     "dependencies": {
         "jqtree": "^1.9.0",
