@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 
-// jsdom doesn't implement the web animations api, which html-tree uses for the
+// jsdom doesn't implement the web animations api, which tree-element uses for the
 // open and close animations
 Element.prototype.animate = () => {
     const animation = {

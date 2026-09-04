@@ -1,4 +1,4 @@
-import type { Node } from "html-tree";
+import type { Node } from "tree-element";
 
 import { screen, waitFor, within } from "@testing-library/dom";
 import userEvent, { type UserEvent } from "@testing-library/user-event";

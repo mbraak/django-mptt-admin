@@ -1,7 +1,7 @@
-import type { Node, TreeEvents } from "html-tree";
+import type { Node, TreeEvents } from "tree-element";
 
-import HtmlTree from "html-tree";
 import Cookies from "js-cookie";
+import TreeElement from "tree-element";
 
 export interface InitTreeOptions {
     animationSpeed?: number | string;
@@ -296,7 +296,7 @@ function initTree(
     treeElement.addEventListener("tree.move", handleMove);
     treeElement.addEventListener("tree.select", handleSelect);
 
-    new HtmlTree({
+    new TreeElement({
         ...treeOptions,
         classPrefix: "jqtree",
         commonClassName: "jqtree_common",
