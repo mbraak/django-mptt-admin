@@ -4490,14 +4490,14 @@ function initTree(treeElement, {
   }
   function handleMove(eventParam) {
     const e = eventParam;
-    const info = e.detail.move_info;
-    if (!info.moved_node.element) {
+    const info = e.detail.moveInfo;
+    if (!info.movedNode.element) {
       return;
     }
-    const htmlElement = info.moved_node.element;
+    const htmlElement = info.movedNode.element;
     const body = new URLSearchParams({
       position: info.position,
-      target_id: String(info.target_node.id)
+      target_id: String(info.targetNode.id)
     });
     handleLoading();
     removeErrorMessage();
@@ -4509,9 +4509,9 @@ function initTree(treeElement, {
       errorElement.textContent = gettext("move failed");
       const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
       nodeElement?.append(errorElement);
-      errorNode = info.moved_node;
+      errorNode = info.movedNode;
     }
-    void fetch(info.moved_node.move_url, {
+    void fetch(info.movedNode.move_url, {
       body,
       headers: {
         // Set Django csrf token
@@ -4520,7 +4520,7 @@ function initTree(treeElement, {
       method: "POST"
     }).then(response => {
       if (response.ok) {
-        info.do_move();
+        info.doMove();
         handleLoaded();
       } else {
         handleError();
