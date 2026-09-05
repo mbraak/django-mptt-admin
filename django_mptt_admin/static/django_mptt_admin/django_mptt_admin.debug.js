@@ -60,141 +60,9 @@ var jqtree=function(t){"use strict";class e{t;i;o;h;l;u;constructor({dataFilter:
 (() => {
 "use strict";
 
-;// ./node_modules/.pnpm/js-cookie@3.0.8/node_modules/js-cookie/dist/js.cookie.mjs
-/*! js-cookie v3.0.8 | MIT */
-function js_cookie_assign (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-    for (var key in source) {
-      if (key === '__proto__') continue
-      target[key] = source[key];
-    }
-  }
-  return target
-}
-
-var defaultConverter = {
-  read: function (value) {
-    if (value[0] === '"') {
-      value = value.slice(1, -1);
-    }
-    return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent)
-  },
-  write: function (value) {
-    return encodeURIComponent(value).replace(
-      /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
-      decodeURIComponent
-    )
-  }
-};
-
-function init(converter, defaultAttributes) {
-  function set(name, value, attributes) {
-    if (typeof document === 'undefined') {
-      return
-    }
-
-    attributes = js_cookie_assign({}, defaultAttributes, attributes);
-
-    if (typeof attributes.expires === 'number') {
-      attributes.expires = new Date(Date.now() + attributes.expires * 864e5);
-    }
-    if (attributes.expires) {
-      attributes.expires = attributes.expires.toUTCString();
-    }
-
-    name = encodeURIComponent(name)
-      .replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent)
-      .replace(/[()]/g, escape);
-
-    var stringifiedAttributes = '';
-    for (var attributeName in attributes) {
-      if (!attributes[attributeName]) {
-        continue
-      }
-
-      stringifiedAttributes += '; ' + attributeName;
-
-      if (attributes[attributeName] === true) {
-        continue
-      }
-
-      // Considers RFC 6265 section 5.2:
-      // ...
-      // 3.  If the remaining unparsed-attributes contains a %x3B (";")
-      //     character:
-      // Consume the characters of the unparsed-attributes up to,
-      // not including, the first %x3B (";") character.
-      // ...
-      stringifiedAttributes += '=' + attributes[attributeName].split(';')[0];
-    }
-
-    return (document.cookie =
-      name + '=' + converter.write(value, name) + stringifiedAttributes)
-  }
-
-  function get(name) {
-    if (typeof document === 'undefined' || (arguments.length && !name)) {
-      return
-    }
-
-    // To prevent the for loop in the first place assign an empty array
-    // in case there are no cookies at all.
-    var cookies = document.cookie ? document.cookie.split('; ') : [];
-    var jar = {};
-    for (var i = 0; i < cookies.length; i++) {
-      var parts = cookies[i].split('=');
-      var value = parts.slice(1).join('=');
-
-      try {
-        var found = decodeURIComponent(parts[0]);
-        if (!(found in jar)) jar[found] = converter.read(value, found);
-        if (name === found) {
-          break
-        }
-      } catch (_e) {
-        // Do nothing...
-      }
-    }
-
-    return name ? jar[name] : jar
-  }
-
-  return Object.create(
-    {
-      set: set,
-      get: get,
-      remove: function (name, attributes) {
-        set(
-          name,
-          '',
-          js_cookie_assign({}, attributes, {
-            expires: -1
-          })
-        );
-      },
-      withAttributes: function (attributes) {
-        return init(this.converter, js_cookie_assign({}, this.attributes, attributes))
-      },
-      withConverter: function (converter) {
-        return init(js_cookie_assign({}, this.converter, converter), this.attributes)
-      }
-    },
-    {
-      attributes: { value: Object.freeze(defaultAttributes) },
-      converter: { value: Object.freeze(converter) }
-    }
-  )
-}
-
-var api = init(defaultConverter, { path: '/' });
-
-
-
 // EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.9.0_jquery@4.0.0/node_modules/jqtree/tree.jquery.js
 var tree_jquery = __webpack_require__(382);
 ;// ./src/initTree.ts
-
 
 function initTree($tree, {
   animationSpeed,
@@ -223,6 +91,16 @@ function initTree($tree, {
     const editCaption = hasChangePermission ? gettext("edit") : gettext("view");
     $title.after(`<a href="${node.url}" class="edit" tabindex="${tabindex}">(${editCaption})</a>`, hasAddPermission ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext("add")})</a>` : "");
   }
+  function getCookie(name) {
+    for (const cookie of document.cookie.split("; ")) {
+      const separatorIndex = cookie.indexOf("=");
+      const key = cookie.slice(0, separatorIndex);
+      if (key === name) {
+        return decodeURIComponent(cookie.slice(separatorIndex + 1));
+      }
+    }
+    return undefined;
+  }
   function getCsrfToken() {
     function getFromMiddleware() {
       const inputElement = document.querySelector('[name="csrfmiddlewaretoken"]');
@@ -232,7 +110,7 @@ function initTree($tree, {
       if (!csrfCookieName) {
         return null;
       } else {
-        return api.get(csrfCookieName);
+        return getCookie(csrfCookieName);
       }
     }
     return getFromCookie() ?? getFromMiddleware() ?? "";
