@@ -1,6 +1,5 @@
 import type { Node, TreeEvent, TreeEvents } from "tree-element";
 
-import Cookies from "js-cookie";
 import TreeElement from "tree-element";
 
 export interface InitTreeOptions {
@@ -84,6 +83,19 @@ function initTree(
         }
     }
 
+    function getCookie(name: string): string | undefined {
+        for (const cookie of document.cookie.split("; ")) {
+            const separatorIndex = cookie.indexOf("=");
+            const key = cookie.slice(0, separatorIndex);
+
+            if (key === name) {
+                return decodeURIComponent(cookie.slice(separatorIndex + 1));
+            }
+        }
+
+        return undefined;
+    }
+
     function getCsrfToken() {
         function getFromMiddleware() {
             const inputElement = document.querySelector<HTMLInputElement>(
@@ -96,7 +108,7 @@ function initTree(
             if (!csrfCookieName) {
                 return null;
             } else {
-                return Cookies.get(csrfCookieName);
+                return getCookie(csrfCookieName);
             }
         }
 

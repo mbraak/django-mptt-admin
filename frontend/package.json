@@ -57,7 +57,6 @@
         "webpack-cli": "^7.2.3"
     },
     "dependencies": {
-        "js-cookie": "^3.0.8",
         "tree-element": "^0.1.0"
     }
 }

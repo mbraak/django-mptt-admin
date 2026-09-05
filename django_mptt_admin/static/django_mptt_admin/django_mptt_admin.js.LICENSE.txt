@@ -19,5 +19,3 @@ limitations under the License.
 */
 
 /* istanbul ignore next @preserve */
-
-/*! js-cookie v3.0.8 | MIT */

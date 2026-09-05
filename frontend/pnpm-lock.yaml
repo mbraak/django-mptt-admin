@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      js-cookie:
-        specifier: ^3.0.8
-        version: 3.0.8
       tree-element:
         specifier: ^0.1.0
         version: 0.1.0
@@ -1977,9 +1974,6 @@ packages:
   jest-worker@27.5.1:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
-
-  js-cookie@3.0.8:
-    resolution: {integrity: sha512-yeJd4aNAdYZQjaon2bpD/Gb0B/omw7HQOsynXXcOiWVCacbBcPlgn8S/d1X6blFSaHao7ozqtW7NZW19xpCtIw==}
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
@@ -4721,8 +4715,6 @@ snapshots:
       '@types/node': 26.4.1
       merge-stream: 2.0.0
       supports-color: 8.1.1
-
-  js-cookie@3.0.8: {}
 
   js-tokens@10.0.0: {}
 
