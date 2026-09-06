@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-mptt-admin"
-version = "2.10.0"
+version = "2.11.0"
 description = "Django-mptt-admin provides a nice Django Admin interface for Mptt models"
 readme = "README.md"
 license = "Apache-2.0"
