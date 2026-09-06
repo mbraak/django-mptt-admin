@@ -145,9 +145,10 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**2.11.0** (september 6 2026)
 
 - Issue #782. Use CSS animations (instead of jQuery animations).
+- Publish releases to PyPI from a GitHub Actions workflow. The package metadata moved from `setup.py` to `pyproject.toml`.
 
 **2.10.0** (august 6 2026)
 

@@ -1,1 +1,2 @@
-mkdocs==1.6.1
+properdocs==1.6.7
+mkdocs-materialx==10.2.0

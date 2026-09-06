@@ -1,0 +1,118 @@
+name: Release
+
+# A tag push does a real release. A manual run (workflow_dispatch) is always a
+# dry run: it publishes to TestPyPI and creates a draft GitHub release.
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build package
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v7
+
+      - name: Read the package version
+        id: version
+        run: |
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check that the tag matches the package version
+        if: github.event_name == 'push'
+        run: |
+          if [ "${{ steps.version.outputs.version }}" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match version ${{ steps.version.outputs.version }} in pyproject.toml"
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install javascript packages
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build javascript
+        working-directory: ./frontend
+        run: pnpm run build
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Build python package
+        run: |
+          pip install build twine
+          python -m build
+          twine check --strict dist/*
+
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to ${{ github.event_name == 'workflow_dispatch' && 'TestPyPI' || 'PyPI' }}
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'workflow_dispatch' && 'testpypi' || 'pypi' }}
+      url: https://${{ github.event_name == 'workflow_dispatch' && 'test.pypi.org' || 'pypi.org' }}/project/django-mptt-admin/${{ needs.build.outputs.version }}/
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        if: github.event_name == 'push'
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+      - name: Publish to TestPyPI (dry run)
+        if: github.event_name == 'workflow_dispatch'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+
+  github-release:
+    name: Create GitHub release
+    needs: [build, publish]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.build.outputs.version }}
+          draft: ${{ github.event_name == 'workflow_dispatch' }}
+          files: dist/*
+          generate_release_notes: true

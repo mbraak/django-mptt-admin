@@ -3,3 +3,5 @@ include README.md
 recursive-include django_mptt_admin/templates *
 recursive-include django_mptt_admin/static *
 recursive-include django_mptt_admin/locale *
+exclude django_mptt_admin/static/django_mptt_admin/django_mptt_admin.coverage.js
+exclude django_mptt_admin/static/django_mptt_admin/django_mptt_admin.coverage.js.map
