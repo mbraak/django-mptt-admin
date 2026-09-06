@@ -4,7 +4,7 @@ django-webtest==1.9.14
 cssselect==1.5.0
 lxml==6.1.2
 playwright==1.62.0
-psycopg==3.3.4
+psycopg==3.3.5
 pyquery==2.1.0
 waitress==3.0.2
 WebOb==1.8.11
