@@ -1,43 +1,24 @@
-import "jqtree";
+import type { Node, TreeEvent, TreeEvents } from "tree-element";
+
+import TreeElement from "tree-element";
 
 export interface InitTreeOptions {
-    animationSpeed: null | number | string;
+    animationSpeed?: number | string;
     autoEscape: boolean;
     autoOpen: boolean | number;
     csrfCookieName: string;
     dragAndDrop: boolean;
     hasAddPermission: boolean;
     hasChangePermission: boolean;
-    mouseDelay: null | number;
+    insertAtUrl?: string;
+    mouseDelay?: number;
     rtl: boolean;
-}
-
-interface JQTreeLoadDataEvent extends JQuery.Event {
-    parent_node: INode | null;
-}
-
-interface JQTreeLoadingEvent extends JQuery.Event {
-    isLoading: boolean;
-    node: INode | null;
-}
-
-interface JQTreeMoveEvent extends JQuery.Event {
-    move_info: {
-        do_move: () => void;
-        moved_node: INode;
-        position: string;
-        target_node: INode;
-    };
-}
-
-interface JQTreeSelectEvent extends JQuery.Event {
-    deselected_node: INode | null;
-    node: INode | null;
-    previous_node: INode | null;
+    saveState?: string;
+    useContextMenu?: boolean;
 }
 
 function initTree(
-    $tree: JQuery,
+    treeElement: HTMLElement,
     {
         animationSpeed,
         autoEscape,
@@ -46,42 +27,60 @@ function initTree(
         dragAndDrop,
         hasAddPermission,
         hasChangePermission,
+        insertAtUrl,
         mouseDelay,
         rtl,
+        saveState,
+        useContextMenu
     }: InitTreeOptions
 ) {
-    let errorNode: INode | null = null;
+    let errorNode: Node | null = null;
     const baseUrl = "http://example.com";
-    const insertAtUrl = new URL($tree.data("insert_at_url") as string, baseUrl);
+    const insertAtUrlObject = insertAtUrl ? new URL(insertAtUrl, baseUrl) : undefined;
 
-    function createLi(node: INode, $li: JQuery, isSelected: boolean) {
+    function createLi(node: Node, liElement: HTMLElement, isSelected: boolean) {
         if (node.id == null) {
             return;
         }
 
+        const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title")
+
+        /* istanbul ignore if */
+        if (!titleElement) {
+            return;
+        }
+
         // Create edit link
-        const $title = $li.find(".jqtree-title");
-
-        insertAtUrl.searchParams.set("insert_at", node.id.toString());
-
-        const insertUrlString = insertAtUrl
-            .toString()
-            .substring(baseUrl.length);
-
-        const tabindex = isSelected ? "0" : "-1";
+        const tabindex = isSelected ? 0 : -1;
         const editCaption = hasChangePermission
             ? gettext("edit")
             : gettext("view");
 
-        $title.after(
-            `<a href="${node.url as string
-            }" class="edit" tabindex="${tabindex}">(${editCaption})</a>`,
-            hasAddPermission
-                ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext(
-                    "add"
-                )})</a>`
-                : ""
-        );
+        const editElement = document.createElement("a");
+        editElement.className = "edit";
+        editElement.href = node.url as string;
+        editElement.tabIndex = tabindex;
+        editElement.text = `(${editCaption})`;
+
+        titleElement.after(editElement);
+
+        if (hasAddPermission && insertAtUrlObject) {
+            insertAtUrlObject.searchParams.set("insert_at", node.id.toString());
+
+            const insertUrlString = insertAtUrlObject
+                .toString()
+                .substring(baseUrl.length);
+
+            const addElement = document.createElement("a");
+            addElement.className = "edit";
+            addElement.href = insertUrlString;
+            addElement.tabIndex = tabindex;
+
+            const addCaption = gettext("add");
+            addElement.text = `(${addCaption})`;
+
+            titleElement.after(addElement);
+        }
     }
 
     function getCookie(name: string): string | undefined {
@@ -116,67 +115,76 @@ function initTree(
         return getFromCookie() ?? getFromMiddleware() ?? "";
     }
 
-    function handleMove(eventParam: JQuery.Event) {
-        const e = eventParam as JQTreeMoveEvent;
-        const info = e.move_info;
+    function handleMove(eventParam: Event) {
+        const e = eventParam as TreeEvent<"tree.move">;
+        const info = e.detail.moveInfo;
 
-        if (!info.moved_node.element) {
+        if (!info.movedNode.element) {
             return;
         }
 
-        const $el = jQuery(info.moved_node.element);
+        const htmlElement = info.movedNode.element;
 
-        const data = {
+        const body = new URLSearchParams({
             position: info.position,
-            target_id: info.target_node.id,
-        };
+            target_id: String(info.targetNode.id),
+        });
 
-        handleLoading(null);
+        handleLoading();
 
         removeErrorMessage();
 
         e.preventDefault();
 
-        void jQuery.ajax({
-            beforeSend: (xhr) => {
-                // Set Django csrf token
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-            data,
-            error: () => {
-                handleLoaded(null);
-                const $node = $el.find(".jqtree-element");
-                $node.append(
-                    `<span class="mptt-admin-error">${gettext(
-                        "move failed"
-                    )}</span>`
-                );
+        function handleError() {
+            handleLoaded();
+            const errorElement = document.createElement("span");
+            errorElement.className = "mptt-admin-error";
+            errorElement.textContent = gettext("move failed");
 
-                errorNode = info.moved_node;
+            const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+            nodeElement?.append(errorElement);
+
+            errorNode = info.movedNode;
+        }
+
+        void fetch(info.movedNode.move_url as string, {
+            body,
+            headers: {
+                // Set Django csrf token
+                "X-CSRFToken": getCsrfToken(),
             },
-            success: () => {
-                info.do_move();
-                handleLoaded(null);
+            method: "POST",
+        }).then(
+            (response) => {
+                if (response.ok) {
+                    info.doMove();
+                    handleLoaded();
+                } else {
+                    handleError();
+                }
             },
-            type: "POST",
-            url: info.moved_node.move_url as string,
-        });
+            () => {
+                handleError();
+            }
+        );
 
         function removeErrorMessage() {
             if (errorNode?.element) {
-                jQuery(errorNode.element).find(".mptt-admin-error").remove();
+                const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
+                errorElement?.remove();
                 errorNode = null;
             }
         }
     }
 
     function handleLoadFailed() {
-        $tree.html(gettext("Error while loading the data from the server"));
+        treeElement.textContent = gettext("Error while loading the data from the server");
     }
 
     const spinners: Record<number | string, HTMLElement | null> = {};
 
-    function getSpinnerId(node: INode | null): null | number | string {
+    function getSpinnerId(node: Node | undefined): null | number | string {
         if (!node) {
             return "__root__";
         } else {
@@ -188,12 +196,13 @@ function initTree(
         }
     }
 
-    function handleLoading(node: INode | null) {
+    function handleLoading(node?: Node) {
         function getContainer() {
             if (node) {
-                return node.element;
+                // display the spinner next to the title of the node
+                return node.element?.querySelector(":scope > .jqtree-element");
             } else {
-                return $tree.get(0);
+                return treeElement;
             }
         }
 
@@ -210,7 +219,7 @@ function initTree(
         spinners[spinnerId] = spinner;
     }
 
-    function handleLoaded(node: INode | null) {
+    function handleLoaded(node?: Node) {
         const spinnerId = getSpinnerId(node);
 
         if (spinnerId == null) {
@@ -224,34 +233,44 @@ function initTree(
         }
     }
 
-    function handleSelect(eventParam: JQuery.Event) {
-        const e = eventParam as JQTreeSelectEvent;
-        const { deselected_node, node, previous_node } = e;
+    function setEditTabIndex(nodeElement: HTMLElement, tabIndex: number) {
+        const editElements = nodeElement.querySelectorAll<HTMLElement>(":scope > .jqtree-element > .edit");
 
-        const deselectedElement = deselected_node?.element ?? previous_node?.element;
-        if (deselectedElement) {
+        for (const editElement of editElements) {
+            editElement.tabIndex = tabIndex;
+        }
+    }
+
+    function handleSelect(e: CustomEvent<TreeEvents["tree.select"]>) {
+        const { deselectedNode, node } = e.detail;
+
+        if (deselectedNode?.element) {
             // deselected node: remove tabindex
-            jQuery(deselectedElement).find("> .jqtree-element .edit").attr("tabindex", -1);
+            setEditTabIndex(deselectedNode.element, -1);
         }
 
         // selected: add tabindex
-        if (node?.element) {
-            jQuery(node.element).find("> .jqtree-element .edit").attr("tabindex", 0);
+        /* istanbul ignore else */
+        if (node.element) {
+            setEditTabIndex(node.element, 0);
         }
     }
 
-    function handleLoadingEvent(e: JQuery.Event) {
-        const { isLoading, node } = e as JQTreeLoadingEvent;
+    function handleDeselect(e: CustomEvent<TreeEvents["tree.deselect"]>) {
+        const { node } = e.detail;
 
-        if (isLoading) {
-            handleLoading(node);
+        /* istanbul ignore else */
+        if (node.element) {
+            setEditTabIndex(node.element, -1);
         }
     }
 
-    function handleLoadDataEvent(e: JQuery.Event) {
-        const { parent_node } = e as JQTreeLoadDataEvent;
+    function handleLoadingEvent(e: CustomEvent<TreeEvents["tree.loading_data"]>) {
+        handleLoading(e.detail.node);
+    }
 
-        handleLoaded(parent_node);
+    function handleLoadedDataEvent(e: CustomEvent<TreeEvents["tree.loaded_data"]>) {
+        handleLoaded(e.detail.node);
     }
 
     const treeOptions: Record<string, unknown> = {
@@ -261,12 +280,11 @@ function initTree(
         closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
         dragAndDrop: dragAndDrop && hasChangePermission,
         onCreateLi: createLi,
-        onLoadFailed: handleLoadFailed,
-        saveState: $tree.data("save_state") as boolean,
-        useContextMenu: Boolean($tree.data("use_context_menu")),
+        saveState,
+        useContextMenu,
     };
 
-    if (animationSpeed !== null) {
+    if (animationSpeed !== undefined) {
         treeOptions.animationSpeed = animationSpeed;
     }
 
@@ -274,12 +292,20 @@ function initTree(
         treeOptions.startDndDelay = mouseDelay;
     }
 
-    $tree.on("tree.loading_data", handleLoadingEvent);
-    $tree.on("tree.load_data", handleLoadDataEvent);
-    $tree.on("tree.move", handleMove);
-    $tree.on("tree.select", handleSelect);
+    treeElement.addEventListener("tree.deselect", handleDeselect);
+    treeElement.addEventListener("tree.load_failed", handleLoadFailed);
+    treeElement.addEventListener("tree.loading_data", handleLoadingEvent);
+    treeElement.addEventListener("tree.loaded_data", handleLoadedDataEvent);
+    treeElement.addEventListener("tree.move", handleMove);
+    treeElement.addEventListener("tree.select", handleSelect);
 
-    $tree.tree(treeOptions);
+    new TreeElement({
+        ...treeOptions,
+        classPrefix: "jqtree",
+        commonClassName: "jqtree_common",
+        htmlElement: treeElement,
+        treeClassName: "jqtree-tree"
+    })
 }
 
 export default initTree;

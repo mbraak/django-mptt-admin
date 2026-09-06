@@ -1,5 +1,7 @@
+import type { Node } from "tree-element";
+
 import { screen, waitFor, within } from "@testing-library/dom";
-import { jQuery } from "jquery";
+import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import {
@@ -31,6 +33,7 @@ const defaultTreeData = [
 ];
 let treeData = {};
 let csrfTokenInRequest: null | string = null;
+let user: UserEvent;
 
 const server = setupServer();
 
@@ -60,6 +63,8 @@ beforeEach(() => {
     );
 
     document.body.innerHTML = "";
+    localStorage.clear();
+    user = userEvent.setup();
 });
 
 const createTreeElement = (dataUrl = "/tree") => {
@@ -76,21 +81,29 @@ const initTestTree = (
     paramOptions?: Partial<InitTreeOptions>
 ) => {
     const defaultOptions: InitTreeOptions = {
-        animationSpeed: null,
         autoEscape: false,
         autoOpen: false,
         csrfCookieName: "csrf",
         dragAndDrop: false,
         hasAddPermission: true,
         hasChangePermission: true,
-        mouseDelay: null,
+        insertAtUrl: "/add",
         rtl: false,
     };
 
-    const $tree = jQuery(treeElement);
     const options = { ...defaultOptions, ...paramOptions };
 
-    initTree($tree, options);
+    initTree(treeElement, options);
+};
+
+const dispatchTreeEvent = (
+    treeElement: HTMLElement,
+    name: string,
+    detail: Record<string, unknown>
+) => {
+    treeElement.dispatchEvent(
+        new CustomEvent(name, { bubbles: true, cancelable: true, detail })
+    );
 };
 
 const getNodeElement = (name: string): HTMLElement => {
@@ -113,11 +126,85 @@ test("initializes the tree", async () => {
 });
 
 test("displays a message when the data cannot be loaded", async () => {
-    initTestTree(createTreeElement("/no_data"));
+    const treeElement = createTreeElement("/no_data");
+    initTestTree(treeElement);
+
+    const spinner = treeElement.querySelector(".jqtree-spin");
+    expect(spinner).toBeInTheDocument();
+    expect(spinner?.parentElement).toBe(treeElement);
 
     expect(
         await screen.findByText("Error while loading the data from the server")
     ).toBeInTheDocument();
+
+    // the message replaces the spinner
+    expect(document.querySelector(".jqtree-spin")).not.toBeInTheDocument();
+});
+
+test("displays a spinner while the data is loading", async () => {
+    const treeElement = createTreeElement();
+    initTestTree(treeElement);
+
+    const spinner = treeElement.querySelector(".jqtree-spin");
+    expect(spinner).toBeInTheDocument();
+    expect(spinner?.parentElement).toBe(treeElement);
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+    expect(treeElement.querySelector(".jqtree-spin")).not.toBeInTheDocument();
+});
+
+test("displays a spinner while the data of a node is loading", async () => {
+    treeData = [
+        {
+            id: 1,
+            load_on_demand: true,
+            name: "root",
+            url: "/edit/1",
+        },
+    ];
+
+    // the request for the children of the root node is delayed, so that the
+    // test can check the spinner while the node is loading
+    let sendChildren = () => {
+        // do nothing
+    };
+    const childrenRequested = new Promise<void>((resolve) => {
+        sendChildren = resolve;
+    });
+
+    server.use(
+        http.get("/tree", async ({ request }) => {
+            const nodeId = new URL(request.url).searchParams.get("node");
+
+            if (nodeId !== "1") {
+                return HttpResponse.json(treeData);
+            }
+
+            await childrenRequested;
+            return HttpResponse.json([
+                { id: 2, name: "Africa", url: "/edit/2" },
+            ]);
+        })
+    );
+
+    // autoOpen opens the root node, which loads its children from the server
+    initTestTree(createTreeElement(), { autoOpen: true });
+
+    // the spinner is displayed next to the title of the node
+    await waitFor(() => {
+        expect(
+            getNodeElement("root").querySelector(
+                ":scope > .jqtree-element > .jqtree-spin"
+            )
+        ).toBeInTheDocument();
+    });
+
+    sendChildren();
+
+    expect(
+        await screen.findByRole("treeitem", { name: "Africa" })
+    ).toBeInTheDocument();
+    expect(document.querySelector(".jqtree-spin")).not.toBeInTheDocument();
 });
 
 test("adds edit links when hasChangePermission is true", async () => {
@@ -208,6 +295,193 @@ test("renders a link for a closed node with rtl is true", async () => {
     expect(screen.getByText("◀")).toBeInTheDocument();
 });
 
+test("renders the button on the left when rtl is true", async () => {
+    initTestTree(createTreeElement(), { rtl: true });
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    // the button is placed before the title of the node
+    const button = screen.getByText("◀");
+    expect(button).toHaveClass("jqtree-toggler-left");
+    expect(button.parentElement?.firstElementChild).toBe(button);
+});
+
+test("renders the button on the right when rtl is false", async () => {
+    initTestTree(createTreeElement(), { rtl: false });
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    // the button is placed after the title of the node
+    const button = screen.getByText("►");
+    expect(button).toHaveClass("jqtree-toggler-right");
+    expect(button.parentElement?.lastElementChild).toBe(button);
+});
+
+describe("autoOpen", () => {
+    test("opens the nodes when autoOpen is true", async () => {
+        initTestTree(createTreeElement(), { autoOpen: true });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+        expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
+            "aria-expanded",
+            "true"
+        );
+    });
+
+    test("opens the nodes up to the level of autoOpen", async () => {
+        initTestTree(createTreeElement(), { autoOpen: 0 });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+        expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
+            "aria-expanded",
+            "true"
+        );
+    });
+
+    test("keeps the nodes closed when autoOpen is false", async () => {
+        initTestTree(createTreeElement(), { autoOpen: false });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+        expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
+            "aria-expanded",
+            "false"
+        );
+    });
+});
+
+describe("autoEscape", () => {
+    beforeEach(() => {
+        treeData = [
+            {
+                children: [],
+                id: 1,
+                name: "<b>root</b>",
+                url: "/edit/1",
+            },
+        ];
+    });
+
+    test("escapes the node name when autoEscape is true", async () => {
+        initTestTree(createTreeElement(), { autoEscape: true });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+        expect(title).toHaveTextContent("<b>root</b>");
+        expect(title.querySelector("b")).toBeNull();
+    });
+
+    test("renders the node name as html when autoEscape is false", async () => {
+        initTestTree(createTreeElement(), { autoEscape: false });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+        expect(title).toHaveTextContent("root");
+        expect(title.querySelector("b")).toBeInTheDocument();
+    });
+});
+
+describe("dragAndDrop", () => {
+    test("enables drag and drop", async () => {
+        initTestTree(createTreeElement(), {
+            dragAndDrop: true,
+            hasChangePermission: true,
+        });
+
+        expect(await screen.findByRole("tree")).toHaveClass("jqtree-dnd");
+    });
+
+    test("doesn't enable drag and drop when dragAndDrop is false", async () => {
+        initTestTree(createTreeElement(), {
+            dragAndDrop: false,
+            hasChangePermission: true,
+        });
+
+        expect(await screen.findByRole("tree")).not.toHaveClass(
+            "jqtree-dnd"
+        );
+    });
+
+    test("doesn't enable drag and drop without change permission", async () => {
+        initTestTree(createTreeElement(), {
+            dragAndDrop: true,
+            hasChangePermission: false,
+        });
+
+        expect(await screen.findByRole("tree")).not.toHaveClass(
+            "jqtree-dnd"
+        );
+    });
+});
+
+describe("saveState", () => {
+    test("saves the state of the tree", async () => {
+        initTestTree(createTreeElement(), { saveState: "myapp_mymodel" });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        // open the root node
+        await user.click(screen.getByText("►"));
+
+        await waitFor(() => {
+            expect(localStorage.getItem("myapp_mymodel")).toEqual(
+                JSON.stringify({ open_nodes: [1], selected_node: [] })
+            );
+        });
+    });
+
+    test("doesn't save the state when saveState is undefined", async () => {
+        initTestTree(createTreeElement(), { saveState: undefined });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        await user.click(screen.getByText("►"));
+
+        expect(localStorage).toHaveLength(0);
+    });
+});
+
+describe("useContextMenu", () => {
+    const rightClickNode = async (name: string) => {
+        await user.pointer({
+            keys: "[MouseRight]",
+            target: screen.getByRole("treeitem", { name }),
+        });
+    };
+
+    test("triggers a contextmenu event when useContextMenu is true", async () => {
+        const treeElement = createTreeElement();
+        const handleContextMenu = vi.fn();
+        treeElement.addEventListener("tree.contextmenu", handleContextMenu);
+
+        initTestTree(treeElement, { autoOpen: true, useContextMenu: true });
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        await rightClickNode("Africa");
+
+        expect(handleContextMenu).toHaveBeenCalledOnce();
+
+        const event = handleContextMenu.mock.calls[0]?.[0] as CustomEvent<{
+            node: Node;
+        }>;
+        expect(event.detail.node.name).toEqual("Africa");
+    });
+
+    test("doesn't trigger a contextmenu event when useContextMenu is undefined", async () => {
+        const treeElement = createTreeElement();
+        const handleContextMenu = vi.fn();
+        treeElement.addEventListener("tree.contextmenu", handleContextMenu);
+
+        initTestTree(treeElement, { autoOpen: true });
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        await rightClickNode("Africa");
+
+        expect(handleContextMenu).not.toHaveBeenCalled();
+    });
+});
+
 describe("tree.move event", () => {
     const triggerTreeMove = (
         treeElement: HTMLElement,
@@ -224,16 +498,16 @@ describe("tree.move event", () => {
             id: 2,
         };
 
-        const move_info = {
-            do_move: doMove,
-            moved_node: movedNode,
-            original_event: {},
+        const moveInfo = {
+            doMove,
+            movedNode,
+            originalEvent: {},
             position: "after",
-            previous_parent: null,
-            target_node: targetNode,
+            previousParent: null,
+            targetNode,
         };
 
-        jQuery(treeElement).trigger(jQuery.Event("tree.move", { move_info }));
+        dispatchTreeEvent(treeElement, "tree.move", { moveInfo });
 
         return doMove;
     };
@@ -296,7 +570,7 @@ describe("tree.move event", () => {
         expect(requestPaths).toEqual(["/move"]);
     });
 
-    test("calls do_move", async () => {
+    test("calls doMove", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();
@@ -417,7 +691,7 @@ describe("tree.move event", () => {
     });
 });
 
-describe("tree.select event", () => {
+describe("selecting a node", () => {
     const getNodeLinks = (nodeElement: HTMLElement) => {
         const elementDiv = nodeElement.querySelector<HTMLElement>(
             ":scope > .jqtree-element"
@@ -433,21 +707,8 @@ describe("tree.select event", () => {
         };
     };
 
-    const triggerTreeSelect = (
-        treeElement: HTMLElement,
-        {
-            deselected_node = null,
-            node = null,
-            previous_node = null,
-        }: {
-            deselected_node?: null | object;
-            node?: null | object;
-            previous_node?: null | object;
-        }
-    ) => {
-        jQuery(treeElement).trigger(
-            jQuery.Event("tree.select", { deselected_node, node, previous_node })
-        );
+    const clickNode = async (name: string) => {
+        await user.click(screen.getByRole("treeitem", { name }));
     };
 
     test("sets the tabindex of the edit links when a node is selected", async () => {
@@ -456,19 +717,12 @@ describe("tree.select event", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const africaElement = getNodeElement("Africa");
-        const editLink = within(africaElement).getByRole("link", {
-            name: "(edit)",
-        });
-        const addLink = within(africaElement).getByRole("link", {
-            name: "(add)",
-        });
+        const { addLink, editLink } = getNodeLinks(africaElement);
 
         expect(editLink).toHaveAttribute("tabindex", "-1");
         expect(addLink).toHaveAttribute("tabindex", "-1");
 
-        triggerTreeSelect(treeElement, {
-            node: { element: africaElement, id: 2 },
-        });
+        await clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "0");
         expect(addLink).toHaveAttribute("tabindex", "0");
@@ -479,42 +733,15 @@ describe("tree.select event", () => {
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const africaElement = getNodeElement("Africa");
-        const { addLink, editLink } = getNodeLinks(africaElement);
+        const { addLink, editLink } = getNodeLinks(getNodeElement("Africa"));
 
-        triggerTreeSelect(treeElement, {
-            node: { element: africaElement, id: 2 },
-        });
+        await clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "0");
         expect(addLink).toHaveAttribute("tabindex", "0");
 
-        triggerTreeSelect(treeElement, {
-            deselected_node: { element: africaElement, id: 2 },
-        });
-
-        expect(editLink).toHaveAttribute("tabindex", "-1");
-        expect(addLink).toHaveAttribute("tabindex", "-1");
-    });
-
-    test("resets the tabindex of the edit links using previous_node when deselected_node is empty", async () => {
-        const treeElement = createTreeElement();
-        initTestTree(treeElement);
-        expect(await screen.findByRole("tree")).toBeInTheDocument();
-
-        const africaElement = getNodeElement("Africa");
-        const { addLink, editLink } = getNodeLinks(africaElement);
-
-        triggerTreeSelect(treeElement, {
-            node: { element: africaElement, id: 2 },
-        });
-
-        expect(editLink).toHaveAttribute("tabindex", "0");
-        expect(addLink).toHaveAttribute("tabindex", "0");
-
-        triggerTreeSelect(treeElement, {
-            previous_node: { element: africaElement, id: 2 },
-        });
+        // clicking the selected node deselects it
+        await clickNode("Africa");
 
         expect(editLink).toHaveAttribute("tabindex", "-1");
         expect(addLink).toHaveAttribute("tabindex", "-1");
@@ -525,25 +752,17 @@ describe("tree.select event", () => {
         initTestTree(treeElement);
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const rootElement = getNodeElement("root");
-        const africaElement = getNodeElement("Africa");
+        const rootLinks = getNodeLinks(getNodeElement("root"));
+        const africaLinks = getNodeLinks(getNodeElement("Africa"));
 
-        const rootLinks = getNodeLinks(rootElement);
-        const africaLinks = getNodeLinks(africaElement);
-
-        triggerTreeSelect(treeElement, {
-            node: { element: rootElement, id: 1 },
-        });
+        await clickNode("root");
 
         expect(rootLinks.editLink).toHaveAttribute("tabindex", "0");
         expect(rootLinks.addLink).toHaveAttribute("tabindex", "0");
         expect(africaLinks.editLink).toHaveAttribute("tabindex", "-1");
         expect(africaLinks.addLink).toHaveAttribute("tabindex", "-1");
 
-        triggerTreeSelect(treeElement, {
-            deselected_node: { element: rootElement, id: 1 },
-            node: { element: africaElement, id: 2 },
-        });
+        await clickNode("Africa");
 
         expect(rootLinks.editLink).toHaveAttribute("tabindex", "-1");
         expect(rootLinks.addLink).toHaveAttribute("tabindex", "-1");

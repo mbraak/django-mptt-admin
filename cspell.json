@@ -9,6 +9,7 @@
     "csrfmiddlewaretoken",
     "jqtree",
     "mptt",
+    "mymodel",
     "rght",
     "tabindex",
     "testcsrf",
