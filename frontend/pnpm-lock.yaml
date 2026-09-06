@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       tree-element:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.1.1
+        version: 0.1.1
     devDependencies:
       '@babel/core':
         specifier: ^8.0.1
@@ -2558,8 +2558,8 @@ packages:
     resolution: {integrity: sha512-bLVMLPtstlZ4iMQHpFHTR7GAGj2jxi8Dg0s2h2MafAE4uSWF98FC/3MomU51iQAMf8/qDUbKWf5GxuvvVcXEhw==}
     engines: {node: '>=20'}
 
-  tree-element@0.1.0:
-    resolution: {integrity: sha512-K2q4jZnJ3Pn2kBguzbrkANTv8Fjqmrkrn6eLRWIqCEzc26smOb1ZOI1a3xyh4CMdjqATWPFJWczgdbwKakMxYQ==}
+  tree-element@0.1.1:
+    resolution: {integrity: sha512-/KH6wogePG17BdSZ800Y3P0aMck1/cSI9DZ6kM0nufJYRrQMbyfnaXaZhgnod1KLznJ6oKIwVTgqyWkp/CRn4w==}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -5210,7 +5210,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  tree-element@0.1.0: {}
+  tree-element@0.1.1: {}
 
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:

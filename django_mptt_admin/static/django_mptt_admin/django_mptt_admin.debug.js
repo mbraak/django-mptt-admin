@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/classNames.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/classNames.js
 const DEFAULT_CLASS_PREFIX = "tree-element";
 
 /* Create the class names that the widget puts on the elements it creates.
@@ -41,7 +41,7 @@ const createClassNames = ({
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dataLoader.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dataLoader.js
 class DataLoader {
   _abortController;
   _classNames;
@@ -104,14 +104,17 @@ class DataLoader {
         // The request was aborted by deinit.
         return;
       }
-      throw error;
+      stopLoading();
+      this._triggerEvent("tree.load_failed", {
+        error
+      });
     });
   }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/positionUtils.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/positionUtils.js
 // Get the top position of the HTML element.
 const getOffsetTop = element => getElementPosition(element).top;
 
@@ -126,7 +129,7 @@ const getElementPosition = element => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
 function binarySearch(items, compareFn) {
   let low = 0;
   let high = items.length;
@@ -150,7 +153,7 @@ function binarySearch(items, compareFn) {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
 class DragElement {
   _element;
   _offsetX;
@@ -190,7 +193,7 @@ class DragElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
 const iterateVisibleNodes = (tree, {
   handleAfterOpenFolder,
   handleClosedFolder,
@@ -245,7 +248,7 @@ const iterateVisibleNodes = (tree, {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
 
 
 
@@ -376,7 +379,7 @@ const generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFrom
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/dragAndDropHandler/index.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/index.js
 
 
 
@@ -688,13 +691,13 @@ class DragAndDropHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/util.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/util.js
 const isInt = n => typeof n === "number" && n % 1 === 0;
 const getBoolString = value => value ? "true" : "false";
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/elementsRenderer.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/elementsRenderer.js
 
 
 class ElementsRenderer {
@@ -946,7 +949,7 @@ class ElementsRenderer {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/keyHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/keyHandler.js
 class KeyHandler {
   _closeNode;
   _getSelectedNode;
@@ -1054,7 +1057,7 @@ class KeyHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/mouseUtils.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/mouseUtils.js
 const getPositionInfoFromMouseEvent = e => ({
   originalEvent: e,
   pageX: e.pageX,
@@ -1070,7 +1073,7 @@ const getPositionInfoFromTouch = (touch, e) => ({
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/mouseHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/mouseHandler.js
 
 
 class MouseHandler {
@@ -1354,12 +1357,12 @@ class MouseHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeUtils.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeUtils.js
 const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/node.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/node.js
 
 
 /*
@@ -2097,7 +2100,7 @@ class Node {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/borderDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/borderDropHint.js
 class BorderDropHint {
   _hint;
   constructor(element, scrollLeft, classNames) {
@@ -2122,7 +2125,7 @@ class BorderDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
 class GhostDropHint {
   _classNames;
   _element;
@@ -2190,7 +2193,7 @@ class GhostDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/index.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/index.js
 
 
 
@@ -2257,7 +2260,7 @@ class NodeElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/animation.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/animation.js
 const getAnimationDuration = duration => {
   if (typeof duration === "number") {
     return duration;
@@ -2297,7 +2300,7 @@ const slideUp = (element, animationSpeed, onFinished) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/nodeElement/folderElement.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/folderElement.js
 
 
 
@@ -2398,7 +2401,7 @@ class FolderElement extends NodeElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/requestUrl.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/requestUrl.js
 // Url class for absolute and relative urls.
 
 const isAbsoluteUrl = inputUrl => {
@@ -2436,7 +2439,7 @@ class RequestUrl {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/saveStateHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/saveStateHandler.js
 
 
 class SaveStateHandler {
@@ -2641,7 +2644,7 @@ class SaveStateHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/scrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/scrollParent.js
 class ScrollParent {
   _container;
   _horizontalScrollDirection;
@@ -2721,7 +2724,7 @@ class ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
 
 
 
@@ -2771,7 +2774,7 @@ class ContainerScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
 
 
 
@@ -2843,7 +2846,7 @@ class DocumentScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
 
 
 
@@ -2882,7 +2885,7 @@ const createScrollParent = (treeElement, refreshHitAreas) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/scrollHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler.js
 
 
 class ScrollHandler {
@@ -2924,7 +2927,7 @@ class ScrollHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/selectNodeHandler.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/selectNodeHandler.js
 class SelectNodeHandler {
   _getNodeById;
   _getNodeElementForNode;
@@ -3091,7 +3094,7 @@ class SelectNodeHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/setDefaultOptions.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/setDefaultOptions.js
 
 
 
@@ -3178,7 +3181,7 @@ const getRtlOptionFromHTMLElement = htmlElement => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/triggerCustomEvent.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/triggerCustomEvent.js
 // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
 const triggerCustomEvent = (element, eventName, values) => {
   const event = new CustomEvent(eventName, {
@@ -3192,9 +3195,9 @@ const triggerCustomEvent = (element, eventName, values) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.1.0/node_modules/tree-element/lib/index.js
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/index.js
 /*
-Html-tree 0.1.0
+Html-tree 0.1.1
 
 Copyright 2026 Marco Braak
 
@@ -3648,7 +3651,7 @@ class TreeElement {
    * @group Other
    */
   getVersion() {
-    return (/* inlined export ["default"] */"0.1.0");
+    return (/* inlined export ["default"] */"0.1.1");
   }
 
   /**
