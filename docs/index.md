@@ -145,6 +145,11 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Use a different javascript library for displaying the tree. Everything works the same.
+  The jqtree library is replaced by tree-element. Tree-element does the same as jqtree, but without jQuery.
+
 **2.11.0** (september 6 2026)
 
 - Issue #782. Use CSS animations (instead of jQuery animations).
