@@ -18,6 +18,7 @@ jobs:
         uses: preactjs/compressed-size-action@v3
         with:
           install-script: pnpm install
+          build-script: pnpm run build
           cwd: ./frontend
           pattern: "../django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js"
           compression: "none"
