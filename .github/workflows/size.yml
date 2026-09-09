@@ -15,10 +15,10 @@ jobs:
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Check compressed size
-        uses: preactjs/compressed-size-action@v3
+        uses: mbraak/compressed-size-action@master
         with:
           install-script: pnpm install
-          build-script: pnpm run build
+          build-script: build
           cwd: ./frontend
           pattern: "../django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js"
           compression: "none"
