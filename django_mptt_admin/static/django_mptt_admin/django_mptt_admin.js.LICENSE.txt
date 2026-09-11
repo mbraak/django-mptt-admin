@@ -1,5 +1,5 @@
 /*
-JqTree 1.9.0
+Html-tree 0.1.1
 
 Copyright 2026 Marco Braak
 
@@ -17,3 +17,5 @@ limitations under the License.
 @license
 
 */
+
+/* istanbul ignore next @preserve */

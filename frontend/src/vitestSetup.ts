@@ -1,14 +1,17 @@
-import { jQuery } from "jquery";
 import "@testing-library/jest-dom/vitest";
 
-declare global {
-    interface Window {
-        $: JQueryStatic;
-        jQuery: JQueryStatic;
-    }
-}
+// jsdom doesn't implement the web animations api, which tree-element uses for the
+// open and close animations
+Element.prototype.animate = () => {
+    const animation = {
+        onfinish: null as (() => void) | null,
+    };
 
-window.$ = jQuery;
-window.jQuery = jQuery;
+    queueMicrotask(() => {
+        animation.onfinish?.();
+    });
+
+    return animation as unknown as Animation;
+};
 
 window.gettext = (key) => key;

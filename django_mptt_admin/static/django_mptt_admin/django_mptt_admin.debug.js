@@ -1,11 +1,3203 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
+/******/ 	"use strict";
 
-/***/ 382
-() {
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/classNames.js
+const DEFAULT_CLASS_PREFIX = "tree-element";
+
+/* Create the class names that the widget puts on the elements it creates.
+ * They are all derived from classPrefix, except for the class of the root
+ * element and the class that every element gets, which have an option of
+ * their own.
+ */
+const createClassNames = ({
+  classPrefix,
+  commonClassName,
+  treeClassName
+}) => ({
+  border: `${classPrefix}-border`,
+  circle: `${classPrefix}-circle`,
+  closed: `${classPrefix}-closed`,
+  common: commonClassName ?? `${classPrefix}-common`,
+  dnd: `${classPrefix}-dnd`,
+  dragging: `${classPrefix}-dragging`,
+  element: `${classPrefix}-element`,
+  folder: `${classPrefix}-folder`,
+  ghost: `${classPrefix}-ghost`,
+  inside: `${classPrefix}-inside`,
+  line: `${classPrefix}-line`,
+  loading: `${classPrefix}-loading`,
+  moving: `${classPrefix}-moving`,
+  rtl: `${classPrefix}-rtl`,
+  selected: `${classPrefix}-selected`,
+  title: `${classPrefix}-title`,
+  titleButtonLeft: `${classPrefix}-title-button-left`,
+  titleButtonRight: `${classPrefix}-title-button-right`,
+  titleFolder: `${classPrefix}-title-folder`,
+  toggler: `${classPrefix}-toggler`,
+  togglerLeft: `${classPrefix}-toggler-left`,
+  togglerRight: `${classPrefix}-toggler-right`,
+  tree: treeClassName ?? classPrefix
+});
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dataLoader.js
+class DataLoader {
+  _abortController;
+  _classNames;
+  _dataFilter;
+  _loadData;
+  _treeElement;
+  _triggerEvent;
+  constructor({
+    classNames,
+    dataFilter,
+    loadData,
+    treeElement,
+    triggerEvent
+  }) {
+    this._abortController = new AbortController();
+    this._classNames = classNames;
+    this._dataFilter = dataFilter;
+    this._loadData = loadData;
+    this._treeElement = treeElement;
+    this._triggerEvent = triggerEvent;
+  }
+  deinit() {
+    this._abortController.abort();
+  }
+  async loadFromUrl(url, node) {
+    const element = node?.element ?? this._treeElement;
+    element.classList.add(this._classNames.loading);
+    this._triggerEvent("tree.loading_data", {
+      element,
+      node
+    });
+    const stopLoading = () => {
+      element.classList.remove(this._classNames.loading);
+      this._triggerEvent("tree.loaded_data", {
+        element,
+        node
+      });
+    };
+    const handleResponse = async response => {
+      if (response.ok) {
+        const data = await response.json();
+        stopLoading();
+        this._loadData(this._dataFilter ? this._dataFilter(data) : data, node);
+      } else {
+        stopLoading();
+        this._triggerEvent("tree.load_failed", {
+          response
+        });
+      }
+    };
+    const signal = this._abortController.signal;
+    url.setSearchParam("_", Date.now().toString());
+    return fetch(url.toString(), {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      signal
+    }).then(handleResponse).catch(error => {
+      if (this._abortController.signal.aborted) {
+        // The request was aborted by deinit.
+        return;
+      }
+      stopLoading();
+      this._triggerEvent("tree.load_failed", {
+        error
+      });
+    });
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/positionUtils.js
+// Get the top position of the HTML element.
+const getOffsetTop = element => getElementPosition(element).top;
+
+// Get the top left position of the HTML element.
+const getElementPosition = element => {
+  const rect = element.getBoundingClientRect();
+  return {
+    left: rect.x + window.scrollX,
+    top: rect.y + window.scrollY
+  };
+};
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
+function binarySearch(items, compareFn) {
+  let low = 0;
+  let high = items.length;
+  while (low < high) {
+    const mid = low + high >> 1;
+    const item = items[mid];
+    if (item === undefined) {
+      return null;
+    }
+    const compareResult = compareFn(item);
+    if (compareResult > 0) {
+      high = mid;
+    } else if (compareResult < 0) {
+      low = mid + 1;
+    } else {
+      return item;
+    }
+  }
+  return null;
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
+class DragElement {
+  _element;
+  _offsetX;
+  _offsetY;
+  constructor({
+    autoEscape,
+    classNames,
+    nodeName,
+    offsetX,
+    offsetY,
+    treeElement
+  }) {
+    this._offsetX = offsetX;
+    this._offsetY = offsetY;
+    this._element = this._createElement(nodeName, autoEscape, classNames);
+    treeElement.appendChild(this._element);
+  }
+  move(pageX, pageY) {
+    this._element.style.left = `${pageX - this._offsetX}px`;
+    this._element.style.top = `${pageY - this._offsetY}px`;
+  }
+  remove() {
+    this._element.remove();
+  }
+  _createElement(nodeName, autoEscape, classNames) {
+    const element = document.createElement("span");
+    element.classList.add(classNames.title, classNames.dragging);
+    if (autoEscape) {
+      element.textContent = nodeName;
+    } else {
+      element.innerHTML = nodeName;
+    }
+    element.style.position = "absolute";
+    return element;
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
+const iterateVisibleNodes = (tree, {
+  handleAfterOpenFolder,
+  handleClosedFolder,
+  handleFirstNode,
+  handleNode,
+  handleOpenFolder
+}) => {
+  let isFirstNode = true;
+  const iterate = (node, nextNode) => {
+    let mustIterateInside = (node.is_open === true || !node.element) && node.hasChildren();
+    let element = null;
+
+    // Is the element visible?
+    if (node.element?.offsetParent) {
+      element = node.element;
+      if (isFirstNode) {
+        handleFirstNode(node);
+        isFirstNode = false;
+      }
+      if (!node.hasChildren()) {
+        handleNode(node, nextNode, node.element);
+      } else if (node.is_open) {
+        if (!handleOpenFolder(node, node.element)) {
+          mustIterateInside = false;
+        }
+      } else {
+        handleClosedFolder(node, nextNode, element);
+      }
+    }
+    if (mustIterateInside) {
+      const childrenLength = node.children.length;
+      node.children.forEach((_, i) => {
+        const child = node.children[i];
+        if (child) {
+          if (i === childrenLength - 1) {
+            iterate(child, null);
+          } else {
+            const nextChild = node.children[i + 1];
+            if (nextChild) {
+              iterate(child, nextChild);
+            }
+          }
+        }
+      });
+      if (node.is_open && element) {
+        handleAfterOpenFolder(node, nextNode);
+      }
+    }
+  };
+  iterate(tree, null);
+};
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
+
+
+
+const generateHitPositions = (tree, currentNode) => {
+  const hitPositions = [];
+  let lastTop = 0;
+  const addHitPosition = (node, position, top) => {
+    hitPositions.push({
+      node,
+      position,
+      top
+    });
+    lastTop = top;
+  };
+  const handleAfterOpenFolder = (node, nextNode) => {
+    if (node === currentNode || nextNode === currentNode) {
+      // Cannot move before or after current item
+      addHitPosition(node, null, lastTop);
+    } else {
+      addHitPosition(node, "after", lastTop);
+    }
+  };
+  const handleClosedFolder = (node, nextNode, element) => {
+    const top = getOffsetTop(element);
+    if (node === currentNode) {
+      // Cannot move after current item
+      addHitPosition(node, null, top);
+    } else {
+      addHitPosition(node, "inside", top);
+
+      // Cannot move before current item
+      if (nextNode !== currentNode) {
+        addHitPosition(node, "after", top);
+      }
+    }
+  };
+  const handleFirstNode = node => {
+    if (node !== currentNode && node.element) {
+      addHitPosition(node, "before", getOffsetTop(node.element));
+    }
+  };
+  const handleNode = (node, nextNode, element) => {
+    const top = getOffsetTop(element);
+    if (node === currentNode) {
+      // Cannot move inside current item
+      addHitPosition(node, null, top);
+    } else {
+      addHitPosition(node, "inside", top);
+    }
+    if (nextNode === currentNode || node === currentNode) {
+      // Cannot move before or after current item
+      addHitPosition(node, null, top);
+    } else {
+      addHitPosition(node, "after", top);
+    }
+  };
+  const handleOpenFolder = (node, element) => {
+    if (node === currentNode) {
+      // Cannot move inside current item
+
+      // Dnd over the current element is not possible: add a position with type None for the top and the bottom.
+      const top = getOffsetTop(element);
+      const height = element.clientHeight;
+      addHitPosition(node, null, top);
+      if (height > 5) {
+        // Subtract 5 pixels to allow more space for the next element.
+        addHitPosition(node, null, top + height - 5);
+      }
+
+      // Stop iterating
+      return false;
+    }
+
+    // Cannot move before current item
+    if (node.children[0] !== currentNode) {
+      addHitPosition(node, "inside", getOffsetTop(element));
+    }
+
+    // Continue iterating
+    return true;
+  };
+  iterateVisibleNodes(tree, {
+    handleAfterOpenFolder,
+    handleClosedFolder,
+    handleFirstNode,
+    handleNode,
+    handleOpenFolder
+  });
+  return hitPositions;
+};
+const generateHitAreasForGroup = (hitAreas, positionsInGroup, top, bottom) => {
+  // limit positions in group
+  const positionCount = Math.min(positionsInGroup.length, 4);
+  const areaHeight = Math.round((bottom - top) / positionCount);
+  let areaTop = top;
+  for (let i = 0; i < positionCount; i++) {
+    const position = positionsInGroup[i];
+    if (position.position) {
+      hitAreas.push({
+        bottom: areaTop + areaHeight,
+        node: position.node,
+        position: position.position,
+        top: areaTop
+      });
+    }
+    areaTop += areaHeight;
+  }
+};
+const generateHitAreasFromPositions = (hitPositions, treeBottom) => {
+  if (!hitPositions.length) {
+    return [];
+  }
+  let previousTop = hitPositions[0].top;
+  let group = [];
+  const hitAreas = [];
+  for (const position of hitPositions) {
+    if (position.top !== previousTop && group.length) {
+      generateHitAreasForGroup(hitAreas, group, previousTop, position.top);
+      previousTop = position.top;
+      group = [];
+    }
+    group.push(position);
+  }
+  generateHitAreasForGroup(hitAreas, group, previousTop, treeBottom);
+  return hitAreas;
+};
+const generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPositions(generateHitPositions(tree, currentNode), treeBottom);
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/dragAndDropHandler/index.js
+
+
+
+
+
+class DragAndDropHandler {
+  currentItem;
+  hitAreas;
+  hoveredArea;
+  isDragging;
+  _autoEscape;
+  _classNames;
+  _dragElement;
+  _getNodeElement;
+  _getNodeElementForNode;
+  _getScrollLeft;
+  _getTree;
+  _onCanMove;
+  _onCanMoveTo;
+  _onDragMove;
+  _onDragStop;
+  _onIsMoveHandle;
+  _openFolderDelay;
+  _openFolderTimer;
+  _openNode;
+  _previousGhost;
+  _refreshElements;
+  _slide;
+  _treeElement;
+  _triggerEvent;
+  constructor({
+    autoEscape,
+    classNames,
+    getNodeElement,
+    getNodeElementForNode,
+    getScrollLeft,
+    getTree,
+    onCanMove,
+    onCanMoveTo,
+    onDragMove,
+    onDragStop,
+    onIsMoveHandle,
+    openFolderDelay,
+    openNode,
+    refreshElements,
+    slide,
+    treeElement,
+    triggerEvent
+  }) {
+    this._autoEscape = autoEscape;
+    this._classNames = classNames;
+    this._getNodeElement = getNodeElement;
+    this._getNodeElementForNode = getNodeElementForNode;
+    this._getScrollLeft = getScrollLeft;
+    this._getTree = getTree;
+    this._onCanMove = onCanMove;
+    this._onCanMoveTo = onCanMoveTo;
+    this._onDragMove = onDragMove;
+    this._onDragStop = onDragStop;
+    this._onIsMoveHandle = onIsMoveHandle;
+    this._openFolderDelay = openFolderDelay;
+    this._openNode = openNode;
+    this._refreshElements = refreshElements;
+    this._slide = slide;
+    this._treeElement = treeElement;
+    this._triggerEvent = triggerEvent;
+    this.hoveredArea = null;
+    this.hitAreas = [];
+    this.isDragging = false;
+    this.currentItem = null;
+    this._dragElement = null;
+    this._openFolderTimer = null;
+    this._previousGhost = null;
+  }
+  mouseCapture(positionInfo) {
+    const element = positionInfo.target;
+    if (!this._mustCaptureElement(element)) {
+      return null;
+    }
+    if (this._onIsMoveHandle && !this._onIsMoveHandle(element)) {
+      return null;
+    }
+    let nodeElement = this._getNodeElement(element);
+    if (nodeElement && this._onCanMove) {
+      if (!this._onCanMove(nodeElement.node)) {
+        nodeElement = null;
+      }
+    }
+    this.currentItem = nodeElement;
+    return this.currentItem != null;
+  }
+  mouseDrag(positionInfo) {
+    if (!this.currentItem || !this._dragElement) {
+      return false;
+    }
+    this._dragElement.move(positionInfo.pageX, positionInfo.pageY);
+    const area = this._findHoveredArea(positionInfo.pageX, positionInfo.pageY);
+    if (area && this._canMoveToArea(area, this.currentItem)) {
+      if (!area.node.isFolder()) {
+        this._stopOpenFolderTimer();
+      }
+      if (this.hoveredArea !== area) {
+        this.hoveredArea = area;
+
+        // If this is a closed folder, start timer to open it
+        if (this._mustOpenFolderTimer(area)) {
+          this._startOpenFolderTimer(area.node);
+        } else {
+          this._stopOpenFolderTimer();
+        }
+        this._updateDropHint();
+      }
+    } else {
+      this._removeDropHint();
+      this._stopOpenFolderTimer();
+      this.hoveredArea = area;
+    }
+    if (!area) {
+      if (this._onDragMove) {
+        this._onDragMove(this.currentItem.node, positionInfo.originalEvent);
+      }
+    }
+    return true;
+  }
+  mouseStart(positionInfo) {
+    if (!this.currentItem) {
+      return false;
+    }
+    this.refresh();
+    const {
+      left,
+      top
+    } = getElementPosition(positionInfo.target);
+    const node = this.currentItem.node;
+    this._dragElement = new DragElement({
+      autoEscape: this._autoEscape ?? true,
+      classNames: this._classNames,
+      nodeName: node.name,
+      offsetX: positionInfo.pageX - left,
+      offsetY: positionInfo.pageY - top,
+      treeElement: this._treeElement
+    });
+    this.isDragging = true;
+    this.currentItem.element.classList.add(this._classNames.moving);
+    return true;
+  }
+  mouseStop(positionInfo) {
+    this._moveItem(positionInfo);
+    this._clear();
+    this._removeHover();
+    this._removeDropHint();
+    this._removeHitAreas();
+    const currentItem = this.currentItem;
+    if (this.currentItem) {
+      this.currentItem.element.classList.remove(this._classNames.moving);
+      this.currentItem = null;
+    }
+    this.isDragging = false;
+    if (!this.hoveredArea && currentItem) {
+      if (this._onDragStop) {
+        this._onDragStop(currentItem.node, positionInfo.originalEvent);
+      }
+    }
+    return false;
+  }
+  refresh() {
+    this._removeHitAreas();
+    if (this.currentItem) {
+      const currentNode = this.currentItem.node;
+      this._generateHitAreas(currentNode);
+      this.currentItem = this._getNodeElementForNode(currentNode);
+      if (this.isDragging) {
+        this.currentItem.element.classList.add(this._classNames.moving);
+      }
+    }
+  }
+  _canMoveToArea(area, currentItem) {
+    if (!this._onCanMoveTo) {
+      return true;
+    }
+    return this._onCanMoveTo(currentItem.node, area.node, area.position);
+  }
+  _clear() {
+    if (this._dragElement) {
+      this._dragElement.remove();
+      this._dragElement = null;
+    }
+  }
+  _findHoveredArea(x, y) {
+    const dimensions = this._getTreeDimensions();
+    if (x < dimensions.left || y < dimensions.top || x > dimensions.right || y > dimensions.bottom) {
+      return null;
+    }
+    return binarySearch(this.hitAreas, area => {
+      if (y < area.top) {
+        return 1;
+      } else if (y > area.bottom) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+  }
+  _generateHitAreas(currentNode) {
+    const tree = this._getTree();
+    if (!tree) {
+      this.hitAreas = [];
+    } else {
+      this.hitAreas = generateHitAreas(tree, currentNode, this._getTreeDimensions().bottom);
+    }
+  }
+  _getTreeDimensions() {
+    // Return the dimensions of the tree. Add a margin to the bottom to allow
+    // to drag-and-drop after the last element.
+    const treePosition = getElementPosition(this._treeElement);
+    const left = treePosition.left + this._getScrollLeft();
+    const top = treePosition.top;
+    return {
+      bottom: top + this._treeElement.clientHeight + 16,
+      left,
+      right: left + this._treeElement.clientWidth,
+      top
+    };
+  }
+
+  /* Move the dragged node to the selected position in the tree. */
+  _moveItem(positionInfo) {
+    if (this.currentItem && this.hoveredArea?.position && this._canMoveToArea(this.hoveredArea, this.currentItem)) {
+      const movedNode = this.currentItem.node;
+      const targetNode = this.hoveredArea.node;
+      const position = this.hoveredArea.position;
+      const previousParent = movedNode.parent;
+      if (position === "inside") {
+        this.hoveredArea.node.is_open = true;
+      }
+      const doMove = () => {
+        const tree = this._getTree();
+        if (tree) {
+          tree.moveNode(movedNode, targetNode, position);
+          this._treeElement.textContent = "";
+          this._refreshElements(null);
+        }
+      };
+      if (this._triggerEvent("tree.move", {
+        moveInfo: {
+          doMove,
+          movedNode,
+          originalEvent: positionInfo.originalEvent,
+          position,
+          previousParent,
+          targetNode
+        }
+      })) {
+        doMove();
+      }
+    }
+  }
+  _mustCaptureElement(element) {
+    const nodeName = element.nodeName;
+    return nodeName !== "INPUT" && nodeName !== "SELECT" && nodeName !== "TEXTAREA";
+  }
+  _mustOpenFolderTimer(area) {
+    const node = area.node;
+    return node.isFolder() && !node.is_open && area.position === "inside";
+  }
+  _removeDropHint() {
+    if (this._previousGhost) {
+      this._previousGhost.remove();
+    }
+  }
+  _removeHitAreas() {
+    this.hitAreas = [];
+  }
+  _removeHover() {
+    this.hoveredArea = null;
+  }
+  _startOpenFolderTimer(folder) {
+    const openFolder = () => {
+      void this._openNode(folder, this._slide).then(() => {
+        this.refresh();
+        this._updateDropHint();
+      });
+    };
+    this._stopOpenFolderTimer();
+    const openFolderDelay = this._openFolderDelay;
+    if (openFolderDelay !== false) {
+      this._openFolderTimer = window.setTimeout(openFolder, openFolderDelay);
+    }
+  }
+  _stopOpenFolderTimer() {
+    if (this._openFolderTimer) {
+      clearTimeout(this._openFolderTimer);
+      this._openFolderTimer = null;
+    }
+  }
+  _updateDropHint() {
+    if (!this.hoveredArea) {
+      return;
+    }
+
+    // remove previous drop hint
+    this._removeDropHint();
+
+    // add new drop hint
+    const nodeElement = this._getNodeElementForNode(this.hoveredArea.node);
+    this._previousGhost = nodeElement.addDropHint(this.hoveredArea.position);
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/util.js
+const isInt = n => typeof n === "number" && n % 1 === 0;
+const getBoolString = value => value ? "true" : "false";
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/elementsRenderer.js
+
+
+class ElementsRenderer {
+  closedIconElement;
+  openedIconElement;
+  _autoEscape;
+  _buttonLeft;
+  _classNames;
+  _dragAndDrop;
+  _getTree;
+  _htmlElement;
+  _isNodeSelected;
+  _onCreateLi;
+  _rtl;
+  _setNodeElement;
+  _showEmptyFolder;
+  _tabIndex;
+  constructor({
+    autoEscape,
+    buttonLeft,
+    classNames,
+    closedIcon,
+    dragAndDrop,
+    getTree,
+    htmlElement,
+    isNodeSelected,
+    onCreateLi,
+    openedIcon,
+    rtl,
+    setNodeElement,
+    showEmptyFolder,
+    tabIndex
+  }) {
+    this._autoEscape = autoEscape;
+    this._buttonLeft = buttonLeft;
+    this._classNames = classNames;
+    this._dragAndDrop = dragAndDrop;
+    this._getTree = getTree;
+    this._htmlElement = htmlElement;
+    this._isNodeSelected = isNodeSelected;
+    this._onCreateLi = onCreateLi;
+    this._rtl = rtl;
+    this._setNodeElement = setNodeElement;
+    this._showEmptyFolder = showEmptyFolder;
+    this._tabIndex = tabIndex;
+    this.openedIconElement = this._createButtonElement(openedIcon ?? "+");
+    this.closedIconElement = this._createButtonElement(closedIcon ?? "-");
+  }
+  render(fromNode) {
+    if (fromNode?.parent) {
+      this.renderFromNode(fromNode);
+    } else {
+      this.renderFromRoot();
+    }
+  }
+  renderFromNode(node) {
+    if (!node.element) {
+      return;
+    }
+    const currentLi = node.element;
+    const newLi = this._createLi(node, node.getLevel());
+    currentLi.replaceWith(newLi);
+
+    // create children
+    this._createDomElements(newLi, node.children, false, node.getLevel() + 1);
+  }
+  renderFromRoot() {
+    this._htmlElement.textContent = '';
+    const tree = this._getTree();
+    if (tree) {
+      this._createDomElements(this._htmlElement, tree.children, true, 1);
+    }
+  }
+  _attachNodeData(node, li) {
+    node.element = li;
+    this._setNodeElement(li, node);
+  }
+  _createButtonElement(value) {
+    if (typeof value === "string") {
+      // convert value to html
+      const div = document.createElement("div");
+      div.innerHTML = value;
+      return document.createTextNode(div.innerHTML);
+    } else if (value.nodeType) {
+      return value;
+    } else {
+      return undefined;
+    }
+  }
+  _createDomElements(element, children, isRootNode, level) {
+    const ul = this._createUl(isRootNode);
+    element.appendChild(ul);
+    for (const child of children) {
+      const li = this._createLi(child, level);
+      ul.appendChild(li);
+      if (child.hasChildren()) {
+        this._createDomElements(li, child.children, false, level + 1);
+      }
+    }
+  }
+  _createFolderLi(node, level, isSelected) {
+    const buttonClasses = this._getButtonClasses(node);
+    const folderClasses = this._getFolderClasses(node, isSelected);
+    const iconElement = node.is_open ? this.openedIconElement : this.closedIconElement;
+
+    // li
+    const li = document.createElement("li");
+    li.className = `${this._classNames.common} ${folderClasses}`;
+    li.setAttribute("role", "none");
+
+    // div
+    const div = document.createElement("div");
+    div.className = `${this._classNames.element} ${this._classNames.common}`;
+    div.setAttribute("role", "none");
+    li.appendChild(div);
+
+    // button link
+    const buttonLink = document.createElement("a");
+    buttonLink.className = buttonClasses;
+    if (iconElement) {
+      buttonLink.appendChild(iconElement.cloneNode(true));
+    }
+    if (this._buttonLeft) {
+      div.appendChild(buttonLink);
+    }
+
+    // title span
+    const titleSpan = this._createTitleSpan(node.name, isSelected, true, level);
+    titleSpan.setAttribute("aria-expanded", getBoolString(node.is_open));
+    div.appendChild(titleSpan);
+    if (!this._buttonLeft) {
+      div.appendChild(buttonLink);
+    }
+    return li;
+  }
+
+  /* Create the <li> element
+   * Attach it to node.element.
+   * Call onCreateLi
+   */
+  _createLi(node, level) {
+    const isSelected = this._isNodeSelected(node);
+    const mustShowFolder = node.isFolder() || node.isEmptyFolder && this._showEmptyFolder;
+    const li = mustShowFolder ? this._createFolderLi(node, level, isSelected) : this._createNodeLi(node, level, isSelected);
+    this._attachNodeData(node, li);
+    if (this._onCreateLi) {
+      this._onCreateLi(node, li, isSelected);
+    }
+    return li;
+  }
+  _createNodeLi(node, level, isSelected) {
+    const liClasses = [this._classNames.common];
+    if (isSelected) {
+      liClasses.push(this._classNames.selected);
+    }
+    const classString = liClasses.join(" ");
+
+    // li
+    const li = document.createElement("li");
+    li.className = classString;
+    li.setAttribute("role", "none");
+
+    // div
+    const div = document.createElement("div");
+    div.className = `${this._classNames.element} ${this._classNames.common}`;
+    div.setAttribute("role", "none");
+    li.appendChild(div);
+
+    // title span
+    const titleSpan = this._createTitleSpan(node.name, isSelected, false, level);
+    div.appendChild(titleSpan);
+    return li;
+  }
+  _createTitleSpan(nodeName, isSelected, isFolder, level) {
+    const titleSpan = document.createElement("span");
+    let classes = `${this._classNames.title} ${this._classNames.common}`;
+    if (isFolder) {
+      classes += ` ${this._classNames.titleFolder}`;
+    }
+    classes += ` ${this._buttonLeft ? this._classNames.titleButtonLeft : this._classNames.titleButtonRight}`;
+    titleSpan.className = classes;
+    if (isSelected) {
+      const tabIndex = this._tabIndex;
+      if (tabIndex !== undefined) {
+        titleSpan.setAttribute("tabindex", `${tabIndex}`);
+      }
+    }
+    this._setTreeItemAriaAttributes(titleSpan, nodeName, level, isSelected);
+    if (this._autoEscape) {
+      titleSpan.textContent = nodeName;
+    } else {
+      titleSpan.innerHTML = nodeName;
+    }
+    return titleSpan;
+  }
+  _createUl(isRootNode) {
+    let classString;
+    let role;
+    if (!isRootNode) {
+      classString = "";
+      role = "group";
+    } else {
+      classString = this._classNames.tree;
+      role = "tree";
+      if (this._rtl) {
+        classString += ` ${this._classNames.rtl}`;
+      }
+    }
+    if (this._dragAndDrop) {
+      classString += ` ${this._classNames.dnd}`;
+    }
+    const ul = document.createElement("ul");
+    ul.className = `${this._classNames.common} ${classString}`;
+    ul.setAttribute("role", role);
+    return ul;
+  }
+  _getButtonClasses(node) {
+    const classes = [this._classNames.toggler, this._classNames.common];
+    if (!node.is_open) {
+      classes.push(this._classNames.closed);
+    }
+    if (this._buttonLeft) {
+      classes.push(this._classNames.togglerLeft);
+    } else {
+      classes.push(this._classNames.togglerRight);
+    }
+    return classes.join(" ");
+  }
+  _getFolderClasses(node, isSelected) {
+    const classes = [this._classNames.folder];
+    if (!node.is_open) {
+      classes.push(this._classNames.closed);
+    }
+    if (isSelected) {
+      classes.push(this._classNames.selected);
+    }
+    if (node.is_loading) {
+      classes.push(this._classNames.loading);
+    }
+    return classes.join(" ");
+  }
+  _setTreeItemAriaAttributes(element, name, level, isSelected) {
+    element.setAttribute("aria-label", name);
+    element.setAttribute("aria-level", `${level}`);
+    element.setAttribute("aria-selected", getBoolString(isSelected));
+    element.setAttribute("role", "treeitem");
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/keyHandler.js
+class KeyHandler {
+  _closeNode;
+  _getSelectedNode;
+  _isFocusOnTree;
+  _keyboardSupport;
+  _openNode;
+  _originalSelectNode;
+  constructor({
+    closeNode,
+    getSelectedNode,
+    isFocusOnTree,
+    keyboardSupport,
+    openNode,
+    selectNode
+  }) {
+    this._closeNode = closeNode;
+    this._getSelectedNode = getSelectedNode;
+    this._isFocusOnTree = isFocusOnTree;
+    this._keyboardSupport = keyboardSupport;
+    this._openNode = openNode;
+    this._originalSelectNode = selectNode;
+    if (keyboardSupport) {
+      document.addEventListener("keydown", this._handleKeyDown);
+    }
+  }
+  deinit() {
+    if (this._keyboardSupport) {
+      document.removeEventListener("keydown", this._handleKeyDown);
+    }
+  }
+  moveDown(selectedNode) {
+    return this._selectNode(selectedNode.getNextVisibleNode());
+  }
+  moveUp(selectedNode) {
+    return this._selectNode(selectedNode.getPreviousVisibleNode());
+  }
+  _canHandleKeyboard() {
+    return this._keyboardSupport && this._isFocusOnTree();
+  }
+  _handleKeyDown = e => {
+    if (!this._canHandleKeyboard()) {
+      return;
+    }
+    let isKeyHandled = false;
+    const selectedNode = this._getSelectedNode();
+    if (selectedNode) {
+      switch (e.key) {
+        case "ArrowDown":
+          isKeyHandled = this.moveDown(selectedNode);
+          break;
+        case "ArrowLeft":
+          isKeyHandled = this._moveLeft(selectedNode);
+          break;
+        case "ArrowRight":
+          isKeyHandled = this._moveRight(selectedNode);
+          break;
+        case "ArrowUp":
+          isKeyHandled = this.moveUp(selectedNode);
+          break;
+      }
+    }
+    if (isKeyHandled) {
+      e.preventDefault();
+    }
+  };
+  _moveLeft(selectedNode) {
+    if (selectedNode.isFolder() && selectedNode.is_open) {
+      // Left on an open node closes the node
+      this._closeNode(selectedNode);
+      return true;
+    } else {
+      // Left on a closed or end node moves focus to the node's parent
+      return this._selectNode(selectedNode.getParent());
+    }
+  }
+  _moveRight(selectedNode) {
+    if (!selectedNode.isFolder()) {
+      return false;
+    } else {
+      // folder node
+      if (selectedNode.is_open) {
+        // Right moves to the first child of an open node
+        return this._selectNode(selectedNode.getNextVisibleNode());
+      } else {
+        // Right expands a closed node
+        void this._openNode(selectedNode);
+        return true;
+      }
+    }
+  }
+
+  /* Select the node.
+   * Don't do anything if the node is null.
+   * Result: a different node was selected.
+   */
+  _selectNode(node) {
+    if (!node) {
+      return false;
+    } else {
+      this._originalSelectNode(node);
+      return true;
+    }
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/mouseUtils.js
+const getPositionInfoFromMouseEvent = e => ({
+  originalEvent: e,
+  pageX: e.pageX,
+  pageY: e.pageY,
+  target: e.target
+});
+const getPositionInfoFromTouch = (touch, e) => ({
+  originalEvent: e,
+  pageX: touch.pageX,
+  pageY: touch.pageY,
+  target: touch.target
+});
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/mouseHandler.js
+
+
+class MouseHandler {
+  _classNames;
+  _element;
+  _getMouseDelay;
+  _getNode;
+  _isMouseDelayMet;
+  _isMouseStarted;
+  _mouseDelayTimer;
+  _mouseDownInfo;
+  _onClickButton;
+  _onClickTitle;
+  _onMouseCapture;
+  _onMouseDrag;
+  _onMouseStart;
+  _onMouseStop;
+  _triggerEvent;
+  _useContextMenu;
+  constructor({
+    classNames,
+    element,
+    getMouseDelay,
+    getNode,
+    onClickButton,
+    onClickTitle,
+    onMouseCapture,
+    onMouseDrag,
+    onMouseStart,
+    onMouseStop,
+    triggerEvent,
+    useContextMenu
+  }) {
+    this._classNames = classNames;
+    this._element = element;
+    this._getMouseDelay = getMouseDelay;
+    this._getNode = getNode;
+    this._onClickButton = onClickButton;
+    this._onClickTitle = onClickTitle;
+    this._onMouseCapture = onMouseCapture;
+    this._onMouseDrag = onMouseDrag;
+    this._onMouseStart = onMouseStart;
+    this._onMouseStop = onMouseStop;
+    this._triggerEvent = triggerEvent;
+    this._useContextMenu = useContextMenu;
+    element.addEventListener("click", this._handleClick);
+    element.addEventListener("dblclick", this._handleDblclick);
+    element.addEventListener("mousedown", this._mouseDown, {
+      passive: false
+    });
+    element.addEventListener("touchstart", this._touchStart, {
+      passive: false
+    });
+    if (useContextMenu) {
+      element.addEventListener("contextmenu", this._handleContextmenu);
+    }
+    this._isMouseStarted = false;
+    this._mouseDelayTimer = null;
+    this._isMouseDelayMet = false;
+    this._mouseDownInfo = null;
+  }
+  deinit() {
+    this._element.removeEventListener("click", this._handleClick);
+    this._element.removeEventListener("dblclick", this._handleDblclick);
+    if (this._useContextMenu) {
+      this._element.removeEventListener("contextmenu", this._handleContextmenu);
+    }
+    this._element.removeEventListener("mousedown", this._mouseDown);
+    this._element.removeEventListener("touchstart", this._touchStart);
+    this._removeMouseMoveEventListeners();
+  }
+  _getClickTarget(element) {
+    const button = element.closest(`.${this._classNames.toggler}`);
+    if (button) {
+      const node = this._getNode(button);
+      if (node) {
+        return {
+          node,
+          type: "button"
+        };
+      }
+    } else {
+      const treeElement = element.closest(`.${this._classNames.element}`);
+      if (treeElement) {
+        const node = this._getNode(treeElement);
+        if (node) {
+          return {
+            node,
+            type: "label"
+          };
+        }
+      }
+    }
+    return null;
+  }
+  _handleClick = e => {
+    if (!e.target) {
+      return;
+    }
+    const clickTarget = this._getClickTarget(e.target);
+    if (!clickTarget) {
+      return;
+    }
+    switch (clickTarget.type) {
+      case "button":
+        this._onClickButton(clickTarget.node);
+        e.preventDefault();
+        e.stopPropagation();
+        break;
+      case "label":
+        {
+          if (this._triggerEvent("tree.click", {
+            node: clickTarget.node,
+            originalEvent: e
+          })) {
+            this._onClickTitle(clickTarget.node);
+          }
+          break;
+        }
+    }
+  };
+  _handleContextmenu = e => {
+    if (!e.target) {
+      return;
+    }
+    const div = e.target.closest(`ul.${this._classNames.tree} .${this._classNames.element}`);
+    if (div) {
+      const node = this._getNode(div);
+      if (node) {
+        e.preventDefault();
+        e.stopPropagation();
+        this._triggerEvent("tree.contextmenu", {
+          node,
+          originalEvent: e
+        });
+        return false;
+      }
+    }
+    return null;
+  };
+  _handleDblclick = e => {
+    if (!e.target) {
+      return;
+    }
+    const clickTarget = this._getClickTarget(e.target);
+    if (clickTarget?.type === "label") {
+      this._triggerEvent("tree.dblclick", {
+        node: clickTarget.node,
+        originalEvent: e
+      });
+    }
+  };
+  _handleMouseDown(positionInfo) {
+    // We may have missed mouseup (out of window)
+    if (this._isMouseStarted) {
+      this._handleMouseUp(positionInfo);
+    }
+    this._mouseDownInfo = positionInfo;
+    if (!this._onMouseCapture(positionInfo)) {
+      return false;
+    }
+    this._handleStartMouse();
+    return true;
+  }
+  _handleMouseMove(e, positionInfo) {
+    if (this._isMouseStarted) {
+      this._onMouseDrag(positionInfo);
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      return;
+    }
+    if (!this._isMouseDelayMet) {
+      return;
+    }
+    if (this._mouseDownInfo) {
+      this._isMouseStarted = this._onMouseStart(this._mouseDownInfo);
+    }
+    if (this._isMouseStarted) {
+      this._onMouseDrag(positionInfo);
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+    } else {
+      this._handleMouseUp(positionInfo);
+    }
+  }
+  _handleMouseUp(positionInfo) {
+    this._removeMouseMoveEventListeners();
+    this._isMouseDelayMet = false;
+    this._mouseDownInfo = null;
+    if (this._isMouseStarted) {
+      this._isMouseStarted = false;
+      this._onMouseStop(positionInfo);
+    }
+  }
+  _handleStartMouse() {
+    document.addEventListener("mousemove", this._mouseMove, {
+      passive: false
+    });
+    document.addEventListener("touchmove", this._touchMove, {
+      passive: false
+    });
+    document.addEventListener("mouseup", this._mouseUp, {
+      passive: false
+    });
+    document.addEventListener("touchend", this._touchEnd, {
+      passive: false
+    });
+    const mouseDelay = this._getMouseDelay();
+    if (mouseDelay) {
+      this._startMouseDelayTimer(mouseDelay);
+    } else {
+      this._isMouseDelayMet = true;
+    }
+  }
+  _mouseDown = e => {
+    // Left mouse button?
+    if (e.button !== 0) {
+      return;
+    }
+    const result = this._handleMouseDown(getPositionInfoFromMouseEvent(e));
+    if (result && e.cancelable) {
+      e.preventDefault();
+    }
+  };
+  _mouseMove = e => {
+    this._handleMouseMove(e, getPositionInfoFromMouseEvent(e));
+  };
+  _mouseUp = e => {
+    this._handleMouseUp(getPositionInfoFromMouseEvent(e));
+  };
+  _removeMouseMoveEventListeners() {
+    document.removeEventListener("mousemove", this._mouseMove);
+    document.removeEventListener("touchmove", this._touchMove);
+    document.removeEventListener("mouseup", this._mouseUp);
+    document.removeEventListener("touchend", this._touchEnd);
+  }
+  _startMouseDelayTimer(mouseDelay) {
+    if (this._mouseDelayTimer) {
+      clearTimeout(this._mouseDelayTimer);
+    }
+    this._mouseDelayTimer = window.setTimeout(() => {
+      if (this._mouseDownInfo) {
+        this._isMouseDelayMet = true;
+      }
+    }, mouseDelay);
+    this._isMouseDelayMet = false;
+  }
+  _touchEnd = e => {
+    if (e.touches.length > 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) {
+      return;
+    }
+    this._handleMouseUp(getPositionInfoFromTouch(touch, e));
+  };
+  _touchMove = e => {
+    if (e.touches.length > 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) {
+      return;
+    }
+    this._handleMouseMove(e, getPositionInfoFromTouch(touch, e));
+  };
+  _touchStart = e => {
+    if (e.touches.length > 1) {
+      return;
+    }
+    const touch = e.touches[0];
+    if (!touch) {
+      return;
+    }
+    this._handleMouseDown(getPositionInfoFromTouch(touch, e));
+  };
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeUtils.js
+const isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/node.js
+
 
 /*
-JqTree 1.9.0
+A node reads and writes the private members of other nodes (node.setParent),
+so the `_` prefix that the build adds cannot be limited to `this.`:
+
+prefix-private-members: all
+*/
+
+/**
+ * @groupDescription Properties
+ * Any other key in the node data is copied onto the node, so
+ * `{ name: "node1", color: "green" }` gives you `node.color`.
+ *
+ * @groupDescription Searching
+ * These work on any node, and search that node's subtree. Called on the root
+ * node, they search the whole tree — which is what the tree's own methods of
+ * the same name do.
+ *
+ * @groupDescription Changing the tree
+ * ::: warning
+ * These methods change the data without re-rendering. The tree's
+ * [methods](/reference/methods) — `appendNode`, `removeNode`, `moveNode` and
+ * friends — do the same and refresh the display, so prefer those. If you do
+ * use these, call `tree.refresh()` afterwards.
+ * :::
+ */
+class Node {
+  /** @hidden */
+
+  /** The child nodes. */
+  children;
+  /** The `li` element, once the node is rendered. */
+  element;
+  /** The id from the node data. */
+  id;
+  /** @hidden */
+  idMapping;
+  /** Whether the node's children are being fetched. */
+  is_loading;
+  /** Whether the folder is open. */
+  is_open;
+  /** Whether the node data had an empty `children` array. */
+  isEmptyFolder;
+  /** Whether the children still have to be fetched. */
+  load_on_demand;
+  /** The label. Also settable from the `label` key in node data. */
+  name;
+  /** @hidden */
+  nodeClass;
+  /** The parent; `null` for the root node. */
+  parent;
+  /** The root node. */
+  tree;
+
+  /** @hidden */
+  constructor(nodeData = null, isRoot = false, nodeClass = Node) {
+    this.name = "";
+    this.load_on_demand = false;
+    this.isEmptyFolder = nodeData != null && isNodeRecordWithChildren(nodeData) && nodeData.children.length === 0;
+    this.setData(nodeData);
+    this.children = [];
+    this.parent = null;
+    this.is_loading = undefined;
+    this.is_open ??= undefined;
+    if (isRoot) {
+      this.idMapping = new Map();
+      this.tree = this;
+      this.nodeClass = nodeClass;
+    } else {
+      this.idMapping = undefined;
+    }
+  }
+
+  /**
+   * Adds a sibling after this node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addAfter(nodeInfo) {
+    if (!this.parent) {
+      return null;
+    } else {
+      const node = this._createNode(nodeInfo);
+      const childIndex = this.parent.getChildIndex(this);
+      this.parent.addChildAtPosition(node, childIndex + 1);
+      node._loadChildrenFromData(nodeInfo);
+      return node;
+    }
+  }
+
+  /**
+   * Adds a sibling before this node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addBefore(nodeInfo) {
+    if (!this.parent) {
+      return null;
+    } else {
+      const node = this._createNode(nodeInfo);
+      const childIndex = this.parent.getChildIndex(this);
+      this.parent.addChildAtPosition(node, childIndex);
+      node._loadChildrenFromData(nodeInfo);
+      return node;
+    }
+  }
+
+  /**
+   * Adds an existing `Node` object as the last child.
+   *
+   * @group Changing the tree
+   */
+  addChild(node) {
+    this.children.push(node);
+    node._setParent(this);
+  }
+
+  /**
+   * Adds an existing `Node` object as a child, at this position in
+   * `children`. The index starts at `0`.
+   *
+   * @group Changing the tree
+   */
+  addChildAtPosition(node, index) {
+    this.children.splice(index, 0, node);
+    node._setParent(this);
+  }
+
+  /** @hidden */
+  addNodeToIndex(node) {
+    if (node.id != null) {
+      this.idMapping?.set(node.id, node);
+    }
+  }
+
+  /**
+   * Inserts a new parent between this node and its current parent.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addParent(nodeInfo) {
+    if (!this.parent) {
+      return null;
+    } else {
+      const newParent = this._createNode(nodeInfo);
+      if (this.tree) {
+        newParent._setParent(this.tree);
+      }
+      const originalParent = this.parent;
+      for (const child of originalParent.children) {
+        newParent.addChild(child);
+      }
+      originalParent.children = [];
+      originalParent.addChild(newParent);
+      return newParent;
+    }
+  }
+
+  /**
+   * Adds a child at the end.
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
+  append(nodeInfo) {
+    const node = this._createNode(nodeInfo);
+    this.addChild(node);
+    node._loadChildrenFromData(nodeInfo);
+    return node;
+  }
+
+  /**
+   * Returns all nodes in the subtree for which the callback returns
+   * `true`.
+   *
+   * @example
+   * ```js
+   * const folders = tree.getTree().filter((node) => node.isFolder());
+   * ```
+   *
+   * @group Searching
+   */
+  filter(f) {
+    const result = [];
+    this.iterate(node => {
+      if (f(node)) {
+        result.push(node);
+      }
+      return true;
+    });
+    return result;
+  }
+
+  /**
+   * Returns the position of a child in `children`, or `-1`.
+   *
+   * @group Inspecting a node
+   */
+  getChildIndex(node) {
+    return this.children.indexOf(node);
+  }
+
+  /**
+   * Returns the subtree as plain data, ready for `JSON.stringify`.
+   * Internal properties (`parent`, `children`, `element`, `tree`,
+   * `idMapping`, `nodeClass`, `load_on_demand`, `isEmptyFolder`) are left
+   * out; your own properties are kept.
+   *
+   * ```js
+   * tree.getTree().getData();
+   * // [{ name: "node1", id: 1, children: [{ name: "child1", id: 2 }] }]
+   * ```
+   *
+   * @param includeParent - Make the result the node itself rather than its
+   * children. Default `false`.
+   * @group Reading data back
+   */
+  getData(includeParent = false) {
+    const getDataFromNodes = nodes => {
+      return nodes.map(node => {
+        const tmpNode = {};
+        for (const k in node) {
+          if (["parent", "children", "element", "idMapping", "load_on_demand", "nodeClass", "tree", "isEmptyFolder"].indexOf(k) === -1 && Object.prototype.hasOwnProperty.call(node, k)) {
+            const v = node[k];
+            tmpNode[k] = v;
+          }
+        }
+        if (node.hasChildren()) {
+          tmpNode.children = getDataFromNodes(node.children);
+        }
+        return tmpNode;
+      });
+    };
+    if (includeParent) {
+      return getDataFromNodes([this]);
+    } else {
+      return getDataFromNodes(this.children);
+    }
+  }
+
+  /**
+   * Returns the last child, or `null`. When that child is an open folder,
+   * its own last child, and so on.
+   *
+   * @group Moving around the tree
+   */
+  getLastChild() {
+    if (!this.hasChildren()) {
+      return null;
+    } else {
+      const lastChild = this.children[this.children.length - 1];
+      if (!(lastChild.hasChildren() && lastChild.is_open)) {
+        return lastChild;
+      } else {
+        return lastChild.getLastChild();
+      }
+    }
+  }
+
+  /**
+   * Returns the depth of the node, counting the top level as `1`.
+   *
+   * @group Inspecting a node
+   */
+  getLevel() {
+    let level = 0;
+    let node = this; // eslint-disable-line @typescript-eslint/no-this-alias
+
+    while (node.parent) {
+      level += 1;
+      node = node.parent;
+    }
+    return level;
+  }
+
+  /**
+   * Returns the next node in the tree, regardless of whether it is
+   * visible. `getNextNode(false)` skips the node's own children.
+   *
+   * @group Moving around the tree
+   */
+  getNextNode(includeChildren = true) {
+    if (includeChildren && this.hasChildren()) {
+      return this.children[0] ?? null;
+    } else if (!this.parent) {
+      return null;
+    } else {
+      const nextSibling = this.getNextSibling();
+      if (nextSibling) {
+        return nextSibling;
+      } else {
+        return this.parent.getNextNode(false);
+      }
+    }
+  }
+
+  /**
+   * Returns the next sibling, or `null`.
+   *
+   * @group Moving around the tree
+   */
+  getNextSibling() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const nextIndex = this.parent.getChildIndex(this) + 1;
+      if (nextIndex < this.parent.children.length) {
+        return this.parent.children[nextIndex] ?? null;
+      } else {
+        return null;
+      }
+    }
+  }
+
+  /**
+   * Like `getNextNode`, but skipping nodes inside closed folders — this is
+   * what the arrow keys use.
+   *
+   * @group Moving around the tree
+   */
+  getNextVisibleNode() {
+    if (this.hasChildren() && this.is_open) {
+      // First child
+      return this.children[0] ?? null;
+    } else {
+      if (!this.parent) {
+        return null;
+      } else {
+        const nextSibling = this.getNextSibling();
+        if (nextSibling) {
+          // Next sibling
+          return nextSibling;
+        } else {
+          // Next node of parent
+          return this.parent.getNextNode(false);
+        }
+      }
+    }
+  }
+
+  /**
+   * Returns the first node for which the callback returns `true`.
+   *
+   * @group Searching
+   */
+  getNodeByCallback(callback) {
+    let result = null;
+    this.iterate(node => {
+      if (result) {
+        return false;
+      } else if (callback(node)) {
+        result = node;
+        return false;
+      } else {
+        return true;
+      }
+    });
+    return result;
+  }
+
+  /**
+   * Returns the node with this id. Only available on the root node, which
+   * keeps the id index.
+   *
+   * @group Searching
+   */
+  getNodeById(nodeId) {
+    return this.idMapping?.get(nodeId) ?? null;
+  }
+
+  /**
+   * Returns the first node with this name.
+   *
+   * @group Searching
+   */
+  getNodeByName(name) {
+    return this.getNodeByCallback(node => node.name === name);
+  }
+
+  /**
+   * Like `getNodeByName`, but throws when there is no such node.
+   *
+   * @group Searching
+   */
+  getNodeByNameMustExist(name) {
+    const node = this.getNodeByCallback(n => n.name === name);
+    if (!node) {
+      throw new Error(`Node with name ${name} not found`);
+    }
+    return node;
+  }
+
+  /**
+   * Returns all nodes with this property value.
+   *
+   * @group Searching
+   */
+  getNodesByProperty(key, value) {
+    return this.filter(node => node[key] === value);
+  }
+
+  /**
+   * Returns the parent: `null` for a top-level node — the root node is not
+   * returned.
+   *
+   * @group Moving around the tree
+   */
+  getParent() {
+    // Return parent except if it is the root node
+    if (!this.parent) {
+      return null;
+    } else if (!this.parent.parent) {
+      // Root node -> null
+      return null;
+    } else {
+      return this.parent;
+    }
+  }
+
+  /**
+   * Returns the previous node in the tree, regardless of whether it is
+   * visible.
+   *
+   * @group Moving around the tree
+   */
+  getPreviousNode() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const previousSibling = this.getPreviousSibling();
+      if (!previousSibling) {
+        return this.getParent();
+      } else if (previousSibling.hasChildren()) {
+        return previousSibling.getLastChild();
+      } else {
+        return previousSibling;
+      }
+    }
+  }
+
+  /**
+   * Returns the previous sibling, or `null`.
+   *
+   * @group Moving around the tree
+   */
+  getPreviousSibling() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const previousIndex = this.parent.getChildIndex(this) - 1;
+      if (previousIndex >= 0) {
+        return this.parent.children[previousIndex] ?? null;
+      } else {
+        return null;
+      }
+    }
+  }
+
+  /**
+   * Like `getPreviousNode`, but skipping nodes inside closed folders —
+   * this is what the arrow keys use.
+   *
+   * @group Moving around the tree
+   */
+  getPreviousVisibleNode() {
+    if (!this.parent) {
+      return null;
+    } else {
+      const previousSibling = this.getPreviousSibling();
+      if (!previousSibling) {
+        return this.getParent();
+      } else if (!previousSibling.hasChildren() || !previousSibling.is_open) {
+        // Previous sibling
+        return previousSibling;
+      } else {
+        // Last child of previous sibling
+        return previousSibling.getLastChild();
+      }
+    }
+  }
+
+  /**
+   * Whether the node has children.
+   *
+   * @group Inspecting a node
+   */
+  hasChildren() {
+    return this.children.length !== 0;
+  }
+
+  /**
+   * Init Node from data without making it the root of the tree.
+   *
+   * @hidden
+   */
+  initFromData(data) {
+    const addNode = nodeData => {
+      this.setData(nodeData);
+      if (isNodeRecordWithChildren(nodeData) && nodeData.children.length) {
+        addChildren(nodeData.children);
+      }
+    };
+    const addChildren = childrenData => {
+      for (const child of childrenData) {
+        const node = this._createNode();
+        node.initFromData(child);
+        this.addChild(node);
+      }
+    };
+    addNode(data);
+  }
+
+  /**
+   * `true` when the node has children, or is marked `load_on_demand`.
+   *
+   * @group Inspecting a node
+   */
+  isFolder() {
+    return this.hasChildren() || this.load_on_demand;
+  }
+
+  /**
+   * Whether this node is an ancestor of the other node.
+   *
+   * @group Inspecting a node
+   */
+  isParentOf(node) {
+    let parent = node.parent;
+    while (parent) {
+      if (parent === this) {
+        return true;
+      }
+      parent = parent.parent;
+    }
+    return false;
+  }
+
+  /**
+   * Walks the subtree, calling the callback with `(node, level)`. Return
+   * `false` from the callback to stop descending into that node:
+   *
+   * ```js
+   * tree.getTree().iterate((node, level) => {
+   *   console.log(" ".repeat(level) + node.name);
+   *   return level <= 2; // don't go deeper than level 2
+   * });
+   * ```
+   *
+   * @group Searching
+   */
+  iterate(callback) {
+    const _iterate = (node, level) => {
+      for (const child of node.children) {
+        const result = callback(child, level);
+        if (result && child.hasChildren()) {
+          _iterate(child, level + 1);
+        }
+      }
+    };
+    _iterate(this, 0);
+  }
+
+  /**
+   * Replaces the children with new node data.
+   *
+   * @group Changing the tree
+   */
+  loadFromData(data) {
+    this.removeChildren();
+    for (const childData of data) {
+      const node = this._createNode(childData);
+      this.addChild(node);
+      if (isNodeRecordWithChildren(childData)) {
+        node.loadFromData(childData.children);
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Moves a node relative to another node. Called on the root node.
+   *
+   * @param position - `"before"`, `"after"` or `"inside"`.
+   * @returns `false` when the move is impossible, for instance moving a
+   * node into its own subtree.
+   * @group Changing the tree
+   */
+  moveNode(movedNode, targetNode, position) {
+    if (!movedNode.parent || movedNode.isParentOf(targetNode)) {
+      // - Node is parent of target node
+      // - Or, parent is empty
+      return false;
+    } else {
+      movedNode.parent._doRemoveChild(movedNode);
+      switch (position) {
+        case "after":
+          {
+            if (targetNode.parent) {
+              targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
+              return true;
+            }
+            return false;
+          }
+        case "before":
+          {
+            if (targetNode.parent) {
+              targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+              return true;
+            }
+            return false;
+          }
+        case "inside":
+          {
+            // move inside as first child
+            targetNode.addChildAtPosition(movedNode, 0);
+            return true;
+          }
+      }
+    }
+  }
+
+  /**
+   * Adds a child at the start.
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
+  prepend(nodeInfo) {
+    const node = this._createNode(nodeInfo);
+    this.addChildAtPosition(node, 0);
+    node._loadChildrenFromData(nodeInfo);
+    return node;
+  }
+
+  /**
+   * Removes this node from its parent.
+   *
+   * @group Changing the tree
+   */
+  remove() {
+    if (this.parent) {
+      this.parent.removeChild(this);
+      this.parent = null;
+    }
+  }
+
+  /**
+   * Removes a child and its children.
+   *
+   * @group Changing the tree
+   */
+  removeChild(node) {
+    // remove children from the index
+    node.removeChildren();
+    this._doRemoveChild(node);
+  }
+
+  /**
+   * Removes all children.
+   *
+   * @group Changing the tree
+   */
+  removeChildren() {
+    this.iterate(child => {
+      this.tree?.removeNodeFromIndex(child);
+      return true;
+    });
+    this.children = [];
+  }
+
+  /** @hidden */
+  removeNodeFromIndex(node) {
+    if (node.id != null) {
+      this.idMapping?.delete(node.id);
+    }
+  }
+
+  /**
+   * Updates the node's properties from node data. `children` and `parent`
+   * are ignored. A string sets the name. Existing node values are not
+   * removed.
+   *
+   * @group Changing the tree
+   */
+  setData(o) {
+    if (!o) {
+      return;
+    } else if (typeof o === "string") {
+      this.name = o;
+    } else if (typeof o === "object") {
+      for (const key in o) {
+        if (Object.prototype.hasOwnProperty.call(o, key)) {
+          const value = o[key];
+          if (key === "label" || key === "name") {
+            // You can use the 'label' key instead of 'name'; this is a legacy feature
+            if (typeof value === "string") {
+              this.name = value;
+            }
+          } else if (key !== "children" && key !== "parent") {
+            // You can't update the children or the parent using this function
+            this[key] = value;
+          }
+        }
+      }
+    }
+  }
+  _createNode(nodeData) {
+    const nodeClass = this._getNodeClass();
+    return new nodeClass(nodeData);
+  }
+  _doRemoveChild(node) {
+    this.children.splice(this.getChildIndex(node), 1);
+    this.tree?.removeNodeFromIndex(node);
+  }
+  _getNodeClass() {
+    return this.nodeClass ?? this.tree?.nodeClass ?? Node;
+  }
+
+  // Load children data from nodeInfo if it has children
+  _loadChildrenFromData(nodeInfo) {
+    if (isNodeRecordWithChildren(nodeInfo) && nodeInfo.children.length) {
+      this.loadFromData(nodeInfo.children);
+    }
+  }
+  _setParent(parent) {
+    this.parent = parent;
+    this.tree = parent.tree;
+    this.tree?.addNodeToIndex(this);
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/borderDropHint.js
+class BorderDropHint {
+  _hint;
+  constructor(element, scrollLeft, classNames) {
+    const div = element.querySelector(`:scope > .${classNames.element}`);
+    if (!div) {
+      this._hint = undefined;
+      return;
+    }
+    const width = Math.max(element.offsetWidth + scrollLeft - 4, 0);
+    const height = Math.max(element.clientHeight - 4, 0);
+    const hint = document.createElement("span");
+    hint.className = classNames.border;
+    hint.style.width = `${width}px`;
+    hint.style.height = `${height}px`;
+    this._hint = hint;
+    div.append(this._hint);
+  }
+  remove() {
+    this._hint?.remove();
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
+class GhostDropHint {
+  _classNames;
+  _element;
+  _ghost;
+  _node;
+  constructor(node, element, position, classNames) {
+    this._classNames = classNames;
+    this._element = element;
+    this._node = node;
+    this._ghost = this._createGhostElement();
+    switch (position) {
+      case "after":
+        this._moveAfter();
+        break;
+      case "before":
+        this._moveBefore();
+        break;
+      case "inside":
+        {
+          if (node.isFolder() && node.is_open) {
+            this._moveInsideOpenFolder();
+          } else {
+            this._moveInside();
+          }
+        }
+    }
+  }
+  remove() {
+    this._ghost.remove();
+  }
+  _createGhostElement() {
+    const {
+      circle,
+      common,
+      ghost: ghostClass,
+      line
+    } = this._classNames;
+    const ghost = document.createElement("li");
+    ghost.className = `${common} ${ghostClass}`;
+    const circleSpan = document.createElement("span");
+    circleSpan.className = `${common} ${circle}`;
+    ghost.append(circleSpan);
+    const lineSpan = document.createElement("span");
+    lineSpan.className = `${common} ${line}`;
+    ghost.append(lineSpan);
+    return ghost;
+  }
+  _moveAfter() {
+    this._element.after(this._ghost);
+  }
+  _moveBefore() {
+    this._element.before(this._ghost);
+  }
+  _moveInside() {
+    this._element.after(this._ghost);
+    this._ghost.classList.add(this._classNames.inside);
+  }
+  _moveInsideOpenFolder() {
+    const childElement = this._node.children[0]?.element;
+    if (childElement) {
+      childElement.before(this._ghost);
+    }
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/index.js
+
+
+
+class NodeElement {
+  element;
+  node;
+  _classNames;
+  _getScrollLeft;
+  _tabIndex;
+  _treeElement;
+  constructor({
+    classNames,
+    getScrollLeft,
+    node,
+    tabIndex,
+    treeElement
+  }) {
+    this._classNames = classNames;
+    this._getScrollLeft = getScrollLeft;
+    this.node = node;
+    this._tabIndex = tabIndex;
+    this._treeElement = treeElement;
+    node.element ??= this._treeElement;
+    this.element = node.element;
+  }
+  addDropHint(position) {
+    if (this._mustShowBorderDropHint(position)) {
+      return new BorderDropHint(this.element, this._getScrollLeft(), this._classNames);
+    } else {
+      return new GhostDropHint(this.node, this.element, position, this._classNames);
+    }
+  }
+  deselect() {
+    this.element.classList.remove(this._classNames.selected);
+    const titleSpan = this._getTitleSpan();
+    titleSpan.removeAttribute("tabindex");
+    titleSpan.setAttribute("aria-selected", "false");
+    titleSpan.blur();
+  }
+  select(mustSetFocus) {
+    this.element.classList.add(this._classNames.selected);
+    const titleSpan = this._getTitleSpan();
+    const tabIndex = this._tabIndex;
+
+    // Check for null or undefined
+    if (tabIndex != null) {
+      titleSpan.setAttribute("tabindex", tabIndex.toString());
+    }
+    titleSpan.setAttribute("aria-selected", "true");
+    if (mustSetFocus) {
+      titleSpan.focus();
+    }
+  }
+  _getTitleSpan() {
+    return this.element.querySelector(`:scope > .${this._classNames.element} > span.${this._classNames.title}`);
+  }
+  _getUl() {
+    return this.element.querySelector(":scope > ul");
+  }
+  _mustShowBorderDropHint(position) {
+    return position === "inside";
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/animation.js
+const getAnimationDuration = duration => {
+  if (typeof duration === "number") {
+    return duration;
+  }
+  return duration === "slow" ? 600 : 200;
+};
+const slideDown = (element, animationSpeed, onFinished) => {
+  element.style.display = "block";
+  const animation = element.animate([{
+    height: "0",
+    overflow: "hidden"
+  }, {
+    height: `${element.scrollHeight}px`,
+    overflow: "hidden"
+  }], {
+    duration: getAnimationDuration(animationSpeed)
+  });
+  animation.onfinish = () => {
+    onFinished();
+  };
+};
+const slideUp = (element, animationSpeed, onFinished) => {
+  const animation = element.animate([{
+    height: `${element.scrollHeight}px`,
+    overflow: "hidden"
+  }, {
+    height: "0",
+    overflow: "hidden"
+  }], {
+    duration: getAnimationDuration(animationSpeed)
+  });
+  animation.onfinish = () => {
+    element.style.display = "none";
+    onFinished();
+  };
+};
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/nodeElement/folderElement.js
+
+
+
+class FolderElement extends NodeElement {
+  _closedIconElement;
+  _openedIconElement;
+  _triggerEvent;
+  constructor({
+    classNames,
+    closedIconElement,
+    getScrollLeft,
+    node,
+    openedIconElement,
+    tabIndex,
+    treeElement,
+    triggerEvent
+  }) {
+    super({
+      classNames,
+      getScrollLeft,
+      node,
+      tabIndex,
+      treeElement
+    });
+    this._closedIconElement = closedIconElement;
+    this._openedIconElement = openedIconElement;
+    this._triggerEvent = triggerEvent;
+  }
+  close(slide, animationSpeed) {
+    if (!this.node.is_open) {
+      return;
+    }
+    this.node.is_open = false;
+    const button = this._getButton();
+    button.classList.add(this._classNames.closed);
+    button.innerHTML = "";
+    const closedIconElement = this._closedIconElement;
+    if (closedIconElement) {
+      const icon = closedIconElement.cloneNode(true);
+      button.appendChild(icon);
+    }
+    const doClose = () => {
+      this.element.classList.add(this._classNames.closed);
+      const titleSpan = this._getTitleSpan();
+      titleSpan.setAttribute("aria-expanded", "false");
+      this._triggerEvent("tree.close", {
+        node: this.node
+      });
+    };
+    const ul = this._getUl();
+    if (slide) {
+      slideUp(ul, animationSpeed, doClose);
+    } else {
+      ul.style.display = "none";
+      doClose();
+    }
+  }
+  async open(slide, animationSpeed) {
+    return new Promise(resolve => {
+      if (this.node.is_open) {
+        resolve();
+        return;
+      }
+      this.node.is_open = true;
+      const button = this._getButton();
+      button.classList.remove(this._classNames.closed);
+      button.innerHTML = "";
+      const openedIconElement = this._openedIconElement;
+      if (openedIconElement) {
+        const icon = openedIconElement.cloneNode(true);
+        button.appendChild(icon);
+      }
+      const doOpen = () => {
+        this.element.classList.remove(this._classNames.closed);
+        const titleSpan = this._getTitleSpan();
+        titleSpan.setAttribute("aria-expanded", "true");
+        this._triggerEvent("tree.open", {
+          node: this.node
+        });
+        resolve();
+      };
+      const ul = this._getUl();
+      if (slide) {
+        slideDown(ul, animationSpeed, doOpen);
+      } else {
+        ul.style.display = "block";
+        doOpen();
+      }
+    });
+  }
+  _mustShowBorderDropHint(position) {
+    return !this.node.is_open && position === "inside";
+  }
+  _getButton() {
+    return this.element.querySelector(`:scope > .${this._classNames.element} > a.${this._classNames.toggler}`);
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/requestUrl.js
+// Url class for absolute and relative urls.
+
+const isAbsoluteUrl = inputUrl => {
+  try {
+    new URL(inputUrl);
+    return true;
+  } catch {
+    return false;
+  }
+};
+const LOCALHOST = "http://localhost";
+class RequestUrl {
+  _isAbsolute;
+  _url;
+  constructor(inputUrl) {
+    if (isAbsoluteUrl(inputUrl)) {
+      this._url = new URL(inputUrl);
+      this._isAbsolute = true;
+    } else {
+      this._url = new URL(inputUrl, LOCALHOST);
+      this._isAbsolute = false;
+    }
+  }
+  setSearchParam(key, value) {
+    this._url.searchParams.set(key, value);
+  }
+  toString() {
+    if (this._isAbsolute) {
+      return this._url.href;
+    } else {
+      return this._url.href.slice(LOCALHOST.length);
+    }
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/saveStateHandler.js
+
+
+class SaveStateHandler {
+  _addToSelection;
+  _getNodeById;
+  _getSelectedNodes;
+  _getTree;
+  _onGetStateFromStorage;
+  _onSetStateFromStorage;
+  _openNode;
+  _refreshElements;
+  _removeFromSelection;
+  _saveStateOption;
+  constructor({
+    addToSelection,
+    getNodeById,
+    getSelectedNodes,
+    getTree,
+    onGetStateFromStorage,
+    onSetStateFromStorage,
+    openNode,
+    refreshElements,
+    removeFromSelection,
+    saveState
+  }) {
+    this._addToSelection = addToSelection;
+    this._getNodeById = getNodeById;
+    this._getSelectedNodes = getSelectedNodes;
+    this._getTree = getTree;
+    this._onGetStateFromStorage = onGetStateFromStorage;
+    this._onSetStateFromStorage = onSetStateFromStorage;
+    this._openNode = openNode;
+    this._refreshElements = refreshElements;
+    this._removeFromSelection = removeFromSelection;
+    this._saveStateOption = saveState;
+  }
+  getNodeIdToBeSelected() {
+    if (!this._saveStateOption) {
+      return null;
+    }
+    const state = this.getStateFromStorage();
+    if (state?.selected_node) {
+      return state.selected_node[0] ?? null;
+    } else {
+      return null;
+    }
+  }
+  getState() {
+    const getOpenNodeIds = () => {
+      const openNodes = [];
+      this._getTree()?.iterate(node => {
+        if (node.is_open && node.id && node.hasChildren()) {
+          openNodes.push(node.id);
+        }
+        return true;
+      });
+      return openNodes;
+    };
+    const getSelectedNodeIds = () => {
+      const selectedNodeIds = [];
+      this._getSelectedNodes().forEach(node => {
+        if (node.id != null) {
+          selectedNodeIds.push(node.id);
+        }
+      });
+      return selectedNodeIds;
+    };
+    return {
+      open_nodes: getOpenNodeIds(),
+      selected_node: getSelectedNodeIds()
+    };
+  }
+  getStateFromStorage() {
+    if (!this._saveStateOption) {
+      return null;
+    }
+    const jsonData = this._loadFromStorage();
+    if (jsonData) {
+      return this._parseState(jsonData);
+    } else {
+      return null;
+    }
+  }
+  saveState() {
+    if (!this._saveStateOption) {
+      return;
+    }
+    const state = JSON.stringify(this.getState());
+    if (this._onSetStateFromStorage) {
+      this._onSetStateFromStorage(state);
+    } else {
+      localStorage.setItem(this._getKeyName(), state);
+    }
+  }
+
+  /*
+  Set initial state
+  Don't handle nodes that are loaded on demand
+   result: must load on demand (boolean)
+  */
+  setInitialState(state) {
+    let mustLoadOnDemand = false;
+    if (state.open_nodes) {
+      mustLoadOnDemand = this._openInitialNodes(state.open_nodes);
+    }
+    this._resetSelection();
+    if (state.selected_node) {
+      this._selectInitialNodes(state.selected_node);
+    }
+    return mustLoadOnDemand;
+  }
+  async setInitialStateOnDemand(state) {
+    let nodeIds = state.open_nodes;
+    const openNodes = async () => {
+      if (!nodeIds) {
+        return;
+      }
+      const newNodesIds = [];
+      for (const nodeId of nodeIds) {
+        const node = this._getNodeById(nodeId);
+        if (!node) {
+          newNodesIds.push(nodeId);
+        } else {
+          if (!node.is_loading) {
+            if (node.load_on_demand) {
+              await loadAndOpenNode(node);
+            } else {
+              await this._openNode(node, false);
+            }
+          }
+        }
+      }
+      nodeIds = newNodesIds;
+      if (state.selected_node) {
+        if (this._selectInitialNodes(state.selected_node)) {
+          this._refreshElements(null);
+        }
+      }
+    };
+    const loadAndOpenNode = async node => {
+      await this._openNode(node, false);
+      await openNodes();
+    };
+    await openNodes();
+  }
+  _getKeyName() {
+    if (typeof this._saveStateOption === "string") {
+      return this._saveStateOption;
+    } else {
+      return "tree";
+    }
+  }
+  _loadFromStorage() {
+    if (this._onGetStateFromStorage) {
+      return this._onGetStateFromStorage();
+    } else {
+      return localStorage.getItem(this._getKeyName());
+    }
+  }
+  _openInitialNodes(nodeIds) {
+    let mustLoadOnDemand = false;
+    for (const nodeId of nodeIds) {
+      const node = this._getNodeById(nodeId);
+      if (node) {
+        if (!node.load_on_demand) {
+          node.is_open = true;
+        } else {
+          mustLoadOnDemand = true;
+        }
+      }
+    }
+    return mustLoadOnDemand;
+  }
+  _parseState(jsonData) {
+    const state = JSON.parse(jsonData);
+
+    // Check if selected_node is an int (instead of an array)
+    if (state.selected_node && isInt(state.selected_node)) {
+      // Convert to array
+      state.selected_node = [state.selected_node];
+    }
+    return state;
+  }
+  _resetSelection() {
+    const selectedNodes = this._getSelectedNodes();
+    selectedNodes.forEach(node => {
+      this._removeFromSelection(node);
+    });
+  }
+  _selectInitialNodes(nodeIds) {
+    let selectCount = 0;
+    for (const nodeId of nodeIds) {
+      const node = this._getNodeById(nodeId);
+      if (node) {
+        selectCount += 1;
+        this._addToSelection(node);
+      }
+    }
+    return selectCount !== 0;
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/scrollParent.js
+class ScrollParent {
+  _container;
+  _horizontalScrollDirection;
+  _horizontalScrollTimeout;
+  _refreshHitAreas;
+  _verticalScrollDirection;
+  _verticalScrollTimeout;
+  constructor({
+    container,
+    refreshHitAreas
+  }) {
+    this._container = container;
+    this._refreshHitAreas = refreshHitAreas;
+  }
+  checkHorizontalScrolling(pageX) {
+    const newHorizontalScrollDirection = this._getNewHorizontalScrollDirection(pageX);
+    if (this._horizontalScrollDirection !== newHorizontalScrollDirection) {
+      this._horizontalScrollDirection = newHorizontalScrollDirection;
+      if (this._horizontalScrollTimeout != null) {
+        window.clearTimeout(this._horizontalScrollTimeout);
+      }
+      if (newHorizontalScrollDirection) {
+        this._horizontalScrollTimeout = window.setTimeout(this._scrollHorizontally.bind(this), 40);
+      }
+    }
+  }
+  checkVerticalScrolling(pageY) {
+    const newVerticalScrollDirection = this._getNewVerticalScrollDirection(pageY);
+    if (this._verticalScrollDirection !== newVerticalScrollDirection) {
+      this._verticalScrollDirection = newVerticalScrollDirection;
+      if (this._verticalScrollTimeout != null) {
+        window.clearTimeout(this._verticalScrollTimeout);
+        this._verticalScrollTimeout = undefined;
+      }
+      if (newVerticalScrollDirection) {
+        this._verticalScrollTimeout = window.setTimeout(this._scrollVertically.bind(this), 40);
+      }
+    }
+  }
+  getScrollLeft() {
+    return this._container.scrollLeft;
+  }
+  scrollToY(top) {
+    this._container.scrollTop = top;
+  }
+  stopScrolling() {
+    this._horizontalScrollDirection = undefined;
+    this._verticalScrollDirection = undefined;
+  }
+  _scrollHorizontally() {
+    if (!this._horizontalScrollDirection) {
+      return;
+    }
+    const distance = this._horizontalScrollDirection === "left" ? -20 : 20;
+    this._container.scrollBy({
+      behavior: "instant",
+      left: distance,
+      top: 0
+    });
+    this._refreshHitAreas();
+    setTimeout(this._scrollHorizontally.bind(this), 40);
+  }
+  _scrollVertically() {
+    if (!this._verticalScrollDirection) {
+      return;
+    }
+    const distance = this._verticalScrollDirection === "top" ? -20 : 20;
+    this._container.scrollBy({
+      behavior: "instant",
+      left: 0,
+      top: distance
+    });
+    this._refreshHitAreas();
+    setTimeout(this._scrollVertically.bind(this), 40);
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
+
+
+
+class ContainerScrollParent extends ScrollParent {
+  _scrollParentBottom;
+  _scrollParentTop;
+  stopScrolling() {
+    super.stopScrolling();
+    this._horizontalScrollDirection = undefined;
+    this._verticalScrollDirection = undefined;
+  }
+  _getNewHorizontalScrollDirection(pageX) {
+    const scrollParentOffset = getElementPosition(this._container);
+    const containerWidth = this._container.getBoundingClientRect().width;
+    const rightEdge = scrollParentOffset.left + containerWidth;
+    const leftEdge = scrollParentOffset.left;
+    const isNearRightEdge = pageX > rightEdge - 20;
+    const isNearLeftEdge = pageX < leftEdge + 20;
+    if (isNearRightEdge) {
+      return "right";
+    } else if (isNearLeftEdge) {
+      return "left";
+    }
+    return undefined;
+  }
+  _getNewVerticalScrollDirection(pageY) {
+    if (pageY < this._getScrollParentTop()) {
+      return "top";
+    }
+    if (pageY > this._getScrollParentBottom()) {
+      return "bottom";
+    }
+    return undefined;
+  }
+  _getScrollParentBottom() {
+    if (this._scrollParentBottom == null) {
+      const containerHeight = this._container.getBoundingClientRect().height;
+      this._scrollParentBottom = this._getScrollParentTop() + containerHeight;
+    }
+    return this._scrollParentBottom;
+  }
+  _getScrollParentTop() {
+    this._scrollParentTop ??= getOffsetTop(this._container);
+    return this._scrollParentTop;
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
+
+
+
+class DocumentScrollParent extends ScrollParent {
+  _documentScrollHeight;
+  _documentScrollWidth;
+  _treeElement;
+  constructor({
+    refreshHitAreas,
+    treeElement
+  }) {
+    super({
+      container: document.documentElement,
+      refreshHitAreas
+    });
+    this._treeElement = treeElement;
+  }
+  scrollToY(top) {
+    const treeTop = getOffsetTop(this._treeElement);
+    super.scrollToY(top + treeTop);
+  }
+  stopScrolling() {
+    super.stopScrolling();
+    this._documentScrollHeight = undefined;
+    this._documentScrollWidth = undefined;
+  }
+  _getNewHorizontalScrollDirection(pageX) {
+    const scrollLeft = this._container.scrollLeft;
+    const windowWidth = window.innerWidth;
+    const isNearRightEdge = pageX > windowWidth - 20;
+    const isNearLeftEdge = pageX - scrollLeft < 20;
+    if (isNearRightEdge && this._canScrollRight()) {
+      return "right";
+    }
+    if (isNearLeftEdge) {
+      return "left";
+    }
+    return undefined;
+  }
+  _getNewVerticalScrollDirection(pageY) {
+    const scrollTop = this._container.scrollTop;
+    const distanceTop = pageY - scrollTop;
+    if (distanceTop < 20) {
+      return "top";
+    }
+    const windowHeight = window.innerHeight;
+    if (windowHeight - (pageY - scrollTop) < 20 && this._canScrollDown()) {
+      return "bottom";
+    }
+    return undefined;
+  }
+  _canScrollDown() {
+    return this._container.scrollTop + this._container.clientHeight < this._getDocumentScrollHeight();
+  }
+  _canScrollRight() {
+    return this._container.scrollLeft + this._container.clientWidth < this._getDocumentScrollWidth();
+  }
+  _getDocumentScrollHeight() {
+    // Store the original scroll height because the scroll height can increase when the drag element is moved beyond the scroll height.
+    this._documentScrollHeight ??= this._container.scrollHeight;
+    return this._documentScrollHeight;
+  }
+  _getDocumentScrollWidth() {
+    // Store the original scroll width because the scroll width can increase when the drag element is moved beyond the scroll width.
+    this._documentScrollWidth ??= this._container.scrollWidth;
+    return this._documentScrollWidth;
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
+
+
+
+const isOverflow = overflowValue => overflowValue === "auto" || overflowValue === "scroll";
+const hasOverFlow = element => {
+  const style = getComputedStyle(element);
+  return isOverflow(style.overflowX) || isOverflow(style.overflowY);
+};
+const getParentWithOverflow = treeElement => {
+  if (hasOverFlow(treeElement)) {
+    return treeElement;
+  }
+  let parent = treeElement.parentElement;
+  while (parent) {
+    if (hasOverFlow(parent)) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+  return null;
+};
+const createScrollParent = (treeElement, refreshHitAreas) => {
+  const container = getParentWithOverflow(treeElement);
+  if (container && container.tagName !== "HTML") {
+    return new ContainerScrollParent({
+      container,
+      refreshHitAreas
+    });
+  } else {
+    return new DocumentScrollParent({
+      refreshHitAreas,
+      treeElement
+    });
+  }
+};
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/scrollHandler.js
+
+
+class ScrollHandler {
+  _refreshHitAreas;
+  _scrollParent;
+  _treeElement;
+  constructor({
+    refreshHitAreas,
+    treeElement
+  }) {
+    this._refreshHitAreas = refreshHitAreas;
+    this._scrollParent = undefined;
+    this._treeElement = treeElement;
+  }
+  checkScrolling(positionInfo) {
+    this._checkVerticalScrolling(positionInfo);
+    this._checkHorizontalScrolling(positionInfo);
+  }
+  getScrollLeft() {
+    return this._getScrollParent().getScrollLeft();
+  }
+  scrollToY(top) {
+    this._getScrollParent().scrollToY(top);
+  }
+  stopScrolling() {
+    this._getScrollParent().stopScrolling();
+  }
+  _checkHorizontalScrolling(positionInfo) {
+    this._getScrollParent().checkHorizontalScrolling(positionInfo.pageX);
+  }
+  _checkVerticalScrolling(positionInfo) {
+    this._getScrollParent().checkVerticalScrolling(positionInfo.pageY);
+  }
+  _getScrollParent() {
+    this._scrollParent ??= createScrollParent(this._treeElement, this._refreshHitAreas);
+    return this._scrollParent;
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/selectNodeHandler.js
+class SelectNodeHandler {
+  _getNodeById;
+  _getNodeElementForNode;
+  _getOnCanSelectNode;
+  _getSelectable;
+  _openParents;
+  _saveState;
+  _selectedNodes;
+  _selectedSingleNode;
+  _triggerEvent;
+  constructor({
+    getNodeById,
+    getNodeElementForNode,
+    getOnCanSelectNode,
+    getSelectable,
+    openParents,
+    saveState,
+    triggerEvent
+  }) {
+    this._getNodeById = getNodeById;
+    this._getNodeElementForNode = getNodeElementForNode;
+    this._getOnCanSelectNode = getOnCanSelectNode;
+    this._getSelectable = getSelectable;
+    this._openParents = openParents;
+    this._saveState = saveState;
+    this._selectedNodes = new Set();
+    this._selectedSingleNode = null;
+    this._triggerEvent = triggerEvent;
+  }
+  addToSelection(node) {
+    if (node.id != null) {
+      this._selectedNodes.add(node.id);
+    } else {
+      this._selectedSingleNode = node;
+    }
+  }
+  clear() {
+    this._selectedNodes.clear();
+    this._selectedSingleNode = null;
+  }
+  getSelectedNode() {
+    const selectedNodes = this.getSelectedNodes();
+    if (selectedNodes.length) {
+      return selectedNodes[0] ?? false;
+    } else {
+      return false;
+    }
+  }
+  getSelectedNodes() {
+    if (this._selectedSingleNode) {
+      return [this._selectedSingleNode];
+    } else {
+      const selectedNodes = [];
+      this._selectedNodes.forEach(id => {
+        const node = this._getNodeById(id);
+        if (node) {
+          selectedNodes.push(node);
+        }
+      });
+      return selectedNodes;
+    }
+  }
+  getSelectedNodesUnder(parent) {
+    if (this._selectedSingleNode) {
+      if (parent.isParentOf(this._selectedSingleNode)) {
+        return [this._selectedSingleNode];
+      } else {
+        return [];
+      }
+    } else {
+      const selectedNodes = [];
+      this._selectedNodes.forEach(id => {
+        const node = this._getNodeById(id);
+        if (node && parent.isParentOf(node)) {
+          selectedNodes.push(node);
+        }
+      });
+      return selectedNodes;
+    }
+  }
+  isNodeSelected(node) {
+    if (node.id != null) {
+      return this._selectedNodes.has(node.id);
+    } else if (this._selectedSingleNode) {
+      return this._selectedSingleNode.element === node.element;
+    } else {
+      return false;
+    }
+  }
+  removeFromSelection(node, includeChildren = false) {
+    if (node.id == null) {
+      if (this._selectedSingleNode && node.element === this._selectedSingleNode.element) {
+        this._selectedSingleNode = null;
+      }
+    } else {
+      this._selectedNodes.delete(node.id);
+      if (includeChildren) {
+        node.iterate(() => {
+          if (node.id != null) {
+            this._selectedNodes.delete(node.id);
+          }
+          return true;
+        });
+      }
+    }
+  }
+
+  /* Select a single node.
+  * Renders the changed elements.
+  * Deselects if the node is currently selected (if the mustToggle is on).
+  * Deselects the previously selected node.
+  * Check if the node is selectable.
+  * Saves the state.
+  * Options:
+    * mustSetFocus: set the focus to the selected node
+    * mustToggle: support deselecting the selected node
+  */
+  selectSingleNode(node, optionsParam) {
+    const defaultOptions = {
+      mustSetFocus: true,
+      mustToggle: true
+    };
+    const selectOptions = {
+      ...defaultOptions,
+      ...(optionsParam ?? {})
+    };
+    const canSelect = () => {
+      if (!this._getSelectable()) {
+        return false;
+      }
+      const onCanSelectNode = this._getOnCanSelectNode();
+      return onCanSelectNode ? onCanSelectNode(node) : true;
+    };
+    if (!canSelect()) {
+      return;
+    }
+    const deselectCurrentNode = deselectedNode => {
+      this.removeFromSelection(deselectedNode);
+      this._getNodeElementForNode(deselectedNode).deselect();
+    };
+    if (this.isNodeSelected(node)) {
+      if (selectOptions.mustToggle) {
+        deselectCurrentNode(node);
+        this._triggerEvent("tree.deselect", {
+          node
+        });
+      }
+    } else {
+      const deselectedNode = this.getSelectedNode();
+      if (deselectedNode) {
+        deselectCurrentNode(deselectedNode);
+      }
+      this.addToSelection(node);
+      this._openParents(node);
+      this._getNodeElementForNode(node).select(selectOptions.mustSetFocus);
+      this._triggerEvent("tree.select", {
+        deselectedNode: deselectedNode || null,
+        node
+      });
+    }
+    this._saveState();
+  }
+}
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/setDefaultOptions.js
+
+
+
+const defaults = {
+  animationSpeed: "fast",
+  autoEscape: true,
+  autoOpen: false,
+  // true / false / int (open n levels starting at 0)
+  buttonLeft: true,
+  classPrefix: DEFAULT_CLASS_PREFIX,
+  // the prefix of all css classes
+  // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
+  // http://www.fileformat.info/info/unicode/char/25ba/index.htm
+  closedIcon: undefined,
+  commonClassName: undefined,
+  // the class of every element; the default is "<classPrefix>-common"
+  data: undefined,
+  dataFilter: undefined,
+  dataUrl: undefined,
+  dragAndDrop: false,
+  keyboardSupport: true,
+  nodeClass: Node,
+  onCanMove: undefined,
+  // Can this node be moved?
+  onCanMoveTo: undefined,
+  // Can this node be moved to this position? function(moved_node, target_node, position)
+  onCanSelectNode: undefined,
+  onCreateLi: undefined,
+  onDragMove: undefined,
+  onDragStop: undefined,
+  onGetStateFromStorage: undefined,
+  onIsMoveHandle: undefined,
+  onSetStateFromStorage: undefined,
+  openedIcon: undefined,
+  openFolderDelay: 500,
+  // The delay for opening a folder during drag and drop; the value is in milliseconds
+  // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
+  // http://www.fileformat.info/info/unicode/char/25bc/index.htm
+  rtl: undefined,
+  // right-to-left support; true / false (default)
+  saveState: false,
+  // true / false / string (local storage key; the default key is "tree")
+  selectable: true,
+  showEmptyFolder: false,
+  slide: true,
+  // must display slide animation?
+  startDndDelay: 300,
+  // The delay for starting dnd (in milliseconds)
+  tabIndex: 0,
+  treeClassName: undefined,
+  // the class of the root element; the default is classPrefix
+  useContextMenu: true
+};
+const setDefaultOptions = (htmlElement, inputOptions) => {
+  const options = {
+    ...defaults,
+    ...inputOptions
+  };
+  options.dataUrl ??= htmlElement.dataset.url;
+  options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
+  options.closedIcon ??= getDefaultClosedIcon(options);
+  options.openedIcon ??= "&#x25bc;";
+  return options;
+};
+const getDefaultClosedIcon = options => {
+  if (options.rtl) {
+    // triangle to the left
+    return "&#x25c0;";
+  } else {
+    // triangle to the right
+    return "&#x25ba;";
+  }
+};
+const getRtlOptionFromHTMLElement = htmlElement => {
+  const dataRtl = htmlElement.dataset.rtl;
+  if (dataRtl == "") {
+    return true;
+  } else if (dataRtl === "false") {
+    return false;
+  } else {
+    return Boolean(dataRtl);
+  }
+};
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/triggerCustomEvent.js
+// Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
+const triggerCustomEvent = (element, eventName, values) => {
+  const event = new CustomEvent(eventName, {
+    bubbles: true,
+    cancelable: true,
+    detail: values
+  });
+  element.dispatchEvent(event);
+  return !event.defaultPrevented;
+};
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.1.1/node_modules/tree-element/lib/index.js
+/*
+Html-tree 0.1.1
 
 Copyright 2026 Marco Braak
 
@@ -23,48 +3215,1088 @@ limitations under the License.
 @license
 
 */
-var jqtree=function(t){"use strict";class e{t;i;o;h;l;u;constructor({dataFilter:t,loadData:e,onLoadFailed:s,onLoading:i,treeElement:o,triggerEvent:n}){this.t=t,this.i=e,this.o=s,this.h=i,this.l=o,this.u=n}loadFromUrl(t,e,s){if(!t)return;const i=this.m(e);this._(i),this.p(!0,e,i);const o=()=>{this.v(i),this.p(!1,e,i)};this.S(t,t=>{o(),this.i(this.N(t),e),s&&"function"==typeof s&&s()},t=>{o(),this.o&&this.o(t)})}_(t){t.classList.add("jqtree-loading")}m(t){return t?.element?t.element:this.l}p(t,e,s){const i=jQuery(s);this.h&&this.h(t,e,i),this.u("tree.loading_data",{$el:i,isLoading:t,node:e})}N(t){return this.t?this.t(t):t}v(t){t.classList.remove("jqtree-loading")}S(t,e,s){const i={cache:!1,dataType:"json",error:s,method:"GET",success:e,..."string"==typeof t?{url:t}:t};i.method=i.method?.toUpperCase()??"GET",jQuery.ajax(i)}}const s=t=>i(t).top,i=t=>{const e=t.getBoundingClientRect();return{left:e.x+window.scrollX,top:e.y+window.scrollY}};class o{j;D;F;constructor({autoEscape:t,nodeName:e,offsetX:s,offsetY:i,treeElement:o}){this.D=s,this.F=i,this.j=this.M(e,t),o.appendChild(this.j)}move(t,e){this.j.style.left=t-this.D+"px",this.j.style.top=e-this.F+"px"}remove(){this.j.remove()}M(t,e){const s=document.createElement("span");return s.classList.add("jqtree-title","jqtree-dragging"),e?s.textContent=t:s.innerHTML=t,s.style.position="absolute",s}}const n=(t,e,s,i)=>{const o=Math.min(e.length,4),n=Math.round((i-s)/o);let r=s;for(let s=0;s<o;s++){const i=e[s];i.position&&t.push({bottom:r+n,node:i.node,position:i.position,top:r}),r+=n}},r=(t,e,i)=>((t,e)=>{if(!t.length)return[];let s=t[0].top,i=[];const o=[];for(const e of t)e.top!==s&&i.length&&(n(o,i,s,e.top),s=e.top,i=[]),i.push(e);return n(o,i,s,e),o})(((t,e)=>{const i=[];let o=0;const n=(t,e,s)=>{i.push({node:t,position:e,top:s}),o=s};return((t,{handleAfterOpenFolder:e,handleClosedFolder:s,handleFirstNode:i,handleNode:o,handleOpenFolder:n})=>{let r=!0;const h=(t,l)=>{let c=(t.is_open||!t.element)&&t.hasChildren(),d=null;if(t.element?.offsetParent&&(d=t.element,r&&(i(t),r=!1),t.hasChildren()?t.is_open?n(t,t.element)||(c=!1):s(t,l,d):o(t,l,t.element)),c){const s=t.children.length;t.children.forEach((e,i)=>{const o=t.children[i];if(o)if(i===s-1)h(o,null);else{const e=t.children[i+1];e&&h(o,e)}}),t.is_open&&d&&e(t,l)}};h(t,null)})(t,{handleAfterOpenFolder:(t,s)=>{n(t,t===e||s===e?null:"after",o)},handleClosedFolder:(t,i,o)=>{const r=s(o);t===e?n(t,null,r):(n(t,"inside",r),i!==e&&n(t,"after",r))},handleFirstNode:t=>{t!==e&&t.element&&n(t,"before",s(t.element))},handleNode:(t,i,o)=>{const r=s(o);n(t,t===e?null:"inside",r),n(t,i===e||t===e?null:"after",r)},handleOpenFolder:(t,i)=>{if(t===e){const e=s(i),o=i.clientHeight;return n(t,null,e),o>5&&n(t,null,e+o-5),!1}return t.children[0]!==e&&n(t,"inside",s(i)),!0}}),i})(t,e),i);class h{currentItem;hitAreas;hoveredArea;isDragging;T;I;C;q;L;k;H;A;B;O;P;U;$;G;V;Y;R;l;u;constructor({autoEscape:t,getNodeElement:e,getNodeElementForNode:s,getScrollLeft:i,getTree:o,onCanMove:n,onCanMoveTo:r,onDragMove:h,onDragStop:l,onIsMoveHandle:c,openFolderDelay:d,openNode:a,refreshElements:u,slide:m,treeElement:f,triggerEvent:g}){this.T=t,this.C=e,this.q=s,this.L=i,this.k=o,this.H=n,this.A=r,this.B=h,this.O=l,this.P=c,this.U=d,this.G=a,this.Y=u,this.R=m,this.l=f,this.u=g,this.hoveredArea=null,this.hitAreas=[],this.isDragging=!1,this.currentItem=null}mouseCapture(t){const e=t.target;if(!this.X(e))return null;if(this.P&&!this.P(jQuery(e)))return null;let s=this.C(e);return s&&this.H&&(this.H(s.node)||(s=null)),this.currentItem=s,null!=this.currentItem}mouseDrag(t){if(!this.currentItem||!this.I)return!1;this.I.move(t.pageX,t.pageY);const e=this.J(t.pageX,t.pageY);return e&&this.K(e,this.currentItem)?(e.node.isFolder()||this.W(),this.hoveredArea!==e&&(this.hoveredArea=e,this.Z(e)?this.tt(e.node):this.W(),this.et())):(this.st(),this.W(),this.hoveredArea=e),e||this.B&&this.B(this.currentItem.node,t.originalEvent),!0}mouseStart(t){if(!this.currentItem)return!1;this.refresh();const{left:e,top:s}=i(t.target),n=this.currentItem.node;return this.I=new o({autoEscape:this.T??!0,nodeName:n.name,offsetX:t.pageX-e,offsetY:t.pageY-s,treeElement:this.l}),this.isDragging=!0,this.currentItem.element.classList.add("jqtree-moving"),!0}mouseStop(t){this.it(t),this.ot(),this.nt(),this.st(),this.rt();const e=this.currentItem;return this.currentItem&&(this.currentItem.element.classList.remove("jqtree-moving"),this.currentItem=null),this.isDragging=!1,!this.hoveredArea&&e&&this.O&&this.O(e.node,t.originalEvent),!1}refresh(){if(this.rt(),this.currentItem){const t=this.currentItem.node;this.ht(t),this.currentItem=this.q(t),this.isDragging&&this.currentItem.element.classList.add("jqtree-moving")}}K(t,e){return!this.A||this.A(e.node,t.node,t.position)}ot(){this.I&&(this.I.remove(),this.I=null)}J(t,e){const s=this.lt();return t<s.left||e<s.top||t>s.right||e>s.bottom?null:function(t,e){let s=0,i=t.length;for(;s<i;){const o=s+i>>1,n=t[o];if(void 0===n)return null;const r=e(n);if(r>0)i=o;else{if(!(r<0))return n;s=o+1}}return null}(this.hitAreas,t=>e<t.top?1:e>t.bottom?-1:0)}ht(t){const e=this.k();this.hitAreas=e?r(e,t,this.lt().bottom):[]}lt(){const t=i(this.l),e=t.left+this.L(),s=t.top;return{bottom:s+this.l.clientHeight+16,left:e,right:e+this.l.clientWidth,top:s}}it(t){if(this.currentItem&&this.hoveredArea?.position&&this.K(this.hoveredArea,this.currentItem)){const e=this.currentItem.node,s=this.hoveredArea.node,i=this.hoveredArea.position,o=e.parent;"inside"===i&&(this.hoveredArea.node.is_open=!0);const n=()=>{const t=this.k();t&&(t.moveNode(e,s,i),this.l.textContent="",this.Y(null))};this.u("tree.move",{move_info:{do_move:n,moved_node:e,original_event:t.originalEvent,position:i,previous_parent:o,target_node:s}})&&n()}}X(t){const e=t.nodeName;return"INPUT"!==e&&"SELECT"!==e&&"TEXTAREA"!==e}Z(t){const e=t.node;return e.isFolder()&&!e.is_open&&"inside"===t.position}st(){this.V&&this.V.remove()}rt(){this.hitAreas=[]}nt(){this.hoveredArea=null}tt(t){const e=()=>{this.G(t,this.R,()=>{this.refresh(),this.et()})};this.W();const s=this.U;!1!==s&&(this.$=window.setTimeout(e,s))}W(){this.$&&(clearTimeout(this.$),this.$=null)}et(){if(!this.hoveredArea)return;this.st();const t=this.q(this.hoveredArea.node);this.V=t.addDropHint(this.hoveredArea.position)}}const l=t=>t?"true":"false";class c{closedIconElement;openedIconElement;T;ct;dt;k;ut;ft;gt;_t;vt;St;constructor({autoEscape:t,buttonLeft:e,closedIcon:s,dragAndDrop:i,getTree:o,htmlElement:n,isNodeSelected:r,onCreateLi:h,openedIcon:l,rtl:c,showEmptyFolder:d,tabIndex:a}){this.T=t,this.ct=e,this.dt=i,this.k=o,this.ut=n,this.ft=r,this.gt=h,this._t=c,this.vt=d,this.St=a,this.openedIconElement=this.Nt(l??"+"),this.closedIconElement=this.Nt(s??"-")}render(t){t?.parent?this.renderFromNode(t):this.renderFromRoot()}renderFromNode(t){if(!t.element)return;const e=t.element,s=this.Et(t,t.getLevel());e.replaceWith(s),this.yt(s,t.children,!1,t.getLevel()+1)}renderFromRoot(){this.ut.textContent="";const t=this.k();t&&this.yt(this.ut,t.children,!0,1)}wt(t,e){t.element=e,jQuery(e).data("node",t)}Nt(t){if("string"==typeof t){const e=document.createElement("div");return e.innerHTML=t,document.createTextNode(e.innerHTML)}return t.nodeType?t:jQuery(t)[0]}yt(t,e,s,i){const o=this.bt(s);t.appendChild(o);for(const t of e){const e=this.Et(t,i);o.appendChild(e),t.hasChildren()&&this.yt(e,t.children,!1,i+1)}}jt(t,e,s){const i=this.Dt(t),o=this.Ft(t,s),n=t.is_open?this.openedIconElement:this.closedIconElement,r=document.createElement("li");r.className=`jqtree_common ${o}`,r.setAttribute("role","none");const h=document.createElement("div");h.className="jqtree-element jqtree_common",h.setAttribute("role","none"),r.appendChild(h);const c=document.createElement("a");c.className=i,n&&c.appendChild(n.cloneNode(!0)),this.ct&&h.appendChild(c);const d=this.Mt(t.name,s,!0,e);return d.setAttribute("aria-expanded",l(t.is_open)),h.appendChild(d),this.ct||h.appendChild(c),r}Et(t,e){const s=this.ft(t),i=t.isFolder()||t.isEmptyFolder&&this.vt?this.jt(t,e,s):this.Tt(t,e,s);return this.wt(t,i),this.gt&&this.gt(t,jQuery(i),s),i}Tt(t,e,s){const i=["jqtree_common"];s&&i.push("jqtree-selected");const o=i.join(" "),n=document.createElement("li");n.className=o,n.setAttribute("role","none");const r=document.createElement("div");r.className="jqtree-element jqtree_common",r.setAttribute("role","none"),n.appendChild(r);const h=this.Mt(t.name,s,!1,e);return r.appendChild(h),n}Mt(t,e,s,i){const o=document.createElement("span");let n="jqtree-title jqtree_common";if(s&&(n+=" jqtree-title-folder"),n+=" jqtree-title-button-"+(this.ct?"left":"right"),o.className=n,e){const t=this.St;void 0!==t&&o.setAttribute("tabindex",`${t}`)}return this.It(o,t,i,e),this.T?o.textContent=t:o.innerHTML=t,o}bt(t){let e,s;t?(e="jqtree-tree",s="tree",this._t&&(e+=" jqtree-rtl")):(e="",s="group"),this.dt&&(e+=" jqtree-dnd");const i=document.createElement("ul");return i.className=`jqtree_common ${e}`,i.setAttribute("role",s),i}Dt(t){const e=["jqtree-toggler","jqtree_common"];return t.is_open||e.push("jqtree-closed"),this.ct?e.push("jqtree-toggler-left"):e.push("jqtree-toggler-right"),e.join(" ")}Ft(t,e){const s=["jqtree-folder"];return t.is_open||s.push("jqtree-closed"),e&&s.push("jqtree-selected"),t.is_loading&&s.push("jqtree-loading"),s.join(" ")}It(t,e,s,i){t.setAttribute("aria-label",e),t.setAttribute("aria-level",`${s}`),t.setAttribute("aria-selected",l(i)),t.setAttribute("role","treeitem")}}class d{Ct;qt;Lt;xt;G;kt;constructor({closeNode:t,getSelectedNode:e,isFocusOnTree:s,keyboardSupport:i,openNode:o,selectNode:n}){this.Ct=t,this.qt=e,this.Lt=s,this.xt=i,this.G=o,this.kt=n,i&&document.addEventListener("keydown",this.Ht)}deinit(){this.xt&&document.removeEventListener("keydown",this.Ht)}moveDown(t){return this.At(t.getNextVisibleNode())}moveUp(t){return this.At(t.getPreviousVisibleNode())}Bt(){return this.xt&&this.Lt()}Ht=t=>{if(!this.Bt())return;let e=!1;const s=this.qt();if(s)switch(t.key){case"ArrowDown":e=this.moveDown(s);break;case"ArrowLeft":e=this.Ot(s);break;case"ArrowRight":e=this.Pt(s);break;case"ArrowUp":e=this.moveUp(s)}e&&t.preventDefault()};Ot(t){return t.isFolder()&&t.is_open?(this.Ct(t),!0):this.At(t.getParent())}Pt(t){return!!t.isFolder()&&(t.is_open?this.At(t.getNextVisibleNode()):(this.G(t),!0))}At(t){return!!t&&(this.kt(t),!0)}}const a=t=>({originalEvent:t,pageX:t.pageX,pageY:t.pageY,target:t.target}),u=(t,e)=>({originalEvent:e,pageX:t.pageX,pageY:t.pageY,target:t.target});class m{j;Qt;Ut;$t;Gt;zt;Vt;Yt;Rt;Xt;Jt;Kt;Wt;u;Zt;constructor({element:t,getMouseDelay:e,getNode:s,onClickButton:i,onClickTitle:o,onMouseCapture:n,onMouseDrag:r,onMouseStart:h,onMouseStop:l,triggerEvent:c,useContextMenu:d}){this.j=t,this.Qt=e,this.Ut=s,this.Yt=i,this.Rt=o,this.Xt=n,this.Jt=r,this.Kt=h,this.Wt=l,this.u=c,this.Zt=d,t.addEventListener("click",this.te),t.addEventListener("dblclick",this.ee),t.addEventListener("mousedown",this.se,{passive:!1}),t.addEventListener("touchstart",this.ie,{passive:!1}),d&&t.addEventListener("contextmenu",this.oe),this.Gt=!1,this.zt=null,this.$t=!1,this.Vt=null}deinit(){this.j.removeEventListener("click",this.te),this.j.removeEventListener("dblclick",this.ee),this.Zt&&this.j.removeEventListener("contextmenu",this.oe),this.j.removeEventListener("mousedown",this.se),this.j.removeEventListener("touchstart",this.ie),this.ne()}re(t){const e=t.closest(".jqtree-toggler");if(e){const t=this.Ut(e);if(t)return{node:t,type:"button"}}else{const e=t.closest(".jqtree-element");if(e){const t=this.Ut(e);if(t)return{node:t,type:"label"}}}return null}te=t=>{if(!t.target)return;const e=this.re(t.target);if(e)switch(e.type){case"button":this.Yt(e.node),t.preventDefault(),t.stopPropagation();break;case"label":this.u("tree.click",{click_event:t,node:e.node})&&this.Rt(e.node)}};oe=t=>{if(!t.target)return;const e=t.target.closest("ul.jqtree-tree .jqtree-element");if(e){const s=this.Ut(e);if(s)return t.preventDefault(),t.stopPropagation(),this.u("tree.contextmenu",{click_event:t,node:s}),!1}return null};ee=t=>{if(!t.target)return;const e=this.re(t.target);"label"===e?.type&&this.u("tree.dblclick",{click_event:t,node:e.node})};he(t){return this.Gt&&this.le(t),this.Vt=t,!!this.Xt(t)&&(this.ce(),!0)}de(t,e){if(this.Gt)return this.Jt(e),void(t.cancelable&&t.preventDefault());this.$t&&(this.Vt&&(this.Gt=this.Kt(this.Vt)),this.Gt?(this.Jt(e),t.cancelable&&t.preventDefault()):this.le(e))}le(t){this.ne(),this.$t=!1,this.Vt=null,this.Gt&&(this.Gt=!1,this.Wt(t))}ce(){document.addEventListener("mousemove",this.ae,{passive:!1}),document.addEventListener("touchmove",this.ue,{passive:!1}),document.addEventListener("mouseup",this.me,{passive:!1}),document.addEventListener("touchend",this.fe,{passive:!1});const t=this.Qt();t?this.ge(t):this.$t=!0}se=t=>{if(0!==t.button)return;this.he(a(t))&&t.cancelable&&t.preventDefault()};ae=t=>{this.de(t,a(t))};me=t=>{this.le(a(t))};ne(){document.removeEventListener("mousemove",this.ae),document.removeEventListener("touchmove",this.ue),document.removeEventListener("mouseup",this.me),document.removeEventListener("touchend",this.fe)}ge(t){this.zt&&clearTimeout(this.zt),this.zt=window.setTimeout(()=>{this.Vt&&(this.$t=!0)},t),this.$t=!1}fe=t=>{if(t.touches.length>1)return;const e=t.touches[0];e&&this.le(u(e,t))};ue=t=>{if(t.touches.length>1)return;const e=t.touches[0];e&&this.de(t,u(e,t))};ie=t=>{if(t.touches.length>1)return;const e=t.touches[0];e&&this.he(u(e,t))}}const f=t=>"object"==typeof t&&"children"in t&&t.children instanceof Array;class g{children;element;id;idMapping;is_loading;is_open;isEmptyFolder;load_on_demand;name;nodeClass;parent;tree;constructor(t=null,e=!1,s=g){this.name="",this.load_on_demand=!1,this.isEmptyFolder=null!=t&&f(t)&&0===t.children.length,this.setData(t),this.children=[],this.parent=null,e&&(this.idMapping=new Map,this.tree=this,this.nodeClass=s)}addAfter(t){if(this.parent){const e=this._e(t),s=this.parent.getChildIndex(this);return this.parent.addChildAtPosition(e,s+1),e.pe(t),e}return null}addBefore(t){if(this.parent){const e=this._e(t),s=this.parent.getChildIndex(this);return this.parent.addChildAtPosition(e,s),e.pe(t),e}return null}addChild(t){this.children.push(t),t.ve(this)}addChildAtPosition(t,e){this.children.splice(e,0,t),t.ve(this)}addNodeToIndex(t){null!=t.id&&this.idMapping.set(t.id,t)}addParent(t){if(this.parent){const e=this._e(t);this.tree&&e.ve(this.tree);const s=this.parent;for(const t of s.children)e.addChild(t);return s.children=[],s.addChild(e),e}return null}append(t){const e=this._e(t);return this.addChild(e),e.pe(t),e}filter(t){const e=[];return this.iterate(s=>(t(s)&&e.push(s),!0)),e}getChildIndex(t){return this.children.indexOf(t)}getData(t=!1){const e=t=>t.map(t=>{const s={};for(const e in t)if(-1===["parent","children","element","idMapping","load_on_demand","nodeClass","tree","isEmptyFolder"].indexOf(e)&&Object.prototype.hasOwnProperty.call(t,e)){const i=t[e];s[e]=i}return t.hasChildren()&&(s.children=e(t.children)),s});return e(t?[this]:this.children)}getLastChild(){if(this.hasChildren()){const t=this.children[this.children.length-1];return t.hasChildren()&&t.is_open?t.getLastChild():t}return null}getLevel(){let t=0,e=this;for(;e.parent;)t+=1,e=e.parent;return t}getNextNode(t=!0){if(t&&this.hasChildren())return this.children[0]??null;if(this.parent){const t=this.getNextSibling();return t||this.parent.getNextNode(!1)}return null}getNextSibling(){if(this.parent){const t=this.parent.getChildIndex(this)+1;return t<this.parent.children.length?this.parent.children[t]??null:null}return null}getNextVisibleNode(){if(this.hasChildren()&&this.is_open)return this.children[0]??null;if(this.parent){const t=this.getNextSibling();return t||this.parent.getNextNode(!1)}return null}getNodeByCallback(t){let e=null;return this.iterate(s=>!e&&(!t(s)||(e=s,!1))),e}getNodeById(t){return this.idMapping.get(t)??null}getNodeByName(t){return this.getNodeByCallback(e=>e.name===t)}getNodeByNameMustExist(t){const e=this.getNodeByCallback(e=>e.name===t);if(!e)throw new Error(`Node with name ${t} not found`);return e}getNodesByProperty(t,e){return this.filter(s=>s[t]===e)}getParent(){return this.parent&&this.parent.parent?this.parent:null}getPreviousNode(){if(this.parent){const t=this.getPreviousSibling();return t?t.hasChildren()?t.getLastChild():t:this.getParent()}return null}getPreviousSibling(){if(this.parent){const t=this.parent.getChildIndex(this)-1;return t>=0?this.parent.children[t]??null:null}return null}getPreviousVisibleNode(){if(this.parent){const t=this.getPreviousSibling();return t?t.hasChildren()&&t.is_open?t.getLastChild():t:this.getParent()}return null}hasChildren(){return 0!==this.children.length}initFromData(t){const e=t=>{for(const e of t){const t=this._e();t.initFromData(e),this.addChild(t)}};(t=>{this.setData(t),f(t)&&t.children.length&&e(t.children)})(t)}isFolder(){return this.hasChildren()||this.load_on_demand}isParentOf(t){let e=t.parent;for(;e;){if(e===this)return!0;e=e.parent}return!1}iterate(t){const e=(s,i)=>{for(const o of s.children){t(o,i)&&o.hasChildren()&&e(o,i+1)}};e(this,0)}loadFromData(t){this.removeChildren();for(const e of t){const t=this._e(e);this.addChild(t),f(e)&&t.loadFromData(e.children)}return this}moveNode(t,e,s){if(!t.parent||t.isParentOf(e))return!1;switch(t.parent.Se(t),s){case"after":return!!e.parent&&(e.parent.addChildAtPosition(t,e.parent.getChildIndex(e)+1),!0);case"before":return!!e.parent&&(e.parent.addChildAtPosition(t,e.parent.getChildIndex(e)),!0);case"inside":return e.addChildAtPosition(t,0),!0}}prepend(t){const e=this._e(t);return this.addChildAtPosition(e,0),e.pe(t),e}remove(){this.parent&&(this.parent.removeChild(this),this.parent=null)}removeChild(t){t.removeChildren(),this.Se(t)}removeChildren(){this.iterate(t=>(this.tree?.removeNodeFromIndex(t),!0)),this.children=[]}removeNodeFromIndex(t){null!=t.id&&this.idMapping.delete(t.id)}setData(t){if(t)if("string"==typeof t)this.name=t;else if("object"==typeof t)for(const e in t)if(Object.prototype.hasOwnProperty.call(t,e)){const s=t[e];"label"===e||"name"===e?"string"==typeof s&&(this.name=s):"children"!==e&&"parent"!==e&&(this[e]=s)}}_e(t){return new(this.Ne())(t)}Se(t){this.children.splice(this.getChildIndex(t),1),this.tree?.removeNodeFromIndex(t)}Ne(){return this.nodeClass??this.tree?.nodeClass??g}pe(t){f(t)&&t.children.length&&this.loadFromData(t.children)}ve(t){this.parent=t,this.tree=t.tree,this.tree?.addNodeToIndex(this)}}class _{Ee;constructor(t,e){const s=t.querySelector(":scope > .jqtree-element");if(!s)return void(this.Ee=void 0);const i=Math.max(t.offsetWidth+e-4,0),o=Math.max(t.clientHeight-4,0),n=document.createElement("span");n.className="jqtree-border",n.style.width=`${i}px`,n.style.height=`${o}px`,this.Ee=n,s.append(this.Ee)}remove(){this.Ee?.remove()}}class p{j;ye;we;constructor(t,e,s){switch(this.j=e,this.we=t,this.ye=this.be(),s){case"after":this.je();break;case"before":this.De();break;case"inside":t.isFolder()&&t.is_open?this.Fe():this.Me()}}remove(){this.ye.remove()}be(){const t=document.createElement("li");t.className="jqtree_common jqtree-ghost";const e=document.createElement("span");e.className="jqtree_common jqtree-circle",t.append(e);const s=document.createElement("span");return s.className="jqtree_common jqtree-line",t.append(s),t}je(){this.j.after(this.ye)}De(){this.j.before(this.ye)}Me(){this.j.after(this.ye),this.ye.classList.add("jqtree-inside")}Fe(){const t=this.we.children[0]?.element;t&&t.before(this.ye)}}class v{element;node;L;St;l;constructor({getScrollLeft:t,node:e,tabIndex:s,treeElement:i}){this.L=t,this.St=s,this.l=i,this.init(e)}addDropHint(t){return this.mustShowBorderDropHint(t)?new _(this.element,this.L()):new p(this.node,this.element,t)}deselect(){this.element.classList.remove("jqtree-selected");const t=this.getTitleSpan();t.removeAttribute("tabindex"),t.setAttribute("aria-selected","false"),t.blur()}init(t){this.node=t,t.element??=this.l,this.element=t.element}select(t){this.element.classList.add("jqtree-selected");const e=this.getTitleSpan(),s=this.St;null!=s&&e.setAttribute("tabindex",s.toString()),e.setAttribute("aria-selected","true"),t&&e.focus()}getTitleSpan(){return this.element.querySelector(":scope > .jqtree-element > span.jqtree-title")}getUl(){return this.element.querySelector(":scope > ul")}mustShowBorderDropHint(t){return"inside"===t}}const S=t=>"number"==typeof t?t:"slow"===t?600:200;class N extends v{Te;Ie;u;constructor({closedIconElement:t,getScrollLeft:e,node:s,openedIconElement:i,tabIndex:o,treeElement:n,triggerEvent:r}){super({getScrollLeft:e,node:s,tabIndex:o,treeElement:n}),this.Te=t,this.Ie=i,this.u=r}close(t,e){if(!this.node.is_open)return;this.node.is_open=!1;const s=this.Ce();s.classList.add("jqtree-closed"),s.innerHTML="";const i=this.Te;if(i){const t=i.cloneNode(!0);s.appendChild(t)}const o=()=>{this.element.classList.add("jqtree-closed");this.getTitleSpan().setAttribute("aria-expanded","false"),this.u("tree.close",{node:this.node})},n=this.getUl();t?((t,e,s)=>{t.animate([{height:`${t.scrollHeight}px`,overflow:"hidden"},{height:"0",overflow:"hidden"}],{duration:S(e)}).onfinish=()=>{t.style.display="none",s()}})(n,e,o):(n.style.display="none",o())}open(t,e,s){if(this.node.is_open)return;this.node.is_open=!0;const i=this.Ce();i.classList.remove("jqtree-closed"),i.innerHTML="";const o=this.Ie;if(o){const t=o.cloneNode(!0);i.appendChild(t)}const n=()=>{this.element.classList.remove("jqtree-closed");this.getTitleSpan().setAttribute("aria-expanded","true"),t&&t(this.node),this.u("tree.open",{node:this.node})},r=this.getUl();e?((t,e,s)=>{t.style.display="block",t.animate([{height:"0",overflow:"hidden"},{height:`${t.scrollHeight}px`,overflow:"hidden"}],{duration:S(e)}).onfinish=()=>{s()}})(r,s,n):(r.style.display="block",n())}mustShowBorderDropHint(t){return!this.node.is_open&&"inside"===t}Ce(){return this.element.querySelector(":scope > .jqtree-element > a.jqtree-toggler")}}class E{qe;Le;xe;k;ke;He;G;Y;Ae;Be;constructor({addToSelection:t,getNodeById:e,getSelectedNodes:s,getTree:i,onGetStateFromStorage:o,onSetStateFromStorage:n,openNode:r,refreshElements:h,removeFromSelection:l,saveState:c}){this.qe=t,this.Le=e,this.xe=s,this.k=i,this.ke=o,this.He=n,this.G=r,this.Y=h,this.Ae=l,this.Be=c}getNodeIdToBeSelected(){const t=this.getStateFromStorage();return t?.selected_node?t.selected_node[0]??null:null}getState(){return{open_nodes:(()=>{const t=[];return this.k()?.iterate(e=>(e.is_open&&e.id&&e.hasChildren()&&t.push(e.id),!0)),t})(),selected_node:(()=>{const t=[];return this.xe().forEach(e=>{null!=e.id&&t.push(e.id)}),t})()}}getStateFromStorage(){const t=this.Oe();return t?this.Pe(t):null}saveState(){const t=JSON.stringify(this.getState());this.He?this.He(t):localStorage.setItem(this.Qe(),t)}setInitialState(t){let e=!1;return t.open_nodes&&(e=this.Ue(t.open_nodes)),this.$e(),t.selected_node&&this.Ge(t.selected_node),e}setInitialStateOnDemand(t,e){let s=0,i=t.open_nodes;const o=()=>{if(!i)return;const o=[];for(const t of i){const e=this.Le(t);e?e.is_loading||(e.load_on_demand?n(e):this.G(e,!1)):o.push(t)}i=o,t.selected_node&&this.Ge(t.selected_node)&&this.Y(null),0===s&&e()},n=t=>{s+=1,this.G(t,!1,()=>{s-=1,o()})};o()}Qe(){return"string"==typeof this.Be?this.Be:"tree"}Oe(){return this.ke?this.ke():localStorage.getItem(this.Qe())}Ue(t){let e=!1;for(const s of t){const t=this.Le(s);t&&(t.load_on_demand?e=!0:t.is_open=!0)}return e}Pe(t){const e=JSON.parse(t);var s;return e.selected_node&&("number"==typeof(s=e.selected_node)&&s%1==0)&&(e.selected_node=[e.selected_node]),e}$e(){this.xe().forEach(t=>{this.Ae(t)})}Ge(t){let e=0;for(const s of t){const t=this.Le(s);t&&(e+=1,this.qe(t))}return 0!==e}}class y{container;horizontalScrollDirection;horizontalScrollTimeout;refreshHitAreas;verticalScrollDirection;verticalScrollTimeout;constructor({container:t,refreshHitAreas:e}){this.container=t,this.refreshHitAreas=e}checkHorizontalScrolling(t){const e=this.getNewHorizontalScrollDirection(t);this.horizontalScrollDirection!==e&&(this.horizontalScrollDirection=e,null!=this.horizontalScrollTimeout&&window.clearTimeout(this.horizontalScrollTimeout),e&&(this.horizontalScrollTimeout=window.setTimeout(this.scrollHorizontally.bind(this),40)))}checkVerticalScrolling(t){const e=this.getNewVerticalScrollDirection(t);this.verticalScrollDirection!==e&&(this.verticalScrollDirection=e,null!=this.verticalScrollTimeout&&(window.clearTimeout(this.verticalScrollTimeout),this.verticalScrollTimeout=void 0),e&&(this.verticalScrollTimeout=window.setTimeout(this.scrollVertically.bind(this),40)))}getScrollLeft(){return this.container.scrollLeft}scrollToY(t){this.container.scrollTop=t}stopScrolling(){this.horizontalScrollDirection=void 0,this.verticalScrollDirection=void 0}scrollHorizontally(){if(!this.horizontalScrollDirection)return;const t="left"===this.horizontalScrollDirection?-20:20;this.container.scrollBy({behavior:"instant",left:t,top:0}),this.refreshHitAreas(),setTimeout(this.scrollHorizontally.bind(this),40)}scrollVertically(){if(!this.verticalScrollDirection)return;const t="top"===this.verticalScrollDirection?-20:20;this.container.scrollBy({behavior:"instant",left:0,top:t}),this.refreshHitAreas(),setTimeout(this.scrollVertically.bind(this),40)}}class w extends y{ze;Ve;stopScrolling(){super.stopScrolling(),this.horizontalScrollDirection=void 0,this.verticalScrollDirection=void 0}getNewHorizontalScrollDirection(t){const e=i(this.container),s=this.container.getBoundingClientRect().width,o=e.left+s,n=e.left;return t>o-20?"right":t<n+20?"left":void 0}getNewVerticalScrollDirection(t){return t<this.Ye()?"top":t>this.Re()?"bottom":void 0}Re(){if(null==this.ze){const t=this.container.getBoundingClientRect().height;this.ze=this.Ye()+t}return this.ze}Ye(){return this.Ve??=s(this.container),this.Ve}}class b extends y{Xe;Je;l;constructor({refreshHitAreas:t,treeElement:e}){super({container:document.documentElement,refreshHitAreas:t}),this.l=e}scrollToY(t){const e=s(this.l);super.scrollToY(t+e)}stopScrolling(){super.stopScrolling(),this.Xe=void 0,this.Je=void 0}getNewHorizontalScrollDirection(t){const e=t-this.container.scrollLeft<20;return t>window.innerWidth-20&&this.Ke()?"right":e?"left":void 0}getNewVerticalScrollDirection(t){const e=this.container.scrollTop;if(t-e<20)return"top";return window.innerHeight-(t-e)<20&&this.We()?"bottom":void 0}We(){return this.container.scrollTop+this.container.clientHeight<this.Ze()}Ke(){return this.container.scrollLeft+this.container.clientWidth<this.ts()}Ze(){return this.Xe??=this.container.scrollHeight,this.Xe}ts(){return this.Je??=this.container.scrollWidth,this.Je}}const j=t=>"auto"===t||"scroll"===t,D=t=>{const e=getComputedStyle(t);return j(e.overflowX)||j(e.overflowY)},F=(t,e)=>{const s=(t=>{if(D(t))return t;let e=t.parentElement;for(;e;){if(D(e))return e;e=e.parentElement}return null})(t);return s&&"HTML"!==s.tagName?new w({container:s,refreshHitAreas:e}):new b({refreshHitAreas:e,treeElement:t})};class M{es;ss;l;constructor({refreshHitAreas:t,treeElement:e}){this.es=t,this.ss=void 0,this.l=e}checkScrolling(t){this.ns(t),this.rs(t)}getScrollLeft(){return this.hs().getScrollLeft()}scrollToY(t){this.hs().scrollToY(t)}stopScrolling(){this.hs().stopScrolling()}rs(t){this.hs().checkHorizontalScrolling(t.pageX)}ns(t){this.hs().checkVerticalScrolling(t.pageY)}hs(){return this.ss??=F(this.l,this.es),this.ss}}class T{Le;ls;cs;constructor({getNodeById:t}){this.Le=t,this.ls=new Set,this.clear()}addToSelection(t){null!=t.id?this.ls.add(t.id):this.cs=t}clear(){this.ls.clear(),this.cs=null}getSelectedNode(){const t=this.getSelectedNodes();return!!t.length&&(t[0]??!1)}getSelectedNodes(){if(this.cs)return[this.cs];{const t=[];return this.ls.forEach(e=>{const s=this.Le(e);s&&t.push(s)}),t}}getSelectedNodesUnder(t){if(this.cs)return t.isParentOf(this.cs)?[this.cs]:[];{const e=[];return this.ls.forEach(s=>{const i=this.Le(s);i&&t.isParentOf(i)&&e.push(i)}),e}}isNodeSelected(t){return null!=t.id?this.ls.has(t.id):!!this.cs&&this.cs.element===t.element}removeFromSelection(t,e=!1){null==t.id?this.cs&&t.element===this.cs.element&&(this.cs=null):(this.ls.delete(t.id),e&&t.iterate(()=>(null!=t.id&&this.ls.delete(t.id),!0)))}}const I=(t,e)=>{const s=()=>`simple_widget_${e}`,i=(t,e)=>{const s=jQuery.data(t,e);return s&&s instanceof C?s:null},o=(e,o)=>{const n=s();for(const s of e.get()){if(!i(s,n)){const e=new t(s,o);jQuery.data(s,n)||jQuery.data(s,n,e),e.init()}}return e};jQuery.fn[e]=function(t,...e){if(!t)return o(this,null);if("object"==typeof t){return o(this,t)}if("string"==typeof t&&"_"!==t[0]){const o=t;return"destroy"===t?void(t=>{const e=s();for(const s of t.get()){const t=i(s,e);t&&t.destroy(),jQuery.removeData(s,e)}})(this):((t,e,i)=>{let o=null;for(const n of t.get()){const t=jQuery.data(n,s());if(t&&t instanceof C){const s=t[e];s&&"function"==typeof s&&(o=s.apply(t,i))}}return o})(this,o,e)}}};class C{static defaults={};$el;options;constructor(t,e){this.$el=jQuery(t);const s=this.constructor.defaults;this.options={...s,...e}}static register(t,e){I(t,e)}deinit(){}destroy(){this.deinit()}init(){}}const q="Node parameter is empty",L="Parameter is empty: ";class x extends C{static defaults={animationSpeed:"fast",autoEscape:!0,autoOpen:!1,buttonLeft:!0,closedIcon:void 0,data:void 0,dataFilter:void 0,dataUrl:void 0,dragAndDrop:!1,keyboardSupport:!0,nodeClass:g,onCanMove:void 0,onCanMoveTo:void 0,onCanSelectNode:void 0,onCreateLi:void 0,onDragMove:void 0,onDragStop:void 0,onGetStateFromStorage:void 0,onIsMoveHandle:void 0,onLoadFailed:void 0,onLoading:void 0,onSetStateFromStorage:void 0,openedIcon:"&#x25bc;",openFolderDelay:500,rtl:void 0,saveState:!1,selectable:!0,showEmptyFolder:!1,slide:!0,startDndDelay:300,tabIndex:0,useContextMenu:!0};ds;us;j;ut;fs;gs;_s;ps;vs;Ss;Ns;Es;addNodeAfter(t,e){const s=e.addAfter(t);return s&&this.Y(e.parent),s}addNodeBefore(t,e){if(!e)throw Error(L+"existingNode");const s=e.addBefore(t);return s&&this.Y(e.parent),s}addParentNode(t,e){if(!e)throw Error(L+"existingNode");const s=e.addParent(t);return s&&this.Y(s.parent),s}addToSelection(t,e){if(!t)throw Error(q);return this.Ns.addToSelection(t),this.ys(t),this.q(t).select(e??!0),this.ws(),this.j}appendNode(t,e){const s=e??this.Es,i=s.append(t);return this.Y(s),i}closeNode(t,e){if(!t)throw Error(q);const s=e??this.options.slide;return(t.isFolder()||t.isEmptyFolder)&&(this.bs(t).close(s,this.options.animationSpeed),this.ws()),this.j}deinit(){this.ut.textContent="",this.j.off(),this.gs.deinit(),this._s.deinit(),this.Es=new g({},!0),super.deinit()}getNodeByCallback(t){return this.Es.getNodeByCallback(t)}getNodeByHtmlElement(t){const e=t instanceof HTMLElement?t:t.get(0);return e?this.Ut(e):null}getNodeById(t){return this.Es.getNodeById(t)}getNodeByName(t){return this.Es.getNodeByName(t)}getNodeByNameMustExist(t){return this.Es.getNodeByNameMustExist(t)}getNodesByProperty(t,e){return this.Es.getNodesByProperty(t,e)}getSelectedNode(){return this.Ns.getSelectedNode()}getSelectedNodes(){return this.Ns.getSelectedNodes()}getState(){return this.vs.getState()}getStateFromStorage(){return this.vs.getStateFromStorage()}getTree(){return this.Es}getVersion(){return"1.9.0"}init(){super.init(),this.j=this.$el,this.ut=this.j.get(0),this.fs=!1,this.options.dataUrl??=this.j.data("url");const t=this.j.data("rtl");this.options.rtl??=""===t||Boolean(t),this.options.closedIcon??=this.js(),this.Ds(),this.Fs()}isDragging(){return this.us.isDragging}isNodeSelected(t){if(!t)throw Error(q);return this.Ns.isNodeSelected(t)}loadData(t,e){return this.Ms(t,e),this.j}loadDataFromUrl(t,e,s){return"string"==typeof t?this.Ts(t,e,s??null):this.Ts(null,t,e),this.j}moveDown(){const t=this.getSelectedNode();return t&&this.gs.moveDown(t),this.j}moveNode(t,e,s){if(!t)throw Error(q);if(!e)throw Error(L+"targetNode");if(!s)throw Error(L+"position");return this.Es.moveNode(t,e,s),this.Y(null),this.j}moveUp(){const t=this.getSelectedNode();return t&&this.gs.moveUp(t),this.j}openNode(t,e,s){if(!t)throw Error(q);const[i,o]=(()=>{let t,i;return"function"==typeof e?(t=e,i=null):(i=e,t=s),i??=this.options.slide,[i,t]})();return this.Is(t,i,o),this.j}prependNode(t,e){const s=e??this.Es,i=s.prepend(t);return this.Y(s),i}refresh(){return this.Y(null),this.j}reload(t){return this.Ts(null,null,t),this.j}removeFromSelection(t){if(!t)throw Error(q);return this.Ns.removeFromSelection(t),this.q(t).deselect(),this.ws(),this.j}removeNode(t){if(!t)throw Error(q);if(!t.parent)throw Error("Node has no parent");this.Ns.removeFromSelection(t,!0);const e=t.parent;return t.remove(),this.Y(e),this.j}scrollToNode(t){if(!t)throw Error(q);if(!t.element)return this.j;const e=s(t.element)-s(this.ut);return this.Ss.scrollToY(e),this.j}selectNode(t,e){return this.Cs(t,e),this.j}setOption(t,e){return this.options[t]=e,this.j}setState(t){return t&&(this.vs.setInitialState(t),this.Y(null)),this.j}toggle(t,e=null){if(!t)throw Error(q);const s=e??this.options.slide;return t.is_open?this.closeNode(t,s):this.openNode(t,s),this.j}toJson(){return JSON.stringify(this.Es.getData())}updateNode(t,e){if(!t)throw Error(q);if(!e)return this.j;const s="object"==typeof e&&e.id&&e.id!==t.id;return s&&this.Es.removeNodeFromIndex(t),t.setData(e),s&&this.Es.addNodeToIndex(t),"object"==typeof e&&e.children&&e.children instanceof Array&&(t.removeChildren(),e.children.length&&t.loadFromData(e.children)),this.Y(t),this.j}Ds(){const{autoEscape:t,buttonLeft:s,closedIcon:i,dataFilter:o,dragAndDrop:n,keyboardSupport:r,onCanMove:l,onCanMoveTo:a,onCreateLi:u,onDragMove:f,onDragStop:g,onGetStateFromStorage:_,onIsMoveHandle:p,onLoadFailed:v,onLoading:S,onSetStateFromStorage:N,openedIcon:y,openFolderDelay:w,rtl:b,saveState:j,showEmptyFolder:D,slide:F,tabIndex:I}=this.options,C=this.closeNode.bind(this),q=this.C.bind(this),L=this.q.bind(this),x=this.getNodeById.bind(this),k=this.getSelectedNode.bind(this),H=this.getTree.bind(this),A=this.Lt.bind(this),B=this.loadData.bind(this),O=this.Is.bind(this),P=this.Y.bind(this),Q=this.selectNode.bind(this),U=this.ut,$=this.u.bind(this),G=new T({getNodeById:x}),z=G.addToSelection.bind(G),V=G.getSelectedNodes.bind(G),Y=G.isNodeSelected.bind(G),R=G.removeFromSelection.bind(G),X=new e({dataFilter:o,loadData:B,onLoadFailed:v,onLoading:S,treeElement:U,triggerEvent:$}),J=new E({addToSelection:z,getNodeById:x,getSelectedNodes:V,getTree:H,onGetStateFromStorage:_,onSetStateFromStorage:N,openNode:O,refreshElements:P,removeFromSelection:R,saveState:j}),K=new M({refreshHitAreas:()=>{Z.refresh()},treeElement:U}),W=K.getScrollLeft.bind(K),Z=new h({autoEscape:t,getNodeElement:q,getNodeElementForNode:L,getScrollLeft:W,getTree:H,onCanMove:l,onCanMoveTo:a,onDragMove:f,onDragStop:g,onIsMoveHandle:p,openFolderDelay:w,openNode:O,refreshElements:P,slide:F,treeElement:U,triggerEvent:$}),tt=new d({closeNode:C,getSelectedNode:k,isFocusOnTree:A,keyboardSupport:r,openNode:O,selectNode:Q}),et=new c({autoEscape:t,buttonLeft:s,closedIcon:i,dragAndDrop:n,getTree:H,htmlElement:U,isNodeSelected:Y,onCreateLi:u,openedIcon:y,rtl:b,showEmptyFolder:D,tabIndex:I}),st=this.Ut.bind(this),it=this.qs.bind(this),ot=this.Ls.bind(this),nt=this.xs.bind(this),rt=this.ks.bind(this),ht=new m({element:U,getMouseDelay:()=>this.options.startDndDelay??0,getNode:st,onClickButton:this.toggle.bind(this),onClickTitle:this.Cs.bind(this),onMouseCapture:it,onMouseDrag:ot,onMouseStart:nt,onMouseStop:rt,triggerEvent:$,useContextMenu:this.options.useContextMenu});this.ds=X,this.us=Z,this.gs=tt,this._s=ht,this.ps=et,this.vs=J,this.Ss=K,this.Ns=G}Hs(t){const e=this.Ut(t);return e?.tree===this.Es}bs(t){const e=this.ps.closedIconElement,s=this.Ss.getScrollLeft.bind(this.Ss),i=this.ps.openedIconElement,o=this.options.tabIndex,n=this.u.bind(this);return new N({closedIconElement:e,getScrollLeft:s,node:t,openedIconElement:i,tabIndex:o,treeElement:this.ut,triggerEvent:n})}As(t){const e=this.Ss.getScrollLeft.bind(this.Ss),s=this.options.tabIndex;return new v({getScrollLeft:e,node:t,tabIndex:s,treeElement:this.ut})}Bs(){const t=this.getSelectedNode();t&&this.removeFromSelection(t)}Os(t){const e=this.Ns.getSelectedNodesUnder(t);for(const t of e)this.Ns.removeFromSelection(t)}Ms(t,e){t&&(e?(this.Os(e),this.Ps(t,e)):this.Qs(t),this.isDragging()&&this.us.refresh()),this.u("tree.load_data",{parent_node:e,tree_data:t})}Ts(t,e,s){const i=t??this.Us(e);this.ds.loadFromUrl(i,e,s)}Cs(t,e){const s=()=>{this.options.saveState&&this.vs.saveState()};if(!t)return this.Bs(),void s();const i={mustSetFocus:!0,mustToggle:!0,...e??{}};if((()=>this.options.onCanSelectNode?this.options.selectable&&this.options.onCanSelectNode(t):this.options.selectable)()){if(this.Ns.isNodeSelected(t))i.mustToggle&&(this.Bs(),this.u("tree.select",{node:null,previous_node:t}));else{const e=this.getSelectedNode()||null;this.Bs(),this.addToSelection(t,i.mustSetFocus),this.u("tree.select",{deselected_node:e,node:t}),this.ys(t)}s()}}$s(){return!0===this.options.autoOpen?-1:"number"==typeof this.options.autoOpen?this.options.autoOpen:"string"==typeof this.options.autoOpen?parseInt(this.options.autoOpen,10):0}Us(t){const e=e=>{if(t?.id){const s={node:t.id};e.data=s}else{const t=this.Gs();if(t){const s={selected_node:t};e.data=s}}},s=this.options.dataUrl;return"function"==typeof s?s(t):"string"==typeof s?(t=>{const s={url:t};return e(s),s})(s):s&&"object"==typeof s?(e(s),s):null}js(){return this.options.rtl?"&#x25c0;":"&#x25ba;"}Ut(t){const e=t.closest("li.jqtree_common");return e?jQuery(e).data("node"):null}C(t){const e=this.Ut(t);return e?this.q(e):null}q(t){return t.isFolder()?this.bs(t):this.As(t)}Gs(){return this.options.saveState?this.vs.getNodeIdToBeSelected():null}Fs(){if(this.options.data)this.Ms(this.options.data,null);else{this.Us(null)?this.Ts(null,null,null):this.Ms([],null)}}Qs(t){const e=()=>{this.fs||(this.fs=!0,this.u("tree.init"))};this.Es=new this.options.nodeClass(null,!0,this.options.nodeClass),this.Ns.clear(),this.Es.loadFromData(t);const s=this.zs();this.Y(null),s?this.Vs(e):e()}Lt(){const t=document.activeElement;return"SPAN"===t?.tagName&&this.Hs(t)}Ys(t){const e=this.getSelectedNode();return!!e&&(t===e||t.isParentOf(e))}Rs(t,e=!0,s){t.is_loading=!0,this.Ts(null,t,()=>{this.Is(t,e,s)})}Ps(t,e){e.loadFromData(t),e.load_on_demand=!1,e.is_loading=!1,this.Y(e)}qs(t){return!!this.options.dragAndDrop&&this.us.mouseCapture(t)}Ls(t){if(this.options.dragAndDrop){const e=this.us.mouseDrag(t);return this.Ss.checkScrolling(t),e}return!1}xs(t){return!!this.options.dragAndDrop&&this.us.mouseStart(t)}ks(t){return!!this.options.dragAndDrop&&(this.Ss.stopScrolling(),this.us.mouseStop(t))}Is(t,e=!0,s){const i=(e,s,i)=>{if(!t.children.length)return;this.bs(e).open(i,s,this.options.animationSpeed)};if(t.isFolder()||t.isEmptyFolder)if(t.load_on_demand)this.Rs(t,e,s);else{let o=t.parent;for(;o;)o.parent&&i(o,!1),o=o.parent;i(t,e,s),this.ws()}}ys(t){const e=t.parent;e?.parent&&!e.is_open&&this.openNode(e,!1)}Y(t){const e=this.Lt(),s=!!t&&this.Ys(t);this.ps.render(t),s&&this.Xs(e),this.u("tree.refresh")}ws(){this.options.saveState&&this.vs.saveState()}Xs(t){const e=this.getSelectedNode();if(e){this.q(e).select(t)}}zs(){const t=()=>{if(!1===this.options.autoOpen)return!1;const t=this.$s();let e=!1;return this.Es.iterate((s,i)=>s.load_on_demand?(e=!0,!1):!!s.hasChildren()&&(s.is_open=!0,i!==t)),e};let[e,s]=(()=>{if(this.options.saveState){const t=this.vs.getStateFromStorage();if(t){return[!0,this.vs.setInitialState(t)]}return[!1,!1]}return[!1,!1]})();return e||(s=t()),s}Vs(t){const e=()=>{const e=this.$s();let s=0;const i=t=>{s+=1,this.Is(t,!1,()=>{s-=1,o()})},o=()=>{this.Es.iterate((t,s)=>t.load_on_demand?(t.is_loading||i(t),!1):(this.Is(t,!1),s!==e)),0===s&&t()};o()};(()=>{if(this.options.saveState){const e=this.vs.getStateFromStorage();return!!e&&(this.vs.setInitialStateOnDemand(e,t),!0)}return!1})()||e()}u(t,e){const s=jQuery.Event(t,e);return this.j.trigger(s),!s.isDefaultPrevented()}}return C.register(x,"tree"),t.JqTreeWidget=x,t}({});
-//# sourceMappingURL=tree.jquery.js.map
 
 
-/***/ }
 
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	const __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		const module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
-(() => {
-"use strict";
 
-// EXTERNAL MODULE: ./node_modules/.pnpm/jqtree@1.9.0_jquery@4.0.0/node_modules/jqtree/tree.jquery.js
-var tree_jquery = __webpack_require__(382);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// The types that appear in the public api. Consumers cannot import them from
+// the submodules directly, because those are not exposed in package.json.
+// Type only, so that the iife build keeps exposing the TreeElement class itself
+// as its global, instead of an object of named exports.
+
+class TreeElement {
+  /** @hidden */
+  tree;
+  _classNames;
+  _dataLoader;
+  _dndHandler;
+  _htmlElement;
+  _isInitialized;
+  _keyHandler;
+  _mouseHandler;
+  _nodeMap;
+  _options;
+  _renderer;
+  _saveStateHandler;
+  _scrollHandler;
+  _selectNodeHandler;
+  _triggerEventProvider;
+
+  /** @hidden */
+  constructor({
+    htmlElement,
+    overrideTriggerEventProvider,
+    ...options
+  }) {
+    this._htmlElement = htmlElement;
+    this._options = setDefaultOptions(htmlElement, options);
+    this._classNames = createClassNames(this._options);
+    this._triggerEventProvider = overrideTriggerEventProvider ?? triggerCustomEvent;
+    this._isInitialized = false;
+    this.tree = new Node({}, true);
+    this._nodeMap = new WeakMap();
+    const {
+      autoEscape,
+      buttonLeft,
+      closedIcon,
+      dataFilter,
+      dragAndDrop,
+      keyboardSupport,
+      onCanMove,
+      onCanMoveTo,
+      onCreateLi,
+      onDragMove,
+      onDragStop,
+      onGetStateFromStorage,
+      onIsMoveHandle,
+      onSetStateFromStorage,
+      openedIcon,
+      openFolderDelay,
+      rtl,
+      saveState: saveStateOption,
+      showEmptyFolder,
+      slide,
+      tabIndex
+    } = this._options;
+    const classNames = this._classNames;
+    const closeNode = this.closeNode.bind(this);
+    const getNodeElement = this._getNodeElement.bind(this);
+    const getNodeElementForNode = this._getNodeElementForNode.bind(this);
+    const getNodeById = this.getNodeById.bind(this);
+    const getSelectedNode = this.getSelectedNode.bind(this);
+    const getTree = this.getTree.bind(this);
+    const isFocusOnTree = this._isFocusOnTree.bind(this);
+    const loadData = this.loadData.bind(this);
+    const openNode = this.openNode.bind(this);
+    const openParents = this._openParents.bind(this);
+    const refreshElements = this._refreshElements.bind(this);
+    const refreshHitAreas = this.refreshHitAreas.bind(this);
+    const setNodeElement = this._setNodeElement.bind(this);
+    const treeElement = this._htmlElement;
+    const triggerEvent = this._triggerEvent.bind(this);
+    const saveState = () => {
+      saveStateHandler.saveState();
+    };
+    const selectNodeHandler = new SelectNodeHandler({
+      getNodeById,
+      getNodeElementForNode,
+      getOnCanSelectNode: () => this._options.onCanSelectNode,
+      getSelectable: () => this._options.selectable,
+      openParents,
+      saveState,
+      triggerEvent
+    });
+    const addToSelection = selectNodeHandler.addToSelection.bind(selectNodeHandler);
+    const getSelectedNodes = selectNodeHandler.getSelectedNodes.bind(selectNodeHandler);
+    const isNodeSelected = selectNodeHandler.isNodeSelected.bind(selectNodeHandler);
+    const removeFromSelection = selectNodeHandler.removeFromSelection.bind(selectNodeHandler);
+    const selectNode = selectNodeHandler.selectSingleNode.bind(selectNodeHandler);
+    const getMouseDelay = () => this._options.startDndDelay ?? 0;
+    const dataLoader = new DataLoader({
+      classNames,
+      dataFilter,
+      loadData,
+      treeElement,
+      triggerEvent
+    });
+    const saveStateHandler = new SaveStateHandler({
+      addToSelection,
+      getNodeById,
+      getSelectedNodes,
+      getTree,
+      onGetStateFromStorage,
+      onSetStateFromStorage,
+      openNode,
+      refreshElements,
+      removeFromSelection,
+      saveState: saveStateOption
+    });
+    const scrollHandler = new ScrollHandler({
+      refreshHitAreas,
+      treeElement
+    });
+    const getScrollLeft = scrollHandler.getScrollLeft.bind(scrollHandler);
+    const dndHandler = new DragAndDropHandler({
+      autoEscape,
+      classNames,
+      getNodeElement,
+      getNodeElementForNode,
+      getScrollLeft,
+      getTree,
+      onCanMove,
+      onCanMoveTo,
+      onDragMove,
+      onDragStop,
+      onIsMoveHandle,
+      openFolderDelay,
+      openNode,
+      refreshElements,
+      slide,
+      treeElement,
+      triggerEvent
+    });
+    const keyHandler = new KeyHandler({
+      closeNode,
+      getSelectedNode,
+      isFocusOnTree,
+      keyboardSupport,
+      openNode,
+      selectNode
+    });
+    const renderer = new ElementsRenderer({
+      autoEscape,
+      buttonLeft,
+      classNames,
+      closedIcon,
+      dragAndDrop,
+      getTree,
+      htmlElement: treeElement,
+      isNodeSelected,
+      onCreateLi,
+      openedIcon,
+      rtl,
+      setNodeElement,
+      showEmptyFolder,
+      tabIndex
+    });
+    const getNode = this.getNode.bind(this);
+    const onMouseCapture = this._mouseCapture.bind(this);
+    const onMouseDrag = this._mouseDrag.bind(this);
+    const onMouseStart = this._mouseStart.bind(this);
+    const onMouseStop = this._mouseStop.bind(this);
+    const mouseHandler = new MouseHandler({
+      classNames,
+      element: treeElement,
+      getMouseDelay,
+      getNode,
+      onClickButton: this.toggle.bind(this),
+      onClickTitle: selectNode,
+      onMouseCapture,
+      onMouseDrag,
+      onMouseStart,
+      onMouseStop,
+      triggerEvent,
+      useContextMenu: this._options.useContextMenu
+    });
+    this._dataLoader = dataLoader;
+    this._dndHandler = dndHandler;
+    this._keyHandler = keyHandler;
+    this._mouseHandler = mouseHandler;
+    this._renderer = renderer;
+    this._saveStateHandler = saveStateHandler;
+    this._scrollHandler = scrollHandler;
+    this._selectNodeHandler = selectNodeHandler;
+    this._initData();
+  }
+
+  /**
+   * Adds a sibling after a node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addNodeAfter(nodeData, existingNode) {
+    const newNode = existingNode.addAfter(nodeData);
+    if (newNode) {
+      this._refreshElements(existingNode.parent);
+    }
+    return newNode;
+  }
+
+  /**
+   * Adds a sibling before a node.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addNodeBefore(nodeData, existingNode) {
+    const newNode = existingNode.addBefore(nodeData);
+    if (newNode) {
+      this._refreshElements(existingNode.parent);
+    }
+    return newNode;
+  }
+
+  /**
+   * Inserts a new node between a node and its parent, taking the node as its
+   * child.
+   *
+   * @returns The new node, or `null` when the node has no parent.
+   * @group Changing the tree
+   */
+  addParentNode(nodeData, existingNode) {
+    const newNode = existingNode.addParent(nodeData);
+    if (newNode) {
+      this._refreshElements(newNode.parent);
+    }
+    return newNode;
+  }
+
+  /**
+   * Adds a node to the selection instead of replacing it.
+   *
+   * @param mustSetFocus - Move the focus to the node. Default `true`.
+   * @group Selection
+   */
+  addToSelection(node, mustSetFocus) {
+    this._selectNodeHandler.addToSelection(node);
+    this._openParents(node);
+    this._getNodeElementForNode(node).select(mustSetFocus ?? true);
+    this._saveState();
+  }
+
+  /**
+   * Adds a node as the last child of a parent.
+   *
+   * @example
+   * ```js
+   * tree.appendNode({ name: "child", id: 5 }, tree.getNodeById(1));
+   * ```
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
+  appendNode(nodeData, parentNode) {
+    const node = parentNode.append(nodeData);
+    this._refreshElements(parentNode);
+    return node;
+  }
+
+  /**
+   * Closes a folder.
+   *
+   * @param slide - Override the `slide` option for this call.
+   * @group Opening and closing
+   */
+  closeNode(node, slide) {
+    if (node.isFolder() || node.isEmptyFolder) {
+      this._createFolderElement(node).close(slide ?? this._options.slide, this._options.animationSpeed);
+      this._saveState();
+    }
+  }
+
+  /**
+   * Empties the element and removes the tree's document-level keyboard
+   * listener. Call it when you remove the tree from the page.
+   *
+   * @group Other
+   */
+  deinit() {
+    this._htmlElement.textContent = '';
+    this._dataLoader.deinit();
+    this._keyHandler.deinit();
+    this._mouseHandler.deinit();
+    this.tree = new Node({}, true);
+  }
+
+  /**
+   * Returns the node that belongs to a `li` element the tree rendered.
+   *
+   * @group Finding nodes
+   */
+  getNode(element) {
+    const liElement = element.closest(`li.${this._classNames.common}`);
+    if (liElement) {
+      return this._nodeMap.get(liElement) ?? null;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Returns the first node for which the callback returns `true`.
+   *
+   * @example
+   * ```js
+   * const node = tree.getNodeByCallback((node) => node.children.length > 3);
+   * ```
+   *
+   * @group Finding nodes
+   */
+  getNodeByCallback(callback) {
+    return this.tree.getNodeByCallback(callback);
+  }
+
+  /**
+   * Returns the node with this id.
+   *
+   * @example
+   * ```js
+   * const node = tree.getNodeById(1);
+   * ```
+   *
+   * @group Finding nodes
+   */
+  getNodeById(id) {
+    return this.tree.getNodeById(id);
+  }
+
+  /**
+   * Returns the first node with this name.
+   *
+   * @group Finding nodes
+   */
+  getNodeByName(name) {
+    return this.tree.getNodeByName(name);
+  }
+
+  /**
+   * Like `getNodeByName`, but throws when there is no such node. Convenient
+   * in tests and when a missing node is a bug.
+   *
+   * @group Finding nodes
+   */
+  getNodeByNameMustExist(name) {
+    return this.tree.getNodeByNameMustExist(name);
+  }
+
+  /**
+   * Returns all nodes with this property value.
+   *
+   * @example
+   * ```js
+   * tree.getNodesByProperty("color", "green");
+   * ```
+   *
+   * @group Finding nodes
+   */
+  getNodesByProperty(key, value) {
+    return this.tree.getNodesByProperty(key, value);
+  }
+
+  /**
+   * Returns the selected node, or `false` when nothing is selected.
+   *
+   * @group Selection
+   */
+  getSelectedNode() {
+    return this._selectNodeHandler.getSelectedNode();
+  }
+
+  /**
+   * Returns the selected nodes.
+   *
+   * @group Selection
+   */
+  getSelectedNodes() {
+    return this._selectNodeHandler.getSelectedNodes();
+  }
+
+  /**
+   * Returns the current state — `open_nodes` and `selected_node` — whether or
+   * not `saveState` is enabled.
+   *
+   * @group State
+   */
+  getState() {
+    return this._saveStateHandler.getState();
+  }
+
+  /**
+   * Returns the state as it is stored.
+   *
+   * @group State
+   */
+  getStateFromStorage() {
+    return this._saveStateHandler.getStateFromStorage();
+  }
+
+  /**
+   * Returns the root node. It is not rendered; its `children` are the
+   * top-level nodes. Also available as the `tree` property.
+   *
+   * @group Finding nodes
+   */
+  getTree() {
+    return this.tree;
+  }
+
+  /**
+   * Returns the version of tree-element.
+   *
+   * @group Other
+   */
+  getVersion() {
+    return (/* inlined export ["default"] */"0.1.1");
+  }
+
+  /**
+   * Returns whether the user is dragging a node.
+   *
+   * @group Other
+   */
+  isDragging() {
+    return this._dndHandler.isDragging;
+  }
+
+  /**
+   * Returns whether the node is selected.
+   *
+   * @group Selection
+   */
+  isNodeSelected(node) {
+    return this._selectNodeHandler.isNodeSelected(node);
+  }
+
+  /**
+   * Loads data into the tree.
+   *
+   * @param parentNode - Replace this node's children instead of the whole
+   * tree.
+   * @group Loading data
+   */
+  loadData(data, parentNode) {
+    if (data) {
+      if (parentNode) {
+        this._deselectNodes(parentNode);
+        this._loadSubtree(data, parentNode);
+      } else {
+        this._initTree(data);
+      }
+      if (this.isDragging()) {
+        this._dndHandler.refresh();
+      }
+    }
+    this._triggerEvent("tree.set_data", {
+      node: parentNode,
+      treeData: data ?? undefined
+    });
+  }
+
+  /**
+   * Fetches data and loads it into the tree, or into `parentNode`.
+   *
+   * @param url - Defaults to the `dataUrl` option.
+   * @group Loading data
+   */
+  async loadDataFromUrl(url, parentNode) {
+    const requestUrl = url ? new RequestUrl(url) : this._createRequestUrl(parentNode);
+    if (requestUrl) {
+      await this._dataLoader.loadFromUrl(requestUrl, parentNode);
+    }
+  }
+
+  /**
+   * Selects the next visible node, like the down arrow key.
+   *
+   * @group Selection
+   */
+  moveDown() {
+    const selectedNode = this.getSelectedNode();
+    if (selectedNode) {
+      this._keyHandler.moveDown(selectedNode);
+    }
+  }
+
+  /**
+   * Moves a node inside the tree.
+   *
+   * @example
+   * ```js
+   * tree.moveNode(tree.getNodeById(2), tree.getNodeById(1), "inside");
+   * ```
+   *
+   * @param position - `"before"`, `"after"` or `"inside"`.
+   * @group Changing the tree
+   */
+  moveNode(node, targetNode, position) {
+    this.tree.moveNode(node, targetNode, position);
+    this._refreshElements(null);
+  }
+
+  /**
+   * Selects the previous visible node, like the up arrow key.
+   *
+   * @group Selection
+   */
+  moveUp() {
+    const selectedNode = this.getSelectedNode();
+    if (selectedNode) {
+      this._keyHandler.moveUp(selectedNode);
+    }
+  }
+
+  /**
+   * Opens a folder, and the folders above it. A node marked `load_on_demand`
+   * is fetched first, so await the promise when you need to know it is really
+   * open.
+   *
+   * @example
+   * ```js
+   * await tree.openNode(node);
+   * console.log("open");
+   * ```
+   *
+   * @param slide - Override the `slide` option for this call.
+   * @group Opening and closing
+   */
+  async openNode(node, slide) {
+    const mustSlide = slide ?? this._options.slide;
+    const doOpenNode = async (openedNode, slideOption) => {
+      if (!node.children.length) {
+        return;
+      }
+      const folderElement = this._createFolderElement(openedNode);
+      await folderElement.open(slideOption, this._options.animationSpeed);
+    };
+    if (node.isFolder() || node.isEmptyFolder) {
+      if (node.load_on_demand) {
+        await this._loadFolderOnDemand(node, mustSlide);
+      } else {
+        let parent = node.parent;
+        while (parent) {
+          // nb: do not open root element
+          if (parent.parent) {
+            await doOpenNode(parent, false);
+          }
+          parent = parent.parent;
+        }
+        await doOpenNode(node, mustSlide);
+        this._saveState();
+      }
+    }
+  }
+
+  /**
+   * Adds a node as the first child of a parent.
+   *
+   * @returns The new node.
+   * @group Changing the tree
+   */
+  prependNode(nodeData, parentNode) {
+    const node = parentNode.prepend(nodeData);
+    this._refreshElements(parentNode);
+    return node;
+  }
+
+  /**
+   * Re-renders the whole tree. Needed after changing node data directly
+   * instead of through these methods.
+   *
+   * @group Changing the tree
+   */
+  refresh() {
+    this._refreshElements(null);
+  }
+
+  /**
+   * Recomputes the drop targets. Call this if the layout changes during a
+   * drag.
+   *
+   * @group Other
+   */
+  refreshHitAreas() {
+    this._dndHandler.refresh();
+  }
+
+  /**
+   * Removes a node from the selection.
+   *
+   * @group Selection
+   */
+  removeFromSelection(node) {
+    this._selectNodeHandler.removeFromSelection(node);
+    this._getNodeElementForNode(node).deselect();
+    this._saveState();
+  }
+
+  /**
+   * Removes a node and its children.
+   *
+   * @group Changing the tree
+   */
+  removeNode(node) {
+    this._selectNodeHandler.removeFromSelection(node, true); // including children
+
+    const parent = node.parent;
+    node.remove();
+    this._refreshElements(parent);
+  }
+
+  /**
+   * Scrolls the node into view.
+   *
+   * @group Selection
+   */
+  scrollToNode(node) {
+    if (!node.element) {
+      return;
+    }
+    const top = getOffsetTop(node.element) - getOffsetTop(this._htmlElement);
+    this._scrollHandler.scrollToY(top);
+  }
+
+  /**
+   * Replaces the selection, and opens the parents of the node.
+   *
+   * @param node - `null` clears the selection.
+   * @param options - `mustSetFocus`: move focus to the node, default `true`.
+   * `mustToggle`: deselect the node if it is already selected, default
+   * `false`.
+   * @group Selection
+   */
+  selectNode(node, options) {
+    if (!node) {
+      // Called with empty node -> deselect current node
+      this._deselectCurrentNode();
+      this._saveStateHandler.saveState();
+      return;
+    }
+    this._selectNodeHandler.selectSingleNode(node, options);
+  }
+
+  /**
+   * Changes an option after construction. See
+   * [Options](/reference/options#changing-an-option-later) for the caveats.
+   *
+   * @group Other
+   */
+  setOption(option, value) {
+    this._options[option] = value;
+  }
+
+  /**
+   * Applies a state to the tree.
+   *
+   * @group State
+   */
+  setState(state) {
+    this._saveStateHandler.setInitialState(state);
+    this._refreshElements(null);
+  }
+
+  /**
+   * Closes an open node and opens a closed one.
+   *
+   * @param slide - Override the `slide` option for this call.
+   * @group Opening and closing
+   */
+  toggle(node, slide = null) {
+    const mustSlide = slide ?? this._options.slide;
+    if (node.is_open) {
+      this.closeNode(node, mustSlide);
+    } else {
+      void this.openNode(node, mustSlide);
+    }
+  }
+
+  /**
+   * Returns the tree as a json string, including changes made through the
+   * api.
+   *
+   * @group Other
+   */
+  toJson() {
+    return JSON.stringify(this.tree.getData());
+  }
+
+  /**
+   * Updates the data of a node and re-renders it. A string updates just the
+   * name.
+   *
+   * Changing the `id` re-indexes the node. `children` and `parent` are
+   * ignored — use `loadData` or `moveNode` for those.
+   *
+   * @example
+   * ```js
+   * tree.updateNode(node, "new name");
+   * tree.updateNode(node, { name: "new name", color: "red" });
+   * ```
+   *
+   * @group Changing the tree
+   */
+  updateNode(node, data) {
+    const idIsChanged = typeof data === "object" && data.id && data.id !== node.id;
+    if (idIsChanged) {
+      this.tree.removeNodeFromIndex(node);
+    }
+    node.setData(data);
+    if (idIsChanged) {
+      this.tree.addNodeToIndex(node);
+    }
+    if (typeof data === "object" && data.children && data.children instanceof Array) {
+      node.removeChildren();
+      if (data.children.length) {
+        node.loadFromData(data.children);
+      }
+    }
+    this._refreshElements(node);
+  }
+  _createFolderElement(node) {
+    const classNames = this._classNames;
+    const closedIconElement = this._renderer.closedIconElement;
+    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
+    const openedIconElement = this._renderer.openedIconElement;
+    const tabIndex = this._options.tabIndex;
+    const treeElement = this._htmlElement;
+    const triggerEvent = this._triggerEvent.bind(this);
+    return new FolderElement({
+      classNames,
+      closedIconElement,
+      getScrollLeft,
+      node,
+      openedIconElement,
+      tabIndex,
+      treeElement,
+      triggerEvent
+    });
+  }
+  _createNodeElement(node) {
+    const classNames = this._classNames;
+    const getScrollLeft = this._scrollHandler.getScrollLeft.bind(this._scrollHandler);
+    const tabIndex = this._options.tabIndex;
+    const treeElement = this._htmlElement;
+    return new NodeElement({
+      classNames,
+      getScrollLeft,
+      node,
+      tabIndex,
+      treeElement
+    });
+  }
+
+  /* Create a RequestUrl based on the url in the options.
+    * Add a 'node' query parameter for loading on demand
+    * Add a 'selected_node' query parameter if a node is selected.
+  */
+  _createRequestUrl(node) {
+    const dataUrl = this._options.dataUrl;
+    let url;
+    if (typeof dataUrl === "function") {
+      url = dataUrl(node);
+    } else {
+      url = dataUrl;
+    }
+    if (!url) {
+      return null;
+    }
+    const requestUrl = new RequestUrl(url);
+    if (node?.id) {
+      // Load on demand of a subtree; add node parameter
+      requestUrl.setSearchParam('node', node.id.toString());
+    } else {
+      // Add selected_node parameter
+      const selectedNodeId = this._getNodeIdToBeSelected();
+      if (selectedNodeId) {
+        requestUrl.setSearchParam('selected_node', selectedNodeId.toString());
+      }
+    }
+    return requestUrl;
+  }
+  _deselectCurrentNode() {
+    const node = this.getSelectedNode();
+    if (node) {
+      this.removeFromSelection(node);
+    }
+  }
+
+  // Deselect the children of the node.
+  _deselectNodes(parentNode) {
+    const selectedNodesUnderParent = this._selectNodeHandler.getSelectedNodesUnder(parentNode);
+    for (const n of selectedNodesUnderParent) {
+      this._selectNodeHandler.removeFromSelection(n);
+    }
+  }
+
+  // Get the maximum level for auto open
+  _getAutoOpenMaxLevel() {
+    if (this._options.autoOpen === true) {
+      return -1;
+    } else if (typeof this._options.autoOpen === "number") {
+      return this._options.autoOpen;
+    } else if (typeof this._options.autoOpen === "string") {
+      return parseInt(this._options.autoOpen, 10);
+    }
+
+    /* istanbul ignore next @preserve */
+    return 0;
+  }
+  _getNodeElement(element) {
+    const node = this.getNode(element);
+    if (node) {
+      return this._getNodeElementForNode(node);
+    } else {
+      return null;
+    }
+  }
+  _getNodeElementForNode(node) {
+    if (node.isFolder()) {
+      return this._createFolderElement(node);
+    } else {
+      return this._createNodeElement(node);
+    }
+  }
+  _getNodeIdToBeSelected() {
+    return this._saveStateHandler.getNodeIdToBeSelected();
+  }
+  _initData() {
+    if (this._options.data) {
+      this.loadData(this._options.data);
+    } else {
+      const dataUrl = this._createRequestUrl();
+      if (dataUrl) {
+        void this.loadDataFromUrl();
+      } else {
+        this.loadData([]);
+      }
+    }
+  }
+  _initTree(data) {
+    const doInit = () => {
+      if (!this._isInitialized) {
+        this._isInitialized = true;
+        this._triggerEvent("tree.init");
+      }
+    };
+    this.tree = new this._options.nodeClass(null, true, this._options.nodeClass);
+    this._selectNodeHandler.clear();
+    this.tree.loadFromData(data);
+    const mustLoadOnDemand = this._setInitialState();
+    this._refreshElements(null);
+    if (mustLoadOnDemand) {
+      // Load data on demand and then init the tree
+      void this._setInitialStateOnDemand().then(doInit);
+    } else {
+      doInit();
+    }
+  }
+
+  // Does an HTML element of the tree have the focus?
+  _isFocusOnTree() {
+    const activeElement = document.activeElement;
+
+    /* istanbul ignore if */
+    if (!activeElement) {
+      return false;
+    }
+
+    // The keyboard must still work for input elements.
+    const tagName = activeElement.tagName;
+    if (tagName !== "A" && tagName !== "SPAN") {
+      return false;
+    }
+    const node = this.getNode(activeElement);
+    return node?.tree === this.tree;
+  }
+  _isSelectedNodeInSubtree(subtree) {
+    const selectedNode = this.getSelectedNode();
+    if (!selectedNode) {
+      return false;
+    } else {
+      return subtree === selectedNode || subtree.isParentOf(selectedNode);
+    }
+  }
+  async _loadFolderOnDemand(node, slide) {
+    node.is_loading = true;
+    await this.loadDataFromUrl(undefined, node);
+    await this.openNode(node, slide);
+  }
+  _loadSubtree(data, parentNode) {
+    parentNode.loadFromData(data);
+    parentNode.load_on_demand = false;
+    parentNode.is_loading = false;
+    this._refreshElements(parentNode);
+  }
+  _mouseCapture(positionInfo) {
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    return this._dndHandler.mouseCapture(positionInfo);
+  }
+  _mouseDrag(positionInfo) {
+    /* istanbul ignore if */
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    const result = this._dndHandler.mouseDrag(positionInfo);
+    this._scrollHandler.checkScrolling(positionInfo);
+    return result;
+  }
+  _mouseStart(positionInfo) {
+    /* istanbul ignore if */
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    return this._dndHandler.mouseStart(positionInfo);
+  }
+  _mouseStop(positionInfo) {
+    /* istanbul ignore if */
+    if (!this._options.dragAndDrop) {
+      return false;
+    }
+    this._scrollHandler.stopScrolling();
+    return this._dndHandler.mouseStop(positionInfo);
+  }
+  _openParents(node) {
+    const parent = node.parent;
+    if (parent?.parent && !parent.is_open) {
+      void this.openNode(parent, false);
+    }
+  }
+
+  /*
+  Redraw the tree or part of the tree.
+    from_node: redraw this subtree
+  */
+  _refreshElements(fromNode) {
+    const mustSetFocus = this._isFocusOnTree();
+    const mustSelect = fromNode ? this._isSelectedNodeInSubtree(fromNode) : false;
+    this._renderer.render(fromNode);
+    if (mustSelect) {
+      this._selectCurrentNode(mustSetFocus);
+    }
+    this._triggerEvent("tree.refresh");
+  }
+  _saveState() {
+    this._saveStateHandler.saveState();
+  }
+  _selectCurrentNode(mustSetFocus) {
+    const node = this.getSelectedNode();
+    if (node) {
+      const nodeElement = this._getNodeElementForNode(node);
+      nodeElement.select(mustSetFocus);
+    }
+  }
+
+  // Set initial state, either by restoring the state or auto-opening nodes
+  // result: must load nodes on demand?
+  _setInitialState() {
+    const restoreState = () => {
+      // result: is state restored, must load on demand?
+      const state = this._saveStateHandler.getStateFromStorage();
+      if (!state) {
+        return [false, false];
+      } else {
+        const mustLoadOnDemand = this._saveStateHandler.setInitialState(state);
+
+        // return true: the state is restored
+        return [true, mustLoadOnDemand];
+      }
+    };
+    const autoOpenNodes = () => {
+      // result: must load on demand?
+      if (this._options.autoOpen === false) {
+        return false;
+      }
+      const maxLevel = this._getAutoOpenMaxLevel();
+      let mustLoadOnDemand = false;
+      this.tree.iterate((node, level) => {
+        if (node.load_on_demand) {
+          mustLoadOnDemand = true;
+          return false;
+        } else if (!node.hasChildren()) {
+          return false;
+        } else {
+          node.is_open = true;
+          return level !== maxLevel;
+        }
+      });
+      return mustLoadOnDemand;
+    };
+    let [isRestored, mustLoadOnDemand] = restoreState(); // eslint-disable-line prefer-const
+
+    if (!isRestored) {
+      mustLoadOnDemand = autoOpenNodes();
+    }
+    return mustLoadOnDemand;
+  }
+
+  // Set the initial state for nodes that are loaded on demand
+  async _setInitialStateOnDemand() {
+    return new Promise(resolve => {
+      const restoreState = () => {
+        const state = this._saveStateHandler.getStateFromStorage();
+        if (!state) {
+          return false;
+        } else {
+          void this._saveStateHandler.setInitialStateOnDemand(state).then(() => {
+            resolve();
+          });
+          return true;
+        }
+      };
+      const autoOpenNodes = () => {
+        const maxLevel = this._getAutoOpenMaxLevel();
+        let loadingCount = 0;
+        const loadAndOpenNode = node => {
+          loadingCount += 1;
+          void this.openNode(node, false).then(() => {
+            loadingCount -= 1;
+            openNodes();
+          });
+        };
+        const openNodes = () => {
+          this.tree.iterate((node, level) => {
+            if (node.load_on_demand) {
+              if (!node.is_loading) {
+                loadAndOpenNode(node);
+              }
+              return false;
+            } else {
+              void this.openNode(node, false);
+              return level !== maxLevel;
+            }
+          });
+          if (loadingCount === 0) {
+            resolve();
+          }
+        };
+        openNodes();
+      };
+      if (!restoreState()) {
+        autoOpenNodes();
+      }
+    });
+  }
+
+  // Set this HTML element to this node in the node map.
+  _setNodeElement(element, node) {
+    this._nodeMap.set(element, node);
+  }
+  _triggerEvent(eventName, values) {
+    return this._triggerEventProvider(this._htmlElement, eventName, values);
+  }
+}
+
+
+
 ;// ./src/initTree.ts
 
-function initTree($tree, {
+function initTree(treeElement, {
   animationSpeed,
   autoEscape,
   autoOpen,
@@ -72,24 +4304,46 @@ function initTree($tree, {
   dragAndDrop,
   hasAddPermission,
   hasChangePermission,
+  insertAtUrl,
   mouseDelay,
-  rtl
+  rtl,
+  saveState,
+  useContextMenu
 }) {
   let errorNode = null;
   const baseUrl = "http://example.com";
-  const insertAtUrl = new URL($tree.data("insert_at_url"), baseUrl);
-  function createLi(node, $li, isSelected) {
+  const insertAtUrlObject = insertAtUrl ? new URL(insertAtUrl, baseUrl) : undefined;
+  function createLi(node, liElement, isSelected) {
     if (node.id == null) {
+      return;
+    }
+    const titleElement = liElement.querySelector(":scope > .jqtree-element > .jqtree-title");
+
+    /* istanbul ignore if */
+    if (!titleElement) {
       return;
     }
 
     // Create edit link
-    const $title = $li.find(".jqtree-title");
-    insertAtUrl.searchParams.set("insert_at", node.id.toString());
-    const insertUrlString = insertAtUrl.toString().substring(baseUrl.length);
-    const tabindex = isSelected ? "0" : "-1";
+    const tabindex = isSelected ? 0 : -1;
     const editCaption = hasChangePermission ? gettext("edit") : gettext("view");
-    $title.after(`<a href="${node.url}" class="edit" tabindex="${tabindex}">(${editCaption})</a>`, hasAddPermission ? `<a href="${insertUrlString}" class="edit" tabindex="${tabindex}">(${gettext("add")})</a>` : "");
+    const editElement = document.createElement("a");
+    editElement.className = "edit";
+    editElement.href = node.url;
+    editElement.tabIndex = tabindex;
+    editElement.text = `(${editCaption})`;
+    titleElement.after(editElement);
+    if (hasAddPermission && insertAtUrlObject) {
+      insertAtUrlObject.searchParams.set("insert_at", node.id.toString());
+      const insertUrlString = insertAtUrlObject.toString().substring(baseUrl.length);
+      const addElement = document.createElement("a");
+      addElement.className = "edit";
+      addElement.href = insertUrlString;
+      addElement.tabIndex = tabindex;
+      const addCaption = gettext("add");
+      addElement.text = `(${addCaption})`;
+      titleElement.after(addElement);
+    }
   }
   function getCookie(name) {
     for (const cookie of document.cookie.split("; ")) {
@@ -117,46 +4371,54 @@ function initTree($tree, {
   }
   function handleMove(eventParam) {
     const e = eventParam;
-    const info = e.move_info;
-    if (!info.moved_node.element) {
+    const info = e.detail.moveInfo;
+    if (!info.movedNode.element) {
       return;
     }
-    const $el = jQuery(info.moved_node.element);
-    const data = {
+    const htmlElement = info.movedNode.element;
+    const body = new URLSearchParams({
       position: info.position,
-      target_id: info.target_node.id
-    };
-    handleLoading(null);
+      target_id: String(info.targetNode.id)
+    });
+    handleLoading();
     removeErrorMessage();
     e.preventDefault();
-    void jQuery.ajax({
-      beforeSend: xhr => {
+    function handleError() {
+      handleLoaded();
+      const errorElement = document.createElement("span");
+      errorElement.className = "mptt-admin-error";
+      errorElement.textContent = gettext("move failed");
+      const nodeElement = htmlElement.querySelector(":scope > .jqtree-element");
+      nodeElement?.append(errorElement);
+      errorNode = info.movedNode;
+    }
+    void fetch(info.movedNode.move_url, {
+      body,
+      headers: {
         // Set Django csrf token
-        xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+        "X-CSRFToken": getCsrfToken()
       },
-      data,
-      error: () => {
-        handleLoaded(null);
-        const $node = $el.find(".jqtree-element");
-        $node.append(`<span class="mptt-admin-error">${gettext("move failed")}</span>`);
-        errorNode = info.moved_node;
-      },
-      success: () => {
-        info.do_move();
-        handleLoaded(null);
-      },
-      type: "POST",
-      url: info.moved_node.move_url
+      method: "POST"
+    }).then(response => {
+      if (response.ok) {
+        info.doMove();
+        handleLoaded();
+      } else {
+        handleError();
+      }
+    }, () => {
+      handleError();
     });
     function removeErrorMessage() {
       if (errorNode?.element) {
-        jQuery(errorNode.element).find(".mptt-admin-error").remove();
+        const errorElement = errorNode.element.querySelector(":scope > .jqtree-element > .mptt-admin-error");
+        errorElement?.remove();
         errorNode = null;
       }
     }
   }
   function handleLoadFailed() {
-    $tree.html(gettext("Error while loading the data from the server"));
+    treeElement.textContent = gettext("Error while loading the data from the server");
   }
   const spinners = {};
   function getSpinnerId(node) {
@@ -173,9 +4435,10 @@ function initTree($tree, {
   function handleLoading(node) {
     function getContainer() {
       if (node) {
-        return node.element;
+        // display the spinner next to the title of the node
+        return node.element?.querySelector(":scope > .jqtree-element");
       } else {
-        return $tree.get(0);
+        return treeElement;
       }
     }
     const container = getContainer();
@@ -198,38 +4461,43 @@ function initTree($tree, {
       spinner.remove();
     }
   }
-  function handleSelect(eventParam) {
-    const e = eventParam;
+  function setEditTabIndex(nodeElement, tabIndex) {
+    const editElements = nodeElement.querySelectorAll(":scope > .jqtree-element > .edit");
+    for (const editElement of editElements) {
+      editElement.tabIndex = tabIndex;
+    }
+  }
+  function handleSelect(e) {
     const {
-      deselected_node,
-      node,
-      previous_node
-    } = e;
-    const deselectedElement = deselected_node?.element ?? previous_node?.element;
-    if (deselectedElement) {
+      deselectedNode,
+      node
+    } = e.detail;
+    if (deselectedNode?.element) {
       // deselected node: remove tabindex
-      jQuery(deselectedElement).find("> .jqtree-element .edit").attr("tabindex", -1);
+      setEditTabIndex(deselectedNode.element, -1);
     }
 
     // selected: add tabindex
-    if (node?.element) {
-      jQuery(node.element).find("> .jqtree-element .edit").attr("tabindex", 0);
+    /* istanbul ignore else */
+    if (node.element) {
+      setEditTabIndex(node.element, 0);
+    }
+  }
+  function handleDeselect(e) {
+    const {
+      node
+    } = e.detail;
+
+    /* istanbul ignore else */
+    if (node.element) {
+      setEditTabIndex(node.element, -1);
     }
   }
   function handleLoadingEvent(e) {
-    const {
-      isLoading,
-      node
-    } = e;
-    if (isLoading) {
-      handleLoading(node);
-    }
+    handleLoading(e.detail.node);
   }
-  function handleLoadDataEvent(e) {
-    const {
-      parent_node
-    } = e;
-    handleLoaded(parent_node);
+  function handleLoadedDataEvent(e) {
+    handleLoaded(e.detail.node);
   }
   const treeOptions = {
     autoEscape,
@@ -238,52 +4506,103 @@ function initTree($tree, {
     closedIcon: rtl ? "&#x25c0;" : "&#x25ba;",
     dragAndDrop: dragAndDrop && hasChangePermission,
     onCreateLi: createLi,
-    onLoadFailed: handleLoadFailed,
-    saveState: $tree.data("save_state"),
-    useContextMenu: Boolean($tree.data("use_context_menu"))
+    saveState,
+    useContextMenu
   };
-  if (animationSpeed !== null) {
+  if (animationSpeed !== undefined) {
     treeOptions.animationSpeed = animationSpeed;
   }
   if (mouseDelay != null) {
     treeOptions.startDndDelay = mouseDelay;
   }
-  $tree.on("tree.loading_data", handleLoadingEvent);
-  $tree.on("tree.load_data", handleLoadDataEvent);
-  $tree.on("tree.move", handleMove);
-  $tree.on("tree.select", handleSelect);
-  $tree.tree(treeOptions);
+  treeElement.addEventListener("tree.deselect", handleDeselect);
+  treeElement.addEventListener("tree.load_failed", handleLoadFailed);
+  treeElement.addEventListener("tree.loading_data", handleLoadingEvent);
+  treeElement.addEventListener("tree.loaded_data", handleLoadedDataEvent);
+  treeElement.addEventListener("tree.move", handleMove);
+  treeElement.addEventListener("tree.select", handleSelect);
+  new TreeElement({
+    ...treeOptions,
+    classPrefix: "jqtree",
+    commonClassName: "jqtree_common",
+    htmlElement: treeElement,
+    treeClassName: "jqtree-tree"
+  });
 }
 /* harmony default export */ const src_initTree = (initTree);
+;// ./src/parseTreeOptions.ts
+const parseAnimationSpeed = value => {
+  if (!value) {
+    return undefined;
+  }
+  const numberValue = parseNumber(value);
+  if (numberValue === undefined) {
+    return value;
+  } else {
+    return numberValue;
+  }
+};
+const parseAutoOpen = value => {
+  return parseNumber(value) ?? parseBoolean(value);
+};
+const parseBoolean = value => {
+  switch (value) {
+    case "false":
+      return false;
+    case "true":
+      return true;
+    default:
+      return undefined;
+  }
+};
+const parseNumber = value => {
+  if (!value) {
+    return undefined;
+  }
+  const numberValue = parseInt(value);
+  if (isNaN(numberValue)) {
+    return undefined;
+  } else {
+    return numberValue;
+  }
+};
+const parseTreeOptions = treeElement => {
+  const animationSpeed = parseAnimationSpeed(treeElement.dataset.treeAnimationSpeed);
+  const autoOpen = parseAutoOpen(treeElement.dataset.auto_open) ?? false;
+  const autoEscape = parseBoolean(treeElement.dataset.autoescape) ?? true;
+  const csrfCookieName = treeElement.dataset.csrfCookieName ?? "csrf";
+  const dragAndDrop = parseBoolean(treeElement.dataset.dragAndDrop) ?? false;
+  const hasAddPermission = parseBoolean(treeElement.dataset.hasAddPermission) ?? false;
+  const hasChangePermission = parseBoolean(treeElement.dataset.hasChangePermission) ?? false;
+  const insertAtUrl = treeElement.dataset.insert_at_url;
+  const mouseDelay = parseNumber(treeElement.dataset.treeMouseDelay);
+  const rtl = treeElement.dataset.rtl !== undefined;
+  const saveState = treeElement.dataset.save_state;
+  const useContextMenu = parseBoolean(treeElement.dataset.use_context_menu);
+  return {
+    animationSpeed,
+    autoEscape,
+    autoOpen,
+    csrfCookieName,
+    dragAndDrop,
+    hasAddPermission,
+    hasChangePermission,
+    insertAtUrl,
+    mouseDelay,
+    rtl,
+    saveState,
+    useContextMenu
+  };
+};
+/* harmony default export */ const src_parseTreeOptions = (parseTreeOptions);
 ;// ./src/djangoMpttAdmin.ts
 
-jQuery(() => {
-  const $tree = jQuery("#tree");
-  if ($tree.length) {
-    const animationSpeed = $tree.data("tree-animation-speed");
-    const autoOpen = $tree.data("auto_open");
-    const autoEscape = Boolean($tree.data("autoescape"));
-    const hasAddPermission = Boolean($tree.data("has-add-permission"));
-    const hasChangePermission = Boolean($tree.data("has-change-permission"));
-    const mouseDelay = $tree.data("tree-mouse-delay");
-    const dragAndDrop = $tree.data("drag-and-drop");
-    const rtl = $tree.data("rtl") === "1";
-    const csrfCookieName = $tree.data("csrf-cookie-name");
-    src_initTree($tree, {
-      animationSpeed,
-      autoEscape,
-      autoOpen,
-      csrfCookieName,
-      dragAndDrop,
-      hasAddPermission,
-      hasChangePermission,
-      mouseDelay,
-      rtl
-    });
+
+addEventListener("DOMContentLoaded", () => {
+  const treeElement = document.getElementById("tree");
+  if (treeElement) {
+    src_initTree(treeElement, src_parseTreeOptions(treeElement));
   }
 });
-})();
-
 /******/ })()
 ;
-//# sourceMappingURL=django_mptt_admin.debug.js.map

@@ -1,4 +1,5 @@
 const path = require("path");
+const MinimizerPlugin = require("minimizer-webpack-plugin");
 
 const skipCompressJs = Boolean(process.env.SKIP_COMPRESS_JS);
 const coverage = Boolean(process.env.COVERAGE);
@@ -16,13 +17,14 @@ const getOutputFilename = () => {
 const minimize = !skipCompressJs && !coverage;
 
 module.exports = {
+    devtool: false,
     entry: {
         django_mptt_admin: ["./src/djangoMpttAdmin.ts"],
     },
     output: {
         path: path.resolve(
             __dirname,
-            "../django_mptt_admin/static/django_mptt_admin/"
+            "../django_mptt_admin/static/django_mptt_admin/",
         ),
         filename: getOutputFilename(),
     },
@@ -42,16 +44,29 @@ module.exports = {
                     },
                 },
             },
+            {
+                test: /\.js$/,
+                use: path.resolve(__dirname, "stripSourceMapComments.js"),
+            },
         ].filter(Boolean),
     },
     resolve: {
         extensions: [".ts", ".js"],
     },
-    devtool: "source-map",
     optimization: {
         minimize,
-    },
-    externals: {
-        jquery: "jQuery",
+        minimizer: [
+            new MinimizerPlugin({
+                // Terser is the default minifier. Also mangle property names
+                // that start with an underscore (internal/private members).
+                minimizerOptions: {
+                    mangle: {
+                        properties: {
+                            regex: /^_/,
+                        },
+                    },
+                },
+            }),
+        ],
     },
 };
