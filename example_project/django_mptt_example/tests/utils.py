@@ -28,9 +28,9 @@ def get_continents():
 
 
 def wait_until(fn):  # pragma: no cover
-    for i in range(100):
+    for _i in range(100):
         if fn():
             return
         sleep(0.1)
 
-    assert False
+    raise AssertionError()

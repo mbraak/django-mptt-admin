@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.html import format_html
-
-from mptt.models import TreeForeignKey, MPTTModel
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 class Country(MPTTModel):

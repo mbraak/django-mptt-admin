@@ -1,0 +1,21 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v7
+      - name: Ruff check
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: "0.16.7"
+          args: check --output-format github
+      - name: Ruff format
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: "0.16.7"
+          args: format --check

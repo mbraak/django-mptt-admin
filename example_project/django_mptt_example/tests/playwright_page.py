@@ -1,5 +1,7 @@
 from uuid import uuid4
+
 from playwright.sync_api import ElementHandle, sync_playwright
+
 from .utils import wait_until, write_json
 
 
@@ -66,11 +68,11 @@ class PlaywrightPage:
             """
             function(el) {
                 const li = el.closest("li");
-    
+
                 if (!li) {
                     throw Error("Node element not found");
                 }
-    
+
                 return li;
             }
             """
