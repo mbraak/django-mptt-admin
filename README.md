@@ -11,4 +11,6 @@ _Django-mptt-admin_ provides a nice Django Admin interface for [django-mptt mode
 - The source is available on [https://github.com/mbraak/django-mptt-admin](https://github.com/mbraak/django-mptt-admin).
 - Documentation is available on [https://mbraak.github.io/django-mptt-admin/](https://mbraak.github.io/django-mptt-admin/).
 
+Example project: https://github.com/mbraak/django-mptt-admin-example
+
 ![Screenshot](https://raw.github.com/mbraak/django-mptt-admin/master/screenshot.png)
