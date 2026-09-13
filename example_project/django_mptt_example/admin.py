@@ -1,5 +1,5 @@
-from django.contrib import admin
 from django.conf import settings
+from django.contrib import admin
 
 from django_mptt_admin.admin import DjangoMpttAdmin
 

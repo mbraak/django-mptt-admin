@@ -1,7 +1,6 @@
-from django.test import override_settings
 from django.contrib.auth.models import Permission, User
+from django.test import override_settings
 
-from ..models import Country
 from .base_playwright_testcase import BasePlaywrightTestCase
 
 

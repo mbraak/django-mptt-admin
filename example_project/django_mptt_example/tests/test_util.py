@@ -1,9 +1,10 @@
 from uuid import UUID
+
 from django.test import TestCase
 
 from django_mptt_admin.util import (
-    get_tree_queryset,
     get_tree_from_queryset,
+    get_tree_queryset,
     serialize_id,
 )
 

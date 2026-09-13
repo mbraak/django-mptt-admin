@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.test import LiveServerTestCase
+
 from .playwright_page import PlaywrightPage
 
 

@@ -1,5 +1,5 @@
-from django.contrib.admin.views.main import ChangeList
 import django
+from django.contrib.admin.views.main import ChangeList
 
 from . import util
 
@@ -11,21 +11,21 @@ class TreeChangeList(ChangeList):
         self.node_id = node_id
         self.max_level = max_level
 
-        params = dict(
-            request=request,
-            model=model,
-            list_display=(),
-            list_display_links=(),
-            list_filter=list_filter,
-            date_hierarchy=None,
-            search_fields=(),
-            list_select_related=(),
-            list_per_page=100,
-            list_max_show_all=200,
-            list_editable=(),
-            model_admin=model_admin,
-            sortable_by=[],
-        )
+        params = {
+            "request": request,
+            "model": model,
+            "list_display": (),
+            "list_display_links": (),
+            "list_filter": list_filter,
+            "date_hierarchy": None,
+            "search_fields": (),
+            "list_select_related": (),
+            "list_per_page": 100,
+            "list_max_show_all": 200,
+            "list_editable": (),
+            "model_admin": model_admin,
+            "sortable_by": [],
+        }
 
         if django.VERSION >= (4, 0):
             params["search_help_text"] = ""
