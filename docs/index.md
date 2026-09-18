@@ -147,6 +147,11 @@ Also see the example project for a complete continent filter.
 
 **development**
 
+- Make rendering faster by using templates.
+- The children of a closed folder are rendered when the folder is opened.
+
+**3.0.0** (september 11 2026)
+
 - Use a different javascript library for displaying the tree. Everything works the same.
   The jqtree library is replaced by tree-element. Tree-element does the same as jqtree, but without jQuery.
 

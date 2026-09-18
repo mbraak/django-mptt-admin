@@ -1,6 +1,6 @@
+import django
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth.models import User
-import django
 
 from ..models import Country
 from .base_view_testcase import BaseViewTestCase
@@ -66,21 +66,19 @@ class MoveTestCase(BaseViewTestCase):
         ].value
 
         response = self.app.post(
-            "/django_mptt_example/country/{0:d}/move/".format(source_id),
-            params=dict(
-                csrfmiddlewaretoken=csrf_token,
-                target_id=target_id,
-                position=position,
-            ),
+            f"/django_mptt_example/country/{source_id:d}/move/",
+            params={
+                "csrfmiddlewaretoken": csrf_token,
+                "target_id": target_id,
+                "position": position,
+            },
         )
-        self.assertEqual(response.json, dict(success=True))
+        self.assertEqual(response.json, {"success": True})
 
 
 class PopupTestCase(BaseViewTestCase):
     def test_return_grid_view(self):
-        grid_page = self.app.get(
-            "/django_mptt_example/country/?{0!s}=true".format(IS_POPUP_VAR)
-        )
+        grid_page = self.app.get(f"/django_mptt_example/country/?{IS_POPUP_VAR}=true")
 
         first_row = grid_page.pyquery("#result_list tbody tr").eq(0)
         self.assertEqual(first_row.find("td").eq(0).text(), "Afghanistan")

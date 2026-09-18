@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-mptt-admin"
-version = "2.11.0"
+version = "3.0.0"
 description = "Django-mptt-admin provides a nice Django Admin interface for Mptt models"
 readme = "README.md"
 license = "Apache-2.0"
@@ -34,3 +34,13 @@ Changelog = "https://mbraak.github.io/django-mptt-admin/#changelog"
 
 [tool.setuptools.packages.find]
 include = ["django_mptt_admin*"]
+
+[tool.ruff]
+target-version = "py310"
+extend-exclude = ["migrations", "frontend", "coverage", "docs", "site"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["django_mptt_admin", "django_mptt_example"]

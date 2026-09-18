@@ -59,7 +59,7 @@ beforeEach(() => {
         http.post("/move", ({ request }) => {
             csrfTokenInRequest = request.headers.get("X-CSRFToken");
             return HttpResponse.json({});
-        })
+        }),
     );
 
     document.body.innerHTML = "";
@@ -78,11 +78,11 @@ const createTreeElement = (dataUrl = "/tree") => {
 
 const initTestTree = (
     treeElement: HTMLElement,
-    paramOptions?: Partial<InitTreeOptions>
+    paramOptions?: Partial<InitTreeOptions>,
 ) => {
     const defaultOptions: InitTreeOptions = {
         autoEscape: false,
-        autoOpen: false,
+        autoOpen: true,
         csrfCookieName: "csrf",
         dragAndDrop: false,
         hasAddPermission: true,
@@ -99,10 +99,10 @@ const initTestTree = (
 const dispatchTreeEvent = (
     treeElement: HTMLElement,
     name: string,
-    detail: Record<string, unknown>
+    detail: Record<string, unknown>,
 ) => {
     treeElement.dispatchEvent(
-        new CustomEvent(name, { bubbles: true, cancelable: true, detail })
+        new CustomEvent(name, { bubbles: true, cancelable: true, detail }),
     );
 };
 
@@ -121,7 +121,7 @@ test("initializes the tree", async () => {
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
     expect(
-        screen.getByRole("treeitem", { name: "Africa" })
+        screen.getByRole("treeitem", { name: "Africa" }),
     ).toBeInTheDocument();
 });
 
@@ -134,7 +134,7 @@ test("displays a message when the data cannot be loaded", async () => {
     expect(spinner?.parentElement).toBe(treeElement);
 
     expect(
-        await screen.findByText("Error while loading the data from the server")
+        await screen.findByText("Error while loading the data from the server"),
     ).toBeInTheDocument();
 
     // the message replaces the spinner
@@ -184,7 +184,7 @@ test("displays a spinner while the data of a node is loading", async () => {
             return HttpResponse.json([
                 { id: 2, name: "Africa", url: "/edit/2" },
             ]);
-        })
+        }),
     );
 
     // autoOpen opens the root node, which loads its children from the server
@@ -194,15 +194,15 @@ test("displays a spinner while the data of a node is loading", async () => {
     await waitFor(() => {
         expect(
             getNodeElement("root").querySelector(
-                ":scope > .jqtree-element > .jqtree-spin"
-            )
+                ":scope > .jqtree-element > .jqtree-spin",
+            ),
         ).toBeInTheDocument();
     });
 
     sendChildren();
 
     expect(
-        await screen.findByRole("treeitem", { name: "Africa" })
+        await screen.findByRole("treeitem", { name: "Africa" }),
     ).toBeInTheDocument();
     expect(document.querySelector(".jqtree-spin")).not.toBeInTheDocument();
 });
@@ -276,27 +276,27 @@ test("doesn't add links without node ids", async () => {
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
     expect(
-        screen.getByRole("treeitem", { name: "Africa" })
+        screen.getByRole("treeitem", { name: "Africa" }),
     ).toBeInTheDocument();
     expect(screen.queryAllByRole("link")).toHaveLength(0);
 });
 
 test("renders a link for a closed node with rtl is false", async () => {
-    initTestTree(createTreeElement());
+    initTestTree(createTreeElement(), { autoOpen: false });
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
     expect(screen.getByText("►")).toBeInTheDocument();
 });
 
 test("renders a link for a closed node with rtl is true", async () => {
-    initTestTree(createTreeElement(), { rtl: true });
+    initTestTree(createTreeElement(), { autoOpen: false, rtl: true });
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
     expect(screen.getByText("◀")).toBeInTheDocument();
 });
 
 test("renders the button on the left when rtl is true", async () => {
-    initTestTree(createTreeElement(), { rtl: true });
+    initTestTree(createTreeElement(), { autoOpen: false, rtl: true });
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
@@ -307,7 +307,7 @@ test("renders the button on the left when rtl is true", async () => {
 });
 
 test("renders the button on the right when rtl is false", async () => {
-    initTestTree(createTreeElement(), { rtl: false });
+    initTestTree(createTreeElement(), { autoOpen: false, rtl: false });
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
@@ -324,7 +324,7 @@ describe("autoOpen", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
         expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
             "aria-expanded",
-            "true"
+            "true",
         );
     });
 
@@ -334,7 +334,7 @@ describe("autoOpen", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
         expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
             "aria-expanded",
-            "true"
+            "true",
         );
     });
 
@@ -344,7 +344,7 @@ describe("autoOpen", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
         expect(screen.getByRole("treeitem", { name: "root" })).toHaveAttribute(
             "aria-expanded",
-            "false"
+            "false",
         );
     });
 });
@@ -398,9 +398,7 @@ describe("dragAndDrop", () => {
             hasChangePermission: true,
         });
 
-        expect(await screen.findByRole("tree")).not.toHaveClass(
-            "jqtree-dnd"
-        );
+        expect(await screen.findByRole("tree")).not.toHaveClass("jqtree-dnd");
     });
 
     test("doesn't enable drag and drop without change permission", async () => {
@@ -409,15 +407,16 @@ describe("dragAndDrop", () => {
             hasChangePermission: false,
         });
 
-        expect(await screen.findByRole("tree")).not.toHaveClass(
-            "jqtree-dnd"
-        );
+        expect(await screen.findByRole("tree")).not.toHaveClass("jqtree-dnd");
     });
 });
 
 describe("saveState", () => {
     test("saves the state of the tree", async () => {
-        initTestTree(createTreeElement(), { saveState: "myapp_mymodel" });
+        initTestTree(createTreeElement(), {
+            autoOpen: false,
+            saveState: "myapp_mymodel",
+        });
 
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
@@ -426,13 +425,16 @@ describe("saveState", () => {
 
         await waitFor(() => {
             expect(localStorage.getItem("myapp_mymodel")).toEqual(
-                JSON.stringify({ open_nodes: [1], selected_node: [] })
+                JSON.stringify({ open_nodes: [1], selected_node: [] }),
             );
         });
     });
 
     test("doesn't save the state when saveState is undefined", async () => {
-        initTestTree(createTreeElement(), { saveState: undefined });
+        initTestTree(createTreeElement(), {
+            autoOpen: false,
+            saveState: undefined,
+        });
 
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
@@ -485,7 +487,7 @@ describe("useContextMenu", () => {
 describe("tree.move event", () => {
     const triggerTreeMove = (
         treeElement: HTMLElement,
-        movedNodeOverrides?: { element?: HTMLElement; move_url?: string }
+        movedNodeOverrides?: { element?: HTMLElement; move_url?: string },
     ) => {
         const doMove = vi.fn();
         const movedNode = {
@@ -522,7 +524,7 @@ describe("tree.move event", () => {
                     url: request.url,
                 });
                 return HttpResponse.json({});
-            })
+            }),
         );
 
         const treeElement = createTreeElement();
@@ -547,7 +549,7 @@ describe("tree.move event", () => {
             http.post("*", ({ request }) => {
                 requestPaths.push(new URL(request.url).pathname);
                 return HttpResponse.json({});
-            })
+            }),
         );
 
         const treeElement = createTreeElement();
@@ -630,7 +632,7 @@ describe("tree.move event", () => {
 
     test("displays an error message when the move fails", async () => {
         server.use(
-            http.post("/move", () => new HttpResponse(null, { status: 500 }))
+            http.post("/move", () => new HttpResponse(null, { status: 500 })),
         );
 
         const treeElement = createTreeElement();
@@ -641,14 +643,14 @@ describe("tree.move event", () => {
 
         const africaElement = getNodeElement("Africa");
         expect(
-            await within(africaElement).findByText("move failed")
+            await within(africaElement).findByText("move failed"),
         ).toBeInTheDocument();
         expect(doMove).not.toHaveBeenCalled();
     });
 
     test("removes the error message when the node is moved again", async () => {
         server.use(
-            http.post("/move", () => new HttpResponse(null, { status: 500 }))
+            http.post("/move", () => new HttpResponse(null, { status: 500 })),
         );
 
         const treeElement = createTreeElement();
@@ -694,7 +696,7 @@ describe("tree.move event", () => {
 describe("selecting a node", () => {
     const getNodeLinks = (nodeElement: HTMLElement) => {
         const elementDiv = nodeElement.querySelector<HTMLElement>(
-            ":scope > .jqtree-element"
+            ":scope > .jqtree-element",
         );
 
         if (!elementDiv) {

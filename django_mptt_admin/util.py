@@ -21,7 +21,7 @@ def get_tree_from_queryset(
     # Dict of all nodes; used for building the tree
     # - key is node id
     # - value is node info (label, id)
-    node_dict = dict()
+    node_dict = {}
 
     # The lowest level of the tree; used for building the tree
     # - Initial value is None; set later
@@ -39,12 +39,13 @@ def get_tree_from_queryset(
         else:
             label = str(instance)
 
-        node_info = dict(name=label, id=serialize_id(pk))
+        node_info = {"name": label, "id": serialize_id(pk)}
         if on_create_node:
             on_create_node(instance, node_info)
 
         if max_level is not None and not instance.is_leaf_node():
-            # If there is a maximum level and this node has children, then initially set property 'load_on_demand' to true.
+            # If there is a maximum level and this node has children, then initially
+            # set property 'load_on_demand' to true.
             node_info["load_on_demand"] = True
 
         if instance.level == min_level:
@@ -52,7 +53,8 @@ def get_tree_from_queryset(
             # Add node to the tree
             tree.append(node_info)
         else:
-            # NB: use instance's local value for parent attribute - consistent values for uuid
+            # NB: use instance's local value for parent attribute - consistent values
+            # for uuid
             parent_field = instance._meta.get_field(instance._mptt_meta.parent_attr)
             parent_attname = parent_field.get_attname()
             parent_id = getattr(instance, parent_attname)
@@ -68,7 +70,8 @@ def get_tree_from_queryset(
                 # Add node to the tree
                 parent_info["children"].append(node_info)
 
-                # If there is a maximum level, then reset property 'load_on_demand' for parent
+                # If there is a maximum level, then reset property 'load_on_demand'
+                # for parent
                 if max_level is not None:
                     parent_info["load_on_demand"] = False
 
