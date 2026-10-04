@@ -6,6 +6,7 @@ import perfectionistPlugin from "eslint-plugin-perfectionist";
 import vitest from "@vitest/eslint-plugin";
 
 export default [
+    { ignores: ["*.config.{js,mjs,ts}"] },
     eslint.configs.recommended,
     compat.configs["flat/recommended"],
     ...tseslint.configs.strictTypeChecked,
