@@ -4535,8 +4535,8 @@ const parseNumber = value => {
   if (!value) {
     return undefined;
   }
-  const numberValue = parseInt(value);
-  if (isNaN(numberValue)) {
+  const numberValue = parseInt(value, 10);
+  if (Number.isNaN(numberValue)) {
     return undefined;
   } else {
     return numberValue;
@@ -4575,7 +4575,7 @@ const parseTreeOptions = treeElement => {
 
 
 addEventListener("DOMContentLoaded", () => {
-  const treeElement = document.getElementById("tree");
+  const treeElement = document.querySelector("#tree");
   if (treeElement) {
     src_initTree(treeElement, src_parseTreeOptions(treeElement));
   }
