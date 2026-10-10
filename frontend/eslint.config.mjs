@@ -1,3 +1,4 @@
+import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import compat from "eslint-plugin-compat";
@@ -14,6 +15,7 @@ export default defineConfig([
     {
         extends: [
             eslint.configs.recommended,
+            comments.recommended,
             compat.configs["flat/recommended"],
             ...tseslint.configs.strictTypeChecked,
             ...tseslint.configs.stylisticTypeChecked,
@@ -22,6 +24,9 @@ export default defineConfig([
             perfectionistPlugin.configs["recommended-natural"],
         ],
         files: ["**/*.ts"],
+        linterOptions: {
+            reportUnusedDisableDirectives: "error",
+        },
         languageOptions: {
             parserOptions: {
                 projectService: true,
@@ -32,6 +37,7 @@ export default defineConfig([
             unicorn,
         },
         rules: {
+            "@eslint-community/eslint-comments/require-description": "error",
             "unicorn/dom-node-dataset": "error",
             "unicorn/error-message": "error",
             "unicorn/new-for-builtins": "error",
