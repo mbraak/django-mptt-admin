@@ -1,6 +1,7 @@
 import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import compat from "eslint-plugin-compat";
+import jestDom from "eslint-plugin-jest-dom";
 import tseslint from "typescript-eslint";
 import importPlugin from "eslint-plugin-import-x";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
@@ -31,7 +32,10 @@ export default defineConfig([
         },
     },
     {
-        extends: [testingLibrary.configs["flat/dom"]],
+        extends: [
+            jestDom.configs["flat/recommended"],
+            testingLibrary.configs["flat/dom"],
+        ],
         files: ["src/**/*.test.ts"],
         plugins: {
             vitest,
