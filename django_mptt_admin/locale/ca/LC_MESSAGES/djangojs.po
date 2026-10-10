@@ -32,3 +32,9 @@ msgstr "Error quan es carregaven les dades del servidor"
 #: django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js:1
 msgid "move failed"
 msgstr "moviment fallit"
+
+msgid "Loading"
+msgstr "Carregant"
+
+msgid "view"
+msgstr "veure"
