@@ -1,4 +1,3 @@
-import css from "@eslint/css";
 import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import compat from "eslint-plugin-compat";
@@ -38,19 +37,6 @@ export default defineConfig([
         rules: {
             ...vitest.configs.recommended.rules,
             "compat/compat": "off",
-        },
-    },
-    {
-        extends: [css.configs.recommended],
-        files: ["**/*.scss"],
-        language: "css/css",
-        plugins: { css },
-        rules: {
-            // Variables are defined in the Django admin stylesheets
-            "css/no-invalid-properties": [
-                "error",
-                { allowUnknownVariables: true },
-            ],
         },
     },
 ]);
