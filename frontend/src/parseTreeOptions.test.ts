@@ -19,7 +19,7 @@ beforeEach(() => {
 });
 
 test("returns the default options for an element without data attributes", () => {
-    expect(parseTreeOptions(createTreeElement())).toEqual({
+    expect(parseTreeOptions(createTreeElement())).toStrictEqual({
         animationSpeed: undefined,
         autoEscape: true,
         autoOpen: false,
@@ -51,7 +51,7 @@ test("parses all data attributes", () => {
         "data-use_context_menu": "true",
     });
 
-    expect(parseTreeOptions(treeElement)).toEqual({
+    expect(parseTreeOptions(treeElement)).toStrictEqual({
         animationSpeed: 300,
         autoEscape: false,
         autoOpen: 2,
@@ -77,7 +77,7 @@ describe("animationSpeed", () => {
             "data-tree-animation-speed": value,
         });
 
-        expect(parseTreeOptions(treeElement).animationSpeed).toEqual(expected);
+        expect(parseTreeOptions(treeElement).animationSpeed).toStrictEqual(expected);
     });
 });
 
@@ -91,7 +91,7 @@ describe("autoOpen", () => {
     ])("parses %o as %o", (value, expected) => {
         const treeElement = createTreeElement({ "data-auto_open": value });
 
-        expect(parseTreeOptions(treeElement).autoOpen).toEqual(expected);
+        expect(parseTreeOptions(treeElement).autoOpen).toStrictEqual(expected);
     });
 });
 
@@ -103,7 +103,7 @@ describe("autoEscape", () => {
     ])("parses %o as %o", (value, expected) => {
         const treeElement = createTreeElement({ "data-autoescape": value });
 
-        expect(parseTreeOptions(treeElement).autoEscape).toEqual(expected);
+        expect(parseTreeOptions(treeElement).autoEscape).toStrictEqual(expected);
     });
 });
 
@@ -113,7 +113,7 @@ describe("csrfCookieName", () => {
     test("keeps an empty attribute empty", () => {
         const treeElement = createTreeElement({ "data-csrf-cookie-name": "" });
 
-        expect(parseTreeOptions(treeElement).csrfCookieName).toEqual("");
+        expect(parseTreeOptions(treeElement).csrfCookieName).toBe("");
     });
 
     test("uses the value of the attribute", () => {
@@ -121,7 +121,7 @@ describe("csrfCookieName", () => {
             "data-csrf-cookie-name": "other_csrf",
         });
 
-        expect(parseTreeOptions(treeElement).csrfCookieName).toEqual(
+        expect(parseTreeOptions(treeElement).csrfCookieName).toBe(
             "other_csrf"
         );
     });
@@ -135,7 +135,7 @@ describe("dragAndDrop", () => {
     ])("parses %o as %o", (value, expected) => {
         const treeElement = createTreeElement({ "data-drag-and-drop": value });
 
-        expect(parseTreeOptions(treeElement).dragAndDrop).toEqual(expected);
+        expect(parseTreeOptions(treeElement).dragAndDrop).toStrictEqual(expected);
     });
 });
 
@@ -149,7 +149,7 @@ describe("hasAddPermission", () => {
             "data-has-add-permission": value,
         });
 
-        expect(parseTreeOptions(treeElement).hasAddPermission).toEqual(expected);
+        expect(parseTreeOptions(treeElement).hasAddPermission).toStrictEqual(expected);
     });
 });
 
@@ -163,7 +163,7 @@ describe("hasChangePermission", () => {
             "data-has-change-permission": value,
         });
 
-        expect(parseTreeOptions(treeElement).hasChangePermission).toEqual(
+        expect(parseTreeOptions(treeElement).hasChangePermission).toStrictEqual(
             expected
         );
     });
@@ -179,7 +179,7 @@ describe("mouseDelay", () => {
             "data-tree-mouse-delay": value,
         });
 
-        expect(parseTreeOptions(treeElement).mouseDelay).toEqual(expected);
+        expect(parseTreeOptions(treeElement).mouseDelay).toStrictEqual(expected);
     });
 });
 
@@ -192,7 +192,7 @@ describe("rtl", () => {
     ])("parses %o as %o", (value, expected) => {
         const treeElement = createTreeElement({ "data-rtl": value });
 
-        expect(parseTreeOptions(treeElement).rtl).toEqual(expected);
+        expect(parseTreeOptions(treeElement).rtl).toStrictEqual(expected);
     });
 
     test("is false when the attribute is missing", () => {
@@ -210,6 +210,6 @@ describe("useContextMenu", () => {
             "data-use_context_menu": value,
         });
 
-        expect(parseTreeOptions(treeElement).useContextMenu).toEqual(expected);
+        expect(parseTreeOptions(treeElement).useContextMenu).toStrictEqual(expected);
     });
 });

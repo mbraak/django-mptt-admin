@@ -41,14 +41,6 @@ beforeAll(() => {
     server.listen();
 });
 
-afterEach(() => {
-    server.resetHandlers();
-});
-
-afterAll(() => {
-    server.close();
-});
-
 beforeEach(() => {
     treeData = defaultTreeData;
     csrfTokenInRequest = null;
@@ -65,6 +57,14 @@ beforeEach(() => {
     document.body.innerHTML = "";
     localStorage.clear();
     user = userEvent.setup();
+});
+
+afterEach(() => {
+    server.resetHandlers();
+});
+
+afterAll(() => {
+    server.close();
 });
 
 const createTreeElement = (dataUrl = "/tree") => {
@@ -130,6 +130,7 @@ test("displays a message when the data cannot be loaded", async () => {
     initTestTree(treeElement);
 
     const spinner = screen.getByRole("status", { name: "Loading" });
+
     expect(spinner).toHaveClass("jqtree-spin");
     expect(spinner.parentElement).toBe(treeElement);
 
@@ -146,6 +147,7 @@ test("displays a spinner while the data is loading", async () => {
     initTestTree(treeElement);
 
     const spinner = screen.getByRole("status", { name: "Loading" });
+
     expect(spinner).toHaveClass("jqtree-spin");
     expect(spinner.parentElement).toBe(treeElement);
 
@@ -200,6 +202,7 @@ test("displays a spinner while the data of a node is loading", async () => {
     });
 
     const spinner = within(getNodeElement("root")).getByRole("status");
+
     expect(spinner.parentElement).toHaveClass("jqtree-element");
     expect(spinner.parentElement?.parentElement).toBe(getNodeElement("root"));
 
@@ -219,8 +222,9 @@ test("adds edit links when hasChangePermission is true", async () => {
     const editLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
         name: "(edit)",
     });
+
     expect(editLinks).toHaveLength(2);
-    expect(editLinks[0]?.href).toEqual("http://localhost:3000/edit/1");
+    expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
 
     expect(screen.queryAllByRole("link", { name: "(view)" })).toHaveLength(0);
 });
@@ -233,8 +237,9 @@ test("adds view links when hasChangePermission is false", async () => {
     const editLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
         name: "(view)",
     });
+
     expect(editLinks).toHaveLength(2);
-    expect(editLinks[0]?.href).toEqual("http://localhost:3000/edit/1");
+    expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
 
     expect(screen.queryAllByRole("link", { name: "(edit)" })).toHaveLength(0);
 });
@@ -247,8 +252,9 @@ test("adds add links when hasAddPermission is true", async () => {
     const addLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
         name: "(add)",
     });
+
     expect(addLinks).toHaveLength(2);
-    expect(addLinks[0]?.href).toEqual("http://localhost:3000/add?insert_at=1");
+    expect(addLinks[0]?.href).toBe("http://localhost:3000/add?insert_at=1");
 });
 
 test("doesn't add add links when hasAddPermission is false", async () => {
@@ -259,6 +265,7 @@ test("doesn't add add links when hasAddPermission is false", async () => {
     const addLinks = screen.queryAllByRole("link", {
         name: "(add)",
     });
+
     expect(addLinks).toHaveLength(0);
 });
 
@@ -306,6 +313,7 @@ test("renders the button on the left when rtl is true", async () => {
 
     // the button is placed before the title of the node
     const button = screen.getByText("◀");
+
     expect(button).toHaveClass("jqtree-toggler-left");
     expect(button.parentElement?.firstElementChild).toBe(button);
 });
@@ -317,6 +325,7 @@ test("renders the button on the right when rtl is false", async () => {
 
     // the button is placed after the title of the node
     const button = screen.getByText("►");
+
     expect(button).toHaveClass("jqtree-toggler-right");
     expect(button.parentElement?.lastElementChild).toBe(button);
 });
@@ -371,6 +380,7 @@ describe("autoEscape", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+
         expect(title).toHaveTextContent("<b>root</b>");
         expect(title.querySelector("b")).toBeNull();
     });
@@ -381,6 +391,7 @@ describe("autoEscape", () => {
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+
         expect(title).toHaveTextContent("root");
         expect(title.querySelector("b")).toBeInTheDocument();
     });
@@ -428,7 +439,7 @@ describe("saveState", () => {
         await user.click(screen.getByText("►"));
 
         await waitFor(() => {
-            expect(localStorage.getItem("myapp_mymodel")).toEqual(
+            expect(localStorage.getItem("myapp_mymodel")).toStrictEqual(
                 JSON.stringify({ open_nodes: [1], selected_node: [] }),
             );
         });
@@ -462,6 +473,7 @@ describe("useContextMenu", () => {
         treeElement.addEventListener("tree.contextmenu", handleContextMenu);
 
         initTestTree(treeElement, { autoOpen: true, useContextMenu: true });
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         await rightClickNode("Africa");
@@ -471,7 +483,8 @@ describe("useContextMenu", () => {
         const event = handleContextMenu.mock.calls[0]?.[0] as CustomEvent<{
             node: Node;
         }>;
-        expect(event.detail.node.name).toEqual("Africa");
+
+        expect(event.detail.node.name).toBe("Africa");
     });
 
     test("doesn't trigger a contextmenu event when useContextMenu is undefined", async () => {
@@ -480,6 +493,7 @@ describe("useContextMenu", () => {
         treeElement.addEventListener("tree.contextmenu", handleContextMenu);
 
         initTestTree(treeElement, { autoOpen: true });
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         await rightClickNode("Africa");
@@ -533,6 +547,7 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         triggerTreeMove(treeElement);
@@ -540,7 +555,8 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(moveRequests).toHaveLength(1);
         });
-        expect(moveRequests[0]).toEqual({
+
+        expect(moveRequests[0]).toStrictEqual({
             body: "position=after&target_id=2",
             url: "http://localhost:3000/move",
         });
@@ -558,6 +574,7 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         // this move is ignored, because the node has no element
@@ -573,12 +590,14 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(requestPaths).toEqual(["/move"]);
+
+        expect(requestPaths).toStrictEqual(["/move"]);
     });
 
     test("calls doMove", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const doMove = triggerTreeMove(treeElement);
@@ -593,6 +612,7 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const doMove = triggerTreeMove(treeElement);
@@ -600,7 +620,8 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRequest).toEqual("csrf1");
+
+        expect(csrfTokenInRequest).toBe("csrf1");
     });
 
     test("sets the csrf cookie with a crsf cookie and a csrfCookieName parameter", async () => {
@@ -609,6 +630,7 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement, { csrfCookieName: "otherName" });
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const doMove = triggerTreeMove(treeElement);
@@ -616,7 +638,8 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRequest).toEqual("value1");
+
+        expect(csrfTokenInRequest).toBe("value1");
     });
 
     test("sets the csrf cookie with a crsf cookie and an empty csrfCookieName parameter", async () => {
@@ -624,6 +647,7 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement, { csrfCookieName: undefined });
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const doMove = triggerTreeMove(treeElement);
@@ -631,7 +655,8 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRequest).toEqual("");
+
+        expect(csrfTokenInRequest).toBe("");
     });
 
     test("displays an error message when the move fails", async () => {
@@ -641,11 +666,13 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const doMove = triggerTreeMove(treeElement);
 
         const africaElement = getNodeElement("Africa");
+
         expect(
             await within(africaElement).findByText("move failed"),
         ).toBeInTheDocument();
@@ -659,9 +686,11 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         triggerTreeMove(treeElement);
+
         expect(await screen.findByText("move failed")).toBeInTheDocument();
 
         server.use(http.post("/move", () => HttpResponse.json({})));
@@ -686,6 +715,7 @@ describe("tree.move event", () => {
 
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const doMove = triggerTreeMove(treeElement);
@@ -693,7 +723,8 @@ describe("tree.move event", () => {
         await waitFor(() => {
             expect(doMove).toHaveBeenCalled();
         });
-        expect(csrfTokenInRequest).toEqual("csrf_test");
+
+        expect(csrfTokenInRequest).toBe("csrf_test");
     });
 });
 
@@ -720,6 +751,7 @@ describe("selecting a node", () => {
     test("sets the tabindex of the edit links when a node is selected", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const africaElement = getNodeElement("Africa");
@@ -737,6 +769,7 @@ describe("selecting a node", () => {
     test("resets the tabindex of the edit links when a node is deselected", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const { addLink, editLink } = getNodeLinks(getNodeElement("Africa"));
@@ -756,6 +789,7 @@ describe("selecting a node", () => {
     test("doesn't change the tabindex of the edit links of child nodes", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
+
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
         const rootLinks = getNodeLinks(getNodeElement("root"));
