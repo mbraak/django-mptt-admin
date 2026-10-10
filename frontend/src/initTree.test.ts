@@ -54,7 +54,7 @@ beforeEach(() => {
         }),
     );
 
-    document.body.innerHTML = "";
+    document.body.replaceChildren();
     localStorage.clear();
     user = userEvent.setup();
 });
@@ -69,8 +69,8 @@ afterAll(() => {
 
 const createTreeElement = (dataUrl = "/tree") => {
     const treeElement = document.createElement("div");
-    treeElement.setAttribute("data-url", dataUrl);
-    treeElement.setAttribute("data-insert_at_url", "/add");
+    treeElement.dataset.url = dataUrl;
+    treeElement.dataset.insert_at_url = "/add";
     document.body.append(treeElement);
 
     return treeElement;

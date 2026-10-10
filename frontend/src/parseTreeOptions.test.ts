@@ -15,7 +15,7 @@ const createTreeElement = (attributes: Record<string, string> = {}) => {
 };
 
 beforeEach(() => {
-    document.body.innerHTML = "";
+    document.body.replaceChildren();
 });
 
 test("returns the default options for an element without data attributes", () => {
