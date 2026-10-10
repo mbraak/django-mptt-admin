@@ -149,6 +149,8 @@ Also see the example project for a complete continent filter.
 
 - Make rendering faster by using templates.
 - The children of a closed folder are rendered when the folder is opened.
+- Add aria role to loading spinner so it is recognized by screen readers.
+- Add missing 'view' translation.
 
 **3.0.0** (september 11 2026)
 

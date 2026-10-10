@@ -129,28 +129,28 @@ test("displays a message when the data cannot be loaded", async () => {
     const treeElement = createTreeElement("/no_data");
     initTestTree(treeElement);
 
-    const spinner = treeElement.querySelector(".jqtree-spin");
-    expect(spinner).toBeInTheDocument();
-    expect(spinner?.parentElement).toBe(treeElement);
+    const spinner = screen.getByRole("status", { name: "Loading" });
+    expect(spinner).toHaveClass("jqtree-spin");
+    expect(spinner.parentElement).toBe(treeElement);
 
     expect(
         await screen.findByText("Error while loading the data from the server"),
     ).toBeInTheDocument();
 
     // the message replaces the spinner
-    expect(document.querySelector(".jqtree-spin")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
 });
 
 test("displays a spinner while the data is loading", async () => {
     const treeElement = createTreeElement();
     initTestTree(treeElement);
 
-    const spinner = treeElement.querySelector(".jqtree-spin");
-    expect(spinner).toBeInTheDocument();
-    expect(spinner?.parentElement).toBe(treeElement);
+    const spinner = screen.getByRole("status", { name: "Loading" });
+    expect(spinner).toHaveClass("jqtree-spin");
+    expect(spinner.parentElement).toBe(treeElement);
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
-    expect(treeElement.querySelector(".jqtree-spin")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
 });
 
 test("displays a spinner while the data of a node is loading", async () => {
@@ -193,18 +193,22 @@ test("displays a spinner while the data of a node is loading", async () => {
     // the spinner is displayed next to the title of the node
     await waitFor(() => {
         expect(
-            getNodeElement("root").querySelector(
-                ":scope > .jqtree-element > .jqtree-spin",
-            ),
+            within(getNodeElement("root")).getByRole("status", {
+                name: "Loading",
+            }),
         ).toBeInTheDocument();
     });
+
+    const spinner = within(getNodeElement("root")).getByRole("status");
+    expect(spinner.parentElement).toHaveClass("jqtree-element");
+    expect(spinner.parentElement?.parentElement).toBe(getNodeElement("root"));
 
     sendChildren();
 
     expect(
         await screen.findByRole("treeitem", { name: "Africa" }),
     ).toBeInTheDocument();
-    expect(document.querySelector(".jqtree-spin")).not.toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
 });
 
 test("adds edit links when hasChangePermission is true", async () => {
