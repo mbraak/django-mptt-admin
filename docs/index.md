@@ -145,7 +145,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**3.0.1** (october 10 2026)
 
 - Make rendering faster by using templates.
 - The children of a closed folder are rendered when the folder is opened.
