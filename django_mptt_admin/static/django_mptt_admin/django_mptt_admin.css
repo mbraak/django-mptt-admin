@@ -74,7 +74,7 @@ ul.jqtree-tree li.jqtree-ghost span {
   display: block;
 }
 ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
-  border: solid 2px #0000ff;
+  border: solid 2px #00f;
   border-radius: 100px;
   height: 8px;
   width: 8px;
@@ -84,7 +84,7 @@ ul.jqtree-tree li.jqtree-ghost span.jqtree-circle {
   box-sizing: border-box;
 }
 ul.jqtree-tree li.jqtree-ghost span.jqtree-line {
-  background-color: #0000ff;
+  background-color: #00f;
   height: 2px;
   padding: 0;
   position: absolute;
@@ -100,7 +100,7 @@ ul.jqtree-tree span.jqtree-border {
   display: block;
   left: -2px;
   top: 0;
-  border: solid 2px #0000ff;
+  border: solid 2px #00f;
   border-radius: 6px;
   margin: 0;
   box-sizing: content-box;
@@ -108,11 +108,11 @@ ul.jqtree-tree span.jqtree-border {
 ul.jqtree-tree li.jqtree-selected > .jqtree-element,
 ul.jqtree-tree li.jqtree-selected > .jqtree-element:hover {
   background-color: #97bdd6;
-  background: linear-gradient(#bee0f5, #89afca);
+  background-image: linear-gradient(#bee0f5, #89afca);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 ul.jqtree-tree .jqtree-moving > .jqtree-element .jqtree-title {
-  outline: dashed 1px #0000ff;
+  outline: dashed 1px #00f;
 }
 
 ul.jqtree-tree.jqtree-rtl {
@@ -172,7 +172,7 @@ span.jqtree-dragging {
 }
 
 #tree {
-  padding: 1em 0 1em 0;
+  padding: 1em 0;
 }
 #tree .mptt-admin-error {
   color: var(--error-fg);
