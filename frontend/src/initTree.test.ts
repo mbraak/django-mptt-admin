@@ -390,7 +390,7 @@ describe("autoEscape", () => {
 
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+        const title = screen.getByRole("treeitem", { name: "root" });
 
         expect(title).toHaveTextContent("root");
         expect(title.querySelector("b")).toBeInTheDocument();
