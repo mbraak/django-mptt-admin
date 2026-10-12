@@ -4337,6 +4337,7 @@ function initTree(treeElement, {
   hasAddPermission,
   hasChangePermission,
   insertAtUrl,
+  label,
   mouseDelay,
   rtl,
   saveState,
@@ -4552,6 +4553,9 @@ function initTree(treeElement, {
   if (animationSpeed !== undefined) {
     treeOptions.animationSpeed = animationSpeed;
   }
+  if (label) {
+    treeOptions.ariaLabel = label;
+  }
   if (mouseDelay != null) {
     treeOptions.startDndDelay = mouseDelay;
   }
@@ -4615,6 +4619,7 @@ const parseTreeOptions = treeElement => {
   const hasAddPermission = parseBoolean(treeElement.dataset.hasAddPermission) ?? false;
   const hasChangePermission = parseBoolean(treeElement.dataset.hasChangePermission) ?? false;
   const insertAtUrl = treeElement.dataset.insert_at_url;
+  const label = treeElement.dataset.label === "" ? undefined : treeElement.dataset.label;
   const mouseDelay = parseNumber(treeElement.dataset.treeMouseDelay);
   const rtl = treeElement.dataset.rtl !== undefined;
   const saveState = treeElement.dataset.save_state;
@@ -4628,6 +4633,7 @@ const parseTreeOptions = treeElement => {
     hasAddPermission,
     hasChangePermission,
     insertAtUrl,
+    label,
     mouseDelay,
     rtl,
     saveState,

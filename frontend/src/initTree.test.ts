@@ -214,6 +214,20 @@ test("displays a spinner while the data of a node is loading", async () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
 });
 
+test("labels the tree", async () => {
+    initTestTree(createTreeElement(), { label: "Countries" });
+
+    expect(
+        await screen.findByRole("tree", { name: "Countries" }),
+    ).toBeInTheDocument();
+});
+
+test("doesn't label the tree when there is no label", async () => {
+    initTestTree(createTreeElement());
+
+    expect(await screen.findByRole("tree")).not.toHaveAttribute("aria-label");
+});
+
 test("adds edit links when hasChangePermission is true", async () => {
     initTestTree(createTreeElement());
 

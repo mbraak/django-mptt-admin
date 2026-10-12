@@ -11,6 +11,7 @@ export interface InitTreeOptions {
     hasAddPermission: boolean;
     hasChangePermission: boolean;
     insertAtUrl?: string;
+    label?: string;
     mouseDelay?: number;
     rtl: boolean;
     saveState?: string;
@@ -28,6 +29,7 @@ function initTree(
         hasAddPermission,
         hasChangePermission,
         insertAtUrl,
+        label,
         mouseDelay,
         rtl,
         saveState,
@@ -299,6 +301,10 @@ function initTree(
 
     if (animationSpeed !== undefined) {
         treeOptions.animationSpeed = animationSpeed;
+    }
+
+    if (label) {
+        treeOptions.ariaLabel = label;
     }
 
     if (mouseDelay != null) {
