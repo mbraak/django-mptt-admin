@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/classNames.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/classNames.js
 let DEFAULT_CLASS_PREFIX = "tree-element";
 
 /* Create the class names that the widget puts on the elements it creates.
@@ -41,7 +41,7 @@ let createClassNames = ({
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/dataLoader.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dataLoader.js
 class DataLoader {
   constructor({
     _classNames: classNames,
@@ -63,12 +63,17 @@ class DataLoader {
   async _loadFromUrl(url, node) {
     let element = node?.element ?? this._treeElement;
     element.classList.add(this._classNames.loading);
+
+    // Tell screen readers that the children of the folder are loading
+    let titleSpan = node ? this._getTitleSpan(element) : null;
+    titleSpan?.setAttribute("aria-busy", "true");
     this._triggerEvent("tree.loading_data", {
       element,
       node
     });
     let stopLoading = () => {
       element.classList.remove(this._classNames.loading);
+      titleSpan?.removeAttribute("aria-busy");
       this._triggerEvent("tree.loaded_data", {
         element,
         node
@@ -104,11 +109,14 @@ class DataLoader {
       });
     });
   }
+  _getTitleSpan(element) {
+    return element.querySelector(`:scope > .${this._classNames.element} > .${this._classNames.title}`);
+  }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/positionUtils.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/positionUtils.js
 // Get the top position of the HTML element.
 let getOffsetTop = element => getElementPosition(element).top;
 
@@ -123,7 +131,7 @@ let getElementPosition = element => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
 function binarySearch(items, compareFn) {
   let low = 0;
   let high = items.length;
@@ -147,7 +155,7 @@ function binarySearch(items, compareFn) {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
 class DragElement {
   constructor({
     _autoEscape: autoEscape,
@@ -160,7 +168,7 @@ class DragElement {
     this._offsetX = offsetX;
     this._offsetY = offsetY;
     this._element = this._createElement(nodeName, autoEscape, classNames);
-    treeElement.appendChild(this._element);
+    treeElement.append(this._element);
   }
   _move(pageX, pageY) {
     this._element.style.left = `${pageX - this._offsetX}px`;
@@ -175,6 +183,7 @@ class DragElement {
     if (autoEscape) {
       element.textContent = nodeName;
     } else {
+      // eslint-disable-next-line no-unsanitized/property -- the user opted out of escaping with autoEscape: false
       element.innerHTML = nodeName;
     }
     element.style.position = "absolute";
@@ -184,7 +193,7 @@ class DragElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
 let iterateVisibleNodes = (tree, {
   _handleAfterOpenFolder: handleAfterOpenFolder,
   _handleClosedFolder: handleClosedFolder,
@@ -214,24 +223,25 @@ let iterateVisibleNodes = (tree, {
         handleClosedFolder(node, nextNode, element);
       }
     }
-    if (mustIterateInside) {
-      let childrenLength = node.children.length;
-      node.children.forEach((_, i) => {
-        let child = node.children[i];
-        if (child) {
-          if (i === childrenLength - 1) {
-            iterate(child, null);
-          } else {
-            let nextChild = node.children[i + 1];
-            if (nextChild) {
-              iterate(child, nextChild);
-            }
+    if (!mustIterateInside) {
+      return;
+    }
+    let childrenLength = node.children.length;
+    for (let i of node.children.keys()) {
+      let child = node.children[i];
+      if (child) {
+        if (i === childrenLength - 1) {
+          iterate(child, null);
+        } else {
+          let nextChild = node.children[i + 1];
+          if (nextChild) {
+            iterate(child, nextChild);
           }
         }
-      });
-      if (node.is_open && element) {
-        handleAfterOpenFolder(node, nextNode);
       }
+    }
+    if (node.is_open && element) {
+      handleAfterOpenFolder(node, nextNode);
     }
   };
   iterate(tree, null);
@@ -239,7 +249,7 @@ let iterateVisibleNodes = (tree, {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
 
 
 
@@ -370,7 +380,7 @@ let generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPo
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/dragAndDropHandler/index.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/index.js
 
 
 
@@ -430,10 +440,8 @@ class DragAndDropHandler {
       return null;
     }
     let nodeElement = this._getNodeElement(element);
-    if (nodeElement && this._onCanMove) {
-      if (!this._onCanMove(nodeElement._node)) {
-        nodeElement = null;
-      }
+    if (nodeElement && this._onCanMove && !this._onCanMove(nodeElement._node)) {
+      nodeElement = null;
     }
     this._currentItem = nodeElement;
     return this._currentItem != null;
@@ -464,10 +472,8 @@ class DragAndDropHandler {
       this._stopOpenFolderTimer();
       this._hoveredArea = area;
     }
-    if (!area) {
-      if (this._onDragMove) {
-        this._onDragMove(this._currentItem._node, positionInfo.originalEvent);
-      }
+    if (!area && this._onDragMove) {
+      this._onDragMove(this._currentItem._node, positionInfo.originalEvent);
     }
     return true;
   }
@@ -505,35 +511,32 @@ class DragAndDropHandler {
       this._currentItem = null;
     }
     this._isDragging = false;
-    if (!this._hoveredArea && currentItem) {
-      if (this._onDragStop) {
-        this._onDragStop(currentItem._node, positionInfo.originalEvent);
-      }
+    if (!this._hoveredArea && currentItem && this._onDragStop) {
+      this._onDragStop(currentItem._node, positionInfo.originalEvent);
     }
     return false;
   }
   _refresh() {
     this._removeHitAreas();
-    if (this._currentItem) {
-      let currentNode = this._currentItem._node;
-      this._generateHitAreas(currentNode);
-      this._currentItem = this._getNodeElementForNode(currentNode);
-      if (this._isDragging) {
-        this._currentItem._element.classList.add(this._classNames.moving);
-      }
+    if (!this._currentItem) {
+      return;
+    }
+    let currentNode = this._currentItem._node;
+    this._generateHitAreas(currentNode);
+    this._currentItem = this._getNodeElementForNode(currentNode);
+    if (this._isDragging) {
+      this._currentItem._element.classList.add(this._classNames.moving);
     }
   }
   _canMoveToArea(area, currentItem) {
-    if (!this._onCanMoveTo) {
-      return true;
-    }
-    return this._onCanMoveTo(currentItem._node, area.node, area.position);
+    return this._onCanMoveTo ? this._onCanMoveTo(currentItem._node, area.node, area.position) : true;
   }
   _clear() {
-    if (this._dragElement) {
-      this._dragElement._remove();
-      this._dragElement = null;
+    if (!this._dragElement) {
+      return;
     }
+    this._dragElement._remove();
+    this._dragElement = null;
   }
   _findHoveredArea(x, y) {
     let dimensions = this._getTreeDimensions();
@@ -543,20 +546,13 @@ class DragAndDropHandler {
     return binarySearch(this._hitAreas, area => {
       if (y < area.top) {
         return 1;
-      } else if (y > area.bottom) {
-        return -1;
-      } else {
-        return 0;
       }
+      return y > area.bottom ? -1 : 0;
     });
   }
   _generateHitAreas(currentNode) {
     let tree = this._getTree();
-    if (!tree) {
-      this._hitAreas = [];
-    } else {
-      this._hitAreas = generateHitAreas(tree, currentNode, this._getTreeDimensions().bottom);
-    }
+    this._hitAreas = tree ? generateHitAreas(tree, currentNode, this._getTreeDimensions().bottom) : [];
   }
   _getTreeDimensions() {
     // Return the dimensions of the tree. Add a margin to the bottom to allow
@@ -572,36 +568,40 @@ class DragAndDropHandler {
     };
   }
 
-  /* Move the dragged node to the selected position in the tree. */
+  /*
+  Move the dragged node to the selected position in the tree.
+  */
   _moveItem(positionInfo) {
-    if (this._currentItem && this._hoveredArea?.position && this._canMoveToArea(this._hoveredArea, this._currentItem)) {
-      let movedNode = this._currentItem._node;
-      let targetNode = this._hoveredArea.node;
-      let position = this._hoveredArea.position;
-      let previousParent = movedNode.parent;
-      if (position === "inside") {
-        this._hoveredArea.node.is_open = true;
+    if (!(this._currentItem && this._hoveredArea?.position && this._canMoveToArea(this._hoveredArea, this._currentItem))) {
+      return;
+    }
+    let movedNode = this._currentItem._node;
+    let targetNode = this._hoveredArea.node;
+    let position = this._hoveredArea.position;
+    let previousParent = movedNode.parent;
+    if (position === "inside") {
+      this._hoveredArea.node.is_open = true;
+    }
+    let doMove = () => {
+      let tree = this._getTree();
+      if (!tree) {
+        return;
       }
-      let doMove = () => {
-        let tree = this._getTree();
-        if (tree) {
-          tree.moveNode(movedNode, targetNode, position);
-          this._treeElement.textContent = "";
-          this._refreshElements(null);
-        }
-      };
-      if (this._triggerEvent("tree.move", {
-        moveInfo: {
-          doMove,
-          movedNode,
-          originalEvent: positionInfo.originalEvent,
-          position,
-          previousParent,
-          targetNode
-        }
-      })) {
-        doMove();
+      tree.moveNode(movedNode, targetNode, position);
+      this._treeElement.textContent = "";
+      this._refreshElements(null);
+    };
+    if (this._triggerEvent("tree.move", {
+      moveInfo: {
+        doMove,
+        movedNode,
+        originalEvent: positionInfo.originalEvent,
+        position,
+        previousParent,
+        targetNode
       }
+    })) {
+      doMove();
     }
   }
   _mustCaptureElement(element) {
@@ -637,10 +637,11 @@ class DragAndDropHandler {
     }
   }
   _stopOpenFolderTimer() {
-    if (this._openFolderTimer) {
-      clearTimeout(this._openFolderTimer);
-      this._openFolderTimer = null;
+    if (!this._openFolderTimer) {
+      return;
     }
+    clearTimeout(this._openFolderTimer);
+    this._openFolderTimer = null;
   }
   _updateDropHint() {
     if (!this._hoveredArea) {
@@ -658,13 +659,13 @@ class DragAndDropHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/util.js
-let isInt = n => typeof n === "number" && n % 1 === 0;
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/util.js
+let isInt = n => Number.isInteger(n);
 let getBoolString = value => value ? "true" : "false";
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/elementsRenderer.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/elementsRenderer.js
 
 
 /* Renders the tree to html.
@@ -680,21 +681,25 @@ let getBoolString = value => value ? "true" : "false";
  */
 class ElementsRenderer {
   constructor({
+    _ariaLabel: ariaLabel,
+    _ariaLabelledBy: ariaLabelledBy,
     _autoEscape: autoEscape,
     _buttonLeft: buttonLeft,
     _classNames: classNames,
-    _closedIcon: closedIcon,
+    _closedIcon: closedIcon = "-",
     _dragAndDrop: dragAndDrop,
     _getTree: getTree,
     _htmlElement: htmlElement,
     _isNodeSelected: isNodeSelected,
     _onCreateLi: onCreateLi,
-    _openedIcon: openedIcon,
+    _openedIcon: openedIcon = "+",
     _rtl: rtl,
     _setNodeElement: setNodeElement,
     _showEmptyFolder: showEmptyFolder,
     _tabIndex: tabIndex
   }) {
+    this._ariaLabel = ariaLabel;
+    this._ariaLabelledBy = ariaLabelledBy;
     this._autoEscape = autoEscape;
     this._buttonLeft = buttonLeft;
     this._classNames = classNames;
@@ -707,8 +712,8 @@ class ElementsRenderer {
     this._setNodeElement = setNodeElement;
     this._showEmptyFolder = showEmptyFolder;
     this._tabIndex = tabIndex;
-    this._openedIconElement = this._createButtonElement(openedIcon ?? "+");
-    this._closedIconElement = this._createButtonElement(closedIcon ?? "-");
+    this._openedIconElement = this._createButtonElement(openedIcon);
+    this._closedIconElement = this._createButtonElement(closedIcon);
     this._rootUlTemplate = this._createUlTemplate(true);
     this._groupUlTemplate = this._createUlTemplate(false);
     this._nodeTemplate = this._createNodeTemplate();
@@ -727,10 +732,7 @@ class ElementsRenderer {
    * null when the folder is not rendered or has no children.
    */
   _renderChildren(node) {
-    if (!node.element || !node.hasChildren()) {
-      return null;
-    }
-    return this._createDomElements(node.element, node.children, false, node.getLevel() + 1);
+    return !node.element || !node.hasChildren() ? null : this._createDomElements(node.element, node.children, false, node.getLevel() + 1);
   }
   _renderFromNode(node) {
     if (!node.element) {
@@ -762,21 +764,19 @@ class ElementsRenderer {
   _createButtonElement(value) {
     if (typeof value === "string") {
       let template = document.createElement("template");
+      // eslint-disable-next-line no-unsanitized/property -- icon options are documented to accept html
       template.innerHTML = value;
       return template.content;
-    } else if (value.nodeType) {
-      return value;
-    } else {
-      return undefined;
     }
+    return value.nodeType ? value : undefined;
   }
   _createDomElements(element, children, isRootNode, level) {
     let template = isRootNode ? this._rootUlTemplate : this._groupUlTemplate;
     let ul = template.cloneNode();
-    element.appendChild(ul);
+    element.append(ul);
     for (let child of children) {
       let li = this._createLi(child, level);
-      ul.appendChild(li);
+      ul.append(li);
       if (this._mustRenderChildren(child)) {
         this._createDomElements(li, child.children, false, level + 1);
       }
@@ -789,19 +789,20 @@ class ElementsRenderer {
     if (isSelected) {
       li.classList.add(this._classNames.selected);
     }
-    if (node.is_loading) {
-      li.classList.add(this._classNames.loading);
-    }
 
-    // li > div > [button link], title span, [button link]
+    // li > div > [toggler], title span, [toggler]
     let div = li.firstChild;
     let titleSpan = div.childNodes[this._buttonLeft ? 1 : 0];
     this._fillTitleSpan(titleSpan, node.name, isSelected, level);
+    if (node.is_loading) {
+      li.classList.add(this._classNames.loading);
+      titleSpan.setAttribute("aria-busy", "true");
+    }
     return li;
   }
 
   /* Template for a folder <li>:
-   *   li > div > [button link], title span, [button link]
+   *   li > div > [toggler], title span, [toggler]
    * The toggler icon and the aria-expanded attribute depend on the open
    * state, so there is a template for each.
    */
@@ -813,23 +814,25 @@ class ElementsRenderer {
     let li = this._createLiTemplate(liClasses.join(" "));
     let div = li.firstChild;
 
-    // button link
-    let buttonLink = document.createElement("a");
-    buttonLink.className = this._getButtonClasses(isOpen);
+    // The toggler is hidden from screen readers: the icon is decoration, and
+    // aria-expanded on the treeitem has the open state.
+    let toggler = document.createElement("span");
+    toggler.className = this._getButtonClasses(isOpen);
+    toggler.setAttribute("aria-hidden", "true");
     let iconElement = isOpen ? this._openedIconElement : this._closedIconElement;
     if (iconElement) {
-      buttonLink.appendChild(iconElement.cloneNode(true));
+      toggler.append(iconElement.cloneNode(true));
     }
     if (this._buttonLeft) {
-      div.appendChild(buttonLink);
+      div.append(toggler);
     }
 
     // title span
     let titleSpan = this._createTitleSpanTemplate(true);
     titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
-    div.appendChild(titleSpan);
+    div.append(titleSpan);
     if (!this._buttonLeft) {
-      div.appendChild(buttonLink);
+      div.append(toggler);
     }
     return li;
   }
@@ -849,7 +852,9 @@ class ElementsRenderer {
     return li;
   }
 
-  /* Create the outer part of a <li> template: li > div */
+  /*
+  Create the outer part of a <li> template: li > div
+  */
   _createLiTemplate(liClasses) {
     let li = document.createElement("li");
     li.className = liClasses;
@@ -857,7 +862,7 @@ class ElementsRenderer {
     let div = document.createElement("div");
     div.className = `${this._classNames.element} ${this._classNames.common}`;
     div.setAttribute("role", "none");
-    li.appendChild(div);
+    li.append(div);
     return li;
   }
   _createNodeLi(node, level, isSelected) {
@@ -873,11 +878,13 @@ class ElementsRenderer {
     return li;
   }
 
-  /* Template for a <li> without children: li > div > title span */
+  /*
+  Template for a <li> without children: li > div > title span
+  */
   _createNodeTemplate() {
     let li = this._createLiTemplate(this._classNames.common);
     let div = li.firstChild;
-    div.appendChild(this._createTitleSpanTemplate(false));
+    div.append(this._createTitleSpanTemplate(false));
     return li;
   }
   _createTitleSpanTemplate(isFolder) {
@@ -890,20 +897,25 @@ class ElementsRenderer {
     titleSpan.className = classes;
     titleSpan.setAttribute("role", "treeitem");
     titleSpan.setAttribute("aria-selected", "false");
+
+    // Every node is focusable, but only the tab stop is in the tab order
+    if (this._tabIndex !== undefined) {
+      titleSpan.setAttribute("tabindex", "-1");
+    }
     return titleSpan;
   }
   _createUlTemplate(isRootNode) {
     let classString;
     let role;
-    if (!isRootNode) {
-      classString = "";
-      role = "group";
-    } else {
+    if (isRootNode) {
       classString = this._classNames.tree;
       role = "tree";
       if (this._rtl) {
         classString += ` ${this._classNames.rtl}`;
       }
+    } else {
+      classString = "";
+      role = "group";
     }
     if (this._dragAndDrop) {
       classString += ` ${this._classNames.dnd}`;
@@ -911,23 +923,33 @@ class ElementsRenderer {
     let ul = document.createElement("ul");
     ul.className = `${this._classNames.common} ${classString}`;
     ul.setAttribute("role", role);
+    if (isRootNode) {
+      if (this._ariaLabel !== undefined) {
+        ul.setAttribute("aria-label", this._ariaLabel);
+      }
+      if (this._ariaLabelledBy !== undefined) {
+        ul.setAttribute("aria-labelledby", this._ariaLabelledBy);
+      }
+    }
     return ul;
   }
 
-  /* Set the parts of a cloned title span that differ per node */
+  /*
+  Set the parts of a cloned title span that differ per node
+  */
   _fillTitleSpan(titleSpan, nodeName, isSelected, level) {
-    titleSpan.setAttribute("aria-label", nodeName);
-    titleSpan.setAttribute("aria-level", `${level}`);
+    titleSpan.setAttribute("aria-level", String(level));
     if (isSelected) {
       titleSpan.setAttribute("aria-selected", "true");
       let tabIndex = this._tabIndex;
       if (tabIndex !== undefined) {
-        titleSpan.setAttribute("tabindex", `${tabIndex}`);
+        titleSpan.setAttribute("tabindex", String(tabIndex));
       }
     }
     if (this._autoEscape) {
       titleSpan.textContent = nodeName;
     } else {
+      // eslint-disable-next-line no-unsanitized/property -- the user opted out of escaping with autoEscape: false
       titleSpan.innerHTML = nodeName;
     }
   }
@@ -944,7 +966,9 @@ class ElementsRenderer {
     return classes.join(" ");
   }
 
-  /* The children of a closed folder are rendered when it is opened */
+  /*
+  The children of a closed folder are rendered when it is opened
+  */
   _mustRenderChildren(node) {
     return node.hasChildren() && node.is_open === true;
   }
@@ -952,22 +976,26 @@ class ElementsRenderer {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/keyHandler.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/keyHandler.js
 class KeyHandler {
   constructor({
     _closeNode: closeNode,
+    _getFocusedNode: getFocusedNode,
     _getSelectedNode: getSelectedNode,
-    _isFocusOnTree: isFocusOnTree,
+    _getTree: getTree,
     _keyboardSupport: keyboardSupport,
     _openNode: openNode,
-    _selectNode: selectNode
+    _selectNode: selectNode,
+    _triggerEvent: triggerEvent
   }) {
     this._closeNode = closeNode;
+    this._getFocusedNode = getFocusedNode;
     this._getSelectedNode = getSelectedNode;
-    this._isFocusOnTree = isFocusOnTree;
+    this._getTree = getTree;
     this._keyboardSupport = keyboardSupport;
     this._openNode = openNode;
     this._originalSelectNode = selectNode;
+    this._triggerEvent = triggerEvent;
     if (keyboardSupport) {
       document.addEventListener("keydown", this._handleKeyDown);
     }
@@ -983,35 +1011,89 @@ class KeyHandler {
   _moveUp() {
     return this._selectNode(this._getSelectedNode()?.getPreviousVisibleNode());
   }
-  _canHandleKeyboard() {
-    return this._keyboardSupport && this._isFocusOnTree();
+
+  // Activate the node, for example to open its edit page.
+  _activate(node, originalEvent) {
+    this._triggerEvent("tree.activate", {
+      node,
+      originalEvent
+    });
+    return true;
+  }
+  _handleArrowKey(key) {
+    switch (key) {
+      case "ArrowDown":
+        {
+          return this._moveDown();
+        }
+      case "ArrowLeft":
+        {
+          return this._moveLeft();
+        }
+      case "ArrowRight":
+        {
+          return this._moveRight();
+        }
+      case "ArrowUp":
+        {
+          return this._moveUp();
+        }
+      default:
+        {
+          return false;
+        }
+    }
   }
   _handleKeyDown = e => {
-    if (!this._canHandleKeyboard()) {
+    let focusedNode = this._getFocusedNode();
+    if (!focusedNode) {
       return;
     }
-    let isKeyHandled = false;
+    let isKeyHandled;
     let selectedNode = this._getSelectedNode();
-    if (selectedNode) {
-      switch (e.key) {
-        case "ArrowDown":
-          isKeyHandled = this._moveDown();
+    switch (e.key) {
+      case "End":
+        {
+          isKeyHandled = this._selectNode(this._getTree()?.getLastChild());
           break;
-        case "ArrowLeft":
-          isKeyHandled = this._moveLeft();
+        }
+      case "Enter":
+        {
+          // Without a selected node, activate the focused node
+          isKeyHandled = this._activate(selectedNode ?? focusedNode, e);
           break;
-        case "ArrowRight":
-          isKeyHandled = this._moveRight();
+        }
+      case "Home":
+        {
+          isKeyHandled = this._selectNode(this._getTree()?.children[0]);
           break;
-        case "ArrowUp":
-          isKeyHandled = this._moveUp();
-          break;
-      }
+        }
+      default:
+        {
+          isKeyHandled = selectedNode ? this._handleArrowKey(e.key) : this._handleKeyWithoutSelection(e.key, focusedNode);
+        }
     }
     if (isKeyHandled) {
       e.preventDefault();
     }
   };
+
+  // No node is selected. These keys select the focused node, which is
+  // usually the first node, see TreeElement.updateTabStop.
+  _handleKeyWithoutSelection(key, focusedNode) {
+    switch (key) {
+      case " ":
+      case "ArrowDown":
+      case "ArrowRight":
+        {
+          return this._selectNode(focusedNode);
+        }
+      default:
+        {
+          return false;
+        }
+    }
+  }
   _moveLeft() {
     let selectedNode = this._getSelectedNode();
 
@@ -1021,28 +1103,25 @@ class KeyHandler {
     }
     if (selectedNode.isFolder() && selectedNode.is_open) {
       // Left on an open node closes the node
-      this._closeNode(selectedNode);
+      void this._closeNode(selectedNode);
       return true;
-    } else {
-      // Left on a closed or end node moves focus to the node's parent
-      return this._selectNode(selectedNode.getParent());
     }
+    // Left on a closed or end node moves focus to the node's parent
+    return this._selectNode(selectedNode.getParent());
   }
   _moveRight() {
     let selectedNode = this._getSelectedNode();
-    if (!selectedNode?.isFolder()) {
-      return false;
-    } else {
+    if (selectedNode?.isFolder()) {
       // folder node
       if (selectedNode.is_open) {
         // Right moves to the first child of an open node
         return this._selectNode(selectedNode.getNextVisibleNode());
-      } else {
-        // Right expands a closed node
-        void this._openNode(selectedNode);
-        return true;
       }
+      // Right expands a closed node
+      void this._openNode(selectedNode);
+      return true;
     }
+    return false;
   }
 
   /* Select the node.
@@ -1050,18 +1129,17 @@ class KeyHandler {
    * Result: a different node was selected.
    */
   _selectNode(node) {
-    if (!node) {
-      return false;
-    } else {
+    if (node) {
       this._originalSelectNode(node);
       return true;
     }
+    return false;
   }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/mouseUtils.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/mouseUtils.js
 let getPositionInfoFromMouseEvent = e => ({
   originalEvent: e,
   pageX: e.pageX,
@@ -1077,7 +1155,7 @@ let getPositionInfoFromTouch = (touch, e) => ({
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/mouseHandler.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/mouseHandler.js
 
 
 class MouseHandler {
@@ -1167,10 +1245,12 @@ class MouseHandler {
     }
     switch (clickTarget.type) {
       case "button":
-        this._onClickButton(clickTarget.node);
-        e.preventDefault();
-        e.stopPropagation();
-        break;
+        {
+          void this._onClickButton(clickTarget.node);
+          e.preventDefault();
+          e.stopPropagation();
+          break;
+        }
       case "label":
         {
           if (this._triggerEvent("tree.click", {
@@ -1253,10 +1333,11 @@ class MouseHandler {
     this._removeMouseMoveEventListeners();
     this._isMouseDelayMet = false;
     this._mouseDownInfo = null;
-    if (this._isMouseStarted) {
-      this._isMouseStarted = false;
-      this._onMouseStop(positionInfo);
+    if (!this._isMouseStarted) {
+      return;
     }
+    this._isMouseStarted = false;
+    this._onMouseStop(positionInfo);
   }
   _handleStartMouse() {
     document.addEventListener("mousemove", this._mouseMove, {
@@ -1345,12 +1426,12 @@ class MouseHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/nodeUtils.js
-let isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && data.children instanceof Array;
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeUtils.js
+let isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && Array.isArray(data.children);
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/node.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/node.js
 
 
 /*
@@ -1379,38 +1460,62 @@ prefix-private-members: all
  * :::
  */
 class Node {
-  /** @hidden */
+  /**
+  @hidden
+  */
 
-  /** The child nodes. */
+  /**
+  The child nodes.
+  */
   children;
   /** The `li` element, once the node is rendered. Nodes inside a closed
    * folder are rendered when the folder is opened. */
   element;
-  /** The id from the node data. */
+  /**
+  The id from the node data.
+  */
   id;
-  /** @hidden */
+  /**
+  @hidden
+  */
   idMapping;
-  /** Whether the node's children are being fetched. */
+  /**
+  Whether the node's children are being fetched.
+  */
   is_loading;
-  /** Whether the folder is open. */
+  /**
+  Whether the folder is open.
+  */
   is_open;
-  /** Whether the node data had an empty `children` array. */
+  /**
+  Whether the node data had an empty `children` array.
+  */
   isEmptyFolder;
-  /** Whether the children still have to be fetched. */
-  load_on_demand;
-  /** The label. Also settable from the `label` key in node data. */
-  name;
-  /** @hidden */
+  /**
+  Whether the children still have to be fetched.
+  */
+  load_on_demand = false;
+  /**
+  The label. Also settable from the `label` key in node data.
+  */
+  name = "";
+  /**
+  @hidden
+  */
   nodeClass;
-  /** The parent; `null` for the root node. */
+  /**
+  The parent; `null` for the root node.
+  */
   parent;
-  /** The root node. */
+  /**
+  The root node.
+  */
   tree;
 
-  /** @hidden */
+  /**
+  @hidden
+  */
   constructor(nodeData = null, isRoot = false, nodeClass = Node) {
-    this.name = "";
-    this.load_on_demand = false;
     this.isEmptyFolder = nodeData != null && isNodeRecordWithChildren(nodeData) && nodeData.children.length === 0;
     this.setData(nodeData);
     this.children = [];
@@ -1433,15 +1538,14 @@ class Node {
    * @group Changing the tree
    */
   addAfter(nodeInfo) {
-    if (!this.parent) {
-      return null;
-    } else {
+    if (this.parent) {
       let node = this._createNode(nodeInfo);
       let childIndex = this.parent.getChildIndex(this);
       this.parent.addChildAtPosition(node, childIndex + 1);
       node._loadChildrenFromData(nodeInfo);
       return node;
     }
+    return null;
   }
 
   /**
@@ -1451,15 +1555,14 @@ class Node {
    * @group Changing the tree
    */
   addBefore(nodeInfo) {
-    if (!this.parent) {
-      return null;
-    } else {
+    if (this.parent) {
       let node = this._createNode(nodeInfo);
       let childIndex = this.parent.getChildIndex(this);
       this.parent.addChildAtPosition(node, childIndex);
       node._loadChildrenFromData(nodeInfo);
       return node;
     }
+    return null;
   }
 
   /**
@@ -1483,7 +1586,9 @@ class Node {
     node._setParent(this);
   }
 
-  /** @hidden */
+  /**
+  @hidden
+  */
   addNodeToIndex(node) {
     if (node.id != null) {
       this.idMapping?.set(node.id, node);
@@ -1497,9 +1602,7 @@ class Node {
    * @group Changing the tree
    */
   addParent(nodeInfo) {
-    if (!this.parent) {
-      return null;
-    } else {
+    if (this.parent) {
       let newParent = this._createNode(nodeInfo);
       if (this.tree) {
         newParent._setParent(this.tree);
@@ -1512,6 +1615,7 @@ class Node {
       originalParent.addChild(newParent);
       return newParent;
     }
+    return null;
   }
 
   /**
@@ -1578,10 +1682,11 @@ class Node {
       return nodes.map(node => {
         let tmpNode = {};
         for (let k in node) {
-          if (["parent", "children", "element", "idMapping", "load_on_demand", "nodeClass", "tree", "isEmptyFolder"].indexOf(k) === -1 && Object.prototype.hasOwnProperty.call(node, k)) {
-            let v = node[k];
-            tmpNode[k] = v;
+          if (["children", "element", "idMapping", "isEmptyFolder", "load_on_demand", "nodeClass", "parent", "tree"].includes(k) || !Object.prototype.hasOwnProperty.call(node, k)) {
+            continue;
           }
+          let v = node[k];
+          tmpNode[k] = v;
         }
         if (node.hasChildren()) {
           tmpNode.children = getDataFromNodes(node.children);
@@ -1589,11 +1694,7 @@ class Node {
         return tmpNode;
       });
     };
-    if (includeParent) {
-      return getDataFromNodes([this]);
-    } else {
-      return getDataFromNodes(this.children);
-    }
+    return getDataFromNodes(includeParent ? [this] : this.children);
   }
 
   /**
@@ -1603,16 +1704,11 @@ class Node {
    * @group Moving around the tree
    */
   getLastChild() {
-    if (!this.hasChildren()) {
-      return null;
-    } else {
+    if (this.hasChildren()) {
       let lastChild = this.children[this.children.length - 1];
-      if (!(lastChild.hasChildren() && lastChild.is_open)) {
-        return lastChild;
-      } else {
-        return lastChild.getLastChild();
-      }
+      return lastChild.hasChildren() && lastChild.is_open ? lastChild.getLastChild() : lastChild;
     }
+    return null;
   }
 
   /**
@@ -1622,7 +1718,7 @@ class Node {
    */
   getLevel() {
     let level = 0;
-    let node = this; // eslint-disable-line @typescript-eslint/no-this-alias
+    let node = this; // eslint-disable-line @typescript-eslint/no-this-alias, unicorn/no-this-assignment
 
     while (node.parent) {
       level += 1;
@@ -1640,16 +1736,12 @@ class Node {
   getNextNode(includeChildren = true) {
     if (includeChildren && this.hasChildren()) {
       return this.children[0] ?? null;
-    } else if (!this.parent) {
-      return null;
-    } else {
-      let nextSibling = this.getNextSibling();
-      if (nextSibling) {
-        return nextSibling;
-      } else {
-        return this.parent.getNextNode(false);
-      }
     }
+    if (this.parent) {
+      let nextSibling = this.getNextSibling();
+      return nextSibling ?? this.parent.getNextNode(false);
+    }
+    return null;
   }
 
   /**
@@ -1658,16 +1750,11 @@ class Node {
    * @group Moving around the tree
    */
   getNextSibling() {
-    if (!this.parent) {
-      return null;
-    } else {
+    if (this.parent) {
       let nextIndex = this.parent.getChildIndex(this) + 1;
-      if (nextIndex < this.parent.children.length) {
-        return this.parent.children[nextIndex] ?? null;
-      } else {
-        return null;
-      }
+      return nextIndex < this.parent.children.length ? this.parent.children[nextIndex] ?? null : null;
     }
+    return null;
   }
 
   /**
@@ -1680,20 +1767,17 @@ class Node {
     if (this.hasChildren() && this.is_open) {
       // First child
       return this.children[0] ?? null;
-    } else {
-      if (!this.parent) {
-        return null;
-      } else {
-        let nextSibling = this.getNextSibling();
-        if (nextSibling) {
-          // Next sibling
-          return nextSibling;
-        } else {
-          // Next node of parent
-          return this.parent.getNextNode(false);
-        }
-      }
     }
+    if (this.parent) {
+      let nextSibling = this.getNextSibling();
+      if (nextSibling) {
+        // Next sibling
+        return nextSibling;
+      }
+      // Next node of parent
+      return this.parent.getNextNode(false);
+    }
+    return null;
   }
 
   /**
@@ -1706,12 +1790,12 @@ class Node {
     this.iterate(node => {
       if (result) {
         return false;
-      } else if (callback(node)) {
+      }
+      if (callback(node)) {
         result = node;
         return false;
-      } else {
-        return true;
       }
+      return true;
     });
     return result;
   }
@@ -1767,12 +1851,12 @@ class Node {
     // Return parent except if it is the root node
     if (!this.parent) {
       return null;
-    } else if (!this.parent.parent) {
-      // Root node -> null
-      return null;
-    } else {
+    }
+    if (this.parent.parent) {
       return this.parent;
     }
+    // Root node -> null
+    return null;
   }
 
   /**
@@ -1782,18 +1866,14 @@ class Node {
    * @group Moving around the tree
    */
   getPreviousNode() {
-    if (!this.parent) {
-      return null;
-    } else {
+    if (this.parent) {
       let previousSibling = this.getPreviousSibling();
       if (!previousSibling) {
         return this.getParent();
-      } else if (previousSibling.hasChildren()) {
-        return previousSibling.getLastChild();
-      } else {
-        return previousSibling;
       }
+      return previousSibling.hasChildren() ? previousSibling.getLastChild() : previousSibling;
     }
+    return null;
   }
 
   /**
@@ -1802,16 +1882,11 @@ class Node {
    * @group Moving around the tree
    */
   getPreviousSibling() {
-    if (!this.parent) {
-      return null;
-    } else {
+    if (this.parent) {
       let previousIndex = this.parent.getChildIndex(this) - 1;
-      if (previousIndex >= 0) {
-        return this.parent.children[previousIndex] ?? null;
-      } else {
-        return null;
-      }
+      return previousIndex >= 0 ? this.parent.children[previousIndex] ?? null : null;
     }
+    return null;
   }
 
   /**
@@ -1821,20 +1896,19 @@ class Node {
    * @group Moving around the tree
    */
   getPreviousVisibleNode() {
-    if (!this.parent) {
-      return null;
-    } else {
+    if (this.parent) {
       let previousSibling = this.getPreviousSibling();
       if (!previousSibling) {
         return this.getParent();
-      } else if (!previousSibling.hasChildren() || !previousSibling.is_open) {
+      }
+      if (!previousSibling.hasChildren() || !previousSibling.is_open) {
         // Previous sibling
         return previousSibling;
-      } else {
-        // Last child of previous sibling
-        return previousSibling.getLastChild();
       }
+      // Last child of previous sibling
+      return previousSibling.getLastChild();
     }
+    return null;
   }
 
   /**
@@ -1948,32 +2022,31 @@ class Node {
       // - Node is parent of target node
       // - Or, parent is empty
       return false;
-    } else {
-      movedNode.parent._doRemoveChild(movedNode);
-      switch (position) {
-        case "after":
-          {
-            if (targetNode.parent) {
-              targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
-              return true;
-            }
-            return false;
-          }
-        case "before":
-          {
-            if (targetNode.parent) {
-              targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
-              return true;
-            }
-            return false;
-          }
-        case "inside":
-          {
-            // move inside as first child
-            targetNode.addChildAtPosition(movedNode, 0);
+    }
+    movedNode.parent._doRemoveChild(movedNode);
+    switch (position) {
+      case "after":
+        {
+          if (targetNode.parent) {
+            targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode) + 1);
             return true;
           }
-      }
+          return false;
+        }
+      case "before":
+        {
+          if (targetNode.parent) {
+            targetNode.parent.addChildAtPosition(movedNode, targetNode.parent.getChildIndex(targetNode));
+            return true;
+          }
+          return false;
+        }
+      case "inside":
+        {
+          // move inside as first child
+          targetNode.addChildAtPosition(movedNode, 0);
+          return true;
+        }
     }
   }
 
@@ -1996,10 +2069,11 @@ class Node {
    * @group Changing the tree
    */
   remove() {
-    if (this.parent) {
-      this.parent.removeChild(this);
-      this.parent = null;
+    if (!this.parent) {
+      return;
     }
+    this.parent.removeChild(this);
+    this.parent = null;
   }
 
   /**
@@ -2026,7 +2100,9 @@ class Node {
     this.children = [];
   }
 
-  /** @hidden */
+  /**
+  @hidden
+  */
   removeNodeFromIndex(node) {
     if (node.id != null) {
       this.idMapping?.delete(node.id);
@@ -2043,21 +2119,23 @@ class Node {
   setData(o) {
     if (!o) {
       return;
-    } else if (typeof o === "string") {
+    }
+    if (typeof o === "string") {
       this.name = o;
     } else if (typeof o === "object") {
       for (let key in o) {
-        if (Object.prototype.hasOwnProperty.call(o, key)) {
-          let value = o[key];
-          if (key === "label" || key === "name") {
-            // You can use the 'label' key instead of 'name'; this is a legacy feature
-            if (typeof value === "string") {
-              this.name = value;
-            }
-          } else if (key !== "children" && key !== "parent") {
-            // You can't update the children or the parent using this function
-            this[key] = value;
+        if (!Object.prototype.hasOwnProperty.call(o, key)) {
+          continue;
+        }
+        let value = o[key];
+        if (key === "label" || key === "name") {
+          // You can use the 'label' key instead of 'name'; this is a legacy feature
+          if (typeof value === "string") {
+            this.name = value;
           }
+        } else if (key !== "children" && key !== "parent") {
+          // You can't update the children or the parent using this function
+          this[key] = value;
         }
       }
     }
@@ -2089,7 +2167,7 @@ class Node {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/nodeElement/borderDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/borderDropHint.js
 class BorderDropHint {
   constructor(element, scrollLeft, classNames) {
     let div = element.querySelector(`:scope > .${classNames.element}`);
@@ -2113,7 +2191,7 @@ class BorderDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
 class GhostDropHint {
   constructor(node, element, position, classNames) {
     this._classNames = classNames;
@@ -2122,11 +2200,15 @@ class GhostDropHint {
     this._ghost = this._createGhostElement();
     switch (position) {
       case "after":
-        this._moveAfter();
-        break;
+        {
+          this._moveAfter();
+          break;
+        }
       case "before":
-        this._moveBefore();
-        break;
+        {
+          this._moveBefore();
+          break;
+        }
       case "inside":
         {
           if (node.isFolder() && node.is_open) {
@@ -2177,7 +2259,7 @@ class GhostDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/nodeElement/index.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/index.js
 
 
 
@@ -2199,11 +2281,7 @@ class NodeElement {
     this._element = node.element ?? this._treeElement;
   }
   _addDropHint(position) {
-    if (this._mustShowBorderDropHint(position)) {
-      return new BorderDropHint(this._element, this._getScrollLeft(), this._classNames);
-    } else {
-      return new GhostDropHint(this._node, this._element, position, this._classNames);
-    }
+    return this._mustShowBorderDropHint(position) ? new BorderDropHint(this._element, this._getScrollLeft(), this._classNames) : new GhostDropHint(this._node, this._element, position, this._classNames);
   }
   _deselect() {
     if (!this._isRendered()) {
@@ -2211,7 +2289,11 @@ class NodeElement {
     }
     this._element.classList.remove(this._classNames.selected);
     let titleSpan = this._getTitleSpan();
-    titleSpan.removeAttribute("tabindex");
+
+    // Check for null or undefined
+    if (this._tabIndex != null) {
+      titleSpan.setAttribute("tabindex", "-1");
+    }
     titleSpan.setAttribute("aria-selected", "false");
     titleSpan.blur();
   }
@@ -2252,14 +2334,14 @@ class NodeElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/animation.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/animation.js
 let getAnimationDuration = duration => {
   if (typeof duration === "number") {
     return duration;
   }
   return duration === "slow" ? 600 : 200;
 };
-let slideDown = (element, animationSpeed, onFinished) => {
+let slideDown = (element, animationSpeed) => {
   element.style.display = "block";
   let animation = element.animate([{
     height: "0",
@@ -2270,11 +2352,13 @@ let slideDown = (element, animationSpeed, onFinished) => {
   }], {
     duration: getAnimationDuration(animationSpeed)
   });
-  animation.onfinish = () => {
-    onFinished();
-  };
+  return new Promise(resolve => {
+    animation.onfinish = () => {
+      resolve();
+    };
+  });
 };
-let slideUp = (element, animationSpeed, onFinished) => {
+let slideUp = (element, animationSpeed) => {
   let animation = element.animate([{
     height: `${element.scrollHeight}px`,
     overflow: "hidden"
@@ -2284,15 +2368,17 @@ let slideUp = (element, animationSpeed, onFinished) => {
   }], {
     duration: getAnimationDuration(animationSpeed)
   });
-  animation.onfinish = () => {
-    element.style.display = "none";
-    onFinished();
-  };
+  return new Promise(resolve => {
+    animation.onfinish = () => {
+      element.style.display = "none";
+      resolve();
+    };
+  });
 };
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/nodeElement/folderElement.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/folderElement.js
 
 
 
@@ -2320,7 +2406,7 @@ class FolderElement extends NodeElement {
     this._renderChildren = renderChildren;
     this._triggerEvent = triggerEvent;
   }
-  _close(slide, animationSpeed) {
+  async _close(slide, animationSpeed) {
     if (!this._node.is_open) {
       return;
     }
@@ -2333,122 +2419,93 @@ class FolderElement extends NodeElement {
     }
     let button = this._getButton();
     button.classList.add(this._classNames.closed);
-    button.innerHTML = "";
+    button.replaceChildren();
     let closedIconElement = this._closedIconElement;
     if (closedIconElement) {
       let icon = closedIconElement.cloneNode(true);
-      button.appendChild(icon);
+      button.append(icon);
     }
-    let doClose = () => {
-      this._element.classList.add(this._classNames.closed);
-      let titleSpan = this._getTitleSpan();
-      titleSpan.setAttribute("aria-expanded", "false");
-      this._triggerEvent("tree.close", {
-        node: this._node
-      });
-    };
     let ul = this._getUl();
-    if (!ul) {
-      doClose();
-    } else if (slide) {
-      slideUp(ul, animationSpeed, doClose);
-    } else {
-      ul.style.display = "none";
-      doClose();
+    if (ul) {
+      if (slide) {
+        await slideUp(ul, animationSpeed);
+      } else {
+        ul.style.display = "none";
+      }
     }
+    this._element.classList.add(this._classNames.closed);
+    let titleSpan = this._getTitleSpan();
+    titleSpan.setAttribute("aria-expanded", "false");
+    this._triggerEvent("tree.close", {
+      node: this._node
+    });
   }
   async _open(slide, animationSpeed) {
-    return new Promise(resolve => {
-      if (this._node.is_open) {
-        resolve();
-        return;
-      }
-      this._node.is_open = true;
-      if (!this._isRendered()) {
-        // The folder is rendered open when its parent is opened
-        this._triggerEvent("tree.open", {
-          node: this._node
-        });
-        resolve();
-        return;
-      }
-      let button = this._getButton();
-      button.classList.remove(this._classNames.closed);
-      button.innerHTML = "";
-      let openedIconElement = this._openedIconElement;
-      if (openedIconElement) {
-        let icon = openedIconElement.cloneNode(true);
-        button.appendChild(icon);
-      }
-      let doOpen = () => {
-        this._element.classList.remove(this._classNames.closed);
-        let titleSpan = this._getTitleSpan();
-        titleSpan.setAttribute("aria-expanded", "true");
-        this._triggerEvent("tree.open", {
-          node: this._node
-        });
-        resolve();
-      };
+    if (this._node.is_open) {
+      return;
+    }
+    this._node.is_open = true;
+    if (!this._isRendered()) {
+      // The folder is rendered open when its parent is opened
+      this._triggerEvent("tree.open", {
+        node: this._node
+      });
+      return;
+    }
+    let button = this._getButton();
+    button.classList.remove(this._classNames.closed);
+    button.replaceChildren();
+    let openedIconElement = this._openedIconElement;
+    if (openedIconElement) {
+      let icon = openedIconElement.cloneNode(true);
+      button.append(icon);
+    }
 
-      // The children are rendered the first time the folder is opened
-      let ul = this._getUl() ?? this._renderChildren(this._node);
-      if (!ul) {
-        doOpen();
-      } else if (slide) {
-        slideDown(ul, animationSpeed, doOpen);
+    // The children are rendered the first time the folder is opened
+    let ul = this._getUl() ?? this._renderChildren(this._node);
+    if (ul) {
+      if (slide) {
+        await slideDown(ul, animationSpeed);
       } else {
         ul.style.display = "block";
-        doOpen();
       }
+    }
+    this._element.classList.remove(this._classNames.closed);
+    let titleSpan = this._getTitleSpan();
+    titleSpan.setAttribute("aria-expanded", "true");
+    this._triggerEvent("tree.open", {
+      node: this._node
     });
   }
   _mustShowBorderDropHint(position) {
     return !this._node.is_open && position === "inside";
   }
   _getButton() {
-    return this._element.querySelector(`:scope > .${this._classNames.element} > a.${this._classNames.toggler}`);
+    return this._element.querySelector(`:scope > .${this._classNames.element} > .${this._classNames.toggler}`);
   }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/requestUrl.js
-// Url class for absolute and relative urls.
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/requestUrl.js
+// Url of a request. A relative url is resolved against the page, like a link
+// or `fetch` would, so it also works when the page is in a subdirectory.
 
-let isAbsoluteUrl = inputUrl => {
-  try {
-    new URL(inputUrl);
-    return true;
-  } catch {
-    return false;
-  }
-};
-let LOCALHOST = "http://localhost";
 class RequestUrl {
   constructor(inputUrl) {
-    if (isAbsoluteUrl(inputUrl)) {
-      this._url = new URL(inputUrl);
-      this._isAbsolute = true;
-    } else {
-      this._url = new URL(inputUrl, LOCALHOST);
-      this._isAbsolute = false;
-    }
+    this._url = new URL(inputUrl, document.baseURI);
   }
   _setSearchParam(key, value) {
     this._url.searchParams.set(key, value);
   }
   _value() {
-    if (this._isAbsolute) {
-      return this._url.href;
-    } else {
-      return this._url.href.slice(LOCALHOST.length);
-    }
+    return this._url.href;
   }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/saveStateHandler.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/saveStateHandler.js
 
 
 class SaveStateHandler {
@@ -2480,11 +2537,7 @@ class SaveStateHandler {
       return null;
     }
     let state = this._getStateFromStorage();
-    if (state?.selected_node) {
-      return state.selected_node[0] ?? null;
-    } else {
-      return null;
-    }
+    return state?.selected_node ? state.selected_node[0] ?? null : null;
   }
   _getState() {
     let getOpenNodeIds = () => {
@@ -2499,11 +2552,11 @@ class SaveStateHandler {
     };
     let getSelectedNodeIds = () => {
       let selectedNodeIds = [];
-      this._getSelectedNodes().forEach(node => {
+      for (let node of this._getSelectedNodes()) {
         if (node.id != null) {
           selectedNodeIds.push(node.id);
         }
-      });
+      }
       return selectedNodeIds;
     };
     return {
@@ -2516,11 +2569,7 @@ class SaveStateHandler {
       return null;
     }
     let jsonData = this._loadFromStorage();
-    if (jsonData) {
-      return this._parseState(jsonData);
-    } else {
-      return null;
-    }
+    return jsonData ? this._parseState(jsonData) : null;
   }
   _saveState() {
     if (!this._saveStateOption) {
@@ -2540,10 +2589,7 @@ class SaveStateHandler {
      result: must load on demand (boolean)
     */
   _setInitialState(state) {
-    let mustLoadOnDemand = false;
-    if (state.open_nodes) {
-      mustLoadOnDemand = this._openInitialNodes(state.open_nodes);
-    }
+    let mustLoadOnDemand = state.open_nodes ? this._openInitialNodes(state.open_nodes) : false;
     this._resetSelection();
     if (state.selected_node) {
       this._selectInitialNodes(state.selected_node);
@@ -2559,9 +2605,7 @@ class SaveStateHandler {
       let newNodesIds = [];
       for (let nodeId of nodeIds) {
         let node = this._getNodeById(nodeId);
-        if (!node) {
-          newNodesIds.push(nodeId);
-        } else {
+        if (node) {
           if (!node.is_loading) {
             if (node.load_on_demand) {
               await loadAndOpenNode(node);
@@ -2569,13 +2613,13 @@ class SaveStateHandler {
               await this._openNode(node, false);
             }
           }
+        } else {
+          newNodesIds.push(nodeId);
         }
       }
       nodeIds = newNodesIds;
-      if (state.selected_node) {
-        if (this._selectInitialNodes(state.selected_node)) {
-          this._refreshElements(null);
-        }
+      if (state.selected_node && this._selectInitialNodes(state.selected_node)) {
+        this._refreshElements(null);
       }
     };
     let loadAndOpenNode = async node => {
@@ -2585,28 +2629,20 @@ class SaveStateHandler {
     await openNodes();
   }
   _getKeyName() {
-    if (typeof this._saveStateOption === "string") {
-      return this._saveStateOption;
-    } else {
-      return "tree";
-    }
+    return typeof this._saveStateOption === "string" ? this._saveStateOption : "tree";
   }
   _loadFromStorage() {
-    if (this._onGetStateFromStorage) {
-      return this._onGetStateFromStorage();
-    } else {
-      return localStorage.getItem(this._getKeyName());
-    }
+    return this._onGetStateFromStorage ? this._onGetStateFromStorage() : localStorage.getItem(this._getKeyName());
   }
   _openInitialNodes(nodeIds) {
     let mustLoadOnDemand = false;
     for (let nodeId of nodeIds) {
       let node = this._getNodeById(nodeId);
       if (node) {
-        if (!node.load_on_demand) {
-          node.is_open = true;
-        } else {
+        if (node.load_on_demand) {
           mustLoadOnDemand = true;
+        } else {
+          node.is_open = true;
         }
       }
     }
@@ -2624,18 +2660,19 @@ class SaveStateHandler {
   }
   _resetSelection() {
     let selectedNodes = this._getSelectedNodes();
-    selectedNodes.forEach(node => {
+    for (let node of selectedNodes) {
       this._removeFromSelection(node);
-    });
+    }
   }
   _selectInitialNodes(nodeIds) {
     let selectCount = 0;
     for (let nodeId of nodeIds) {
       let node = this._getNodeById(nodeId);
-      if (node) {
-        selectCount += 1;
-        this._addToSelection(node);
+      if (!node) {
+        continue;
       }
+      selectCount += 1;
+      this._addToSelection(node);
     }
     return selectCount !== 0;
   }
@@ -2643,7 +2680,7 @@ class SaveStateHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/scrollHandler/scrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/scrollParent.js
 class ScrollParent {
   constructor({
     _container: container,
@@ -2654,27 +2691,29 @@ class ScrollParent {
   }
   _checkHorizontalScrolling(pageX) {
     let newHorizontalScrollDirection = this._getNewHorizontalScrollDirection(pageX);
-    if (this._horizontalScrollDirection !== newHorizontalScrollDirection) {
-      this._horizontalScrollDirection = newHorizontalScrollDirection;
-      if (this._horizontalScrollTimeout != null) {
-        window.clearTimeout(this._horizontalScrollTimeout);
-      }
-      if (newHorizontalScrollDirection) {
-        this._horizontalScrollTimeout = window.setTimeout(this._scrollHorizontally.bind(this), 40);
-      }
+    if (this._horizontalScrollDirection === newHorizontalScrollDirection) {
+      return;
+    }
+    this._horizontalScrollDirection = newHorizontalScrollDirection;
+    if (this._horizontalScrollTimeout != null) {
+      window.clearTimeout(this._horizontalScrollTimeout);
+    }
+    if (newHorizontalScrollDirection) {
+      this._horizontalScrollTimeout = window.setTimeout(this._scrollHorizontally.bind(this), 40);
     }
   }
   _checkVerticalScrolling(pageY) {
     let newVerticalScrollDirection = this._getNewVerticalScrollDirection(pageY);
-    if (this._verticalScrollDirection !== newVerticalScrollDirection) {
-      this._verticalScrollDirection = newVerticalScrollDirection;
-      if (this._verticalScrollTimeout != null) {
-        window.clearTimeout(this._verticalScrollTimeout);
-        this._verticalScrollTimeout = undefined;
-      }
-      if (newVerticalScrollDirection) {
-        this._verticalScrollTimeout = window.setTimeout(this._scrollVertically.bind(this), 40);
-      }
+    if (this._verticalScrollDirection === newVerticalScrollDirection) {
+      return;
+    }
+    this._verticalScrollDirection = newVerticalScrollDirection;
+    if (this._verticalScrollTimeout != null) {
+      window.clearTimeout(this._verticalScrollTimeout);
+      this._verticalScrollTimeout = undefined;
+    }
+    if (newVerticalScrollDirection) {
+      this._verticalScrollTimeout = window.setTimeout(this._scrollVertically.bind(this), 40);
     }
   }
   _getScrollLeft() {
@@ -2717,7 +2756,7 @@ class ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
 
 
 
@@ -2733,22 +2772,17 @@ class ContainerScrollParent extends ScrollParent {
     let rightEdge = scrollParentOffset.left + containerWidth;
     let leftEdge = scrollParentOffset.left;
     let isNearRightEdge = pageX > rightEdge - 20;
-    let isNearLeftEdge = pageX < leftEdge + 20;
     if (isNearRightEdge) {
       return "right";
-    } else if (isNearLeftEdge) {
-      return "left";
     }
-    return undefined;
+    let isNearLeftEdge = pageX < leftEdge + 20;
+    return isNearLeftEdge ? "left" : undefined;
   }
   _getNewVerticalScrollDirection(pageY) {
     if (pageY < this._getScrollParentTop()) {
       return "top";
     }
-    if (pageY > this._getScrollParentBottom()) {
-      return "bottom";
-    }
-    return undefined;
+    return pageY > this._getScrollParentBottom() ? "bottom" : undefined;
   }
   _getScrollParentBottom() {
     if (this._scrollParentBottom == null) {
@@ -2765,7 +2799,7 @@ class ContainerScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
 
 
 
@@ -2793,14 +2827,11 @@ class DocumentScrollParent extends ScrollParent {
     let scrollLeft = this._container.scrollLeft;
     let windowWidth = window.innerWidth;
     let isNearRightEdge = pageX > windowWidth - 20;
-    let isNearLeftEdge = pageX - scrollLeft < 20;
     if (isNearRightEdge && this._canScrollRight()) {
       return "right";
     }
-    if (isNearLeftEdge) {
-      return "left";
-    }
-    return undefined;
+    let isNearLeftEdge = pageX - scrollLeft < 20;
+    return isNearLeftEdge ? "left" : undefined;
   }
   _getNewVerticalScrollDirection(pageY) {
     let scrollTop = this._container.scrollTop;
@@ -2809,10 +2840,7 @@ class DocumentScrollParent extends ScrollParent {
       return "top";
     }
     let windowHeight = window.innerHeight;
-    if (windowHeight - (pageY - scrollTop) < 20 && this._canScrollDown()) {
-      return "bottom";
-    }
-    return undefined;
+    return windowHeight - (pageY - scrollTop) < 20 && this._canScrollDown() ? "bottom" : undefined;
   }
   _canScrollDown() {
     return this._container.scrollTop + this._container.clientHeight < this._getDocumentScrollHeight();
@@ -2834,7 +2862,7 @@ class DocumentScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
 
 
 
@@ -2863,17 +2891,16 @@ let createScrollParent = (treeElement, refreshHitAreas) => {
       _container: container,
       _refreshHitAreas: refreshHitAreas
     });
-  } else {
-    return new DocumentScrollParent({
-      _refreshHitAreas: refreshHitAreas,
-      _treeElement: treeElement
-    });
   }
+  return new DocumentScrollParent({
+    _refreshHitAreas: refreshHitAreas,
+    _treeElement: treeElement
+  });
 };
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/scrollHandler.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler.js
 
 
 class ScrollHandler {
@@ -2912,7 +2939,7 @@ class ScrollHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/selectNodeHandler.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/selectNodeHandler.js
 class SelectNodeHandler {
   constructor({
     _getNodeById: getNodeById,
@@ -2921,7 +2948,8 @@ class SelectNodeHandler {
     _getSelectable: getSelectable,
     _openParents: openParents,
     _saveState: saveState,
-    _triggerEvent: triggerEvent
+    _triggerEvent: triggerEvent,
+    _updateTabStop: updateTabStop
   }) {
     this._getNodeById = getNodeById;
     this._getNodeElementForNode = getNodeElementForNode;
@@ -2932,12 +2960,13 @@ class SelectNodeHandler {
     this._selectedNodes = new Set();
     this._selectedSingleNode = null;
     this._triggerEvent = triggerEvent;
+    this._updateTabStop = updateTabStop;
   }
   _addToSelection(node) {
-    if (node.id != null) {
-      this._selectedNodes.add(node.id);
-    } else {
+    if (node.id == null) {
       this._selectedSingleNode = node;
+    } else {
+      this._selectedNodes.add(node.id);
     }
   }
   _clear() {
@@ -2946,52 +2975,39 @@ class SelectNodeHandler {
   }
   _getSelectedNode() {
     let selectedNodes = this._getSelectedNodes();
-    if (selectedNodes.length) {
-      return selectedNodes[0] ?? null;
-    } else {
-      return null;
-    }
+    return selectedNodes.length ? selectedNodes[0] ?? null : null;
   }
   _getSelectedNodes() {
     if (this._selectedSingleNode) {
       return [this._selectedSingleNode];
-    } else {
-      let selectedNodes = [];
-      this._selectedNodes.forEach(id => {
-        let node = this._getNodeById(id);
-        if (node) {
-          selectedNodes.push(node);
-        }
-      });
-      return selectedNodes;
     }
+    let selectedNodes = [];
+    this._selectedNodes.forEach(id => {
+      let node = this._getNodeById(id);
+      if (node) {
+        selectedNodes.push(node);
+      }
+    });
+    return selectedNodes;
   }
   _getSelectedNodesUnder(parent) {
     if (this._selectedSingleNode) {
-      if (parent.isParentOf(this._selectedSingleNode)) {
-        return [this._selectedSingleNode];
-      } else {
-        return [];
-      }
-    } else {
-      let selectedNodes = [];
-      this._selectedNodes.forEach(id => {
-        let node = this._getNodeById(id);
-        if (node && parent.isParentOf(node)) {
-          selectedNodes.push(node);
-        }
-      });
-      return selectedNodes;
+      return parent.isParentOf(this._selectedSingleNode) ? [this._selectedSingleNode] : [];
     }
+    let selectedNodes = [];
+    this._selectedNodes.forEach(id => {
+      let node = this._getNodeById(id);
+      if (node && parent.isParentOf(node)) {
+        selectedNodes.push(node);
+      }
+    });
+    return selectedNodes;
   }
   _isNodeSelected(node) {
     if (node.id != null) {
       return this._selectedNodes.has(node.id);
-    } else if (this._selectedSingleNode) {
-      return this._selectedSingleNode === node;
-    } else {
-      return false;
     }
+    return this._selectedSingleNode ? this._selectedSingleNode === node : false;
   }
   _removeFromSelection(node, includeChildren = false) {
     if (node.id == null) {
@@ -3028,7 +3044,7 @@ class SelectNodeHandler {
     };
     let selectOptions = {
       ...defaultOptions,
-      ...(optionsParam ?? {})
+      ...optionsParam
     };
     let canSelect = () => {
       if (!this._getSelectable()) {
@@ -3064,16 +3080,26 @@ class SelectNodeHandler {
         node
       });
     }
+    this._updateTabStop();
     this._saveState();
   }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/setDefaultOptions.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/setDefaultOptions.js
 
 
 
+/* The default icons are svg instead of text: the triangle characters come
+ * from different fonts on each platform, so they differ in shape and size.
+ * They are sized in em to follow the font size, and use currentColor to follow
+ * --tree-element-toggler-color.
+ */
+let triangle = points => `<svg width="0.8em" height="0.8em" viewBox="0 0 10 10" focusable="false"><polygon points="${points}" fill="currentColor"/></svg>`;
+let triangleDown = triangle("0.5,0.5 9.5,0.5 5,9.5");
+let triangleLeft = triangle("9.5,0.5 9.5,9.5 0.5,5");
+let triangleRight = triangle("0.5,0.5 0.5,9.5 9.5,5");
 let defaults = {
   animationSpeed: "fast",
   autoEscape: true,
@@ -3082,9 +3108,7 @@ let defaults = {
   buttonLeft: true,
   classPrefix: DEFAULT_CLASS_PREFIX,
   // the prefix of all css classes
-  // The symbol to use for a closed node - ► BLACK RIGHT-POINTING POINTER
-  // http://www.fileformat.info/info/unicode/char/25ba/index.htm
-  // closedIcon: undefined,
+  // closedIcon: undefined, // the default is a triangle; see getDefaultClosedIcon
   // commonClassName: undefined, // the class of every element; the default is "<classPrefix>-common"
   // data: undefined,
   // dataFilter: undefined,
@@ -3101,11 +3125,9 @@ let defaults = {
   // onGetStateFromStorage: undefined,
   // onIsMoveHandle: undefined,
   // onSetStateFromStorage: undefined,
-  // openedIcon: undefined,
+  // openedIcon: undefined, // the default is a triangle pointing down
   openFolderDelay: 500,
   // The delay for opening a folder during drag and drop; the value is in milliseconds
-  // The symbol to use for an open node - ▼ BLACK DOWN-POINTING TRIANGLE
-  // http://www.fileformat.info/info/unicode/char/25bc/index.htm
   // rtl: undefined, // right-to-left support; true / false (default)
   saveState: false,
   // true / false / string (local storage key; the default key is "tree")
@@ -3122,37 +3144,33 @@ let defaults = {
 let setDefaultOptions = (htmlElement, inputOptions) => {
   let options = {
     ...defaults,
-    ...inputOptions
+    ...inputOptions,
+    animationSpeed: inputOptions.animationSpeed ?? getDefaultAnimationSpeed()
   };
   options.dataUrl ??= htmlElement.dataset.url;
   options.rtl ??= getRtlOptionFromHTMLElement(htmlElement);
   options.closedIcon ??= getDefaultClosedIcon(options);
-  options.openedIcon ??= "&#x25bc;";
+  options.openedIcon ??= triangleDown;
   return options;
 };
+
+// No animation when the user asked the system for reduced motion
+let getDefaultAnimationSpeed = () => prefersReducedMotion() ? 0 : defaults.animationSpeed;
+let prefersReducedMotion = () => typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let getDefaultClosedIcon = options => {
-  if (options.rtl) {
-    // triangle to the left
-    return "&#x25c0;";
-  } else {
-    // triangle to the right
-    return "&#x25ba;";
-  }
+  return options.rtl ? triangleLeft : triangleRight;
 };
 let getRtlOptionFromHTMLElement = htmlElement => {
   let dataRtl = htmlElement.dataset.rtl;
   if (dataRtl == "") {
     return true;
-  } else if (dataRtl === "false") {
-    return false;
-  } else {
-    return Boolean(dataRtl);
   }
+  return dataRtl === "false" ? false : Boolean(dataRtl);
 };
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/triggerCustomEvent.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/triggerCustomEvent.js
 // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
 let triggerCustomEvent = (element, eventName, values) => {
   let event = new CustomEvent(eventName, {
@@ -3166,15 +3184,15 @@ let triggerCustomEvent = (element, eventName, values) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/version.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/version.js
 // Generated by config/generateVersion.mjs. Do not edit.
-let version = "0.2.0";
+let version = "0.3.2";
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.2.0/node_modules/tree-element/lib/index.js
+;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/index.js
 /*
-Tree-element 0.2.0
+Tree-element 0.3.2
 
 Copyright 2026 Marco Braak
 
@@ -3219,6 +3237,7 @@ class TreeElement {
   _classNames;
   _dataLoader;
   _dndHandler;
+  _fallbackTabStop;
   _htmlElement;
   _isInitialized;
   _keyHandler;
@@ -3232,7 +3251,9 @@ class TreeElement {
   _tree;
   _triggerEventProvider;
 
-  /** @hidden */
+  /**
+  @hidden
+  */
   constructor({
     htmlElement,
     overrideTriggerEventProvider,
@@ -3245,7 +3266,10 @@ class TreeElement {
     this._isInitialized = false;
     this._tree = new Node({}, true);
     this._nodeMap = new WeakMap();
+    this._fallbackTabStop = null;
     let {
+      ariaLabel,
+      ariaLabelledBy,
       autoEscape,
       buttonLeft,
       closedIcon,
@@ -3272,10 +3296,10 @@ class TreeElement {
     let closeNode = this.closeNode.bind(this);
     let getNodeElement = this._getNodeElement.bind(this);
     let getNodeElementForNode = this._getNodeElementForNode.bind(this);
+    let getFocusedNode = this._getFocusedNode.bind(this);
     let getNodeById = this.getNodeById.bind(this);
     let getSelectedNode = this.getSelectedNode.bind(this);
     let getTree = this.getTree.bind(this);
-    let isFocusOnTree = this._isFocusOnTree.bind(this);
     let loadData = this.loadData.bind(this);
     let openNode = this.openNode.bind(this);
     let openParents = this._openParents.bind(this);
@@ -3284,6 +3308,7 @@ class TreeElement {
     let setNodeElement = this._setNodeElement.bind(this);
     let treeElement = this._htmlElement;
     let triggerEvent = this._triggerEvent.bind(this);
+    let updateTabStop = this._updateTabStop.bind(this);
     let saveState = () => {
       saveStateHandler._saveState();
     };
@@ -3294,7 +3319,8 @@ class TreeElement {
       _getSelectable: () => this._options.selectable,
       _openParents: openParents,
       _saveState: saveState,
-      _triggerEvent: triggerEvent
+      _triggerEvent: triggerEvent,
+      _updateTabStop: updateTabStop
     });
     let addToSelection = selectNodeHandler._addToSelection.bind(selectNodeHandler);
     let getSelectedNodes = selectNodeHandler._getSelectedNodes.bind(selectNodeHandler);
@@ -3347,13 +3373,17 @@ class TreeElement {
     });
     let keyHandler = new KeyHandler({
       _closeNode: closeNode,
+      _getFocusedNode: getFocusedNode,
       _getSelectedNode: getSelectedNode,
-      _isFocusOnTree: isFocusOnTree,
+      _getTree: getTree,
       _keyboardSupport: keyboardSupport,
       _openNode: openNode,
-      _selectNode: selectNode
+      _selectNode: selectNode,
+      _triggerEvent: triggerEvent
     });
     let renderer = new ElementsRenderer({
+      _ariaLabel: ariaLabel,
+      _ariaLabelledBy: ariaLabelledBy,
       _autoEscape: autoEscape,
       _buttonLeft: buttonLeft,
       _classNames: classNames,
@@ -3448,10 +3478,11 @@ class TreeElement {
    * @param mustSetFocus - Move the focus to the node. Default `true`.
    * @group Selection
    */
-  addToSelection(node, mustSetFocus) {
+  addToSelection(node, mustSetFocus = true) {
     this._selectNodeHandler._addToSelection(node);
     this._openParents(node);
-    this._getNodeElementForNode(node)._select(mustSetFocus ?? true);
+    this._getNodeElementForNode(node)._select(mustSetFocus);
+    this._updateTabStop();
     this._saveState();
   }
 
@@ -3473,16 +3504,24 @@ class TreeElement {
   }
 
   /**
-   * Closes a folder.
+   * Closes a folder. Await the promise when you need to know the closing
+   * animation has finished.
+   *
+   * @example
+   * ```js
+   * await tree.closeNode(node);
+   * console.log("closed");
+   * ```
    *
    * @param slide - Override the `slide` option for this call.
    * @group Opening and closing
    */
-  closeNode(node, slide) {
-    if (node.isFolder() || node.isEmptyFolder) {
-      this._createFolderElement(node)._close(slide ?? this._options.slide, this._options.animationSpeed);
-      this._saveState();
+  async closeNode(node, slide) {
+    if (!(node.isFolder() || node.isEmptyFolder)) {
+      return;
     }
+    await this._createFolderElement(node)._close(slide ?? this._options.slide, this._options.animationSpeed);
+    this._saveState();
   }
 
   /**
@@ -3506,11 +3545,7 @@ class TreeElement {
    */
   getNode(element) {
     let liElement = element.closest(`li.${this._classNames.common}`);
-    if (liElement) {
-      return this._nodeMap.get(liElement) ?? null;
-    } else {
-      return null;
-    }
+    return liElement ? this._nodeMap.get(liElement) ?? null : null;
   }
 
   /**
@@ -3801,6 +3836,7 @@ class TreeElement {
   removeFromSelection(node) {
     this._selectNodeHandler._removeFromSelection(node);
     this._getNodeElementForNode(node)._deselect();
+    this._updateTabStop();
     this._saveState();
   }
 
@@ -3846,7 +3882,12 @@ class TreeElement {
       this._saveStateHandler._saveState();
       return;
     }
-    this._selectNodeHandler._selectSingleNode(node, options);
+
+    // Unlike a click, selecting the selected node again keeps it selected
+    this._selectNodeHandler._selectSingleNode(node, {
+      mustToggle: false,
+      ...options
+    });
   }
 
   /**
@@ -3872,17 +3913,19 @@ class TreeElement {
   }
 
   /**
-   * Closes an open node and opens a closed one.
+   * Closes an open node and opens a closed one. Await the promise when you
+   * need to know the node is really open or closed, like with `openNode` and
+   * `closeNode`.
    *
    * @param slide - Override the `slide` option for this call.
    * @group Opening and closing
    */
-  toggle(node, slide = null) {
+  async toggle(node, slide = null) {
     let mustSlide = slide ?? this._options.slide;
     if (node.is_open) {
-      this.closeNode(node, mustSlide);
+      await this.closeNode(node, mustSlide);
     } else {
-      void this.openNode(node, mustSlide);
+      await this.openNode(node, mustSlide);
     }
   }
 
@@ -3920,7 +3963,7 @@ class TreeElement {
     if (idIsChanged) {
       this._tree.addNodeToIndex(node);
     }
-    if (typeof data === "object" && data.children && data.children instanceof Array) {
+    if (typeof data === "object" && data.children && Array.isArray(data.children)) {
       node.removeChildren();
       if (data.children.length) {
         node.loadFromData(data.children);
@@ -3928,15 +3971,45 @@ class TreeElement {
     }
     this._refreshElements(node);
   }
+
+  // Open the nodes up to the autoOpen level. A folder that is loaded on
+  // demand is fetched first, and its children are opened when the data has
+  // arrived.
+  async _autoOpenNodesOnDemand() {
+    let maxLevel = this._getAutoOpenMaxLevel();
+    let openNodes = async () => {
+      let loading = [];
+      this._tree.iterate((node, level) => {
+        if (node.load_on_demand) {
+          if (!node.is_loading) {
+            loading.push(this.openNode(node, false).then(openNodes));
+          }
+          return false;
+        }
+        void this.openNode(node, false);
+        return level !== maxLevel;
+      });
+      await Promise.all(loading);
+    };
+    await openNodes();
+  }
   _createFolderElement(node) {
     let classNames = this._classNames;
     let closedIconElement = this._renderer._closedIconElement;
     let getScrollLeft = this._scrollHandler._getScrollLeft.bind(this._scrollHandler);
     let openedIconElement = this._renderer._openedIconElement;
-    let renderChildren = this._renderer._renderChildren.bind(this._renderer);
     let tabIndex = this._options.tabIndex;
     let treeElement = this._htmlElement;
     let triggerEvent = this._triggerEvent.bind(this);
+
+    // A selected node in a closed folder is rendered when the folder is
+    // opened, which can be after it was selected. It becomes the tab stop
+    // then, so the fallback tab stop must go.
+    let renderChildren = folder => {
+      let ul = this._renderer._renderChildren(folder);
+      this._updateTabStop();
+      return ul;
+    };
     return new FolderElement({
       _classNames: classNames,
       _closedIconElement: closedIconElement,
@@ -3969,12 +4042,7 @@ class TreeElement {
    */
   _createRequestUrl(node) {
     let dataUrl = this._options.dataUrl;
-    let url;
-    if (typeof dataUrl === "function") {
-      url = dataUrl(node);
-    } else {
-      url = dataUrl;
-    }
+    let url = typeof dataUrl === "function" ? dataUrl(node) : dataUrl;
     if (!url) {
       return null;
     }
@@ -4010,32 +4078,53 @@ class TreeElement {
   _getAutoOpenMaxLevel() {
     if (this._options.autoOpen === true) {
       return -1;
-    } else if (typeof this._options.autoOpen === "number") {
+    }
+    if (typeof this._options.autoOpen === "number") {
       return this._options.autoOpen;
-    } else if (typeof this._options.autoOpen === "string") {
+    }
+    if (typeof this._options.autoOpen === "string") {
       return parseInt(this._options.autoOpen, 10);
     }
 
     /* istanbul ignore next @preserve */
     return 0;
   }
-  _getNodeElement(element) {
-    let node = this.getNode(element);
-    if (node) {
-      return this._getNodeElementForNode(node);
-    } else {
+
+  // The title span of the first node, or null when the tree is empty
+  _getFirstTitleSpan() {
+    let firstElement = this._tree.children[0]?.element;
+    return firstElement ? firstElement.querySelector(`:scope > .${this._classNames.element} > span.${this._classNames.title}`) : null;
+  }
+
+  // The node of the HTML element that has the focus, if it is in this tree
+  _getFocusedNode() {
+    let activeElement = document.activeElement;
+
+    /* istanbul ignore if */
+    if (!activeElement) {
       return null;
     }
+
+    // The keyboard must still work for input elements.
+    let tagName = activeElement.tagName;
+    if (tagName !== "A" && tagName !== "SPAN") {
+      return null;
+    }
+    let node = this.getNode(activeElement);
+    return node?.tree === this._tree ? node : null;
+  }
+  _getNodeElement(element) {
+    let node = this.getNode(element);
+    return node ? this._getNodeElementForNode(node) : null;
   }
   _getNodeElementForNode(node) {
-    if (node.isFolder()) {
-      return this._createFolderElement(node);
-    } else {
-      return this._createNodeElement(node);
-    }
+    return node.isFolder() ? this._createFolderElement(node) : this._createNodeElement(node);
   }
   _getNodeIdToBeSelected() {
     return this._saveStateHandler._getNodeIdToBeSelected();
+  }
+  _hasRenderedSelectedNode() {
+    return this.getSelectedNodes().some(node => Boolean(node.element));
   }
   _initData() {
     if (this._options.data) {
@@ -4051,10 +4140,11 @@ class TreeElement {
   }
   _initTree(data) {
     let doInit = () => {
-      if (!this._isInitialized) {
-        this._isInitialized = true;
-        this._triggerEvent("tree.init");
+      if (this._isInitialized) {
+        return;
       }
+      this._isInitialized = true;
+      this._triggerEvent("tree.init");
     };
     this._tree = new this._options.nodeClass(null, true, this._options.nodeClass);
     this._selectNodeHandler._clear();
@@ -4071,32 +4161,22 @@ class TreeElement {
 
   // Does an HTML element of the tree have the focus?
   _isFocusOnTree() {
-    let activeElement = document.activeElement;
-
-    /* istanbul ignore if */
-    if (!activeElement) {
-      return false;
-    }
-
-    // The keyboard must still work for input elements.
-    let tagName = activeElement.tagName;
-    if (tagName !== "A" && tagName !== "SPAN") {
-      return false;
-    }
-    let node = this.getNode(activeElement);
-    return node?.tree === this._tree;
+    return this._getFocusedNode() !== null;
   }
   _isSelectedNodeInSubtree(subtree) {
     let selectedNode = this.getSelectedNode();
-    if (!selectedNode) {
-      return false;
-    } else {
-      return subtree === selectedNode || subtree.isParentOf(selectedNode);
-    }
+    return selectedNode ? subtree === selectedNode || subtree.isParentOf(selectedNode) : false;
   }
   async _loadFolderOnDemand(node, slide) {
     node.is_loading = true;
     await this.loadDataFromUrl(undefined, node);
+
+    // Loading failed, or there is no url. Opening the node now would load it
+    // again, without end. Leave it closed so the user can try again.
+    if (node.load_on_demand) {
+      node.is_loading = false;
+      return;
+    }
     await this.openNode(node, slide);
   }
   _loadSubtree(data, parentNode) {
@@ -4106,10 +4186,7 @@ class TreeElement {
     this._refreshElements(parentNode);
   }
   _mouseCapture(positionInfo) {
-    if (!this._options.dragAndDrop) {
-      return false;
-    }
-    return this._dndHandler._mouseCapture(positionInfo);
+    return this._options.dragAndDrop ? this._dndHandler._mouseCapture(positionInfo) : false;
   }
   _mouseDrag(positionInfo) {
     /* istanbul ignore if */
@@ -4122,6 +4199,7 @@ class TreeElement {
   }
   _mouseStart(positionInfo) {
     /* istanbul ignore if */
+    // eslint-disable-next-line unicorn/prefer-ternary
     if (!this._options.dragAndDrop) {
       return false;
     }
@@ -4153,6 +4231,7 @@ class TreeElement {
     if (mustSelect) {
       this._selectCurrentNode(mustSetFocus);
     }
+    this._updateTabStop();
     this._triggerEvent("tree.refresh");
   }
   _saveState() {
@@ -4160,10 +4239,11 @@ class TreeElement {
   }
   _selectCurrentNode(mustSetFocus) {
     let node = this.getSelectedNode();
-    if (node) {
-      let nodeElement = this._getNodeElementForNode(node);
-      nodeElement._select(mustSetFocus);
+    if (!node) {
+      return;
     }
+    let nodeElement = this._getNodeElementForNode(node);
+    nodeElement._select(mustSetFocus);
   }
 
   // Set initial state, either by restoring the state or auto-opening nodes
@@ -4172,14 +4252,13 @@ class TreeElement {
     let restoreState = () => {
       // result: is state restored, must load on demand?
       let state = this._saveStateHandler._getStateFromStorage();
-      if (!state) {
-        return [false, false];
-      } else {
+      if (state) {
         let mustLoadOnDemand = this._saveStateHandler._setInitialState(state);
 
         // return true: the state is restored
         return [true, mustLoadOnDemand];
       }
+      return [false, false];
     };
     let autoOpenNodes = () => {
       // result: must load on demand?
@@ -4192,12 +4271,12 @@ class TreeElement {
         if (node.load_on_demand) {
           mustLoadOnDemand = true;
           return false;
-        } else if (!node.hasChildren()) {
-          return false;
-        } else {
+        }
+        if (node.hasChildren()) {
           node.is_open = true;
           return level !== maxLevel;
         }
+        return false;
       });
       return mustLoadOnDemand;
     };
@@ -4211,50 +4290,12 @@ class TreeElement {
 
   // Set the initial state for nodes that are loaded on demand
   async _setInitialStateOnDemand() {
-    return new Promise(resolve => {
-      let restoreState = () => {
-        let state = this._saveStateHandler._getStateFromStorage();
-        if (!state) {
-          return false;
-        } else {
-          void this._saveStateHandler._setInitialStateOnDemand(state).then(() => {
-            resolve();
-          });
-          return true;
-        }
-      };
-      let autoOpenNodes = () => {
-        let maxLevel = this._getAutoOpenMaxLevel();
-        let loadingCount = 0;
-        let loadAndOpenNode = node => {
-          loadingCount += 1;
-          void this.openNode(node, false).then(() => {
-            loadingCount -= 1;
-            openNodes();
-          });
-        };
-        let openNodes = () => {
-          this._tree.iterate((node, level) => {
-            if (node.load_on_demand) {
-              if (!node.is_loading) {
-                loadAndOpenNode(node);
-              }
-              return false;
-            } else {
-              void this.openNode(node, false);
-              return level !== maxLevel;
-            }
-          });
-          if (loadingCount === 0) {
-            resolve();
-          }
-        };
-        openNodes();
-      };
-      if (!restoreState()) {
-        autoOpenNodes();
-      }
-    });
+    let state = this._saveStateHandler._getStateFromStorage();
+    if (state) {
+      await this._saveStateHandler._setInitialStateOnDemand(state);
+    } else {
+      await this._autoOpenNodesOnDemand();
+    }
   }
 
   // Set this HTML element to this node in the node map.
@@ -4263,6 +4304,23 @@ class TreeElement {
   }
   _triggerEvent(eventName, values) {
     return this._triggerEventProvider(this._htmlElement, eventName, values);
+  }
+
+  /* Keyboard users reach the tree through the tab stop. The selected node is
+   * the tab stop, see NodeElement.select. Without a selected node, the first
+   * node is the tab stop, so the tree can always be reached.
+   */
+  _updateTabStop() {
+    let tabIndex = this._options.tabIndex;
+    let previousTabStop = this._fallbackTabStop;
+    let tabStop = tabIndex == null || this._hasRenderedSelectedNode() ? null : this._getFirstTitleSpan();
+    if (previousTabStop && previousTabStop !== tabStop && previousTabStop.getAttribute("aria-selected") !== "true") {
+      previousTabStop.setAttribute("tabindex", "-1");
+    }
+    if (tabStop && tabIndex != null) {
+      tabStop.setAttribute("tabindex", String(tabIndex));
+    }
+    this._fallbackTabStop = tabStop;
   }
 }
 
