@@ -41,3 +41,18 @@ msgstr "Chargement"
 #: static/django_mptt_admin/django_mptt_admin.js:1
 msgid "view"
 msgstr "voir"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Edit %s"
+msgstr "Modifier %s"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "View %s"
+msgstr "Voir %s"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Add child to %s"
+msgstr "Ajouter un enfant à %s"

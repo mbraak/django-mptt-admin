@@ -220,13 +220,13 @@ test("adds edit links when hasChangePermission is true", async () => {
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const editLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
-        name: "(edit)",
+        name: /^Edit /,
     });
 
     expect(editLinks).toHaveLength(2);
     expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
 
-    expect(screen.queryAllByRole("link", { name: "(view)" })).toHaveLength(0);
+    expect(screen.queryAllByRole("link", { name: /^View / })).toHaveLength(0);
 });
 
 test("adds view links when hasChangePermission is false", async () => {
@@ -235,13 +235,13 @@ test("adds view links when hasChangePermission is false", async () => {
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const editLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
-        name: "(view)",
+        name: /^View /,
     });
 
     expect(editLinks).toHaveLength(2);
     expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
 
-    expect(screen.queryAllByRole("link", { name: "(edit)" })).toHaveLength(0);
+    expect(screen.queryAllByRole("link", { name: /^Edit / })).toHaveLength(0);
 });
 
 test("adds add links when hasAddPermission is true", async () => {
@@ -250,11 +250,37 @@ test("adds add links when hasAddPermission is true", async () => {
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const addLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
-        name: "(add)",
+        name: /^Add child to /,
     });
 
     expect(addLinks).toHaveLength(2);
     expect(addLinks[0]?.href).toBe("http://localhost:3000/add?insert_at=1");
+});
+
+test("labels the edit and add links with the node name", async () => {
+    initTestTree(createTreeElement());
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    expect(
+        screen.getByRole<HTMLAnchorElement>("link", { name: "Edit Africa" })
+            .href,
+    ).toBe("http://localhost:3000/edit/2");
+    expect(
+        screen.getByRole<HTMLAnchorElement>("link", {
+            name: "Add child to Africa",
+        }).href,
+    ).toBe("http://localhost:3000/add?insert_at=2");
+});
+
+test("labels the view links with the node name", async () => {
+    initTestTree(createTreeElement(), { hasChangePermission: false });
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    expect(
+        screen.getByRole("link", { name: "View Africa" }),
+    ).toBeInTheDocument();
 });
 
 test("doesn't add add links when hasAddPermission is false", async () => {
@@ -263,7 +289,7 @@ test("doesn't add add links when hasAddPermission is false", async () => {
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const addLinks = screen.queryAllByRole("link", {
-        name: "(add)",
+        name: /^Add child to /,
     });
 
     expect(addLinks).toHaveLength(0);
@@ -394,6 +420,9 @@ describe("autoEscape", () => {
 
         expect(title).toHaveTextContent("root");
         expect(title.querySelector("b")).toBeInTheDocument();
+        expect(
+            screen.getByRole("link", { name: "Edit root" }),
+        ).toBeInTheDocument();
     });
 });
 
@@ -739,8 +768,8 @@ describe("selecting a node", () => {
         }
 
         return {
-            addLink: within(elementDiv).getByRole("link", { name: "(add)" }),
-            editLink: within(elementDiv).getByRole("link", { name: "(edit)" }),
+            addLink: within(elementDiv).getByRole("link", { name: /^Add child to / }),
+            editLink: within(elementDiv).getByRole("link", { name: /^Edit / }),
         };
     };
 

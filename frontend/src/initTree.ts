@@ -55,12 +55,19 @@ function initTree(
         const editCaption = hasChangePermission
             ? gettext("edit")
             : gettext("view");
+        const editLabel = hasChangePermission
+            ? gettext("Edit %s")
+            : gettext("View %s");
+
+        // Use the rendered text, so the label doesn't contain html when autoEscape is false
+        const nodeName = titleElement.textContent;
 
         const editElement = document.createElement("a");
         editElement.className = "edit";
         editElement.href = node.url as string;
         editElement.tabIndex = tabindex;
         editElement.text = `(${editCaption})`;
+        editElement.setAttribute("aria-label", interpolate(editLabel, [nodeName]));
 
         titleElement.after(editElement);
 
@@ -78,6 +85,10 @@ function initTree(
 
             const addCaption = gettext("add");
             addElement.text = `(${addCaption})`;
+            addElement.setAttribute(
+                "aria-label",
+                interpolate(gettext("Add child to %s"), [nodeName])
+            );
 
             titleElement.after(addElement);
         }

@@ -38,3 +38,18 @@ msgstr "Carregant"
 
 msgid "view"
 msgstr "veure"
+
+#: django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Edit %s"
+msgstr "Editar %s"
+
+#: django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "View %s"
+msgstr "Veure %s"
+
+#: django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Add child to %s"
+msgstr "Afegir un fill a %s"
