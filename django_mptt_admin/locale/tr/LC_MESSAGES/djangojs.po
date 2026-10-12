@@ -23,3 +23,9 @@ msgstr "taşıma başarısız"
 
 msgid "Error while loading the data from the server"
 msgstr "Veri sunucudan yüklenirken hata oluştu"
+
+msgid "Loading"
+msgstr "Yükleniyor"
+
+msgid "view"
+msgstr "görüntüle"

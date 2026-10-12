@@ -30,3 +30,9 @@ msgstr "В виде сетки"
 
 msgid "Tree view"
 msgstr "В виде дерева"
+
+msgid "Loading"
+msgstr "Загрузка"
+
+msgid "view"
+msgstr "просмотреть"

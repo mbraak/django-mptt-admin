@@ -215,6 +215,8 @@ function initTree(
 
         const spinner = document.createElement("span");
         spinner.className = "jqtree-spin";
+        spinner.setAttribute("role", "status");
+        spinner.setAttribute("aria-label", gettext("Loading"));
         container.append(spinner);
         spinners[spinnerId] = spinner;
     }

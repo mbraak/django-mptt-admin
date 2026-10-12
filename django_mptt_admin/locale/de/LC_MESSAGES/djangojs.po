@@ -33,3 +33,11 @@ msgstr "Fehler beim Laden der Daten vom Server"
 #: static/django_mptt_admin/django_mptt_admin.js:1
 msgid "move failed"
 msgstr "Verschieben fehlgeschlagen"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+msgid "Loading"
+msgstr "Wird geladen"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+msgid "view"
+msgstr "Ansehen"

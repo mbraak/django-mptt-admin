@@ -33,3 +33,11 @@ msgstr "déplacement échoué"
 #: static/django_mptt_admin/django_mptt_admin.js:1
 msgid "Error while loading the data from the server"
 msgstr "Erreur en chargeant les données depuis le serveur"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+msgid "Loading"
+msgstr "Chargement"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+msgid "view"
+msgstr "voir"

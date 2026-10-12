@@ -32,9 +32,9 @@ const parseNumber = (value?: string) => {
     return undefined;
   }
 
-  const numberValue = parseInt(value);
+  const numberValue = parseInt(value, 10);
 
-  if (isNaN(numberValue)) {
+  if (Number.isNaN(numberValue)) {
     return undefined;
   } else {
     return numberValue;

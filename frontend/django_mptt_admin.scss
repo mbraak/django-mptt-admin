@@ -91,7 +91,7 @@ ul.jqtree-tree {
         }
 
         span.jqtree-circle {
-            border: solid 2px #0000ff;
+            border: solid 2px #00f;
             border-radius: 100px;
             height: 8px;
             width: 8px;
@@ -102,7 +102,7 @@ ul.jqtree-tree {
         }
 
         span.jqtree-line {
-            background-color: #0000ff;
+            background-color: #00f;
             height: 2px;
             padding: 0;
             position: absolute;
@@ -121,7 +121,7 @@ ul.jqtree-tree {
         display: block;
         left: -2px;
         top: 0;
-        border: solid 2px #0000ff;
+        border: solid 2px #00f;
         border-radius: 6px;
         margin: 0;
         box-sizing: content-box;
@@ -130,12 +130,12 @@ ul.jqtree-tree {
     li.jqtree-selected > .jqtree-element,
     li.jqtree-selected > .jqtree-element:hover {
         background-color: #97bdd6;
-        background: linear-gradient(#bee0f5, #89afca);
-        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+        background-image: linear-gradient(#bee0f5, #89afca);
+        text-shadow: 0 1px 0 rgb(255 255 255 / 70%);
     }
 
     .jqtree-moving > .jqtree-element .jqtree-title {
-        outline: dashed 1px #0000ff;
+        outline: dashed 1px #00f;
     }
 }
 
@@ -196,6 +196,7 @@ span.jqtree-dragging {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -204,8 +205,9 @@ span.jqtree-dragging {
 #changelist {
     border: none;
 }
+
 #tree {
-    padding: 1em 0 1em 0;
+    padding: 1em 0;
 
     .mptt-admin-error {
         color: var(--error-fg);

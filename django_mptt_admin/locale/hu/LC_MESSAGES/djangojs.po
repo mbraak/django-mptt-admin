@@ -22,3 +22,9 @@ msgstr "mozgatás sikertelen"
 
 msgid "Error while loading the data from the server"
 msgstr "Hiba történt az adatok betöltése közben"
+
+msgid "Loading"
+msgstr "Betöltés"
+
+msgid "view"
+msgstr "megtekint"

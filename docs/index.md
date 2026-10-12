@@ -145,10 +145,12 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**3.0.1** (october 10 2026)
 
 - Make rendering faster by using templates.
 - The children of a closed folder are rendered when the folder is opened.
+- Add aria role to loading spinner so it is recognized by screen readers.
+- Add missing 'view' translation.
 
 **3.0.0** (september 11 2026)
 
