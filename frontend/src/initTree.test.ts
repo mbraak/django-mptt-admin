@@ -358,6 +358,55 @@ test("renders the button on the left when rtl is true", async () => {
     expect(button.parentElement?.firstElementChild).toBe(button);
 });
 
+describe("animationSpeed", () => {
+    const stubReducedMotion = (matches: boolean) => {
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: query === "(prefers-reduced-motion: reduce)" && matches,
+        }));
+    };
+
+    const openNodeAndGetDuration = async () => {
+        const animate = vi.spyOn(Element.prototype, "animate");
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        await user.click(screen.getByText("►"));
+
+        await waitFor(() => {
+            expect(animate).toHaveBeenCalled();
+        });
+
+        const options = animate.mock.calls[0]?.[1] as KeyframeAnimationOptions;
+
+        return options.duration;
+    };
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    test("uses the animation speed when reduced motion is not preferred", async () => {
+        stubReducedMotion(false);
+        initTestTree(createTreeElement(), {
+            animationSpeed: 300,
+            autoOpen: false,
+        });
+
+        expect(await openNodeAndGetDuration()).toBe(300);
+    });
+
+    test("disables the animation when reduced motion is preferred", async () => {
+        stubReducedMotion(true);
+        initTestTree(createTreeElement(), {
+            animationSpeed: 300,
+            autoOpen: false,
+        });
+
+        expect(await openNodeAndGetDuration()).toBe(0);
+    });
+});
+
 test("renders the button on the right when rtl is false", async () => {
     initTestTree(createTreeElement(), { autoOpen: false, rtl: false });
 

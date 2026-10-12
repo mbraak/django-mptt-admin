@@ -299,7 +299,14 @@ function initTree(
         useContextMenu,
     };
 
-    if (animationSpeed !== undefined) {
+    const prefersReducedMotion =
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Reduced motion takes precedence over the configured animation speed
+    if (prefersReducedMotion) {
+        treeOptions.animationSpeed = 0;
+    } else if (animationSpeed !== undefined) {
         treeOptions.animationSpeed = animationSpeed;
     }
 
