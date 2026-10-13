@@ -28,3 +28,15 @@ msgstr "Betöltés"
 
 msgid "view"
 msgstr "megtekint"
+
+#, javascript-format
+msgid "Edit %s"
+msgstr "%s szerkesztése"
+
+#, javascript-format
+msgid "View %s"
+msgstr "%s megtekintése"
+
+#, javascript-format
+msgid "Add child to %s"
+msgstr "Gyermekelem hozzáadása ehhez: %s"

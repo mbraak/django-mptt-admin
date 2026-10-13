@@ -38,3 +38,18 @@ msgstr "Cargando"
 
 msgid "view"
 msgstr "ver"
+
+#: django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Edit %s"
+msgstr "Editar %s"
+
+#: django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "View %s"
+msgstr "Ver %s"
+
+#: django_mptt_admin/static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Add child to %s"
+msgstr "Añadir un hijo a %s"

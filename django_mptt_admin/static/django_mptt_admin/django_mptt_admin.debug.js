@@ -4337,6 +4337,7 @@ function initTree(treeElement, {
   hasAddPermission,
   hasChangePermission,
   insertAtUrl,
+  label,
   mouseDelay,
   rtl,
   saveState,
@@ -4359,11 +4360,16 @@ function initTree(treeElement, {
     // Create edit link
     const tabindex = isSelected ? 0 : -1;
     const editCaption = hasChangePermission ? gettext("edit") : gettext("view");
+    const editLabel = hasChangePermission ? gettext("Edit %s") : gettext("View %s");
+
+    // Use the rendered text, so the label doesn't contain html when autoEscape is false
+    const nodeName = titleElement.textContent;
     const editElement = document.createElement("a");
     editElement.className = "edit";
     editElement.href = node.url;
     editElement.tabIndex = tabindex;
     editElement.text = `(${editCaption})`;
+    editElement.setAttribute("aria-label", interpolate(editLabel, [nodeName]));
     titleElement.after(editElement);
     if (hasAddPermission && insertAtUrlObject) {
       insertAtUrlObject.searchParams.set("insert_at", node.id.toString());
@@ -4374,6 +4380,7 @@ function initTree(treeElement, {
       addElement.tabIndex = tabindex;
       const addCaption = gettext("add");
       addElement.text = `(${addCaption})`;
+      addElement.setAttribute("aria-label", interpolate(gettext("Add child to %s"), [nodeName]));
       titleElement.after(addElement);
     }
   }
@@ -4543,8 +4550,16 @@ function initTree(treeElement, {
     saveState,
     useContextMenu
   };
-  if (animationSpeed !== undefined) {
+  const prefersReducedMotion = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Reduced motion takes precedence over the configured animation speed
+  if (prefersReducedMotion) {
+    treeOptions.animationSpeed = 0;
+  } else if (animationSpeed !== undefined) {
     treeOptions.animationSpeed = animationSpeed;
+  }
+  if (label) {
+    treeOptions.ariaLabel = label;
   }
   if (mouseDelay != null) {
     treeOptions.startDndDelay = mouseDelay;
@@ -4609,6 +4624,7 @@ const parseTreeOptions = treeElement => {
   const hasAddPermission = parseBoolean(treeElement.dataset.hasAddPermission) ?? false;
   const hasChangePermission = parseBoolean(treeElement.dataset.hasChangePermission) ?? false;
   const insertAtUrl = treeElement.dataset.insert_at_url;
+  const label = treeElement.dataset.label === "" ? undefined : treeElement.dataset.label;
   const mouseDelay = parseNumber(treeElement.dataset.treeMouseDelay);
   const rtl = treeElement.dataset.rtl !== undefined;
   const saveState = treeElement.dataset.save_state;
@@ -4622,6 +4638,7 @@ const parseTreeOptions = treeElement => {
     hasAddPermission,
     hasChangePermission,
     insertAtUrl,
+    label,
     mouseDelay,
     rtl,
     saveState,

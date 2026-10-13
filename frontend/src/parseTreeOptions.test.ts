@@ -28,6 +28,7 @@ test("returns the default options for an element without data attributes", () =>
         hasAddPermission: false,
         hasChangePermission: false,
         insertAtUrl: undefined,
+        label: undefined,
         mouseDelay: undefined,
         rtl: false,
         saveState: undefined,
@@ -44,6 +45,7 @@ test("parses all data attributes", () => {
         "data-has-add-permission": "true",
         "data-has-change-permission": "true",
         "data-insert_at_url": "/add",
+        "data-label": "Countries",
         "data-rtl": "1",
         "data-save_state": "myapp_mymodel",
         "data-tree-animation-speed": "300",
@@ -60,6 +62,7 @@ test("parses all data attributes", () => {
         hasAddPermission: true,
         hasChangePermission: true,
         insertAtUrl: "/add",
+        label: "Countries",
         mouseDelay: 500,
         rtl: true,
         saveState: "myapp_mymodel",
@@ -166,6 +169,14 @@ describe("hasChangePermission", () => {
         expect(parseTreeOptions(treeElement).hasChangePermission).toStrictEqual(
             expected
         );
+    });
+});
+
+describe("label", () => {
+    test("is undefined when the attribute is empty", () => {
+        const treeElement = createTreeElement({ "data-label": "" });
+
+        expect(parseTreeOptions(treeElement).label).toBeUndefined();
     });
 });
 

@@ -15,3 +15,7 @@ Element.prototype.animate = () => {
 };
 
 window.gettext = (key) => key;
+window.interpolate = (fmt, obj) => {
+    const values = [...obj];
+    return fmt.replaceAll("%s", () => String(values.shift()));
+};
