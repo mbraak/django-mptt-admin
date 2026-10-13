@@ -67,6 +67,6 @@
         "webpack-cli": "^7.2.3"
     },
     "dependencies": {
-        "tree-element": "^0.2.0"
+        "tree-element": "^0.3.2"
     }
 }
