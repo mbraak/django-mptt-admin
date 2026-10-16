@@ -41,3 +41,18 @@ msgstr "Wird geladen"
 #: static/django_mptt_admin/django_mptt_admin.js:1
 msgid "view"
 msgstr "Ansehen"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Edit %s"
+msgstr "%s bearbeiten"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "View %s"
+msgstr "%s ansehen"
+
+#: static/django_mptt_admin/django_mptt_admin.js:1
+#, javascript-format
+msgid "Add child to %s"
+msgstr "Unterelement zu %s hinzufügen"

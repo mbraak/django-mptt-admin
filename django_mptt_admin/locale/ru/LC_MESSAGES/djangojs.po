@@ -36,3 +36,15 @@ msgstr "Загрузка"
 
 msgid "view"
 msgstr "просмотреть"
+
+#, javascript-format
+msgid "Edit %s"
+msgstr "Редактировать %s"
+
+#, javascript-format
+msgid "View %s"
+msgstr "Просмотреть %s"
+
+#, javascript-format
+msgid "Add child to %s"
+msgstr "Добавить дочерний элемент в %s"

@@ -1,5 +1,5 @@
 /*
-Tree-element 0.2.0
+Tree-element 0.3.2
 
 Copyright 2026 Marco Braak
 

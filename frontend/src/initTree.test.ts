@@ -214,19 +214,33 @@ test("displays a spinner while the data of a node is loading", async () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
 });
 
+test("labels the tree", async () => {
+    initTestTree(createTreeElement(), { label: "Countries" });
+
+    expect(
+        await screen.findByRole("tree", { name: "Countries" }),
+    ).toBeInTheDocument();
+});
+
+test("doesn't label the tree when there is no label", async () => {
+    initTestTree(createTreeElement());
+
+    expect(await screen.findByRole("tree")).not.toHaveAttribute("aria-label");
+});
+
 test("adds edit links when hasChangePermission is true", async () => {
     initTestTree(createTreeElement());
 
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const editLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
-        name: "(edit)",
+        name: /^Edit /,
     });
 
     expect(editLinks).toHaveLength(2);
     expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
 
-    expect(screen.queryAllByRole("link", { name: "(view)" })).toHaveLength(0);
+    expect(screen.queryAllByRole("link", { name: /^View / })).toHaveLength(0);
 });
 
 test("adds view links when hasChangePermission is false", async () => {
@@ -235,13 +249,13 @@ test("adds view links when hasChangePermission is false", async () => {
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const editLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
-        name: "(view)",
+        name: /^View /,
     });
 
     expect(editLinks).toHaveLength(2);
     expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
 
-    expect(screen.queryAllByRole("link", { name: "(edit)" })).toHaveLength(0);
+    expect(screen.queryAllByRole("link", { name: /^Edit / })).toHaveLength(0);
 });
 
 test("adds add links when hasAddPermission is true", async () => {
@@ -250,11 +264,37 @@ test("adds add links when hasAddPermission is true", async () => {
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const addLinks = screen.getAllByRole<HTMLAnchorElement>("link", {
-        name: "(add)",
+        name: /^Add child to /,
     });
 
     expect(addLinks).toHaveLength(2);
     expect(addLinks[0]?.href).toBe("http://localhost:3000/add?insert_at=1");
+});
+
+test("labels the edit and add links with the node name", async () => {
+    initTestTree(createTreeElement());
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    expect(
+        screen.getByRole<HTMLAnchorElement>("link", { name: "Edit Africa" })
+            .href,
+    ).toBe("http://localhost:3000/edit/2");
+    expect(
+        screen.getByRole<HTMLAnchorElement>("link", {
+            name: "Add child to Africa",
+        }).href,
+    ).toBe("http://localhost:3000/add?insert_at=2");
+});
+
+test("labels the view links with the node name", async () => {
+    initTestTree(createTreeElement(), { hasChangePermission: false });
+
+    expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+    expect(
+        screen.getByRole("link", { name: "View Africa" }),
+    ).toBeInTheDocument();
 });
 
 test("doesn't add add links when hasAddPermission is false", async () => {
@@ -263,7 +303,7 @@ test("doesn't add add links when hasAddPermission is false", async () => {
     expect(await screen.findByRole("tree")).toBeInTheDocument();
 
     const addLinks = screen.queryAllByRole("link", {
-        name: "(add)",
+        name: /^Add child to /,
     });
 
     expect(addLinks).toHaveLength(0);
@@ -316,6 +356,55 @@ test("renders the button on the left when rtl is true", async () => {
 
     expect(button).toHaveClass("jqtree-toggler-left");
     expect(button.parentElement?.firstElementChild).toBe(button);
+});
+
+describe("animationSpeed", () => {
+    const stubReducedMotion = (matches: boolean) => {
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: query === "(prefers-reduced-motion: reduce)" && matches,
+        }));
+    };
+
+    const openNodeAndGetDuration = async () => {
+        const animate = vi.spyOn(Element.prototype, "animate");
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        await user.click(screen.getByText("►"));
+
+        await waitFor(() => {
+            expect(animate).toHaveBeenCalled();
+        });
+
+        const options = animate.mock.calls[0]?.[1] as KeyframeAnimationOptions;
+
+        return options.duration;
+    };
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    test("uses the animation speed when reduced motion is not preferred", async () => {
+        stubReducedMotion(false);
+        initTestTree(createTreeElement(), {
+            animationSpeed: 300,
+            autoOpen: false,
+        });
+
+        expect(await openNodeAndGetDuration()).toBe(300);
+    });
+
+    test("disables the animation when reduced motion is preferred", async () => {
+        stubReducedMotion(true);
+        initTestTree(createTreeElement(), {
+            animationSpeed: 300,
+            autoOpen: false,
+        });
+
+        expect(await openNodeAndGetDuration()).toBe(0);
+    });
 });
 
 test("renders the button on the right when rtl is false", async () => {
@@ -390,10 +479,13 @@ describe("autoEscape", () => {
 
         expect(await screen.findByRole("tree")).toBeInTheDocument();
 
-        const title = screen.getByRole("treeitem", { name: "<b>root</b>" });
+        const title = screen.getByRole("treeitem", { name: "root" });
 
         expect(title).toHaveTextContent("root");
         expect(title.querySelector("b")).toBeInTheDocument();
+        expect(
+            screen.getByRole("link", { name: "Edit root" }),
+        ).toBeInTheDocument();
     });
 });
 
@@ -739,8 +831,8 @@ describe("selecting a node", () => {
         }
 
         return {
-            addLink: within(elementDiv).getByRole("link", { name: "(add)" }),
-            editLink: within(elementDiv).getByRole("link", { name: "(edit)" }),
+            addLink: within(elementDiv).getByRole("link", { name: /^Add child to / }),
+            editLink: within(elementDiv).getByRole("link", { name: /^Edit / }),
         };
     };
 

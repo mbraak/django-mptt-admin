@@ -210,6 +210,11 @@ span.jqtree-dragging {
   animation: jqtree-spin 1s linear infinite;
   vertical-align: middle;
 }
+@media (prefers-reduced-motion: reduce) {
+  #tree .jqtree-spin {
+    animation-duration: 3s;
+  }
+}
 #tree.block-style ul.jqtree-tree {
   margin-left: 0;
   margin-right: 0;

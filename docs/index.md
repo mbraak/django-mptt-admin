@@ -145,6 +145,17 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
+**development**
+
+- Accessibility improvements:
+  - Add screen reader titles to buttons.
+  - Add aria-label to the tree.
+  - Support reduced motion.
+  - Make the toggle button larger.
+  - Hide the toggle button for screen readers.
+  - Add keyboard support for Home and End.
+- Add Dutch translations.
+
 **3.0.1** (october 10 2026)
 
 - Make rendering faster by using templates.

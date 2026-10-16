@@ -254,6 +254,10 @@ span.jqtree-dragging {
         box-sizing: border-box;
         animation: jqtree-spin 1s linear infinite;
         vertical-align: middle;
+
+        @media (prefers-reduced-motion: reduce) {
+            animation-duration: 3s;
+        }
     }
 
     &.block-style {

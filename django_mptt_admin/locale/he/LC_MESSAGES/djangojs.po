@@ -29,3 +29,15 @@ msgstr "טוען"
 
 msgid "view"
 msgstr "צפייה"
+
+#, javascript-format
+msgid "Edit %s"
+msgstr "עריכת %s"
+
+#, javascript-format
+msgid "View %s"
+msgstr "צפייה ב־%s"
+
+#, javascript-format
+msgid "Add child to %s"
+msgstr "הוספת צאצא ל־%s"

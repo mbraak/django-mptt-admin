@@ -29,3 +29,15 @@ msgstr "Yükleniyor"
 
 msgid "view"
 msgstr "görüntüle"
+
+#, javascript-format
+msgid "Edit %s"
+msgstr "%s öğesini düzenle"
+
+#, javascript-format
+msgid "View %s"
+msgstr "%s öğesini görüntüle"
+
+#, javascript-format
+msgid "Add child to %s"
+msgstr "%s öğesine alt öğe ekle"
