@@ -17,7 +17,7 @@ The release requires a trusted publisher setup on pypi.org.
    version = "2.10.1"
    ```
 
-3. Add an entry at the top of the changelog in `docs/index.md`, following the
+3. Add an entry at the top of the changelog in `docs/changelog.md`, following the
    existing format:
 
    ```markdown

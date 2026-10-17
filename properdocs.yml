@@ -26,3 +26,9 @@ markdown_extensions:
   - pymdownx.superfences
   - toc:
       permalink: true
+
+nav:
+  - Home: index.md
+  - Options: options.md
+  - Filters: filters.md
+  - Changelog: changelog.md
