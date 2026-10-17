@@ -145,7 +145,7 @@ Also see the example project for a complete continent filter.
 
 ## Changelog
 
-**development**
+**3.1.0** (october 17 2026)
 
 - Accessibility improvements:
   - Add screen reader titles to buttons.
@@ -159,7 +159,7 @@ Also see the example project for a complete continent filter.
 **3.0.1** (october 10 2026)
 
 - Make rendering faster by using templates.
-- The children of a closed folder are rendered when the folder is opened.
+- Make rendering faster by only rendering visible nodes.
 - Add aria role to loading spinner so it is recognized by screen readers.
 - Add missing 'view' translation.
 
