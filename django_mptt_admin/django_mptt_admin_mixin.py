@@ -166,8 +166,6 @@ class DjangoMpttAdminMixin:
         )
 
         js = [
-            "admin/js/jquery.init.js",
-            static("django_mptt_admin/jquery_namespace.js"),
             static(f"django_mptt_admin/{django_mptt_admin_js}"),
         ]
         css = {"all": (static("django_mptt_admin/django_mptt_admin.css"),)}
