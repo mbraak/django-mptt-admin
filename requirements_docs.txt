@@ -1,2 +1,2 @@
 properdocs==1.6.7
-mkdocs-materialx==10.2.0
+mkdocs-materialx==10.2.1
