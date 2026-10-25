@@ -8,9 +8,7 @@
 
 {% block extrahead %}
     {{ block.super }}
-    {% if django_major_version >= 4 %}
-        <script src="{% static 'admin/js/filters.js' %}" defer></script>
-    {% endif %}
+    <script src="{% static 'admin/js/filters.js' %}" defer></script>
 {% endblock %}
 
 {% block search %}{% endblock %}
