@@ -1,4 +1,3 @@
-import django
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth.models import User
 
@@ -127,11 +126,7 @@ class FilterTestCase(BaseViewTestCase):
 
         country_node = root["children"][0]
 
-        expected_changelist_filters = (
-            "continent%3D%255B%2527Europe%2527%255D"
-            if django.VERSION >= (5, 0)
-            else "continent%3DEurope"
-        )
+        expected_changelist_filters = "continent%3D%255B%2527Europe%2527%255D"
         node_id = country_node["id"]
 
         self.assertEqual(

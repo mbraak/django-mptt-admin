@@ -1,7 +1,6 @@
 from functools import update_wrapper
 from typing import Union
 
-import django
 from django.conf import settings
 from django.contrib.admin.options import IS_POPUP_VAR, ModelAdmin, csrf_protect_m
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -103,7 +102,6 @@ class DjangoMpttAdminMixin:
 
         context = {
             **self.admin_site.each_context(request),
-            "django_major_version": django.VERSION[0],
             "module_name": str(self.opts.verbose_name_plural),
             "title": change_list.title,
             "subtitle": None,
