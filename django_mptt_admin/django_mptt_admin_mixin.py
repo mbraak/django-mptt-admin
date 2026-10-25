@@ -10,7 +10,6 @@ from django.db import transaction
 from django.forms import Media
 from django.http import JsonResponse
 from django.template.response import TemplateResponse
-from django.templatetags.static import static
 from django.urls import re_path, reverse
 from django.utils.http import urlencode
 from django.views.i18n import JavaScriptCatalog
@@ -164,9 +163,9 @@ class DjangoMpttAdminMixin:
 
         js = [
             self.get_admin_url("jsi18n"),
-            static(f"django_mptt_admin/{django_mptt_admin_js}"),
+            f"django_mptt_admin/{django_mptt_admin_js}",
         ]
-        css = {"all": (static("django_mptt_admin/django_mptt_admin.css"),)}
+        css = {"all": ("django_mptt_admin/django_mptt_admin.css",)}
 
         tree_media = Media(js=js, css=css)
 
