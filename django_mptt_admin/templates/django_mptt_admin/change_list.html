@@ -1,15 +1,5 @@
 {% extends 'admin/change_list.html' %}
-{% load i18n admin_list static javascript_value %}
-
-{% block extrastyle %}
-    {{ block.super }}
-    <script type="text/javascript" src="{{ jsi18n_url }}"></script>
-{% endblock %}
-
-{% block extrahead %}
-    {{ block.super }}
-    <script src="{% static 'admin/js/filters.js' %}" defer></script>
-{% endblock %}
+{% load i18n javascript_value %}
 
 {% block search %}{% endblock %}
 

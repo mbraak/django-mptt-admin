@@ -91,7 +91,6 @@ class DjangoMpttAdminMixin:
             "has_add_permission": self.has_add_permission(request),
             "has_change_permission": self.has_change_permission(request),
             "insert_at_url": insert_at_url,
-            "jsi18n_url": self.get_admin_url("jsi18n"),
             "model_name": util.get_model_name(self.model),
             "tree_animation_speed": self.tree_animation_speed,
             "tree_auto_open": self.tree_auto_open,
@@ -164,6 +163,7 @@ class DjangoMpttAdminMixin:
         )
 
         js = [
+            self.get_admin_url("jsi18n"),
             static(f"django_mptt_admin/{django_mptt_admin_js}"),
         ]
         css = {"all": (static("django_mptt_admin/django_mptt_admin.css"),)}
