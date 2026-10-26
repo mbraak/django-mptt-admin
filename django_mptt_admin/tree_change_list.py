@@ -1,4 +1,3 @@
-import django
 from django.contrib.admin.views.main import ChangeList
 
 from . import util
@@ -24,11 +23,9 @@ class TreeChangeList(ChangeList):
             "list_max_show_all": 200,
             "list_editable": (),
             "model_admin": model_admin,
+            "search_help_text": "",
             "sortable_by": [],
         }
-
-        if django.VERSION >= (4, 0):
-            params["search_help_text"] = ""
 
         super().__init__(**params)
 

@@ -1,7 +1,6 @@
 from functools import update_wrapper
 from typing import Union
 
-import django
 from django.conf import settings
 from django.contrib.admin.options import IS_POPUP_VAR, ModelAdmin, csrf_protect_m
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -11,7 +10,6 @@ from django.db import transaction
 from django.forms import Media
 from django.http import JsonResponse
 from django.template.response import TemplateResponse
-from django.templatetags.static import static
 from django.urls import re_path, reverse
 from django.utils.http import urlencode
 from django.views.i18n import JavaScriptCatalog
@@ -92,7 +90,6 @@ class DjangoMpttAdminMixin:
             "has_add_permission": self.has_add_permission(request),
             "has_change_permission": self.has_change_permission(request),
             "insert_at_url": insert_at_url,
-            "jsi18n_url": self.get_admin_url("jsi18n"),
             "model_name": util.get_model_name(self.model),
             "tree_animation_speed": self.tree_animation_speed,
             "tree_auto_open": self.tree_auto_open,
@@ -103,7 +100,6 @@ class DjangoMpttAdminMixin:
 
         context = {
             **self.admin_site.each_context(request),
-            "django_major_version": django.VERSION[0],
             "module_name": str(self.opts.verbose_name_plural),
             "title": change_list.title,
             "subtitle": None,
@@ -166,9 +162,10 @@ class DjangoMpttAdminMixin:
         )
 
         js = [
-            static(f"django_mptt_admin/{django_mptt_admin_js}"),
+            self.get_admin_url("jsi18n"),
+            f"django_mptt_admin/{django_mptt_admin_js}",
         ]
-        css = {"all": (static("django_mptt_admin/django_mptt_admin.css"),)}
+        css = {"all": ("django_mptt_admin/django_mptt_admin.css",)}
 
         tree_media = Media(js=js, css=css)
 
