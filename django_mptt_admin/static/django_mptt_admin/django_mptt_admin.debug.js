@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/classNames.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/classNames.js
 let DEFAULT_CLASS_PREFIX = "tree-element";
 
 /* Create the class names that the widget puts on the elements it creates.
@@ -11,13 +11,13 @@ let DEFAULT_CLASS_PREFIX = "tree-element";
  */
 let createClassNames = ({
   classPrefix,
-  commonClassName,
-  treeClassName
+  commonClassName = `${classPrefix}-common`,
+  treeClassName = classPrefix
 }) => ({
   border: `${classPrefix}-border`,
   circle: `${classPrefix}-circle`,
   closed: `${classPrefix}-closed`,
-  common: commonClassName ?? `${classPrefix}-common`,
+  common: commonClassName,
   dnd: `${classPrefix}-dnd`,
   dragging: `${classPrefix}-dragging`,
   element: `${classPrefix}-element`,
@@ -36,12 +36,12 @@ let createClassNames = ({
   toggler: `${classPrefix}-toggler`,
   togglerLeft: `${classPrefix}-toggler-left`,
   togglerRight: `${classPrefix}-toggler-right`,
-  tree: treeClassName ?? classPrefix
+  tree: treeClassName
 });
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dataLoader.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dataLoader.js
 class DataLoader {
   constructor({
     _classNames: classNames,
@@ -65,15 +65,18 @@ class DataLoader {
     element.classList.add(this._classNames.loading);
 
     // Tell screen readers that the children of the folder are loading
-    let titleSpan = node ? this._getTitleSpan(element) : null;
-    titleSpan?.setAttribute("aria-busy", "true");
+    if (node) {
+      element.setAttribute("aria-busy", "true");
+    }
     this._triggerEvent("tree.loading_data", {
       element,
       node
     });
     let stopLoading = () => {
       element.classList.remove(this._classNames.loading);
-      titleSpan?.removeAttribute("aria-busy");
+      if (node) {
+        element.removeAttribute("aria-busy");
+      }
       this._triggerEvent("tree.loaded_data", {
         element,
         node
@@ -109,14 +112,11 @@ class DataLoader {
       });
     });
   }
-  _getTitleSpan(element) {
-    return element.querySelector(`:scope > .${this._classNames.element} > .${this._classNames.title}`);
-  }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/positionUtils.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/positionUtils.js
 // Get the top position of the HTML element.
 let getOffsetTop = element => getElementPosition(element).top;
 
@@ -131,7 +131,7 @@ let getElementPosition = element => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
 function binarySearch(items, compareFn) {
   let low = 0;
   let high = items.length;
@@ -155,7 +155,7 @@ function binarySearch(items, compareFn) {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
 class DragElement {
   constructor({
     _autoEscape: autoEscape,
@@ -193,7 +193,7 @@ class DragElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
 let iterateVisibleNodes = (tree, {
   _handleAfterOpenFolder: handleAfterOpenFolder,
   _handleClosedFolder: handleClosedFolder,
@@ -249,7 +249,7 @@ let iterateVisibleNodes = (tree, {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
 
 
 
@@ -380,7 +380,7 @@ let generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPo
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/dragAndDropHandler/index.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/index.js
 
 
 
@@ -659,13 +659,13 @@ class DragAndDropHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/util.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/util.js
 let isInt = n => Number.isInteger(n);
 let getBoolString = value => value ? "true" : "false";
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/elementsRenderer.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/elementsRenderer.js
 
 
 /* Renders the tree to html.
@@ -691,6 +691,7 @@ class ElementsRenderer {
     _getTree: getTree,
     _htmlElement: htmlElement,
     _isNodeSelected: isNodeSelected,
+    _multiSelect: multiSelect,
     _onCreateLi: onCreateLi,
     _openedIcon: openedIcon = "+",
     _rtl: rtl,
@@ -707,6 +708,7 @@ class ElementsRenderer {
     this._getTree = getTree;
     this._htmlElement = htmlElement;
     this._isNodeSelected = isNodeSelected;
+    this._multiSelect = multiSelect;
     this._onCreateLi = onCreateLi;
     this._rtl = rtl;
     this._setNodeElement = setNodeElement;
@@ -732,7 +734,7 @@ class ElementsRenderer {
    * null when the folder is not rendered or has no children.
    */
   _renderChildren(node) {
-    return !node.element || !node.hasChildren() ? null : this._createDomElements(node.element, node.children, false, node.getLevel() + 1);
+    return node.element && node.hasChildren() ? this._createDomElements(node.element, node.children, false, node.getLevel() + 1) : null;
   }
   _renderFromNode(node) {
     if (!node.element) {
@@ -793,10 +795,10 @@ class ElementsRenderer {
     // li > div > [toggler], title span, [toggler]
     let div = li.firstChild;
     let titleSpan = div.childNodes[this._buttonLeft ? 1 : 0];
-    this._fillTitleSpan(titleSpan, node.name, isSelected, level);
+    this._fillNode(li, titleSpan, node.name, isSelected, level);
     if (node.is_loading) {
       li.classList.add(this._classNames.loading);
-      titleSpan.setAttribute("aria-busy", "true");
+      li.setAttribute("aria-busy", "true");
     }
     return li;
   }
@@ -826,11 +828,10 @@ class ElementsRenderer {
     if (this._buttonLeft) {
       div.append(toggler);
     }
+    li.setAttribute("aria-expanded", getBoolString(isOpen));
 
     // title span
-    let titleSpan = this._createTitleSpanTemplate(true);
-    titleSpan.setAttribute("aria-expanded", getBoolString(isOpen));
-    div.append(titleSpan);
+    div.append(this._createTitleSpanTemplate(true));
     if (!this._buttonLeft) {
       div.append(toggler);
     }
@@ -854,11 +855,22 @@ class ElementsRenderer {
 
   /*
   Create the outer part of a <li> template: li > div
+  The li is the treeitem, so the ul of its children is inside the treeitem.
   */
   _createLiTemplate(liClasses) {
     let li = document.createElement("li");
     li.className = liClasses;
-    li.setAttribute("role", "none");
+    li.setAttribute("role", "treeitem");
+
+    // Only a multiselect tree marks the nodes that are not selected
+    if (this._multiSelect) {
+      li.setAttribute("aria-selected", "false");
+    }
+
+    // Every node is focusable, but only the tab stop is in the tab order
+    if (this._tabIndex !== undefined) {
+      li.setAttribute("tabindex", "-1");
+    }
     let div = document.createElement("div");
     div.className = `${this._classNames.element} ${this._classNames.common}`;
     div.setAttribute("role", "none");
@@ -874,7 +886,7 @@ class ElementsRenderer {
     // li > div > title span
     let div = li.firstChild;
     let titleSpan = div.firstChild;
-    this._fillTitleSpan(titleSpan, node.name, isSelected, level);
+    this._fillNode(li, titleSpan, node.name, isSelected, level);
     return li;
   }
 
@@ -895,13 +907,6 @@ class ElementsRenderer {
     }
     classes += ` ${this._buttonLeft ? this._classNames.titleButtonLeft : this._classNames.titleButtonRight}`;
     titleSpan.className = classes;
-    titleSpan.setAttribute("role", "treeitem");
-    titleSpan.setAttribute("aria-selected", "false");
-
-    // Every node is focusable, but only the tab stop is in the tab order
-    if (this._tabIndex !== undefined) {
-      titleSpan.setAttribute("tabindex", "-1");
-    }
     return titleSpan;
   }
   _createUlTemplate(isRootNode) {
@@ -930,20 +935,25 @@ class ElementsRenderer {
       if (this._ariaLabelledBy !== undefined) {
         ul.setAttribute("aria-labelledby", this._ariaLabelledBy);
       }
+      if (this._multiSelect) {
+        ul.setAttribute("aria-multiselectable", "true");
+      }
     }
     return ul;
   }
 
   /*
-  Set the parts of a cloned title span that differ per node
+  Set the parts of a cloned li and title span that differ per node
   */
-  _fillTitleSpan(titleSpan, nodeName, isSelected, level) {
-    titleSpan.setAttribute("aria-level", String(level));
+  _fillNode(li, titleSpan, nodeName, isSelected, level) {
+    li.setAttribute("aria-level", String(level));
     if (isSelected) {
-      titleSpan.setAttribute("aria-selected", "true");
+      li.setAttribute("aria-selected", "true");
       let tabIndex = this._tabIndex;
-      if (tabIndex !== undefined) {
-        titleSpan.setAttribute("tabindex", String(tabIndex));
+
+      // With multiSelect the tab stop is the active node, see updateTabStop
+      if (tabIndex !== undefined && !this._multiSelect) {
+        li.setAttribute("tabindex", String(tabIndex));
       }
     }
     if (this._autoEscape) {
@@ -952,6 +962,10 @@ class ElementsRenderer {
       // eslint-disable-next-line no-unsanitized/property -- the user opted out of escaping with autoEscape: false
       titleSpan.innerHTML = nodeName;
     }
+
+    // The treeitem is named by its title, without the html when autoEscape
+    // is false. Otherwise the name would contain everything in the row.
+    li.setAttribute("aria-label", titleSpan.textContent);
   }
   _getButtonClasses(isOpen) {
     let classes = [this._classNames.toggler, this._classNames.common];
@@ -976,25 +990,38 @@ class ElementsRenderer {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/keyHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/keyHandler.js
+/* The keys move from the selected node and select the node they move to.
+ * With multiSelect they move from the focused node and only move the focus;
+ * Space adds the focused node to the selection or removes it.
+ */
+
 class KeyHandler {
   constructor({
     _closeNode: closeNode,
+    _focusNode: focusNode,
+    _getActiveNode: getActiveNode,
     _getFocusedNode: getFocusedNode,
     _getSelectedNode: getSelectedNode,
     _getTree: getTree,
     _keyboardSupport: keyboardSupport,
+    _multiSelect: multiSelect,
     _openNode: openNode,
     _selectNode: selectNode,
+    _toggleNodeInSelection: toggleNodeInSelection,
     _triggerEvent: triggerEvent
   }) {
     this._closeNode = closeNode;
+    this._focusNode = focusNode;
+    this._getActiveNode = getActiveNode;
     this._getFocusedNode = getFocusedNode;
     this._getSelectedNode = getSelectedNode;
     this._getTree = getTree;
     this._keyboardSupport = keyboardSupport;
+    this._multiSelect = multiSelect;
     this._openNode = openNode;
     this._originalSelectNode = selectNode;
+    this._toggleNodeInSelection = toggleNodeInSelection;
     this._triggerEvent = triggerEvent;
     if (keyboardSupport) {
       document.addEventListener("keydown", this._handleKeyDown);
@@ -1006,10 +1033,10 @@ class KeyHandler {
     }
   }
   _moveDown() {
-    return this._selectNode(this._getSelectedNode()?.getNextVisibleNode());
+    return this._goToNode(this._getCurrentNode()?.getNextVisibleNode());
   }
   _moveUp() {
-    return this._selectNode(this._getSelectedNode()?.getPreviousVisibleNode());
+    return this._goToNode(this._getCurrentNode()?.getPreviousVisibleNode());
   }
 
   // Activate the node, for example to open its edit page.
@@ -1018,6 +1045,26 @@ class KeyHandler {
       node,
       originalEvent
     });
+    return true;
+  }
+
+  // No node is selected. These keys select the focused node, which is
+  // usually the first node, see TreeElement.updateTabStop.
+  _getCurrentNode() {
+    return this._multiSelect ? this._getActiveNode() : this._getSelectedNode();
+  }
+
+  // Move to the node: select it, or with multiSelect focus it.
+  // Result: there was a node to move to.
+  _goToNode(node) {
+    if (!node) {
+      return false;
+    }
+    if (this._multiSelect) {
+      this._focusNode(node);
+    } else {
+      this._originalSelectNode(node);
+    }
     return true;
   }
   _handleArrowKey(key) {
@@ -1044,49 +1091,53 @@ class KeyHandler {
         }
     }
   }
+  _handleKey(key, focusedNode) {
+    return this._getCurrentNode() ? this._handleArrowKey(key) : this._handleKeyWithoutSelection(key, focusedNode);
+  }
   _handleKeyDown = e => {
     let focusedNode = this._getFocusedNode();
     if (!focusedNode) {
       return;
     }
     let isKeyHandled;
-    let selectedNode = this._getSelectedNode();
     switch (e.key) {
+      case " ":
+        {
+          isKeyHandled = this._multiSelect ? this._toggle(focusedNode) : this._handleKey(e.key, focusedNode);
+          break;
+        }
       case "End":
         {
-          isKeyHandled = this._selectNode(this._getTree()?.getLastChild());
+          isKeyHandled = this._goToNode(this._getTree()?.getLastChild());
           break;
         }
       case "Enter":
         {
           // Without a selected node, activate the focused node
-          isKeyHandled = this._activate(selectedNode ?? focusedNode, e);
+          isKeyHandled = this._activate(this._multiSelect ? focusedNode : this._getSelectedNode() ?? focusedNode, e);
           break;
         }
       case "Home":
         {
-          isKeyHandled = this._selectNode(this._getTree()?.children[0]);
+          isKeyHandled = this._goToNode(this._getTree()?.children[0]);
           break;
         }
       default:
         {
-          isKeyHandled = selectedNode ? this._handleArrowKey(e.key) : this._handleKeyWithoutSelection(e.key, focusedNode);
+          isKeyHandled = this._handleKey(e.key, focusedNode);
         }
     }
     if (isKeyHandled) {
       e.preventDefault();
     }
   };
-
-  // No node is selected. These keys select the focused node, which is
-  // usually the first node, see TreeElement.updateTabStop.
   _handleKeyWithoutSelection(key, focusedNode) {
     switch (key) {
       case " ":
       case "ArrowDown":
       case "ArrowRight":
         {
-          return this._selectNode(focusedNode);
+          return this._goToNode(focusedNode);
         }
       default:
         {
@@ -1095,51 +1146,43 @@ class KeyHandler {
     }
   }
   _moveLeft() {
-    let selectedNode = this._getSelectedNode();
+    let currentNode = this._getCurrentNode();
 
     /* istanbul ignore if */
-    if (!selectedNode) {
+    if (!currentNode) {
       return false;
     }
-    if (selectedNode.isFolder() && selectedNode.is_open) {
+    if (currentNode.isFolder() && currentNode.is_open) {
       // Left on an open node closes the node
-      void this._closeNode(selectedNode);
+      void this._closeNode(currentNode);
       return true;
     }
     // Left on a closed or end node moves focus to the node's parent
-    return this._selectNode(selectedNode.getParent());
+    return this._goToNode(currentNode.getParent());
   }
   _moveRight() {
-    let selectedNode = this._getSelectedNode();
-    if (selectedNode?.isFolder()) {
+    let currentNode = this._getCurrentNode();
+    if (currentNode?.isFolder()) {
       // folder node
-      if (selectedNode.is_open) {
+      if (currentNode.is_open) {
         // Right moves to the first child of an open node
-        return this._selectNode(selectedNode.getNextVisibleNode());
+        return this._goToNode(currentNode.getNextVisibleNode());
       }
       // Right expands a closed node
-      void this._openNode(selectedNode);
+      void this._openNode(currentNode);
       return true;
     }
     return false;
   }
-
-  /* Select the node.
-   * Don't do anything if the node is null.
-   * Result: a different node was selected.
-   */
-  _selectNode(node) {
-    if (node) {
-      this._originalSelectNode(node);
-      return true;
-    }
-    return false;
+  _toggle(node) {
+    this._toggleNodeInSelection(node);
+    return true;
   }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/mouseUtils.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/mouseUtils.js
 let getPositionInfoFromMouseEvent = e => ({
   originalEvent: e,
   pageX: e.pageX,
@@ -1155,7 +1198,7 @@ let getPositionInfoFromTouch = (touch, e) => ({
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/mouseHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/mouseHandler.js
 
 
 class MouseHandler {
@@ -1426,12 +1469,12 @@ class MouseHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeUtils.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeUtils.js
 let isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && Array.isArray(data.children);
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/node.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/node.js
 
 
 /*
@@ -2167,7 +2210,7 @@ class Node {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/borderDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/borderDropHint.js
 class BorderDropHint {
   constructor(element, scrollLeft, classNames) {
     let div = element.querySelector(`:scope > .${classNames.element}`);
@@ -2191,7 +2234,7 @@ class BorderDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
 class GhostDropHint {
   constructor(node, element, position, classNames) {
     this._classNames = classNames;
@@ -2259,7 +2302,7 @@ class GhostDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/index.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/index.js
 
 
 
@@ -2267,12 +2310,14 @@ class NodeElement {
   constructor({
     _classNames: classNames,
     _getScrollLeft: getScrollLeft,
+    _multiSelect: multiSelect = false,
     _node: node,
     _tabIndex: tabIndex,
     _treeElement: treeElement
   }) {
     this._classNames = classNames;
     this._getScrollLeft = getScrollLeft;
+    this._multiSelect = multiSelect;
     this._node = node;
     this._tabIndex = tabIndex;
     this._treeElement = treeElement;
@@ -2288,34 +2333,35 @@ class NodeElement {
       return;
     }
     this._element.classList.remove(this._classNames.selected);
-    let titleSpan = this._getTitleSpan();
+
+    // Only a multiselect tree marks the nodes that are not selected
+    if (this._multiSelect) {
+      this._element.setAttribute("aria-selected", "false");
+      return;
+    }
+    this._element.removeAttribute("aria-selected");
 
     // Check for null or undefined
     if (this._tabIndex != null) {
-      titleSpan.setAttribute("tabindex", "-1");
+      this._element.setAttribute("tabindex", "-1");
     }
-    titleSpan.setAttribute("aria-selected", "false");
-    titleSpan.blur();
+    this._element.blur();
   }
   _select(mustSetFocus) {
     if (!this._isRendered()) {
       return;
     }
     this._element.classList.add(this._classNames.selected);
-    let titleSpan = this._getTitleSpan();
+    this._element.setAttribute("aria-selected", "true");
     let tabIndex = this._tabIndex;
 
     // Check for null or undefined
-    if (tabIndex != null) {
-      titleSpan.setAttribute("tabindex", tabIndex.toString());
+    if (tabIndex != null && !this._multiSelect) {
+      this._element.setAttribute("tabindex", tabIndex.toString());
     }
-    titleSpan.setAttribute("aria-selected", "true");
     if (mustSetFocus) {
-      titleSpan.focus();
+      this._element.focus();
     }
-  }
-  _getTitleSpan() {
-    return this._element.querySelector(`:scope > .${this._classNames.element} > span.${this._classNames.title}`);
   }
   _getUl() {
     return this._element.querySelector(":scope > ul");
@@ -2334,7 +2380,7 @@ class NodeElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/animation.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/animation.js
 let getAnimationDuration = duration => {
   if (typeof duration === "number") {
     return duration;
@@ -2378,7 +2424,7 @@ let slideUp = (element, animationSpeed) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/nodeElement/folderElement.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/folderElement.js
 
 
 
@@ -2387,6 +2433,7 @@ class FolderElement extends NodeElement {
     _classNames: classNames,
     _closedIconElement: closedIconElement,
     _getScrollLeft: getScrollLeft,
+    _multiSelect: multiSelect,
     _node: node,
     _openedIconElement: openedIconElement,
     _renderChildren: renderChildren,
@@ -2397,6 +2444,7 @@ class FolderElement extends NodeElement {
     super({
       _classNames: classNames,
       _getScrollLeft: getScrollLeft,
+      _multiSelect: multiSelect,
       _node: node,
       _tabIndex: tabIndex,
       _treeElement: treeElement
@@ -2434,8 +2482,7 @@ class FolderElement extends NodeElement {
       }
     }
     this._element.classList.add(this._classNames.closed);
-    let titleSpan = this._getTitleSpan();
-    titleSpan.setAttribute("aria-expanded", "false");
+    this._element.setAttribute("aria-expanded", "false");
     this._triggerEvent("tree.close", {
       node: this._node
     });
@@ -2471,8 +2518,7 @@ class FolderElement extends NodeElement {
       }
     }
     this._element.classList.remove(this._classNames.closed);
-    let titleSpan = this._getTitleSpan();
-    titleSpan.setAttribute("aria-expanded", "true");
+    this._element.setAttribute("aria-expanded", "true");
     this._triggerEvent("tree.open", {
       node: this._node
     });
@@ -2487,7 +2533,7 @@ class FolderElement extends NodeElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/requestUrl.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/requestUrl.js
 // Url of a request. A relative url is resolved against the page, like a link
 // or `fetch` would, so it also works when the page is in a subdirectory.
 
@@ -2505,7 +2551,7 @@ class RequestUrl {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/saveStateHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/saveStateHandler.js
 
 
 class SaveStateHandler {
@@ -2680,7 +2726,7 @@ class SaveStateHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/scrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/scrollParent.js
 class ScrollParent {
   constructor({
     _container: container,
@@ -2756,7 +2802,7 @@ class ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
 
 
 
@@ -2799,7 +2845,7 @@ class ContainerScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
 
 
 
@@ -2862,7 +2908,7 @@ class DocumentScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
 
 
 
@@ -2900,7 +2946,7 @@ let createScrollParent = (treeElement, refreshHitAreas) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/scrollHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler.js
 
 
 class ScrollHandler {
@@ -2939,7 +2985,7 @@ class ScrollHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/selectNodeHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/selectNodeHandler.js
 class SelectNodeHandler {
   constructor({
     _getNodeById: getNodeById,
@@ -3017,9 +3063,9 @@ class SelectNodeHandler {
     } else {
       this._selectedNodes.delete(node.id);
       if (includeChildren) {
-        node.iterate(() => {
-          if (node.id != null) {
-            this._selectedNodes.delete(node.id);
+        node.iterate(child => {
+          if (child.id != null) {
+            this._selectedNodes.delete(child.id);
           }
           return true;
         });
@@ -3038,6 +3084,9 @@ class SelectNodeHandler {
    * mustToggle: support deselecting the selected node
    */
   _selectSingleNode(node, optionsParam) {
+    if (!this._canSelect(node)) {
+      return;
+    }
     let defaultOptions = {
       mustSetFocus: true,
       mustToggle: true
@@ -3046,31 +3095,23 @@ class SelectNodeHandler {
       ...defaultOptions,
       ...optionsParam
     };
-    let canSelect = () => {
-      if (!this._getSelectable()) {
-        return false;
-      }
-      let onCanSelectNode = this._getOnCanSelectNode();
-      return onCanSelectNode ? onCanSelectNode(node) : true;
-    };
-    if (!canSelect()) {
-      return;
-    }
-    let deselectCurrentNode = deselectedNode => {
-      this._removeFromSelection(deselectedNode);
-      this._getNodeElementForNode(deselectedNode)._deselect();
-    };
+    let otherSelectedNodes = this._getSelectedNodes().filter(selectedNode => selectedNode !== node);
     if (this._isNodeSelected(node)) {
-      if (selectOptions.mustToggle) {
-        deselectCurrentNode(node);
+      if (otherSelectedNodes.length) {
+        // Part of a multiple selection: keep only this node selected
+        for (let otherNode of otherSelectedNodes) {
+          this._deselectNode(otherNode);
+        }
+      } else if (selectOptions.mustToggle) {
+        this._deselectNode(node);
         this._triggerEvent("tree.deselect", {
           node
         });
       }
     } else {
-      let deselectedNode = this._getSelectedNode();
-      if (deselectedNode) {
-        deselectCurrentNode(deselectedNode);
+      let deselectedNode = otherSelectedNodes[0] ?? null;
+      for (let otherNode of otherSelectedNodes) {
+        this._deselectNode(otherNode);
       }
       this._addToSelection(node);
       this._openParents(node);
@@ -3083,11 +3124,48 @@ class SelectNodeHandler {
     this._updateTabStop();
     this._saveState();
   }
+
+  /* Add a node to the selection, or remove it when it is selected, without
+   * changing the other selected nodes.
+   * Checks if the node is selectable and saves the state.
+   */
+  _toggleNodeInSelection(node, mustSetFocus = true) {
+    if (!this._canSelect(node)) {
+      return;
+    }
+    if (this._isNodeSelected(node)) {
+      this._deselectNode(node);
+      this._triggerEvent("tree.deselect", {
+        node
+      });
+    } else {
+      this._addToSelection(node);
+      this._openParents(node);
+      this._getNodeElementForNode(node)._select(mustSetFocus);
+      this._triggerEvent("tree.select", {
+        deselectedNode: null,
+        node
+      });
+    }
+    this._updateTabStop();
+    this._saveState();
+  }
+  _canSelect(node) {
+    if (!this._getSelectable()) {
+      return false;
+    }
+    let onCanSelectNode = this._getOnCanSelectNode();
+    return onCanSelectNode ? onCanSelectNode(node) : true;
+  }
+  _deselectNode(node) {
+    this._removeFromSelection(node);
+    this._getNodeElementForNode(node)._deselect();
+  }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/setDefaultOptions.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/setDefaultOptions.js
 
 
 
@@ -3115,6 +3193,7 @@ let defaults = {
   // dataUrl: undefined,
   dragAndDrop: false,
   keyboardSupport: true,
+  multiSelect: false,
   nodeClass: Node,
   // onCanMove: undefined, // Can this node be moved?
   // onCanMoveTo: undefined, // Can this node be moved to this position? function(moved_node, target_node, position)
@@ -3170,7 +3249,7 @@ let getRtlOptionFromHTMLElement = htmlElement => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/triggerCustomEvent.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/triggerCustomEvent.js
 // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
 let triggerCustomEvent = (element, eventName, values) => {
   let event = new CustomEvent(eventName, {
@@ -3184,15 +3263,15 @@ let triggerCustomEvent = (element, eventName, values) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/version.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/version.js
 // Generated by config/generateVersion.mjs. Do not edit.
-let version = "0.3.2";
+let version = "0.4.0";
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.3.2/node_modules/tree-element/lib/index.js
+;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/index.js
 /*
-Tree-element 0.3.2
+Tree-element 0.4.0
 
 Copyright 2026 Marco Braak
 
@@ -3234,6 +3313,8 @@ limitations under the License.
 // as its global, instead of an object of named exports.
 
 class TreeElement {
+  // With multiSelect: the node that is the tab stop, see updateTabStop
+  _activeNode;
   _classNames;
   _dataLoader;
   _dndHandler;
@@ -3267,6 +3348,7 @@ class TreeElement {
     this._tree = new Node({}, true);
     this._nodeMap = new WeakMap();
     this._fallbackTabStop = null;
+    this._activeNode = null;
     let {
       ariaLabel,
       ariaLabelledBy,
@@ -3276,6 +3358,7 @@ class TreeElement {
       dataFilter,
       dragAndDrop,
       keyboardSupport,
+      multiSelect,
       onCanMove,
       onCanMoveTo,
       onCreateLi,
@@ -3327,6 +3410,17 @@ class TreeElement {
     let isNodeSelected = selectNodeHandler._isNodeSelected.bind(selectNodeHandler);
     let removeFromSelection = selectNodeHandler._removeFromSelection.bind(selectNodeHandler);
     let selectNode = selectNodeHandler._selectSingleNode.bind(selectNodeHandler);
+    let toggleNodeInSelection = selectNodeHandler._toggleNodeInSelection.bind(selectNodeHandler);
+
+    // With multiSelect, a click adds a node to the selection or removes it
+    let onClickTitle = node => {
+      if (this._options.multiSelect) {
+        toggleNodeInSelection(node, false);
+        this._focusNode(node);
+      } else {
+        selectNode(node);
+      }
+    };
     let getMouseDelay = () => this._options.startDndDelay ?? 0;
     let dataLoader = new DataLoader({
       _classNames: classNames,
@@ -3373,12 +3467,16 @@ class TreeElement {
     });
     let keyHandler = new KeyHandler({
       _closeNode: closeNode,
+      _focusNode: this._focusNode.bind(this),
+      _getActiveNode: this._getActiveNode.bind(this),
       _getFocusedNode: getFocusedNode,
       _getSelectedNode: getSelectedNode,
       _getTree: getTree,
       _keyboardSupport: keyboardSupport,
+      _multiSelect: multiSelect,
       _openNode: openNode,
       _selectNode: selectNode,
+      _toggleNodeInSelection: toggleNodeInSelection,
       _triggerEvent: triggerEvent
     });
     let renderer = new ElementsRenderer({
@@ -3392,6 +3490,7 @@ class TreeElement {
       _getTree: getTree,
       _htmlElement: treeElement,
       _isNodeSelected: isNodeSelected,
+      _multiSelect: multiSelect,
       _onCreateLi: onCreateLi,
       _openedIcon: openedIcon,
       _rtl: rtl,
@@ -3410,7 +3509,7 @@ class TreeElement {
       _getMouseDelay: getMouseDelay,
       _getNode: getNode,
       _onClickButton: this.toggle.bind(this),
-      _onClickTitle: selectNode,
+      _onClickTitle: onClickTitle,
       _onMouseCapture: onMouseCapture,
       _onMouseDrag: onMouseDrag,
       _onMouseStart: onMouseStart,
@@ -3426,6 +3525,9 @@ class TreeElement {
     this._saveStateHandler = saveStateHandler;
     this._scrollHandler = scrollHandler;
     this._selectNodeHandler = selectNodeHandler;
+    if (multiSelect) {
+      treeElement.addEventListener("focusin", this._handleFocusIn);
+    }
     this._initData();
   }
 
@@ -3535,6 +3637,7 @@ class TreeElement {
     this._dataLoader._deinit();
     this._keyHandler._deinit();
     this._mouseHandler._deinit();
+    this._htmlElement.removeEventListener("focusin", this._handleFocusIn);
     this._tree = new Node({}, true);
   }
 
@@ -3722,7 +3825,8 @@ class TreeElement {
   }
 
   /**
-   * Selects the next visible node, like the down arrow key.
+   * Selects the next visible node, like the down arrow key. With
+   * `multiSelect` it moves the focus instead.
    *
    * @group Selection
    */
@@ -3747,7 +3851,8 @@ class TreeElement {
   }
 
   /**
-   * Selects the previous visible node, like the up arrow key.
+   * Selects the previous visible node, like the up arrow key. With
+   * `multiSelect` it moves the focus instead.
    *
    * @group Selection
    */
@@ -3877,8 +3982,8 @@ class TreeElement {
    */
   selectNode(node, options) {
     if (!node) {
-      // Called with empty node -> deselect current node
-      this._deselectCurrentNode();
+      // Called with empty node -> deselect all nodes
+      this._deselectAllNodes();
       this._saveStateHandler._saveState();
       return;
     }
@@ -4014,6 +4119,7 @@ class TreeElement {
       _classNames: classNames,
       _closedIconElement: closedIconElement,
       _getScrollLeft: getScrollLeft,
+      _multiSelect: this._options.multiSelect,
       _node: node,
       _openedIconElement: openedIconElement,
       _renderChildren: renderChildren,
@@ -4030,6 +4136,7 @@ class TreeElement {
     return new NodeElement({
       _classNames: classNames,
       _getScrollLeft: getScrollLeft,
+      _multiSelect: this._options.multiSelect,
       _node: node,
       _tabIndex: tabIndex,
       _treeElement: treeElement
@@ -4059,9 +4166,8 @@ class TreeElement {
     }
     return requestUrl;
   }
-  _deselectCurrentNode() {
-    let node = this.getSelectedNode();
-    if (node) {
+  _deselectAllNodes() {
+    for (let node of this.getSelectedNodes()) {
       this.removeFromSelection(node);
     }
   }
@@ -4072,6 +4178,20 @@ class TreeElement {
     for (let n of selectedNodesUnderParent) {
       this._selectNodeHandler._removeFromSelection(n);
     }
+  }
+
+  // The treeitem of the first node, or null when the tree is empty
+  // Move the focus to a node, without selecting it
+  _focusNode(node) {
+    this._activeNode = node;
+    this._updateTabStop();
+    node.element?.focus();
+  }
+
+  // With multiSelect: the active node, if it is still rendered in the tree
+  _getActiveNode() {
+    let element = this._activeNode?.element;
+    return element && this._htmlElement.contains(element) ? this._activeNode : null;
   }
 
   // Get the maximum level for auto open
@@ -4089,11 +4209,8 @@ class TreeElement {
     /* istanbul ignore next @preserve */
     return 0;
   }
-
-  // The title span of the first node, or null when the tree is empty
-  _getFirstTitleSpan() {
-    let firstElement = this._tree.children[0]?.element;
-    return firstElement ? firstElement.querySelector(`:scope > .${this._classNames.element} > span.${this._classNames.title}`) : null;
+  _getFirstTreeItem() {
+    return this._tree.children[0]?.element ?? null;
   }
 
   // The node of the HTML element that has the focus, if it is in this tree
@@ -4107,7 +4224,7 @@ class TreeElement {
 
     // The keyboard must still work for input elements.
     let tagName = activeElement.tagName;
-    if (tagName !== "A" && tagName !== "SPAN") {
+    if (tagName !== "A" && tagName !== "LI" && tagName !== "SPAN") {
       return null;
     }
     let node = this.getNode(activeElement);
@@ -4123,6 +4240,16 @@ class TreeElement {
   _getNodeIdToBeSelected() {
     return this._saveStateHandler._getNodeIdToBeSelected();
   }
+
+  // With multiSelect, the focused node becomes the tab stop
+  _handleFocusIn = () => {
+    let node = this._getFocusedNode();
+    if (!node || node === this._activeNode) {
+      return;
+    }
+    this._activeNode = node;
+    this._updateTabStop();
+  };
   _hasRenderedSelectedNode() {
     return this.getSelectedNodes().some(node => Boolean(node.element));
   }
@@ -4199,7 +4326,6 @@ class TreeElement {
   }
   _mouseStart(positionInfo) {
     /* istanbul ignore if */
-    // eslint-disable-next-line unicorn/prefer-ternary
     if (!this._options.dragAndDrop) {
       return false;
     }
@@ -4309,12 +4435,22 @@ class TreeElement {
   /* Keyboard users reach the tree through the tab stop. The selected node is
    * the tab stop, see NodeElement.select. Without a selected node, the first
    * node is the tab stop, so the tree can always be reached.
+   * With multiSelect the tab stop is the active node: the node that was
+   * focused last. Without one, it is the first node.
    */
   _updateTabStop() {
     let tabIndex = this._options.tabIndex;
+    let multiSelect = this._options.multiSelect;
     let previousTabStop = this._fallbackTabStop;
-    let tabStop = tabIndex == null || this._hasRenderedSelectedNode() ? null : this._getFirstTitleSpan();
-    if (previousTabStop && previousTabStop !== tabStop && previousTabStop.getAttribute("aria-selected") !== "true") {
+    let tabStop;
+    if (tabIndex == null) {
+      tabStop = null;
+    } else if (multiSelect) {
+      tabStop = this._getActiveNode()?.element ?? this._getFirstTreeItem();
+    } else {
+      tabStop = this._hasRenderedSelectedNode() ? null : this._getFirstTreeItem();
+    }
+    if (previousTabStop && previousTabStop !== tabStop && (multiSelect || previousTabStop.getAttribute("aria-selected") !== "true")) {
       previousTabStop.setAttribute("tabindex", "-1");
     }
     if (tabStop && tabIndex != null) {
