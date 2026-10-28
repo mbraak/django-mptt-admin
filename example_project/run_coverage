@@ -1,2 +1,3 @@
-coverage run --source=django_mptt_admin,django_mptt_example manage.py test django_mptt_example
-coverage report -m
+coverage run --rcfile=../.coveragerc manage.py test --parallel auto django_mptt_example
+coverage combine --rcfile=../.coveragerc
+coverage report --rcfile=../.coveragerc -m
