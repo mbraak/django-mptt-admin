@@ -43,9 +43,7 @@ class DjangoMpttAdminMixin:
     change_list_tree_class = TreeChangeList
 
     @csrf_protect_m
-    def changelist_view(
-        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request, extra_context=None
-    ):
+    def changelist_view(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request, extra_context=None):
         request.current_app = self.admin_site.name
         is_popup = IS_POPUP_VAR in request.GET
         if is_popup:
@@ -129,10 +127,7 @@ class DjangoMpttAdminMixin:
                 regex,
                 wrap(view, cacheable),
                 kwargs=kwargs,
-                name=(
-                    f"{self.opts.app_label}_{util.get_model_name(self.model)}"
-                    f"_{url_name}"
-                ),
+                name=(f"{self.opts.app_label}_{util.get_model_name(self.model)}_{url_name}"),
             )
 
         def create_js_catalog_url():
@@ -227,34 +222,22 @@ class DjangoMpttAdminMixin:
         url_name = f"admin:{opts.app_label}_{model_name}_{name}"
         return reverse(url_name, args=args, current_app=self.admin_site.name)
 
-    def get_tree_data(
-        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], qs, max_level, filters_params
-    ):
+    def get_tree_data(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], qs, max_level, filters_params):
         pk_attname = self.opts.pk.attname
 
-        preserved_filters = urlencode(
-            {"_changelist_filters": urlencode(filters_params)}
-        )
+        preserved_filters = urlencode({"_changelist_filters": urlencode(filters_params)})
 
         def add_preserved_filters_to_url(url):
-            return add_preserved_filters(
-                {"preserved_filters": preserved_filters, "opts": self.opts}, url
-            )
+            return add_preserved_filters({"preserved_filters": preserved_filters, "opts": self.opts}, url)
 
         def handle_create_node(instance, node_info):
             pk = getattr(instance, pk_attname)
 
-            node_url = add_preserved_filters_to_url(
-                self.get_admin_url("change", (quote(pk),))
-            )
+            node_url = add_preserved_filters_to_url(self.get_admin_url("change", (quote(pk),)))
 
-            node_info.update(
-                url=node_url, move_url=self.get_admin_url("move", (quote(pk),))
-            )
+            node_info.update(url=node_url, move_url=self.get_admin_url("move", (quote(pk),)))
 
-        return util.get_tree_from_queryset(
-            qs, handle_create_node, max_level, self.item_label_field_name
-        )
+        return util.get_tree_from_queryset(qs, handle_create_node, max_level, self.item_label_field_name)
 
     def tree_json_view(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request):
         request.current_app = self.admin_site.name
@@ -279,9 +262,7 @@ class DjangoMpttAdminMixin:
         # Set safe to False because the data is a list instead of a dict
         return JsonResponse(tree_data, safe=False)
 
-    def grid_view(
-        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request, extra_context=None
-    ):
+    def grid_view(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request, extra_context=None):
         request.current_app = self.admin_site.name
 
         preserved_filters = self.get_preserved_filters(request)
@@ -328,9 +309,7 @@ class DjangoMpttAdminMixin:
         """
         return queryset
 
-    def get_changeform_initial_data(
-        self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request
-    ):
+    def get_changeform_initial_data(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], request):
         initial_data = super().get_changeform_initial_data(request=request)
 
         if "insert_at" in request.GET:
