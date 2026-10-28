@@ -136,6 +136,23 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.wait_for_text("Error while loading the data from the server")
 
 
+# Log in using the login form instead of a session cookie
+@override_settings(DJANGO_TESTING=True)
+class PlaywrightLoginTestCase(BasePlaywrightTestCase):
+    fixtures = ["countries.json"]
+
+    def setUp(self):
+        User.objects.create_superuser("admin", "admin@admin.com", "password")
+        super().setUp()
+
+    def setup_page(self):
+        self.page.login("admin", "password")
+
+    def test_login(self):
+        self.page.visit_countries_page()
+        self.page.find_title_element("Oceania")
+
+
 # Test the CountryCodeAdmin
 # * Test the item_label_field_name feature
 @override_settings(DJANGO_TESTING=True)

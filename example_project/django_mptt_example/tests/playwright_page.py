@@ -19,6 +19,9 @@ class PlaywrightPage:
     def reset_abort_requests(self):
         self.page.unroute("**")
 
+    def add_cookie(self, name, value):
+        self.page.context.add_cookies([{"name": name, "value": value, "url": self.live_server_url}])
+
     def add_node(self, parent_title):
         self.find_edit_link(parent_title, "(add)").click()
         self.wait_for_text("Add country")
