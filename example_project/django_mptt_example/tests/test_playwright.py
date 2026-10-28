@@ -39,15 +39,11 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
 
         page.select_node("Asia")
         self.assertEqual(page.selected_node().text_content(), "Asia")
-        self.assertEqual(
-            page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "0"
-        )
+        self.assertEqual(page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "0")
 
         page.select_node("Europe")
         self.assertEqual(page.selected_node().text_content(), "Europe")
-        self.assertEqual(
-            page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "-1"
-        )
+        self.assertEqual(page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "-1")
 
     def test_open_node(self):
         page = self.page
@@ -186,9 +182,7 @@ class PlaywrightReadonlyTestCase(BasePlaywrightTestCase):
     fixtures = ["countries.json"]
 
     def setUp(self):
-        user = User.objects.create_user(
-            "admin", "admin@admin.com", "password", is_staff=True
-        )
+        user = User.objects.create_user("admin", "admin@admin.com", "password", is_staff=True)
 
         user.user_permissions.add(Permission.objects.get(codename="view_country"))
         user.save()

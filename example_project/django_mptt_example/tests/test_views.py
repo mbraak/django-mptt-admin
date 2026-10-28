@@ -60,9 +60,7 @@ class MoveTestCase(BaseViewTestCase):
 
     def move(self, source_id, target_id, position):
         countries_page = self.app.get("/django_mptt_example/country/")
-        csrf_token = countries_page.forms["changelist-form"][
-            "csrfmiddlewaretoken"
-        ].value
+        csrf_token = countries_page.forms["changelist-form"]["csrfmiddlewaretoken"].value
 
         response = self.app.post(
             f"/django_mptt_example/country/{source_id:d}/move/",
@@ -115,9 +113,7 @@ class FilterTestCase(BaseViewTestCase):
         )
 
     def test_filter_and_selected_node(self):
-        json_data = self.app.get(
-            "/django_mptt_example/country/tree_json/?continent=Europe&selected_node=2"
-        ).json
+        json_data = self.app.get("/django_mptt_example/country/tree_json/?continent=Europe&selected_node=2").json
 
         self.assertEqual(len(json_data), 1)
         root = json_data[0]

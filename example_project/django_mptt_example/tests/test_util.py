@@ -56,9 +56,7 @@ class GetTreeFromQuerySetTestCase(TestCase):
         self.assertEqual(african_countries[0]["name"], "Algeria")
 
     def test_format_label(self):
-        tree = get_tree_from_queryset(
-            get_tree_queryset(Country), item_label_field_name="code"
-        )
+        tree = get_tree_from_queryset(get_tree_queryset(Country), item_label_field_name="code")
         root = tree[0]
         continents = root["children"]
         african_countries = continents[0]["children"]

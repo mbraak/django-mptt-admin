@@ -45,6 +45,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_mptt_example.middleware.AutoLoginMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
