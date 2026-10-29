@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from playwright.sync_api import ElementHandle, sync_playwright
 
-from .utils import wait_until, write_json
+from .utils import write_json
 
 
 class PlaywrightPage:
@@ -18,6 +18,9 @@ class PlaywrightPage:
 
     def reset_abort_requests(self):
         self.page.unroute("**")
+
+    def add_cookie(self, name, value):
+        self.page.context.add_cookies([{"name": name, "value": value, "url": self.live_server_url}])
 
     def add_node(self, parent_title):
         self.find_edit_link(parent_title, "(add)").click()
@@ -39,7 +42,6 @@ class PlaywrightPage:
             from_rect["y"] + from_rect["height"] / 2,
         )
         self.page.mouse.down()
-        self.page.wait_for_timeout(200)
         self.page.mouse.move(to_rect["x"] + to_rect["width"] / 2, to_rect["y"] + to_rect["height"] / 2)
         self.page.mouse.up()
 
@@ -109,8 +111,7 @@ class PlaywrightPage:
         self.toggle_node(title)
         node_element = self.find_node_element(title)
 
-        if "jqtree-loading" in node_element.get_attribute("class"):
-            wait_until(lambda: "jqtree-loading" not in node_element.get_attribute("class"))
+        self.page.wait_for_function("el => !el.classList.contains('jqtree-loading')", arg=node_element)
 
     def save_coverage(self):
         coverage = self.page.evaluate_handle(
