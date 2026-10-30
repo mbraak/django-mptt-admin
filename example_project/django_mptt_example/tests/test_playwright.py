@@ -4,8 +4,9 @@ from django.test import override_settings
 from .base_playwright_testcase import BasePlaywrightTestCase
 
 
+# Tests for the CountryAdmin; split into several classes so they can run in parallel
 @override_settings(DJANGO_TESTING=True)
-class PlaywrightTestCase(BasePlaywrightTestCase):
+class BasePlaywrightCountryTestCase(BasePlaywrightTestCase):
     fixtures = ["countries.json"]
 
     def setUp(self):
@@ -13,6 +14,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         super().setUp()
         self.page.visit_countries_page()
 
+
+class PlaywrightTreeTestCase(BasePlaywrightCountryTestCase):
     def test_display_tree(self):
         page = self.page
 
@@ -39,15 +42,11 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
 
         page.select_node("Asia")
         self.assertEqual(page.selected_node().text_content(), "Asia")
-        self.assertEqual(
-            page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "0"
-        )
+        self.assertEqual(page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "0")
 
         page.select_node("Europe")
         self.assertEqual(page.selected_node().text_content(), "Europe")
-        self.assertEqual(
-            page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "-1"
-        )
+        self.assertEqual(page.find_edit_link("Asia", "(edit)").get_attribute("tabindex"), "-1")
 
     def test_open_node(self):
         page = self.page
@@ -55,6 +54,15 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.open_node("Oceania")
         page.find_title_element("Tuvalu")
 
+    def test_load_error(self):
+        page = self.page
+        page.abort_requests()
+
+        page.toggle_node("Asia")
+        page.wait_for_text("Error while loading the data from the server")
+
+
+class PlaywrightGridViewTestCase(BasePlaywrightCountryTestCase):
     def test_grid_view(self):
         page = self.page
 
@@ -73,6 +81,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.wait_for_node("Tuvalu")
         self.assertEqual(page.selected_node().text_content(), "Tuvalu")
 
+
+class PlaywrightEditTestCase(BasePlaywrightCountryTestCase):
     def test_edit(self):
         page = self.page
 
@@ -101,6 +111,8 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.wait_for_node("**Test**")
         page.find_node_element("**Test**")
 
+
+class PlaywrightMoveTestCase(BasePlaywrightCountryTestCase):
     def test_move_node(self):
         page = self.page
 
@@ -132,12 +144,22 @@ class PlaywrightTestCase(BasePlaywrightTestCase):
         page.drag_and_drop("Africa", "Asia")
         page.wait_for_text("move failed")
 
-    def test_load_error(self):
-        page = self.page
-        page.abort_requests()
 
-        page.toggle_node("Asia")
-        page.wait_for_text("Error while loading the data from the server")
+# Log in using the login form instead of a session cookie
+@override_settings(DJANGO_TESTING=True)
+class PlaywrightLoginTestCase(BasePlaywrightTestCase):
+    fixtures = ["countries.json"]
+
+    def setUp(self):
+        User.objects.create_superuser("admin", "admin@admin.com", "password")
+        super().setUp()
+
+    def setup_page(self):
+        self.page.login("admin", "password")
+
+    def test_login(self):
+        self.page.visit_countries_page()
+        self.page.find_title_element("Oceania")
 
 
 # Test the CountryCodeAdmin
@@ -186,9 +208,7 @@ class PlaywrightReadonlyTestCase(BasePlaywrightTestCase):
     fixtures = ["countries.json"]
 
     def setUp(self):
-        user = User.objects.create_user(
-            "admin", "admin@admin.com", "password", is_staff=True
-        )
+        user = User.objects.create_user("admin", "admin@admin.com", "password", is_staff=True)
 
         user.user_permissions.add(Permission.objects.get(codename="view_country"))
         user.save()

@@ -116,6 +116,18 @@ const getNodeElement = (name: string): HTMLElement => {
     return nodeElement;
 };
 
+const getNodeTitle = (name: string): HTMLElement => {
+    const titleElement = getNodeElement(name).querySelector<HTMLElement>(
+        ":scope > .jqtree-element > .jqtree-title",
+    );
+
+    if (!titleElement) {
+        throw new Error(`Title element not found for '${name}'`);
+    }
+
+    return titleElement;
+};
+
 test("initializes the tree", async () => {
     initTestTree(createTreeElement());
 
@@ -555,7 +567,7 @@ describe("useContextMenu", () => {
     const rightClickNode = async (name: string) => {
         await user.pointer({
             keys: "[MouseRight]",
-            target: screen.getByRole("treeitem", { name }),
+            target: getNodeTitle(name),
         });
     };
 
@@ -837,7 +849,7 @@ describe("selecting a node", () => {
     };
 
     const clickNode = async (name: string) => {
-        await user.click(screen.getByRole("treeitem", { name }));
+        await user.click(getNodeTitle(name));
     };
 
     test("sets the tabindex of the edit links when a node is selected", async () => {

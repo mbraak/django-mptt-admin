@@ -45,6 +45,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_mptt_example.middleware.AutoLoginMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
@@ -79,6 +80,10 @@ ALLOWED_HOSTS = ["*"]
 
 if "COVERAGE" in os.environ:
     DJANGO_MPTT_ADMIN_COVERAGE_JS = True
+
+if "test" in sys.argv:
+    # A fast hasher makes creating users and logging in quicker; not secure, so only for tests
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 STORAGES = {
     "default": {

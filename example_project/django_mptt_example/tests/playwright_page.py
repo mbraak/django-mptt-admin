@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from playwright.sync_api import ElementHandle, sync_playwright
 
-from .utils import wait_until, write_json
+from .utils import write_json
 
 
 class PlaywrightPage:
@@ -18,6 +18,9 @@ class PlaywrightPage:
 
     def reset_abort_requests(self):
         self.page.unroute("**")
+
+    def add_cookie(self, name, value):
+        self.page.context.add_cookies([{"name": name, "value": value, "url": self.live_server_url}])
 
     def add_node(self, parent_title):
         self.find_edit_link(parent_title, "(add)").click()
@@ -39,10 +42,7 @@ class PlaywrightPage:
             from_rect["y"] + from_rect["height"] / 2,
         )
         self.page.mouse.down()
-        self.page.wait_for_timeout(200)
-        self.page.mouse.move(
-            to_rect["x"] + to_rect["width"] / 2, to_rect["y"] + to_rect["height"] / 2
-        )
+        self.page.mouse.move(to_rect["x"] + to_rect["width"] / 2, to_rect["y"] + to_rect["height"] / 2)
         self.page.mouse.up()
 
     def edit_node(self, title):
@@ -51,9 +51,7 @@ class PlaywrightPage:
 
     def find_edit_link(self, node_title, link_title):
         links = [
-            e
-            for e in self.find_node_element(node_title).query_selector_all("a.edit")
-            if e.text_content() == link_title
+            e for e in self.find_node_element(node_title).query_selector_all("a.edit") if e.text_content() == link_title
         ]
         return links[0]
 
@@ -113,10 +111,7 @@ class PlaywrightPage:
         self.toggle_node(title)
         node_element = self.find_node_element(title)
 
-        if "jqtree-loading" in node_element.get_attribute("class"):
-            wait_until(
-                lambda: "jqtree-loading" not in node_element.get_attribute("class")
-            )
+        self.page.wait_for_function("el => !el.classList.contains('jqtree-loading')", arg=node_element)
 
     def save_coverage(self):
         coverage = self.page.evaluate_handle(
@@ -138,9 +133,7 @@ class PlaywrightPage:
         self.find_title_element(title).click()
 
     def selected_node(self):
-        return self.page.query_selector(
-            ".jqtree-selected > .jqtree-element > .jqtree-title"
-        )
+        return self.page.query_selector(".jqtree-selected > .jqtree-element > .jqtree-title")
 
     def toggle_node(self, title):
         node_element = self.find_node_element(title)
@@ -163,9 +156,7 @@ class PlaywrightPage:
         page.wait_for_selector(f"text={expected_text}")
         page.wait_for_selector("css=#tree >> text=Oceania")
 
-    def visit_country_codes_and_names_page(
-        self, expected_text="Select country code and name to change"
-    ):
+    def visit_country_codes_and_names_page(self, expected_text="Select country code and name to change"):
         page = self.page
         page.goto(self.live_server_url + "/django_mptt_example/countrycodeandname/")
         page.wait_for_selector(f"text={expected_text}")

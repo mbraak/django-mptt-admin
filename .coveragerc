@@ -1,6 +1,12 @@
 [run]
 branch = True
+# Measure the test worker processes when running the tests with --parallel
+concurrency = multiprocessing,thread
+parallel = True
+source =
+  django_mptt_admin
+  django_mptt_example
 omit =
-  example_project/django_mptt_example/tests/base_playwright_testcase.py
-  example_project/django_mptt_example/tests/playwright_page.py
-  example_project/django_mptt_example/tests/test_playwright.py
+  */django_mptt_example/tests/base_playwright_testcase.py
+  */django_mptt_example/tests/playwright_page.py
+  */django_mptt_example/tests/test_playwright.py
