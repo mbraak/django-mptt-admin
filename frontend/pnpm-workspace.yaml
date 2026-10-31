@@ -2,8 +2,8 @@ allowBuilds:
     "@parcel/watcher": true
     msw: true
     unrs-resolver: true
-minimumReleaseAgeExclude:
-  - tree-element@0.1.0 || 0.1.1 || 0.2.0 || 0.3.2
 overrides:
-  "@istanbuljs/load-nyc-config>js-yaml": ^4.1.0
-  "babel-plugin-istanbul>test-exclude": ^8.0.0
+    "@istanbuljs/load-nyc-config>js-yaml": ^4.1.0
+    "babel-plugin-istanbul>test-exclude": ^8.0.0
+    "glob@>=9.0.0 <=14.0.1": ^14.0.2
+    "minimatch@<11.0.1": ^11.0.1
