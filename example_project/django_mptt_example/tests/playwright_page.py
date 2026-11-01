@@ -109,9 +109,11 @@ class PlaywrightPage:
 
     def open_node(self, title):
         self.toggle_node(title)
-        node_element = self.find_node_element(title)
 
-        self.page.wait_for_function("el => !el.classList.contains('jqtree-loading')", arg=node_element)
+        # Wait until the node is loaded and the slide animation is finished; the 'jqtree-closed' class
+        # is removed after the animation. Clicking a child during the animation can miss its target.
+        # Look up the node element each time, because it is re-rendered after loading.
+        self.wait_for_node_classes(title, present=[], absent=["jqtree-loading", "jqtree-closed"])
 
     def save_coverage(self):
         coverage = self.page.evaluate_handle(
@@ -131,6 +133,9 @@ class PlaywrightPage:
 
     def select_node(self, title):
         self.find_title_element(title).click()
+
+        # Make sure the click selected the node before continuing
+        self.wait_for_node_classes(title, present=["jqtree-selected"], absent=[])
 
     def selected_node(self) -> ElementHandle:
         # Wait, because tree-element restores the selection from the saved state only
@@ -168,6 +173,25 @@ class PlaywrightPage:
 
     def wait_for_node(self, title):
         self.page.wait_for_selector(f'css=#tree .jqtree-title >> text="{title}"')
+
+    def wait_for_node_classes(self, title, present, absent):
+        self.page.wait_for_function(
+            """
+            ({ title, present, absent }) => {
+                const titleElement = [...document.querySelectorAll("#tree .jqtree-title")].find(
+                    (el) => el.textContent === title
+                );
+                const li = titleElement?.closest("li");
+
+                return (
+                    li != null &&
+                    present.every((c) => li.classList.contains(c)) &&
+                    !absent.some((c) => li.classList.contains(c))
+                );
+            }
+            """,
+            arg={"title": title, "present": present, "absent": absent},
+        )
 
     def wait_for_text(self, text):
         self.page.wait_for_selector(f'text="{text}"')
