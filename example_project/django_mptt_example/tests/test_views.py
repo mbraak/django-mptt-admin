@@ -1,6 +1,12 @@
+from unittest import mock
+
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth.models import User
+from django.test import override_settings
 
+from django_mptt_admin.django_mptt_admin_mixin import DjangoMpttAdminMixin
+
+from ..admin import CountryAdmin
 from ..models import Country
 from .base_view_testcase import BaseViewTestCase
 from .utils import get_continents
@@ -159,3 +165,108 @@ class FilterTestCase(BaseViewTestCase):
             object_tool_buttons.eq(1).attr("href"),
             "/django_mptt_example/country/?continent=Europe",
         )
+
+
+class InsertAtTestCase(BaseViewTestCase):
+    def test_insert_at_sets_the_parent(self):
+        europe = Country.objects.get(name="Europe")
+
+        add_page = self.app.get(f"/django_mptt_example/country/add/?insert_at={europe.id}")
+
+        self.assertEqual(add_page.forms["country_form"]["parent"].value, str(europe.id))
+
+    def test_without_insert_at(self):
+        add_page = self.app.get("/django_mptt_example/country/add/")
+
+        self.assertEqual(add_page.forms["country_form"]["parent"].value, "")
+
+    def test_add_child_with_insert_at(self):
+        europe = Country.objects.get(name="Europe")
+
+        add_page = self.app.get(f"/django_mptt_example/country/add/?insert_at={europe.id}")
+        form = add_page.forms["country_form"]
+        form["name"] = "Atlantis"
+        form.submit().follow()
+
+        self.assertEqual(Country.objects.get(name="Atlantis").parent, europe)
+
+
+class TriggerSaveAfterMoveTestCase(BaseViewTestCase):
+    def test_trigger_save_after_move(self):
+        def count_saves_during_move(code, target_name):
+            moved_country = Country.objects.get(code=code)
+            target = Country.objects.get(name=target_name)
+
+            with mock.patch.object(Country, "save", autospec=True, side_effect=Country.save) as save:
+                MoveTestCase.move(self, moved_country.id, target.id, "inside")
+
+            return save
+
+        # mptt's move_to saves the node itself
+        save_without_trigger = count_saves_during_move("BV", "Oceania")
+
+        with mock.patch.object(CountryAdmin, "trigger_save_after_move", True):
+            save_with_trigger = count_saves_during_move("NL", "Oceania")
+
+        self.assertEqual(save_with_trigger.call_count, save_without_trigger.call_count + 1)
+
+        saved_instance = save_with_trigger.call_args.args[0]
+        self.assertEqual(saved_instance.code, "NL")
+        self.assertEqual(saved_instance.parent.name, "Oceania")
+
+
+class LoadOnDemandTestCase(BaseViewTestCase):
+    def test_tree_json(self):
+        json_data = self.app.get("/django_mptt_example/country/tree_json/").json
+
+        [root] = json_data
+        self.assertEqual(root["name"], "root")
+        self.assertEqual(
+            [continent["name"] for continent in root["children"]],
+            ["Africa", "Antarctica", "Asia", "Europe", "North America", "Oceania", "South America"],
+        )
+
+        # The countries are not loaded; they are loaded on demand
+        europe = root["children"][3]
+        self.assertTrue(europe["load_on_demand"])
+        self.assertNotIn("children", europe)
+
+    def test_tree_json_for_node(self):
+        europe = Country.objects.get(name="Europe")
+
+        json_data = self.app.get(f"/django_mptt_example/country/tree_json/?node={europe.id}").json
+
+        self.assertEqual(
+            [country["id"] for country in json_data],
+            list(europe.get_children().values_list("id", flat=True)),
+        )
+        self.assertEqual(len(json_data), 50)
+        self.assertNotIn("load_on_demand", json_data[0])
+
+    def test_tree_json_for_root_node(self):
+        root = Country.objects.get(name="root")
+
+        json_data = self.app.get(f"/django_mptt_example/country/tree_json/?node={root.id}").json
+
+        self.assertEqual(len(json_data), 7)
+        self.assertTrue(all(continent["load_on_demand"] for continent in json_data))
+
+
+class TreeMouseDelayTestCase(BaseViewTestCase):
+    def get_mouse_delay_attribute(self):
+        countries_page = self.app.get("/django_mptt_example/country/")
+        return countries_page.pyquery("#tree").attr("data-tree-mouse-delay")
+
+    @override_settings(DJANGO_TESTING=True)
+    def test_example_mouse_delay(self):
+        # The example admin disables the delay for the playwright tests
+        self.assertEqual(self.get_mouse_delay_attribute(), "0")
+
+    @mock.patch.object(CountryAdmin, "get_tree_mouse_delay", DjangoMpttAdminMixin.get_tree_mouse_delay)
+    def test_default_mouse_delay(self):
+        self.assertIsNone(self.get_mouse_delay_attribute())
+
+    @mock.patch.object(CountryAdmin, "get_tree_mouse_delay", DjangoMpttAdminMixin.get_tree_mouse_delay)
+    @mock.patch.object(CountryAdmin, "tree_mouse_delay", 200)
+    def test_tree_mouse_delay_attribute(self):
+        self.assertEqual(self.get_mouse_delay_attribute(), "200")
