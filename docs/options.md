@@ -10,9 +10,9 @@ Auto-open node. Default value is 1.
 
 Values:
 
-- **True**: autopen all nodes
-- **False**: do not autoopen
-- **integer**: autopen until this level
+- **True**: open all nodes automatically
+- **False**: do not open any node automatically
+- **integer**: open automatically until this level
 
 **tree_load_on_demand**
 
@@ -30,7 +30,7 @@ Autoescape titles in tree.
 
 **filter_tree_queryset**
 
-Override the **filter_tree_queryset** method to filter the queyset for the tree.
+Override the **filter_tree_queryset** method to filter the queryset for the tree.
 
 ```python
 class CountryAdmin(DjangoMpttAdmin):
