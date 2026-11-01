@@ -333,3 +333,42 @@ class GridViewTestCase(BaseViewTestCase):
         object_tool_buttons = grid_page.pyquery(".object-tools a")
         self.assertEqual(object_tool_buttons.eq(0).attr("href"), "/django_mptt_example/country/add/")
         self.assertEqual(object_tool_buttons.eq(1).attr("href"), "/django_mptt_example/country/")
+
+
+class ItemLabelFieldNameTestCase(BaseViewTestCase):
+    def get_europe_labels(self, model_name):
+        europe = Country.objects.get(name="Europe")
+        json_data = self.app.get(f"/django_mptt_example/{model_name}/tree_json/?node={europe.id}").json
+
+        return {node["id"]: node["name"] for node in json_data}
+
+    def get_continent_labels(self, model_name):
+        [root] = self.app.get(f"/django_mptt_example/{model_name}/tree_json/").json
+
+        return [continent["name"] for continent in root["children"]]
+
+    def test_default_label(self):
+        netherlands = Country.objects.get(code="NL")
+
+        self.assertEqual(self.get_europe_labels("country")[netherlands.id], "Netherlands")
+
+    def test_label_from_property(self):
+        # CountryCodeAdmin uses the code_or_name property
+        netherlands = Country.objects.get(code="NL")
+
+        self.assertEqual(self.get_europe_labels("countrycode")[netherlands.id], "NL")
+        # Continents don't have a code
+        self.assertEqual(self.get_continent_labels("countrycode")[3], "Europe")
+
+    def test_label_with_html(self):
+        # CountryWithHtmlAdmin uses the html_code_and_name property
+        netherlands = Country.objects.get(code="NL")
+
+        self.assertEqual(
+            self.get_europe_labels("countrycodeandname")[netherlands.id],
+            "<strong>NL</strong> Netherlands",
+        )
+        self.assertEqual(self.get_continent_labels("countrycodeandname")[3], "<strong>Europe</strong>")
+
+        countries_page = self.app.get("/django_mptt_example/countrycodeandname/")
+        self.assertEqual(countries_page.pyquery("#tree").attr("data-autoescape"), "false")

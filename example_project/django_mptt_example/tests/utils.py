@@ -1,4 +1,3 @@
-from json import dumps
 from pathlib import Path
 
 from ..models import Country
@@ -14,12 +13,6 @@ def remove_directory(string):  # pragma: no cover
         file.unlink()
 
     path.rmdir()
-
-
-def write_json(path, data):
-    json = dumps(data)
-
-    Path(path).write_text(json)
 
 
 def get_continents():

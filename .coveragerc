@@ -7,6 +7,7 @@ source =
   django_mptt_admin
   django_mptt_example
 omit =
+  */migrations/*
   */django_mptt_example/tests/base_playwright_testcase.py
   */django_mptt_example/tests/playwright_page.py
   */django_mptt_example/tests/test_playwright.py

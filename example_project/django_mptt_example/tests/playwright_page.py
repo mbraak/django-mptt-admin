@@ -1,8 +1,12 @@
+from json import dumps
+from pathlib import Path
 from uuid import uuid4
 
 from playwright.sync_api import ElementHandle, sync_playwright
 
-from .utils import write_json
+
+def write_json(path, data):
+    Path(path).write_text(dumps(data))
 
 
 class PlaywrightPage:
