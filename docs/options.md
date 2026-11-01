@@ -57,6 +57,17 @@ Capture the contextmenu event. NB: the contextmenu event is triggered when you c
   - Also see https://mbraak.github.io/jqTree/#usecontextmenu and https://mbraak.github.io/jqTree/#event-tree-contextmenu
 - False (default): do not capture the contextmenu event.
 
+**trigger_save_after_move**
+
+Call the `save()` method of the node after it's moved with drag-and-drop (True / False). Default is False.
+
+Note that django-mptt already saves the node while moving it, so this saves the node a second time, after the move is complete.
+
+```python
+class CountryAdmin(DjangoMpttAdmin):
+    trigger_save_after_move = True
+```
+
 **item_label_field_name**
 
 Define which field of the model should be the label for tree items.
