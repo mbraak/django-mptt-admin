@@ -32,6 +32,49 @@ Homepage = "https://github.com/mbraak/django-mptt-admin"
 Documentation = "https://mbraak.github.io/django-mptt-admin/"
 Changelog = "https://mbraak.github.io/django-mptt-admin/#changelog"
 
+[dependency-groups]
+# Django version used for local development; CI overrides it per matrix entry
+django = ["Django>=6.1,<6.2"]
+# Packages used by the tests of the example project in example_project/
+test = [
+    "beautifulsoup4==4.15.0",
+    "cssselect==1.5.0",
+    "django-mptt==0.20.0",
+    "django-webtest==1.9.15",
+    "lxml==6.1.3",
+    "playwright==1.64.0",
+    "psycopg==3.3.6",
+    "pyquery==2.1.0",
+    "tblib==3.2.2",
+    "waitress==3.0.2",
+    "WebOb==1.8.11",
+    "WebTest==3.0.7",
+]
+ci = [
+    "coverage==7.16.2",
+    "ruff==0.16.7",
+]
+docs = [
+    "mkdocs-materialx==10.2.2",
+    "properdocs==1.6.7",
+]
+# Installed by default with `uv sync`
+dev = [
+    { include-group = "django" },
+    { include-group = "test" },
+    { include-group = "ci" },
+]
+
+[tool.uv]
+# Ignore package releases newer than 3 days when resolving. This is set here
+# instead of only in a user's uv.toml, so that uv.lock is the same everywhere.
+exclude-newer = "3 days"
+
+[tool.uv.dependency-groups]
+# Django 6.1 needs Python 3.12+; the package itself still supports 3.10+
+django = { requires-python = ">=3.12" }
+dev = { requires-python = ">=3.12" }
+
 [tool.setuptools.packages.find]
 include = ["django_mptt_admin*"]
 
