@@ -5,10 +5,17 @@ on:
     branches:
       - master
       - properdocs-workflow
+  workflow_dispatch:
+
+# Only one deployment at a time; a newer push cancels a pending one, so an
+# older build can never overwrite the docs of a newer commit
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
-    name: Deploy docs
+    name: Build docs
     runs-on: ubuntu-latest
 
     steps:
@@ -25,4 +32,25 @@ jobs:
           pip install -r requirements_docs.txt
 
       - name: Run properdocs
-        run: properdocs gh-deploy --force
+        run: properdocs build --strict
+
+      - name: Upload docs
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    name: Deploy docs
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
