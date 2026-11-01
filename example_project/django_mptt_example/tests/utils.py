@@ -1,18 +1,4 @@
-from pathlib import Path
-
 from ..models import Country
-
-
-def remove_directory(string):  # pragma: no cover
-    path = Path(string)
-
-    if not path.exists():
-        return
-
-    for file in path.iterdir():
-        file.unlink()
-
-    path.rmdir()
 
 
 def get_continents():
