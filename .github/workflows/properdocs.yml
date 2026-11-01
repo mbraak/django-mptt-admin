@@ -22,17 +22,13 @@ jobs:
       - name: Checkout master
         uses: actions/checkout@v7
 
-      - name: Set up Python
-        uses: actions/setup-python@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.3
         with:
-          python-version: 3.12
-
-      - name: Install python packages
-        run: |
-          pip install -r requirements_docs.txt
+          python-version: "3.12"
 
       - name: Run properdocs
-        run: properdocs build --strict
+        run: uv run --locked --only-group docs properdocs build --strict
 
       - name: Upload docs
         uses: actions/upload-pages-artifact@v5

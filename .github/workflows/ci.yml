@@ -53,29 +53,25 @@ jobs:
       - name: Install javascript packages
         working-directory: ./frontend
         run: pnpm install
-      - name: Cache python packages
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements**.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
       - name: Get playwright version
         id: playwright-version
         run: |
-          echo "VERSION=$(grep '^playwright==' example_project/requirements_test.txt | cut -d= -f3)" >> $GITHUB_OUTPUT
+          echo "VERSION=$(grep -o '"playwright==[^"]*"' pyproject.toml | cut -d= -f3 | tr -d '"')" >> $GITHUB_OUTPUT
       - name: Cache playwright browsers
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
-      - name: Set up Python
-        uses: actions/setup-python@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.3.3
         with:
           python-version: "3.12"
       - name: Install python packages
         run: |
-          pip install ${{ matrix.django }} && pip install -r example_project/requirements_test.txt && playwright install chromium && pip install -r example_project/requirements_ci.txt && pip install -e .
+          uv sync --locked
+          uv pip install "${{ matrix.django }}"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          .venv/bin/playwright install chromium
       - name: Build javascript
         working-directory: ./frontend
         run: pnpm run build
