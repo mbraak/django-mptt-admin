@@ -1,8 +1,9 @@
 from unittest import mock
 
+from django.contrib import admin
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.auth.models import User
-from django.test import override_settings
+from django.test import RequestFactory, override_settings
 
 from django_mptt_admin.django_mptt_admin_mixin import DjangoMpttAdminMixin
 
@@ -270,3 +271,65 @@ class TreeMouseDelayTestCase(BaseViewTestCase):
     @mock.patch.object(CountryAdmin, "tree_mouse_delay", 200)
     def test_tree_mouse_delay_attribute(self):
         self.assertEqual(self.get_mouse_delay_attribute(), "200")
+
+
+class MoveViewErrorsTestCase(BaseViewTestCase):
+    # The move requests in these tests don't need a csrf token
+    csrf_checks = False
+
+    def move_url(self):
+        return f"/django_mptt_example/country/{Country.objects.get(code='BV').id:d}/move/"
+
+    def test_move_without_change_permission(self):
+        User.objects.filter(username="admin").update(is_superuser=False)
+
+        self.app.post(
+            self.move_url(),
+            params={"target_id": Country.objects.get(name="Oceania").id, "position": "inside"},
+            status=403,
+        )
+
+        self.assertEqual(Country.objects.get(code="BV").parent.name, "Antarctica")
+
+    def test_move_with_get(self):
+        with self.assertLogs("django.security.SuspiciousOperation", level="ERROR"):
+            self.app.get(self.move_url(), status=400)
+
+        self.assertEqual(Country.objects.get(code="BV").parent.name, "Antarctica")
+
+
+class CsrfCookieNameTestCase(BaseViewTestCase):
+    def get_csrf_cookie_name_attribute(self):
+        countries_page = self.app.get("/django_mptt_example/country/")
+        return countries_page.pyquery("#tree").attr("data-csrf-cookie-name")
+
+    def test_csrf_cookie_name(self):
+        self.assertEqual(self.get_csrf_cookie_name_attribute(), "csrftoken")
+
+    @override_settings(CSRF_COOKIE_NAME="custom_csrf")
+    def test_custom_csrf_cookie_name(self):
+        self.assertEqual(self.get_csrf_cookie_name_attribute(), "custom_csrf")
+
+    @override_settings(CSRF_USE_SESSIONS=True)
+    def test_csrf_use_sessions(self):
+        # The csrf token is stored in the session, so there is no cookie
+        self.assertEqual(self.get_csrf_cookie_name_attribute(), "")
+
+
+class GridViewTestCase(BaseViewTestCase):
+    def test_extra_context(self):
+        request = RequestFactory().get("/django_mptt_example/country/grid/")
+        request.user = User.objects.get(username="admin")
+
+        response = admin.site.get_model_admin(Country).grid_view(request, extra_context={"extra": "value"})
+
+        self.assertEqual(response.context_data["extra"], "value")
+        self.assertEqual(response.context_data["tree_url"], "/django_mptt_example/country/")
+
+    @mock.patch.object(CountryAdmin, "preserve_filters", False)
+    def test_without_preserve_filters(self):
+        grid_page = self.app.get("/django_mptt_example/country/grid/?continent=Europe")
+
+        object_tool_buttons = grid_page.pyquery(".object-tools a")
+        self.assertEqual(object_tool_buttons.eq(0).attr("href"), "/django_mptt_example/country/add/")
+        self.assertEqual(object_tool_buttons.eq(1).attr("href"), "/django_mptt_example/country/")
