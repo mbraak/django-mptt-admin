@@ -66,6 +66,8 @@ jobs:
         uses: astral-sh/setup-uv@v10.3.3
         with:
           python-version: "3.12"
+          # Separate cache per Django version, because it's installed outside uv.lock
+          cache-suffix: ${{ matrix.django }}
       - name: Install python packages
         run: |
           uv sync --locked
