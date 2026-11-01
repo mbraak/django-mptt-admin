@@ -372,3 +372,25 @@ class ItemLabelFieldNameTestCase(BaseViewTestCase):
 
         countries_page = self.app.get("/django_mptt_example/countrycodeandname/")
         self.assertEqual(countries_page.pyquery("#tree").attr("data-autoescape"), "false")
+
+
+class NoFilteringListFilter(admin.SimpleListFilter):
+    """A list filter that doesn't filter; its queryset method returns None"""
+
+    title = "no filtering"
+    parameter_name = "no_filtering"
+
+    def lookups(self, request, model_admin):
+        return [("value", "value")]
+
+    def queryset(self, request, queryset):
+        return None
+
+
+class ListFilterTestCase(BaseViewTestCase):
+    @mock.patch.object(CountryAdmin, "list_filter", (NoFilteringListFilter,))
+    def test_filter_that_returns_none(self):
+        [root] = self.app.get("/django_mptt_example/country/tree_json/?no_filtering=value").json
+
+        self.assertEqual(root["name"], "root")
+        self.assertEqual(len(root["children"]), 7)
