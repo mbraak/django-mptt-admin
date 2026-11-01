@@ -1,6 +1,6 @@
 import type { Node } from "tree-element";
 
-import { screen, waitFor, within } from "@testing-library/dom";
+import { fireEvent, screen, waitFor, within } from "@testing-library/dom";
 import userEvent, { type UserEvent } from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
@@ -912,5 +912,122 @@ describe("selecting a node", () => {
         expect(rootLinks.addLink).toHaveAttribute("tabindex", "-1");
         expect(africaLinks.editLink).toHaveAttribute("tabindex", "0");
         expect(africaLinks.addLink).toHaveAttribute("tabindex", "0");
+    });
+});
+
+describe("edge cases", () => {
+    test("displays an error message when the move request fails", async () => {
+        server.use(http.post("/move", () => HttpResponse.error()));
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = vi.fn();
+        dispatchTreeEvent(treeElement, "tree.move", {
+            moveInfo: {
+                doMove,
+                movedNode: {
+                    element: getNodeElement("Africa"),
+                    id: 2,
+                    move_url: "/move",
+                },
+                position: "after",
+                targetNode: { id: 1 },
+            },
+        });
+
+        expect(
+            await within(getNodeElement("Africa")).findByText("move failed"),
+        ).toBeInTheDocument();
+        expect(doMove).not.toHaveBeenCalled();
+        expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    });
+
+    test("doesn't add add links without an insertAtUrl", async () => {
+        initTestTree(createTreeElement(), { insertAtUrl: undefined });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+        expect(
+            screen.getAllByRole("link", { name: /^Edit / }),
+        ).toHaveLength(2);
+        expect(
+            screen.queryAllByRole("link", { name: /^Add child to / }),
+        ).toHaveLength(0);
+    });
+
+    test("renders focusable links for a node that is selected when it's rendered", async () => {
+        // The saved state selects Africa, so it's selected when it's rendered
+        localStorage.setItem(
+            "myapp_mymodel",
+            JSON.stringify({ open_nodes: [1], selected_node: [2] }),
+        );
+
+        initTestTree(createTreeElement(), {
+            autoOpen: false,
+            saveState: "myapp_mymodel",
+        });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const africaElement = getNodeElement("Africa");
+
+        expect(
+            within(africaElement).getByRole("link", { name: "Edit Africa" }),
+        ).toHaveAttribute("tabindex", "0");
+        expect(
+            within(africaElement).getByRole("link", { name: "Add child to Africa" }),
+        ).toHaveAttribute("tabindex", "0");
+    });
+
+    test("ignores loading events for a node without an element or id", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        // A node without an element: there is no place for the spinner
+        dispatchTreeEvent(treeElement, "tree.loading_data", { node: { id: 5 } });
+        dispatchTreeEvent(treeElement, "tree.loaded_data", { node: { id: 5 } });
+
+        // A node without an id: the spinner can't be found again
+        const africaElement = getNodeElement("Africa");
+        dispatchTreeEvent(treeElement, "tree.loading_data", {
+            node: { element: africaElement },
+        });
+        dispatchTreeEvent(treeElement, "tree.loaded_data", {
+            node: { element: africaElement },
+        });
+
+        expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    });
+});
+
+describe("mouseDelay", () => {
+    const pressMouseOnNode = async (options?: Partial<InitTreeOptions>) => {
+        initTestTree(createTreeElement(), { dragAndDrop: true, ...options });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const setTimeoutSpy = vi.spyOn(window, "setTimeout");
+        fireEvent.mouseDown(getNodeTitle("Africa"), { button: 0 });
+
+        const delays = setTimeoutSpy.mock.calls.map(([, delay]) => delay);
+        setTimeoutSpy.mockRestore();
+
+        return delays;
+    };
+
+    test("passes the mouse delay to the tree", async () => {
+        expect(await pressMouseOnNode({ mouseDelay: 500 })).toContain(500);
+    });
+
+    test("starts dragging without a delay when the mouse delay is 0", async () => {
+        expect(await pressMouseOnNode({ mouseDelay: 0 })).toHaveLength(0);
+    });
+
+    test("uses the default delay of the tree without a mouse delay", async () => {
+        expect(await pressMouseOnNode()).toContain(300);
     });
 });

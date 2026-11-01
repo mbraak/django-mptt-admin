@@ -10,9 +10,9 @@ Auto-open node. Default value is 1.
 
 Values:
 
-- **True**: autopen all nodes
-- **False**: do not autoopen
-- **integer**: autopen until this level
+- **True**: open all nodes automatically
+- **False**: do not open any node automatically
+- **integer**: open automatically until this level
 
 **tree_load_on_demand**
 
@@ -30,7 +30,7 @@ Autoescape titles in tree.
 
 **filter_tree_queryset**
 
-Override the **filter_tree_queryset** method to filter the queyset for the tree.
+Override the **filter_tree_queryset** method to filter the queryset for the tree.
 
 ```python
 class CountryAdmin(DjangoMpttAdmin):
@@ -56,6 +56,17 @@ Capture the contextmenu event. NB: the contextmenu event is triggered when you c
   - This is useful if you want to write custom javascript to catch the `tree.contextmenu` event.
   - Also see https://mbraak.github.io/jqTree/#usecontextmenu and https://mbraak.github.io/jqTree/#event-tree-contextmenu
 - False (default): do not capture the contextmenu event.
+
+**trigger_save_after_move**
+
+Call the `save()` method of the node after it's moved with drag-and-drop (True / False). Default is False.
+
+Note that django-mptt already saves the node while moving it, so this saves the node a second time, after the move is complete.
+
+```python
+class CountryAdmin(DjangoMpttAdmin):
+    trigger_save_after_move = True
+```
 
 **item_label_field_name**
 
