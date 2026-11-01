@@ -1,8 +1,12 @@
+from json import dumps
+from pathlib import Path
 from uuid import uuid4
 
 from playwright.sync_api import ElementHandle, sync_playwright
 
-from .utils import write_json
+
+def write_json(path, data):
+    Path(path).write_text(dumps(data))
 
 
 class PlaywrightPage:
@@ -109,9 +113,11 @@ class PlaywrightPage:
 
     def open_node(self, title):
         self.toggle_node(title)
-        node_element = self.find_node_element(title)
 
-        self.page.wait_for_function("el => !el.classList.contains('jqtree-loading')", arg=node_element)
+        # Wait until the node is loaded and the slide animation is finished; the 'jqtree-closed' class
+        # is removed after the animation. Clicking a child during the animation can miss its target.
+        # Look up the node element each time, because it is re-rendered after loading.
+        self.wait_for_node_classes(title, present=[], absent=["jqtree-loading", "jqtree-closed"])
 
     def save_coverage(self):
         coverage = self.page.evaluate_handle(
@@ -132,8 +138,15 @@ class PlaywrightPage:
     def select_node(self, title):
         self.find_title_element(title).click()
 
-    def selected_node(self):
-        return self.page.query_selector(".jqtree-selected > .jqtree-element > .jqtree-title")
+        # Make sure the click selected the node before continuing
+        self.wait_for_node_classes(title, present=["jqtree-selected"], absent=[])
+
+    def selected_node(self) -> ElementHandle:
+        # Wait, because tree-element restores the selection from the saved state only
+        # after it has loaded and rendered the open nodes
+        element = self.page.wait_for_selector(".jqtree-selected > .jqtree-element > .jqtree-title")
+        assert element
+        return element
 
     def toggle_node(self, title):
         node_element = self.find_node_element(title)
@@ -164,6 +177,25 @@ class PlaywrightPage:
 
     def wait_for_node(self, title):
         self.page.wait_for_selector(f'css=#tree .jqtree-title >> text="{title}"')
+
+    def wait_for_node_classes(self, title, present, absent):
+        self.page.wait_for_function(
+            """
+            ({ title, present, absent }) => {
+                const titleElement = [...document.querySelectorAll("#tree .jqtree-title")].find(
+                    (el) => el.textContent === title
+                );
+                const li = titleElement?.closest("li");
+
+                return (
+                    li != null &&
+                    present.every((c) => li.classList.contains(c)) &&
+                    !absent.some((c) => li.classList.contains(c))
+                );
+            }
+            """,
+            arg={"title": title, "present": present, "absent": absent},
+        )
 
     def wait_for_text(self, text):
         self.page.wait_for_selector(f'text="{text}"')

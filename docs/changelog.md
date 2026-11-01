@@ -1,6 +1,6 @@
 # Changelog
 
-**development**
+**3.1.1** (november 1 2026)
 
 - Make the tree readable for screen readers.
 

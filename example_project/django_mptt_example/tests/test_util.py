@@ -62,6 +62,15 @@ class GetTreeFromQuerySetTestCase(TestCase):
         african_countries = continents[0]["children"]
         self.assertEqual(african_countries[0]["name"], "DZ")
 
+    def test_node_without_parent_in_queryset(self):
+        # The continents are not in the queryset, e.g. because a filter removed them;
+        # the countries can't be attached to the tree, so they are left out
+        queryset = Country.objects.exclude(level=1).order_by("tree_id", "lft")
+
+        tree = get_tree_from_queryset(queryset)
+
+        self.assertEqual(tree, [{"name": "root", "id": Country.objects.get(name="root").id}])
+
 
 class SerializeIdTestCase(TestCase):
     testcases = (

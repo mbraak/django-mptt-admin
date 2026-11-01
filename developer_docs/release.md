@@ -11,11 +11,15 @@ The release requires a trusted publisher setup on pypi.org.
 ## Release steps
 
 1. Make sure `master` is green in CI.
-2. Update the version in `pyproject.toml`:
+2. Update the version:
 
-   ```toml
-   version = "2.10.1"
+   ```sh
+   uv version 2.10.1
    ```
+
+   This updates the version in both `pyproject.toml` and `uv.lock`. Don't
+   edit `pyproject.toml` by hand: CI installs with `uv sync --locked`, which
+   fails if `uv.lock` is out of date.
 
 3. Add an entry at the top of the changelog in `docs/changelog.md`, following the
    existing format:
@@ -30,7 +34,9 @@ The release requires a trusted publisher setup on pypi.org.
    - the classifiers in `pyproject.toml`
    - the supported versions in `docs/index.md`
    - the Django matrix in `.github/workflows/ci.yml` and `tox.ini`
-5. Commit and push to `master`, and wait for CI to pass.
+   - the `django` dependency group in `pyproject.toml` (the version used for
+     local development), followed by `uv lock`
+5. Commit (including `uv.lock`) and push to `master`, and wait for CI to pass.
 6. Tag the commit and push the tag. The tag must be exactly the version
    number, without a `v` prefix:
 
@@ -62,7 +68,7 @@ requires a trusted publisher setup on test.pypi.org with the environment name
 
 1. **Build**: checks that the tag equals the version in `pyproject.toml`,
    rebuilds the javascript bundle with `pnpm run build`, builds the wheel and
-   sdist with `python -m build`, and validates them with `twine check`.
+   sdist with `uv build`, and validates them with `twine check`.
 2. **Publish to PyPI**: uploads the wheel and sdist using trusted publishing.
 3. **Create GitHub release**: creates a release for the tag with
    auto-generated notes and the built files attached.
@@ -78,8 +84,7 @@ only used by the test suite.
 To check the contents of a build locally:
 
 ```sh
-pip install build
-python -m build
+uv build
 unzip -l dist/*.whl
 ```
 
