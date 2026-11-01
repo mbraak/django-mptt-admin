@@ -132,8 +132,12 @@ class PlaywrightPage:
     def select_node(self, title):
         self.find_title_element(title).click()
 
-    def selected_node(self):
-        return self.page.query_selector(".jqtree-selected > .jqtree-element > .jqtree-title")
+    def selected_node(self) -> ElementHandle:
+        # Wait, because tree-element restores the selection from the saved state only
+        # after it has loaded and rendered the open nodes
+        element = self.page.wait_for_selector(".jqtree-selected > .jqtree-element > .jqtree-title")
+        assert element
+        return element
 
     def toggle_node(self, title):
         node_element = self.find_node_element(title)
