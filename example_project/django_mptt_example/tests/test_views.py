@@ -129,13 +129,23 @@ class FilterTestCase(BaseViewTestCase):
 
         country_node = root["children"][0]
 
-        expected_changelist_filters = "continent%3D%255B%2527Europe%2527%255D"
+        expected_changelist_filters = "continent%3DEurope"
         node_id = country_node["id"]
 
         self.assertEqual(
             country_node["url"],
             f"/django_mptt_example/country/{node_id}/change/?_changelist_filters={expected_changelist_filters}",
         )
+
+    def test_save_node_keeps_filter(self):
+        json_data = self.app.get("/django_mptt_example/country/tree_json/?continent=Europe").json
+        country_node = json_data[0]["children"][0]
+
+        # Edit the node and save it; this returns to the tree with the same filter
+        change_page = self.app.get(country_node["url"])
+        response = change_page.forms["country_form"].submit("_save")
+
+        self.assertEqual(response.location, "/django_mptt_example/country/?continent=Europe")
 
     def test_tree_params_are_not_preserved_filters(self):
         # The 'node' and '_' (cache buster) parameters of a load-on-demand request
