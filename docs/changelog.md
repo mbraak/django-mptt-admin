@@ -1,5 +1,9 @@
 # Changelog
 
+**development**
+
+- Fix: include the app label in the key for the saved tree state. Models with the same name in different apps no longer share their saved state. The saved state (open and selected nodes) is reset once after upgrading.
+
 **3.1.1** (november 1 2026)
 
 - Make the tree readable for screen readers.

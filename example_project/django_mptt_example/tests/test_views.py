@@ -289,6 +289,11 @@ class TreeOptionsTestCase(BaseViewTestCase):
         self.assertEqual(attributes["data-use_context_menu"], "false")
         self.assertNotIn("data-tree-animation-speed", attributes)
 
+    def test_save_state(self):
+        attributes = self.get_tree_attributes()
+
+        self.assertEqual(attributes["data-save_state"], "django_mptt_example_country")
+
     @mock.patch.object(CountryAdmin, "tree_animation_speed", 200)
     @mock.patch.object(CountryAdmin, "use_context_menu", True)
     def test_custom_options(self):
