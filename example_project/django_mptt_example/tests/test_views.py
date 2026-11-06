@@ -137,6 +137,22 @@ class FilterTestCase(BaseViewTestCase):
             f"/django_mptt_example/country/{node_id}/change/?_changelist_filters={expected_changelist_filters}",
         )
 
+    def test_tree_params_are_not_preserved_filters(self):
+        # The 'node' and '_' (cache buster) parameters of a load-on-demand request
+        # are not filters, so they are not added to the urls of the nodes
+        europe = Country.objects.get(name="Europe")
+
+        json_data = self.app.get(f"/django_mptt_example/country/tree_json/?node={europe.id}&_=123").json
+
+        country_node = json_data[0]
+        self.assertEqual(country_node["url"], f"/django_mptt_example/country/{country_node['id']}/change/")
+
+    def test_clear_all_filters(self):
+        countries_page = self.app.get("/django_mptt_example/country/?continent=Europe")
+
+        clear_link = countries_page.pyquery("#changelist-filter a:contains('Clear all filters')")
+        self.assertEqual(clear_link.attr("href"), "?")
+
     def test_urls(self):
         countries_page = self.app.get("/django_mptt_example/country/?continent=Europe")
 
