@@ -273,6 +273,31 @@ class TreeMouseDelayTestCase(BaseViewTestCase):
         self.assertEqual(self.get_mouse_delay_attribute(), "200")
 
 
+class TreeOptionsTestCase(BaseViewTestCase):
+    def get_tree_attributes(self):
+        countries_page = self.app.get("/django_mptt_example/country/")
+        tree_div = countries_page.pyquery("#tree")[0]
+        return {key: value for key, value in tree_div.attrib.items() if key.startswith("data-")}
+
+    # The example admin overrides tree_auto_open; use the default of the mixin
+    @mock.patch.object(CountryAdmin, "tree_auto_open", DjangoMpttAdminMixin.tree_auto_open)
+    def test_default_options(self):
+        attributes = self.get_tree_attributes()
+
+        self.assertEqual(attributes["data-auto_open"], "1")
+        self.assertEqual(attributes["data-autoescape"], "true")
+        self.assertEqual(attributes["data-use_context_menu"], "false")
+        self.assertNotIn("data-tree-animation-speed", attributes)
+
+    @mock.patch.object(CountryAdmin, "tree_animation_speed", 200)
+    @mock.patch.object(CountryAdmin, "use_context_menu", True)
+    def test_custom_options(self):
+        attributes = self.get_tree_attributes()
+
+        self.assertEqual(attributes["data-tree-animation-speed"], "200")
+        self.assertEqual(attributes["data-use_context_menu"], "true")
+
+
 class MoveViewErrorsTestCase(BaseViewTestCase):
     # The move requests in these tests don't need a csrf token
     csrf_checks = False
