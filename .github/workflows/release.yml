@@ -9,16 +9,22 @@ on:
       - "[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   build:
     name: Build package
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Read the package version
         id: version
@@ -28,19 +34,25 @@ jobs:
 
       - name: Check that the tag matches the package version
         if: github.event_name == 'push'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          if [ "${{ steps.version.outputs.version }}" != "$GITHUB_REF_NAME" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match version ${{ steps.version.outputs.version }} in pyproject.toml"
+          if [ "$VERSION" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match version $VERSION in pyproject.toml"
             exit 1
           fi
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
+          # No caches in the release job, so a poisoned cache cannot end up in the package
+          package-manager-cache: false
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: frontend/package.json
 
       - name: Install javascript packages
         working-directory: ./frontend
@@ -51,9 +63,11 @@ jobs:
         run: pnpm run build
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.3
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           python-version: "3.12"
+          # No caches in the release job, so a poisoned cache cannot end up in the package
+          enable-cache: false
 
       - name: Build python package
         run: |
@@ -61,7 +75,7 @@ jobs:
           uvx twine check --strict dist/*
 
       - name: Upload package
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist
           path: dist/
@@ -78,18 +92,18 @@ jobs:
 
     steps:
       - name: Download package
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist
           path: dist/
 
       - name: Publish to PyPI
         if: github.event_name == 'push'
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
 
       - name: Publish to TestPyPI (dry run)
         if: github.event_name == 'workflow_dispatch'
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
         with:
           repository-url: https://test.pypi.org/legacy/
           skip-existing: true
@@ -103,13 +117,13 @@ jobs:
 
     steps:
       - name: Download package
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist
           path: dist/
 
       - name: Create release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: ${{ needs.build.outputs.version }}
           draft: ${{ github.event_name == 'workflow_dispatch' }}
