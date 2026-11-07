@@ -2,16 +2,20 @@ name: Continuous integration
 
 on: [push]
 
+permissions: {}
+
 jobs:
   runner-job:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     strategy:
       matrix:
         django: ["django==5.2.18", "django==6.0.9", "django==6.1.2"]
     services:
       postgres:
-        image: postgres
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
         options: >-
@@ -24,9 +28,11 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Check spelling
-        uses: streetsidesoftware/cspell-action@v9
+        uses: streetsidesoftware/cspell-action@ce1816e4ce36532956ac6e983737392774b6e169 # v9.2.0
         with:
           files: |
             frontend/src/**/*.ts
@@ -34,16 +40,18 @@ jobs:
             example_project/**/*.py
           incremental_files_only: false
       - name: Setup node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "24"
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: frontend/package.json
       - name: Get pnpm store directory
         id: pnpm-cache
         run: |
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-      - uses: actions/cache@v6
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         name: Setup pnpm cache
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -58,12 +66,12 @@ jobs:
         run: |
           echo "VERSION=$(grep -o '"playwright==[^"]*"' pyproject.toml | cut -d= -f3 | tr -d '"')" >> $GITHUB_OUTPUT
       - name: Cache playwright browsers
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.VERSION }}
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.3
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           python-version: "3.12"
           # Separate cache per Django version, because it's installed outside uv.lock
@@ -98,7 +106,7 @@ jobs:
         working-directory: ./coverage
         run: pnpm i && pnpm run merge_coverage
       - name: Codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
