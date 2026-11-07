@@ -129,13 +129,39 @@ class FilterTestCase(BaseViewTestCase):
 
         country_node = root["children"][0]
 
-        expected_changelist_filters = "continent%3D%255B%2527Europe%2527%255D"
+        expected_changelist_filters = "continent%3DEurope"
         node_id = country_node["id"]
 
         self.assertEqual(
             country_node["url"],
             f"/django_mptt_example/country/{node_id}/change/?_changelist_filters={expected_changelist_filters}",
         )
+
+    def test_save_node_keeps_filter(self):
+        json_data = self.app.get("/django_mptt_example/country/tree_json/?continent=Europe").json
+        country_node = json_data[0]["children"][0]
+
+        # Edit the node and save it; this returns to the tree with the same filter
+        change_page = self.app.get(country_node["url"])
+        response = change_page.forms["country_form"].submit("_save")
+
+        self.assertEqual(response.location, "/django_mptt_example/country/?continent=Europe")
+
+    def test_tree_params_are_not_preserved_filters(self):
+        # The 'node' and '_' (cache buster) parameters of a load-on-demand request
+        # are not filters, so they are not added to the urls of the nodes
+        europe = Country.objects.get(name="Europe")
+
+        json_data = self.app.get(f"/django_mptt_example/country/tree_json/?node={europe.id}&_=123").json
+
+        country_node = json_data[0]
+        self.assertEqual(country_node["url"], f"/django_mptt_example/country/{country_node['id']}/change/")
+
+    def test_clear_all_filters(self):
+        countries_page = self.app.get("/django_mptt_example/country/?continent=Europe")
+
+        clear_link = countries_page.pyquery("#changelist-filter a:contains('Clear all filters')")
+        self.assertEqual(clear_link.attr("href"), "?")
 
     def test_urls(self):
         countries_page = self.app.get("/django_mptt_example/country/?continent=Europe")
@@ -271,6 +297,36 @@ class TreeMouseDelayTestCase(BaseViewTestCase):
     @mock.patch.object(CountryAdmin, "tree_mouse_delay", 200)
     def test_tree_mouse_delay_attribute(self):
         self.assertEqual(self.get_mouse_delay_attribute(), "200")
+
+
+class TreeOptionsTestCase(BaseViewTestCase):
+    def get_tree_attributes(self):
+        countries_page = self.app.get("/django_mptt_example/country/")
+        tree_div = countries_page.pyquery("#tree")[0]
+        return {key: value for key, value in tree_div.attrib.items() if key.startswith("data-")}
+
+    # The example admin overrides tree_auto_open; use the default of the mixin
+    @mock.patch.object(CountryAdmin, "tree_auto_open", DjangoMpttAdminMixin.tree_auto_open)
+    def test_default_options(self):
+        attributes = self.get_tree_attributes()
+
+        self.assertEqual(attributes["data-auto_open"], "1")
+        self.assertEqual(attributes["data-autoescape"], "true")
+        self.assertEqual(attributes["data-use_context_menu"], "false")
+        self.assertNotIn("data-tree-animation-speed", attributes)
+
+    def test_save_state(self):
+        attributes = self.get_tree_attributes()
+
+        self.assertEqual(attributes["data-save_state"], "django_mptt_example_country")
+
+    @mock.patch.object(CountryAdmin, "tree_animation_speed", 200)
+    @mock.patch.object(CountryAdmin, "use_context_menu", True)
+    def test_custom_options(self):
+        attributes = self.get_tree_attributes()
+
+        self.assertEqual(attributes["data-tree-animation-speed"], "200")
+        self.assertEqual(attributes["data-use_context_menu"], "true")
 
 
 class MoveViewErrorsTestCase(BaseViewTestCase):
