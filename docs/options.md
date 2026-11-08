@@ -1,10 +1,10 @@
 # Options
 
-**tree_animation_speed**
+**`tree_animation_speed`**
 
 The speed of the open/close animation in milliseconds. The default is 200 milliseconds.
 
-**tree_auto_open**
+**`tree_auto_open`**
 
 Auto-open node. Default value is 1.
 
@@ -14,7 +14,7 @@ Values:
 - **False**: do not open any node automatically
 - **integer**: open automatically until this level
 
-**tree_load_on_demand**
+**`tree_load_on_demand`**
 
 Load on demand (True / False / level). Default is True.
 
@@ -22,15 +22,15 @@ Load on demand (True / False / level). Default is True.
 - **False**: do not load nodes on demand
 - **int**: load nodes on demand until this level
 
-**autoescape**
+**`autoescape`**
 
 Autoescape (True / False). Default is True.
 
 Autoescape titles in tree.
 
-**filter_tree_queryset**
+**`filter_tree_queryset`**
 
-Override the **filter_tree_queryset** method to filter the queryset for the tree.
+Override the `filter_tree_queryset` method to filter the queryset for the tree.
 
 ```python
 class CountryAdmin(DjangoMpttAdmin):
@@ -38,9 +38,9 @@ class CountryAdmin(DjangoMpttAdmin):
     return queryset.filter(name='abc')
 ```
 
-**is_drag_and_drop_enabled**
+**`is_drag_and_drop_enabled`**
 
-Override the **is_drag_and_drop_enabled** method to disable drag-and-drop. By default drag-and-drop is enabled.
+Override the `is_drag_and_drop_enabled` method to disable drag-and-drop. By default drag-and-drop is enabled.
 
 ```python
 class CountryAdmin(DjangoMpttAdmin):
@@ -48,16 +48,16 @@ class CountryAdmin(DjangoMpttAdmin):
     return False
 ```
 
-**use_context_menu**
+**`use_context_menu`**
 
 Capture the contextmenu event. NB: the contextmenu event is triggered when you click with the right mouse button.
 
-- True: Capture the contextmenu event.
-  - This is useful if you want to write custom javascript to catch the `tree.contextmenu` event.
+- True: capture the contextmenu event.
+  - This is useful if you want to write custom JavaScript to catch the `tree.contextmenu` event.
   - Also see https://mbraak.github.io/jqTree/#usecontextmenu and https://mbraak.github.io/jqTree/#event-tree-contextmenu
 - False (default): do not capture the contextmenu event.
 
-**trigger_save_after_move**
+**`trigger_save_after_move`**
 
 Call the `save()` method of the node after it's moved with drag-and-drop (True / False). Default is False.
 
@@ -68,14 +68,14 @@ class CountryAdmin(DjangoMpttAdmin):
     trigger_save_after_move = True
 ```
 
-**item_label_field_name**
+**`item_label_field_name`**
 
 Define which field of the model should be the label for tree items.
 
 Possible values are:
 
 - string: name of the model field or model property method to use as tree items label
-- None (default): model unicode used ad tree item label
+- None (default): the string representation of the model is used as the tree item label
 
 Example:
 
