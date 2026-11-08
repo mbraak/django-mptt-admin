@@ -20,3 +20,5 @@ mise.toml
 node_modules/
 site/
 venv.txt
+.github/styles/*
+!.github/styles/config/
