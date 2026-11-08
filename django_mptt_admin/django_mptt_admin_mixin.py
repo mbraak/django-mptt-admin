@@ -81,6 +81,7 @@ class DjangoMpttAdminMixin:
         insert_at_url = get_admin_url_with_preserved_filters("add")
 
         tree_options = {
+            "app_label": self.opts.app_label,
             "autoescape": self.autoescape,
             "csrf_cookie_name": get_csrf_cookie_name(),
             "drag_and_drop": self.is_drag_and_drop_enabled(),
@@ -225,7 +226,8 @@ class DjangoMpttAdminMixin:
     def get_tree_data(self: Union[ModelAdmin, "DjangoMpttAdminMixin"], qs, max_level, filters_params):
         pk_attname = self.opts.pk.attname
 
-        preserved_filters = urlencode({"_changelist_filters": urlencode(filters_params)})
+        # The values of filters_params are lists, so use doseq
+        preserved_filters = urlencode({"_changelist_filters": urlencode(filters_params, doseq=True)})
 
         def add_preserved_filters_to_url(url):
             return add_preserved_filters({"preserved_filters": preserved_filters, "opts": self.opts}, url)

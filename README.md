@@ -4,7 +4,7 @@
 
 [![License](https://img.shields.io/pypi/l/django-mptt-admin.svg)](https://pypi.python.org/pypi/django-mptt-admin/)
 
-# Django Mptt Admin
+# django-mptt-admin
 
 _Django-mptt-admin_ provides a nice Django Admin interface for [django-mptt models](https://django-mptt.readthedocs.io/).
 

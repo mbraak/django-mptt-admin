@@ -24,6 +24,12 @@ class GetQuerySetTestCase(TestCase):
         self.assertEqual(len(qs), 50)
         self.assertEqual(qs[0].name, "Åland Islands")
 
+    def test_subtree_default_max_level(self):
+        # Without max_level, only the direct children of the node are returned
+        qs = get_tree_queryset(Country, node_id=Country.objects.get(name="root").id)
+        self.assertEqual(len(qs), 7)
+        self.assertEqual(qs[0].name, "Africa")
+
     def test_max_level_1(self):
         qs = get_tree_queryset(Country, max_level=1)
         self.assertEqual(len(qs), 8)
@@ -32,6 +38,11 @@ class GetQuerySetTestCase(TestCase):
     def test_max_level_true(self):
         qs = get_tree_queryset(Country, max_level=True)
         self.assertEqual(len(qs), 8)
+
+    def test_max_level_false(self):
+        # False means no maximum level, even though False is an int
+        qs = get_tree_queryset(Country, max_level=False)
+        self.assertEqual(len(qs), 257)
 
     def test_exclude_root(self):
         qs = get_tree_queryset(Country, include_root=False)
@@ -54,6 +65,24 @@ class GetTreeFromQuerySetTestCase(TestCase):
 
         african_countries = continents[0]["children"]
         self.assertEqual(african_countries[0]["name"], "Algeria")
+
+        # Without max_level, load_on_demand is never set
+        self.assertNotIn("load_on_demand", root)
+        self.assertNotIn("load_on_demand", continents[0])
+        self.assertNotIn("load_on_demand", african_countries[0])
+
+    def test_max_level(self):
+        tree = get_tree_from_queryset(get_tree_queryset(Country, max_level=1), max_level=1)
+
+        # The root's children are loaded, so it is not loaded on demand
+        [root] = tree
+        self.assertIs(root["load_on_demand"], False)
+
+        # The continents have children that are not loaded
+        continents = root["children"]
+        self.assertEqual(len(continents), 7)
+        self.assertTrue(all(continent["load_on_demand"] is True for continent in continents))
+        self.assertTrue(all("children" not in continent for continent in continents))
 
     def test_format_label(self):
         tree = get_tree_from_queryset(get_tree_queryset(Country), item_label_field_name="code")

@@ -1,4 +1,4 @@
-# Django Mptt Admin
+# django-mptt-admin
 
 _Django-mptt-admin_ provides a nice Django Admin interface for [django-mptt models](http://django-mptt.github.io/django-mptt/).
 
@@ -26,7 +26,7 @@ Install the package:
 $ pip install django-mptt-admin
 ```
 
-Add **django_mptt_admin** to your installed apps in **settings.py**.
+Add `django_mptt_admin` to your installed apps in `settings.py`.
 
 ```python
   INSTALLED_APPS = (

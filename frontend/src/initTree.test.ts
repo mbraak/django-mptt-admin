@@ -251,6 +251,7 @@ test("adds edit links when hasChangePermission is true", async () => {
 
     expect(editLinks).toHaveLength(2);
     expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
+    expect(editLinks[0]?.textContent).toBe("(edit)");
 
     expect(screen.queryAllByRole("link", { name: /^View / })).toHaveLength(0);
 });
@@ -266,6 +267,7 @@ test("adds view links when hasChangePermission is false", async () => {
 
     expect(editLinks).toHaveLength(2);
     expect(editLinks[0]?.href).toBe("http://localhost:3000/edit/1");
+    expect(editLinks[0]?.textContent).toBe("(view)");
 
     expect(screen.queryAllByRole("link", { name: /^Edit / })).toHaveLength(0);
 });
@@ -281,6 +283,7 @@ test("adds add links when hasAddPermission is true", async () => {
 
     expect(addLinks).toHaveLength(2);
     expect(addLinks[0]?.href).toBe("http://localhost:3000/add?insert_at=1");
+    expect(addLinks[0]?.textContent).toBe("(add)");
 });
 
 test("labels the edit and add links with the node name", async () => {
@@ -698,6 +701,64 @@ describe("tree.move event", () => {
         expect(requestPaths).toStrictEqual(["/move"]);
     });
 
+    test("doesn't let the tree move the node before the server responds", async () => {
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        // This listener runs after the listener of initTree
+        let moveEvent: Event | undefined;
+        treeElement.addEventListener("tree.move", (e) => {
+            moveEvent = e;
+        });
+
+        const doMove = triggerTreeMove(treeElement);
+
+        // The tree only moves the node itself when the event isn't cancelled
+        expect(moveEvent?.defaultPrevented).toBe(true);
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+    });
+
+    test("displays a spinner while the move request is pending", async () => {
+        // Delay the response, so the test can check the spinner
+        let sendResponse = () => {
+            // do nothing
+        };
+        const responseSent = new Promise<void>((resolve) => {
+            sendResponse = resolve;
+        });
+
+        server.use(
+            http.post("/move", async () => {
+                await responseSent;
+                return HttpResponse.json({});
+            }),
+        );
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement);
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = triggerTreeMove(treeElement);
+
+        const spinner = screen.getByRole("status", { name: "Loading" });
+
+        expect(spinner.parentElement).toBe(treeElement);
+
+        sendResponse();
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+
+        expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    });
+
     test("calls doMove", async () => {
         const treeElement = createTreeElement();
         initTestTree(treeElement);
@@ -828,6 +889,35 @@ describe("tree.move event", () => {
             expect(doMove).toHaveBeenCalled();
         });
 
+        expect(csrfTokenInRequest).toBe("csrf_test");
+    });
+
+    test("sets the csrf cookie with a hidden csrf input when csrfCookieName is empty", async () => {
+        // With CSRF_USE_SESSIONS, the csrf cookie name is empty and there may be no
+        // cookies at all, because the session cookie is HttpOnly
+        for (const cookie of document.cookie.split("; ")) {
+            const name = cookie.split("=")[0] ?? "";
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        }
+
+        const csrfInput = document.createElement("input");
+        csrfInput.setAttribute("name", "csrfmiddlewaretoken");
+        csrfInput.setAttribute("value", "csrf_test");
+        csrfInput.setAttribute("type", "hidden");
+        document.body.append(csrfInput);
+
+        const treeElement = createTreeElement();
+        initTestTree(treeElement, { csrfCookieName: "" });
+
+        expect(await screen.findByRole("tree")).toBeInTheDocument();
+
+        const doMove = triggerTreeMove(treeElement);
+
+        await waitFor(() => {
+            expect(doMove).toHaveBeenCalled();
+        });
+
+        expect(document.cookie).toBe("");
         expect(csrfTokenInRequest).toBe("csrf_test");
     });
 });

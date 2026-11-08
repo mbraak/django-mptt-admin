@@ -13,17 +13,23 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   build:
     name: Build docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout master
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10.3.3
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           python-version: "3.12"
 
@@ -31,14 +37,15 @@ jobs:
         run: uv run --locked --only-group docs properdocs build --strict
 
       - name: Upload docs
-        uses: actions/upload-pages-artifact@v5
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: site
 
   deploy:
     name: Deploy docs
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+    # Allow the GITHUB_TOKEN to deploy to GitHub Pages
     permissions:
       pages: write
       id-token: write
@@ -49,4 +56,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

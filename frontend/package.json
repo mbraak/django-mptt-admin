@@ -1,6 +1,7 @@
 {
     "name": "django-mptt-admin",
     "version": "1.0.0",
+    "packageManager": "pnpm@12.16.1",
     "description": "Frontend code for django-mptt-admin",
     "main": "index.js",
     "scripts": {
