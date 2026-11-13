@@ -2,6 +2,10 @@ allowBuilds:
     "@parcel/watcher": true
     msw: true
     unrs-resolver: true
+minimumReleaseAgeExclude:
+  - stylelint-config-recommended-scss@18.0.0
+  - stylelint-config-standard-scss@18.0.0
+  - stylelint-scss@7.5.0
 overrides:
     "@istanbuljs/load-nyc-config>js-yaml": ^4.1.0
     "babel-plugin-istanbul>test-exclude": ^8.0.0
