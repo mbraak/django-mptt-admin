@@ -52,7 +52,7 @@ test = [
 ]
 ci = [
     "coverage==7.16.2",
-    "ruff==0.17.3",
+    "ruff==0.17.4",
 ]
 docs = [
     "mkdocs-materialx==10.2.2",
