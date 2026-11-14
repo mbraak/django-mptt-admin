@@ -66,9 +66,7 @@ dev = [
 ]
 
 [tool.uv]
-# Ignore package releases newer than 3 days when resolving. This is set here
-# instead of only in a user's uv.toml, so that uv.lock is the same everywhere.
-exclude-newer = "3 days"
+exclude-newer = "7 days"
 
 [tool.uv.dependency-groups]
 # Django 6.1 needs Python 3.12+; the package itself still supports 3.10+
