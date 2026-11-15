@@ -168,14 +168,15 @@ overrides:
   glob@>=9.0.0 <=14.0.1: ^14.0.2
   minimatch@<11.0.1: ^11.0.1
   eslint-plugin-import-x>minimatch: ^10.2.6
+  tree-element: ^0.4.1
 
 importers:
 
   .:
     dependencies:
       tree-element:
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.4.1
+        version: 0.4.1
     devDependencies:
       '@babel/core':
         specifier: ^8.1.2
@@ -3418,8 +3419,8 @@ packages:
     resolution: {integrity: sha512-BcDSDW+SIGWVOns1Zm6Yg91q9AEj7eaID0QDY9oIqJD1A8dscNwMcl9Sms2DeuWCNov1X0/oXanHGYQBSLwZsg==}
     engines: {node: ^22.14.0 || >=24.0.0}
 
-  tree-element@0.4.0:
-    resolution: {integrity: sha512-SRu3JMOHaBzC0S6PNII9ZrE48cMkShGa07wIn4UcxdXl5BqkvKMubauvgFs7Vakz6FqBzKVjasXSWsks8psEAg==}
+  tree-element@0.4.1:
+    resolution: {integrity: sha512-o1imhbjAZ4vnCe3ZwhgQnuQKbPR6+9kdQm6RtmwA2l9qnX2kfejGP9uj/qxSEEBcnnrZ6U+nMVh94G6gDSt9jA==}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -6813,7 +6814,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  tree-element@0.4.0: {}
+  tree-element@0.4.1: {}
 
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:

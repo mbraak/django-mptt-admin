@@ -4,6 +4,7 @@
 
 - Fix: include the app label in the key for the saved tree state. Models with the same name in different apps no longer share their saved state. The saved state (open and selected nodes) is reset once after upgrading.
 - Fix: preserve the active filters correctly in the URLs of the tree nodes. Returning to the tree after editing a node now keeps the filter.
+- Use tree-element 0.4.1. Keyboard focus stays on the node after its children are loaded or after a move.
 
 **3.1.1** (November 1 2026)
 

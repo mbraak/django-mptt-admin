@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/classNames.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/classNames.js
 let DEFAULT_CLASS_PREFIX = "tree-element";
 
 /* Create the class names that the widget puts on the elements it creates.
@@ -41,7 +41,7 @@ let createClassNames = ({
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dataLoader.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/dataLoader.js
 class DataLoader {
   constructor({
     _classNames: classNames,
@@ -96,9 +96,12 @@ class DataLoader {
     };
     let signal = this._abortController.signal;
     url._setSearchParam("_", Date.now().toString());
+
+    // Accept, not Content-Type: the request has no body. A cross-origin request
+    // with only an Accept header also needs no CORS preflight.
     return fetch(url._value(), {
       headers: {
-        "Content-Type": "application/json"
+        Accept: "application/json"
       },
       signal
     }).then(handleResponse).catch(error => {
@@ -116,7 +119,7 @@ class DataLoader {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/positionUtils.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/positionUtils.js
 // Get the top position of the HTML element.
 let getOffsetTop = element => getElementPosition(element).top;
 
@@ -131,7 +134,7 @@ let getElementPosition = element => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/dragAndDropHandler/binarySearch.js
 function binarySearch(items, compareFn) {
   let low = 0;
   let high = items.length;
@@ -155,7 +158,7 @@ function binarySearch(items, compareFn) {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/dragAndDropHandler/dragElement.js
 class DragElement {
   constructor({
     _autoEscape: autoEscape,
@@ -193,7 +196,7 @@ class DragElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/dragAndDropHandler/iterateVisibleNodes.js
 let iterateVisibleNodes = (tree, {
   _handleAfterOpenFolder: handleAfterOpenFolder,
   _handleClosedFolder: handleClosedFolder,
@@ -249,7 +252,7 @@ let iterateVisibleNodes = (tree, {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/dragAndDropHandler/generateHitAreas.js
 
 
 
@@ -265,8 +268,9 @@ let generateHitPositions = (tree, currentNode) => {
     lastTop = top;
   };
   let handleAfterOpenFolder = (node, nextNode) => {
-    if (node === currentNode || nextNode === currentNode) {
-      // Cannot move before or after current item
+    // Not called for the current node: handleOpenFolder stops iterating there
+    if (nextNode === currentNode) {
+      // Dropping the current node after this folder would leave it where it is
       addHitPosition(node, null, lastTop);
     } else {
       addHitPosition(node, "after", lastTop);
@@ -380,7 +384,7 @@ let generateHitAreas = (tree, currentNode, treeBottom) => generateHitAreasFromPo
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/dragAndDropHandler/index.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/dragAndDropHandler/index.js
 
 
 
@@ -402,7 +406,6 @@ class DragAndDropHandler {
     _openFolderDelay: openFolderDelay,
     _openNode: openNode,
     _refreshElements: refreshElements,
-    _slide: slide,
     _treeElement: treeElement,
     _triggerEvent: triggerEvent
   }) {
@@ -420,7 +423,6 @@ class DragAndDropHandler {
     this._openFolderDelay = openFolderDelay;
     this._openNode = openNode;
     this._refreshElements = refreshElements;
-    this._slide = slide;
     this._treeElement = treeElement;
     this._triggerEvent = triggerEvent;
     this._hoveredArea = null;
@@ -453,9 +455,6 @@ class DragAndDropHandler {
     this._dragElement._move(positionInfo.pageX, positionInfo.pageY);
     let area = this._findHoveredArea(positionInfo.pageX, positionInfo.pageY);
     if (area && this._canMoveToArea(area, this._currentItem)) {
-      if (!area.node.isFolder()) {
-        this._stopOpenFolderTimer();
-      }
       if (this._hoveredArea !== area) {
         this._hoveredArea = area;
 
@@ -514,7 +513,6 @@ class DragAndDropHandler {
     if (!this._hoveredArea && currentItem && this._onDragStop) {
       this._onDragStop(currentItem._node, positionInfo.originalEvent);
     }
-    return false;
   }
   _refresh() {
     this._removeHitAreas();
@@ -605,8 +603,7 @@ class DragAndDropHandler {
     }
   }
   _mustCaptureElement(element) {
-    let nodeName = element.nodeName;
-    return nodeName !== "INPUT" && nodeName !== "SELECT" && nodeName !== "TEXTAREA";
+    return !["INPUT", "SELECT", "TEXTAREA"].includes(element.nodeName);
   }
   _mustOpenFolderTimer(area) {
     let node = area.node;
@@ -625,7 +622,7 @@ class DragAndDropHandler {
   }
   _startOpenFolderTimer(folder) {
     let openFolder = () => {
-      void this._openNode(folder, this._slide).then(() => {
+      void this._openNode(folder).then(() => {
         this._refresh();
         this._updateDropHint();
       });
@@ -659,13 +656,36 @@ class DragAndDropHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/util.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/util.js
 let isInt = n => Number.isInteger(n);
 let getBoolString = value => value ? "true" : "false";
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/elementsRenderer.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/folderOpenState.js
+
+
+/* The open state of a folder is shown on the toggler and on the <li>.
+ * These are used both when a folder is rendered and when it is opened or
+ * closed, so a rendered folder looks the same as a toggled one.
+ */
+
+let setTogglerOpenState = (toggler, isOpen, classNames, icons) => {
+  toggler.classList.toggle(classNames.closed, !isOpen);
+  toggler.replaceChildren();
+  let iconElement = isOpen ? icons.opened : icons.closed;
+  if (iconElement) {
+    toggler.append(iconElement.cloneNode(true));
+  }
+};
+let setFolderLiOpenState = (li, isOpen, classNames) => {
+  li.classList.toggle(classNames.closed, !isOpen);
+  li.setAttribute("aria-expanded", getBoolString(isOpen));
+};
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/elementsRenderer.js
 
 
 /* Renders the tree to html.
@@ -714,13 +734,16 @@ class ElementsRenderer {
     this._setNodeElement = setNodeElement;
     this._showEmptyFolder = showEmptyFolder;
     this._tabIndex = tabIndex;
-    this._openedIconElement = this._createButtonElement(openedIcon);
-    this._closedIconElement = this._createButtonElement(closedIcon);
-    this._rootUlTemplate = this._createUlTemplate(true);
-    this._groupUlTemplate = this._createUlTemplate(false);
-    this._nodeTemplate = this._createNodeTemplate();
-    this._openedFolderTemplate = this._createFolderTemplate(true);
-    this._closedFolderTemplate = this._createFolderTemplate(false);
+    this._icons = {
+      closed: this._createButtonElement(closedIcon),
+      opened: this._createButtonElement(openedIcon)
+    };
+    let templates = this._createTemplates();
+    this._closedFolderTemplate = templates.closedFolderTemplate;
+    this._groupUlTemplate = templates.groupUlTemplate;
+    this._nodeTemplate = templates.nodeTemplate;
+    this._openedFolderTemplate = templates.openedFolderTemplate;
+    this._rootUlTemplate = templates.rootUlTemplate;
   }
   _render(fromNode) {
     if (fromNode?.parent) {
@@ -752,6 +775,43 @@ class ElementsRenderer {
     let tree = this._getTree();
     if (tree) {
       this._createDomElements(this._htmlElement, tree.children, true, 1);
+    }
+  }
+
+  /* Change dragAndDrop after construction. The rendered lists and the
+   * templates for new lists get or lose the dnd class.
+   */
+  _setDragAndDrop(dragAndDrop) {
+    this._dragAndDrop = dragAndDrop;
+    this._updateTemplates();
+    for (let ul of this._htmlElement.querySelectorAll(`ul.${this._classNames.common}`)) {
+      ul.classList.toggle(this._classNames.dnd, dragAndDrop);
+    }
+  }
+
+  /* Change multiSelect after construction. Only the templates are updated;
+   * the tree must be rendered again.
+   */
+  _setMultiSelect(multiSelect) {
+    this._multiSelect = multiSelect;
+    this._updateTemplates();
+  }
+
+  /* Change tabIndex after construction. The rendered nodes and the
+   * templates for new nodes get the new tabindex. The tab stop is updated by
+   * TreeElement.updateTabStop.
+   */
+  _setTabIndex(tabIndex) {
+    this._tabIndex = tabIndex;
+    this._updateTemplates();
+    for (let li of this._htmlElement.querySelectorAll("li[role=treeitem]")) {
+      if (tabIndex === undefined) {
+        li.removeAttribute("tabindex");
+      } else if (!this._multiSelect && li.getAttribute("aria-selected") === "true") {
+        li.setAttribute("tabindex", String(tabIndex));
+      } else {
+        li.setAttribute("tabindex", "-1");
+      }
     }
   }
   _attachNodeData(node, li) {
@@ -809,26 +869,19 @@ class ElementsRenderer {
    * state, so there is a template for each.
    */
   _createFolderTemplate(isOpen) {
-    let liClasses = [this._classNames.common, this._classNames.folder];
-    if (!isOpen) {
-      liClasses.push(this._classNames.closed);
-    }
-    let li = this._createLiTemplate(liClasses.join(" "));
+    let li = this._createLiTemplate(`${this._classNames.common} ${this._classNames.folder}`);
+    setFolderLiOpenState(li, isOpen, this._classNames);
     let div = li.firstChild;
 
     // The toggler is hidden from screen readers: the icon is decoration, and
     // aria-expanded on the treeitem has the open state.
     let toggler = document.createElement("span");
-    toggler.className = this._getButtonClasses(isOpen);
+    toggler.className = this._getButtonClasses();
     toggler.setAttribute("aria-hidden", "true");
-    let iconElement = isOpen ? this._openedIconElement : this._closedIconElement;
-    if (iconElement) {
-      toggler.append(iconElement.cloneNode(true));
-    }
+    setTogglerOpenState(toggler, isOpen, this._classNames, this._icons);
     if (this._buttonLeft) {
       div.append(toggler);
     }
-    li.setAttribute("aria-expanded", getBoolString(isOpen));
 
     // title span
     div.append(this._createTitleSpanTemplate(true));
@@ -899,6 +952,15 @@ class ElementsRenderer {
     div.append(this._createTitleSpanTemplate(false));
     return li;
   }
+  _createTemplates() {
+    return {
+      closedFolderTemplate: this._createFolderTemplate(false),
+      groupUlTemplate: this._createUlTemplate(false),
+      nodeTemplate: this._createNodeTemplate(),
+      openedFolderTemplate: this._createFolderTemplate(true),
+      rootUlTemplate: this._createUlTemplate(true)
+    };
+  }
   _createTitleSpanTemplate(isFolder) {
     let titleSpan = document.createElement("span");
     let classes = `${this._classNames.title} ${this._classNames.common}`;
@@ -967,11 +1029,8 @@ class ElementsRenderer {
     // is false. Otherwise the name would contain everything in the row.
     li.setAttribute("aria-label", titleSpan.textContent);
   }
-  _getButtonClasses(isOpen) {
+  _getButtonClasses() {
     let classes = [this._classNames.toggler, this._classNames.common];
-    if (!isOpen) {
-      classes.push(this._classNames.closed);
-    }
     if (this._buttonLeft) {
       classes.push(this._classNames.togglerLeft);
     } else {
@@ -986,11 +1045,19 @@ class ElementsRenderer {
   _mustRenderChildren(node) {
     return node.hasChildren() && node.is_open === true;
   }
+  _updateTemplates() {
+    let templates = this._createTemplates();
+    this._closedFolderTemplate = templates.closedFolderTemplate;
+    this._groupUlTemplate = templates.groupUlTemplate;
+    this._nodeTemplate = templates.nodeTemplate;
+    this._openedFolderTemplate = templates.openedFolderTemplate;
+    this._rootUlTemplate = templates.rootUlTemplate;
+  }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/keyHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/keyHandler.js
 /* The keys move from the selected node and select the node they move to.
  * With multiSelect they move from the focused node and only move the focus;
  * Space adds the focused node to the selection or removes it.
@@ -1037,6 +1104,24 @@ class KeyHandler {
   }
   _moveUp() {
     return this._goToNode(this._getCurrentNode()?.getPreviousVisibleNode());
+  }
+
+  // Change keyboardSupport after construction
+  _setKeyboardSupport(keyboardSupport) {
+    if (keyboardSupport === this._keyboardSupport) {
+      return;
+    }
+    this._keyboardSupport = keyboardSupport;
+    if (keyboardSupport) {
+      document.addEventListener("keydown", this._handleKeyDown);
+    } else {
+      document.removeEventListener("keydown", this._handleKeyDown);
+    }
+  }
+
+  // Change multiSelect after construction
+  _setMultiSelect(multiSelect) {
+    this._multiSelect = multiSelect;
   }
 
   // Activate the node, for example to open its edit page.
@@ -1182,7 +1267,7 @@ class KeyHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/mouseUtils.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/mouseUtils.js
 let getPositionInfoFromMouseEvent = e => ({
   originalEvent: e,
   pageX: e.pageX,
@@ -1198,7 +1283,7 @@ let getPositionInfoFromTouch = (touch, e) => ({
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/mouseHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/mouseHandler.js
 
 
 class MouseHandler {
@@ -1311,19 +1396,19 @@ class MouseHandler {
       return;
     }
     let div = e.target.closest(`ul.${this._classNames.tree} .${this._classNames.element}`);
-    if (div) {
-      let node = this._getNode(div);
-      if (node) {
-        e.preventDefault();
-        e.stopPropagation();
-        this._triggerEvent("tree.contextmenu", {
-          node,
-          originalEvent: e
-        });
-        return false;
-      }
+    if (!div) {
+      return;
     }
-    return null;
+    let node = this._getNode(div);
+    if (!node) {
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    this._triggerEvent("tree.contextmenu", {
+      node,
+      originalEvent: e
+    });
   };
   _handleDblclick = e => {
     if (!e.target) {
@@ -1469,12 +1554,12 @@ class MouseHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeUtils.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/nodeUtils.js
 let isNodeRecordWithChildren = data => typeof data === "object" && "children" in data && Array.isArray(data.children);
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/node.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/node.js
 
 
 /*
@@ -1491,14 +1576,14 @@ prefix-private-members: all
  *
  * @groupDescription Searching
  * These work on any node, and search that node's subtree. Called on the root
- * node, they search the whole tree — which is what the tree's own methods of
+ * node, they search the whole tree—which is what the tree's own methods of
  * the same name do.
  *
  * @groupDescription Changing the tree
  * ::: warning
  * These methods change the data without re-rendering. The tree's
- * [methods](/reference/methods) — `appendNode`, `removeNode`, `moveNode` and
- * friends — do the same and refresh the display, so prefer those. If you do
+ * [methods](/reference/methods)—`appendNode`, `removeNode`, `moveNode` and
+ * friends—do the same and refresh the display, so prefer those. If you do
  * use these, call `tree.refresh()` afterwards.
  * :::
  */
@@ -1547,7 +1632,7 @@ class Node {
   */
   nodeClass;
   /**
-  The parent; `null` for the root node.
+  The parent, or `null` for the root node.
   */
   parent;
   /**
@@ -1639,7 +1724,9 @@ class Node {
   }
 
   /**
-   * Inserts a new parent between this node and its current parent.
+   * Inserts a new parent between this node and its current parent. Its
+   * siblings move along: the new node takes all children of the current
+   * parent, and becomes its only child.
    *
    * @returns The new node, or `null` when the node has no parent.
    * @group Changing the tree
@@ -1709,7 +1796,7 @@ class Node {
    * Returns the subtree as plain data, ready for `JSON.stringify`.
    * Internal properties (`parent`, `children`, `element`, `tree`,
    * `idMapping`, `nodeClass`, `load_on_demand`, `isEmptyFolder`) are left
-   * out; your own properties are kept.
+   * out. Your own properties are kept.
    *
    * ```js
    * tree.getTree().getData();
@@ -1801,7 +1888,7 @@ class Node {
   }
 
   /**
-   * Like `getNextNode`, but skipping nodes inside closed folders — this is
+   * Like `getNextNode`, but skipping nodes inside closed folders. This is
    * what the arrow keys use.
    *
    * @group Moving around the tree
@@ -1885,7 +1972,7 @@ class Node {
   }
 
   /**
-   * Returns the parent: `null` for a top-level node — the root node is not
+   * Returns the parent, or `null` for a top-level node: the root node is not
    * returned.
    *
    * @group Moving around the tree
@@ -1933,8 +2020,8 @@ class Node {
   }
 
   /**
-   * Like `getPreviousNode`, but skipping nodes inside closed folders —
-   * this is what the arrow keys use.
+   * Like `getPreviousNode`, but skipping nodes inside closed folders.
+   * This is what the arrow keys use.
    *
    * @group Moving around the tree
    */
@@ -2210,7 +2297,7 @@ class Node {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/borderDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/nodeElement/borderDropHint.js
 class BorderDropHint {
   constructor(element, scrollLeft, classNames) {
     let div = element.querySelector(`:scope > .${classNames.element}`);
@@ -2234,7 +2321,7 @@ class BorderDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/nodeElement/ghostDropHint.js
 class GhostDropHint {
   constructor(node, element, position, classNames) {
     this._classNames = classNames;
@@ -2302,7 +2389,7 @@ class GhostDropHint {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/index.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/nodeElement/index.js
 
 
 
@@ -2380,7 +2467,7 @@ class NodeElement {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/animation.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/animation.js
 let getAnimationDuration = duration => {
   if (typeof duration === "number") {
     return duration;
@@ -2424,18 +2511,18 @@ let slideUp = (element, animationSpeed) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/nodeElement/folderElement.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/nodeElement/folderElement.js
+
 
 
 
 class FolderElement extends NodeElement {
   constructor({
     _classNames: classNames,
-    _closedIconElement: closedIconElement,
     _getScrollLeft: getScrollLeft,
+    _icons: icons,
     _multiSelect: multiSelect,
     _node: node,
-    _openedIconElement: openedIconElement,
     _renderChildren: renderChildren,
     _tabIndex: tabIndex,
     _treeElement: treeElement,
@@ -2449,8 +2536,7 @@ class FolderElement extends NodeElement {
       _tabIndex: tabIndex,
       _treeElement: treeElement
     });
-    this._closedIconElement = closedIconElement;
-    this._openedIconElement = openedIconElement;
+    this._icons = icons;
     this._renderChildren = renderChildren;
     this._triggerEvent = triggerEvent;
   }
@@ -2459,30 +2545,11 @@ class FolderElement extends NodeElement {
       return;
     }
     this._node.is_open = false;
-    if (!this._isRendered()) {
-      this._triggerEvent("tree.close", {
-        node: this._node
-      });
-      return;
+    if (this._isRendered()) {
+      this._setButtonState(false);
+      await this._setUlState(this._getUl(), false, slide, animationSpeed);
+      this._setElementState(false);
     }
-    let button = this._getButton();
-    button.classList.add(this._classNames.closed);
-    button.replaceChildren();
-    let closedIconElement = this._closedIconElement;
-    if (closedIconElement) {
-      let icon = closedIconElement.cloneNode(true);
-      button.append(icon);
-    }
-    let ul = this._getUl();
-    if (ul) {
-      if (slide) {
-        await slideUp(ul, animationSpeed);
-      } else {
-        ul.style.display = "none";
-      }
-    }
-    this._element.classList.add(this._classNames.closed);
-    this._element.setAttribute("aria-expanded", "false");
     this._triggerEvent("tree.close", {
       node: this._node
     });
@@ -2492,33 +2559,17 @@ class FolderElement extends NodeElement {
       return;
     }
     this._node.is_open = true;
-    if (!this._isRendered()) {
-      // The folder is rendered open when its parent is opened
-      this._triggerEvent("tree.open", {
-        node: this._node
-      });
-      return;
-    }
-    let button = this._getButton();
-    button.classList.remove(this._classNames.closed);
-    button.replaceChildren();
-    let openedIconElement = this._openedIconElement;
-    if (openedIconElement) {
-      let icon = openedIconElement.cloneNode(true);
-      button.append(icon);
-    }
 
-    // The children are rendered the first time the folder is opened
-    let ul = this._getUl() ?? this._renderChildren(this._node);
-    if (ul) {
-      if (slide) {
-        await slideDown(ul, animationSpeed);
-      } else {
-        ul.style.display = "block";
-      }
+    // A folder that is not rendered is rendered open when its parent is
+    // opened
+    if (this._isRendered()) {
+      this._setButtonState(true);
+
+      // The children are rendered the first time the folder is opened
+      let ul = this._getUl() ?? this._renderChildren(this._node);
+      await this._setUlState(ul, true, slide, animationSpeed);
+      this._setElementState(true);
     }
-    this._element.classList.remove(this._classNames.closed);
-    this._element.setAttribute("aria-expanded", "true");
     this._triggerEvent("tree.open", {
       node: this._node
     });
@@ -2529,11 +2580,40 @@ class FolderElement extends NodeElement {
   _getButton() {
     return this._element.querySelector(`:scope > .${this._classNames.element} > .${this._classNames.toggler}`);
   }
+  _setButtonState(isOpen) {
+    setTogglerOpenState(this._getButton(), isOpen, this._classNames, this._icons);
+  }
+  _setElementState(isOpen) {
+    setFolderLiOpenState(this._element, isOpen, this._classNames);
+  }
+  async _setUlState(ul, isOpen, slide, animationSpeed) {
+    if (!ul) {
+      return;
+    }
+    if (slide) {
+      await (isOpen ? slideDown : slideUp)(ul, animationSpeed);
+    } else {
+      ul.style.display = isOpen ? "block" : "none";
+    }
+  }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/requestUrl.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/options.js
+/* The options that setOption can change. The others are read once, in the
+ * constructor, so changing them later would have no effect or leave the tree
+ * in an inconsistent state.
+ */
+let changeableOptions = ["animationSpeed", "dataUrl", "dragAndDrop", "keyboardSupport", "multiSelect", "onCanSelectNode", "selectable", "slide", "startDndDelay", "tabIndex"];
+
+/**
+ * The options that `setOption` can change.
+ */
+
+
+
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/requestUrl.js
 // Url of a request. A relative url is resolved against the page, like a link
 // or `fetch` would, so it also works when the page is in a subdirectory.
 
@@ -2551,7 +2631,7 @@ class RequestUrl {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/saveStateHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/saveStateHandler.js
 
 
 class SaveStateHandler {
@@ -2579,9 +2659,7 @@ class SaveStateHandler {
     this._saveStateOption = saveState;
   }
   _getNodeIdToBeSelected() {
-    if (!this._saveStateOption) {
-      return null;
-    }
+    // Without the saveState option there is no state
     let state = this._getStateFromStorage();
     return state?.selected_node ? state.selected_node[0] ?? null : null;
   }
@@ -2710,23 +2788,25 @@ class SaveStateHandler {
       this._removeFromSelection(node);
     }
   }
+
+  // result: is a node selected?
   _selectInitialNodes(nodeIds) {
-    let selectCount = 0;
+    let isNodeSelected = false;
     for (let nodeId of nodeIds) {
       let node = this._getNodeById(nodeId);
       if (!node) {
         continue;
       }
-      selectCount += 1;
       this._addToSelection(node);
+      isNodeSelected = true;
     }
-    return selectCount !== 0;
+    return isNodeSelected;
   }
 }
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/scrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/scrollHandler/scrollParent.js
 class ScrollParent {
   constructor({
     _container: container,
@@ -2802,7 +2882,7 @@ class ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/scrollHandler/containerScrollParent.js
 
 
 
@@ -2845,7 +2925,7 @@ class ContainerScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/scrollHandler/documentScrollParent.js
 
 
 
@@ -2908,7 +2988,7 @@ class DocumentScrollParent extends ScrollParent {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/scrollHandler/createScrollParent.js
 
 
 
@@ -2946,7 +3026,7 @@ let createScrollParent = (treeElement, refreshHitAreas) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/scrollHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/scrollHandler.js
 
 
 class ScrollHandler {
@@ -2985,7 +3065,7 @@ class ScrollHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/selectNodeHandler.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/selectNodeHandler.js
 class SelectNodeHandler {
   constructor({
     _getNodeById: getNodeById,
@@ -3102,6 +3182,11 @@ class SelectNodeHandler {
         for (let otherNode of otherSelectedNodes) {
           this._deselectNode(otherNode);
         }
+        for (let otherNode of otherSelectedNodes) {
+          this._triggerEvent("tree.deselect", {
+            node: otherNode
+          });
+        }
       } else if (selectOptions.mustToggle) {
         this._deselectNode(node);
         this._triggerEvent("tree.deselect", {
@@ -3109,13 +3194,20 @@ class SelectNodeHandler {
         });
       }
     } else {
-      let deselectedNode = otherSelectedNodes[0] ?? null;
+      // tree.select reports the first deselected node; the others, from a
+      // multiple selection, get a tree.deselect.
+      let [deselectedNode = null, ...alsoDeselectedNodes] = otherSelectedNodes;
       for (let otherNode of otherSelectedNodes) {
         this._deselectNode(otherNode);
       }
       this._addToSelection(node);
       this._openParents(node);
       this._getNodeElementForNode(node)._select(selectOptions.mustSetFocus);
+      for (let otherNode of alsoDeselectedNodes) {
+        this._triggerEvent("tree.deselect", {
+          node: otherNode
+        });
+      }
       this._triggerEvent("tree.select", {
         deselectedNode,
         node
@@ -3165,7 +3257,7 @@ class SelectNodeHandler {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/setDefaultOptions.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/setDefaultOptions.js
 
 
 
@@ -3249,7 +3341,7 @@ let getRtlOptionFromHTMLElement = htmlElement => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/triggerCustomEvent.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/triggerCustomEvent.js
 // Trigger a CustomEvent. Return if the event is processed (true) or cancelled (false).
 let triggerCustomEvent = (element, eventName, values) => {
   let event = new CustomEvent(eventName, {
@@ -3263,15 +3355,15 @@ let triggerCustomEvent = (element, eventName, values) => {
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/version.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/version.js
 // Generated by config/generateVersion.mjs. Do not edit.
-let version = "0.4.0";
+let version = "0.4.1";
 
 
 
-;// ./node_modules/.pnpm/tree-element@0.4.0/node_modules/tree-element/lib/index.js
+;// ./node_modules/.pnpm/tree-element@0.4.1/node_modules/tree-element/lib/index.js
 /*
-Tree-element 0.4.0
+Tree-element 0.4.1
 
 Copyright 2026 Marco Braak
 
@@ -3289,6 +3381,7 @@ limitations under the License.
 @license
 
 */
+
 
 
 
@@ -3372,7 +3465,6 @@ class TreeElement {
       rtl,
       saveState: saveStateOption,
       showEmptyFolder,
-      slide,
       tabIndex
     } = this._options;
     let classNames = this._classNames;
@@ -3461,7 +3553,6 @@ class TreeElement {
       _openFolderDelay: openFolderDelay,
       _openNode: openNode,
       _refreshElements: refreshElements,
-      _slide: slide,
       _treeElement: treeElement,
       _triggerEvent: triggerEvent
     });
@@ -3560,8 +3651,9 @@ class TreeElement {
   }
 
   /**
-   * Inserts a new node between a node and its parent, taking the node as its
-   * child.
+   * Inserts a new node between a node and its parent. The siblings of the node
+   * move along: the new node takes all children of the parent, and becomes its
+   * only child.
    *
    * @returns The new node, or `null` when the node has no parent.
    * @group Changing the tree
@@ -3731,7 +3823,7 @@ class TreeElement {
   }
 
   /**
-   * Returns the current state — `open_nodes` and `selected_node` — whether or
+   * Returns the current state—`open_nodes` and `selected_node`—whether or
    * not `saveState` is enabled.
    *
    * @group State
@@ -3750,7 +3842,7 @@ class TreeElement {
   }
 
   /**
-   * Returns the root node. It is not rendered; its `children` are the
+   * Returns the root node. It is not rendered, and its `children` are the
    * top-level nodes. Also available as the `tree` property.
    *
    * @group Finding nodes
@@ -3861,7 +3953,7 @@ class TreeElement {
   }
 
   /**
-   * Opens a folder, and the folders above it. A node marked `load_on_demand`
+   * Opens a folder, and the folders that contain it. A node marked `load_on_demand`
    * is fetched first, so await the promise when you need to know it is really
    * open.
    *
@@ -3877,7 +3969,7 @@ class TreeElement {
   async openNode(node, slide) {
     let mustSlide = slide ?? this._options.slide;
     let doOpenNode = async (openedNode, slideOption) => {
-      if (!node.children.length) {
+      if (!openedNode.children.length) {
         return;
       }
       let folderElement = this._createFolderElement(openedNode);
@@ -3996,13 +4088,43 @@ class TreeElement {
   }
 
   /**
-   * Changes an option after construction. See
-   * [Options](/reference/options#changing-an-option-later) for the caveats.
+   * Changes an option after construction. Only some options can be changed:
+   * the others throw an error. See
+   * [Options](/reference/options#changing-an-option-later).
    *
    * @group Other
    */
   setOption(option, value) {
+    if (!changeableOptions.includes(option)) {
+      throw new Error(`The option ${option} can only be set in the constructor`);
+    }
     this._options[option] = value;
+    switch (option) {
+      case "dragAndDrop":
+        {
+          this._renderer._setDragAndDrop(Boolean(value));
+          break;
+        }
+      case "keyboardSupport":
+        {
+          this._keyHandler._setKeyboardSupport(Boolean(value));
+          break;
+        }
+      case "multiSelect":
+        {
+          this._setMultiSelect(Boolean(value));
+          break;
+        }
+      case "tabIndex":
+        {
+          this._options.tabIndex = value ?? undefined;
+          this._renderer._setTabIndex(this._options.tabIndex);
+          this._fallbackTabStop = null;
+          this._updateTabStop();
+          break;
+        }
+      // No default
+    }
   }
 
   /**
@@ -4035,8 +4157,8 @@ class TreeElement {
   }
 
   /**
-   * Returns the tree as a json string, including changes made through the
-   * api.
+   * Returns the tree as a JSON string, including changes made through the
+   * API.
    *
    * @group Other
    */
@@ -4049,7 +4171,7 @@ class TreeElement {
    * name.
    *
    * Changing the `id` re-indexes the node. `children` and `parent` are
-   * ignored — use `loadData` or `moveNode` for those.
+   * ignored—use `loadData` or `moveNode` for those.
    *
    * @example
    * ```js
@@ -4100,9 +4222,7 @@ class TreeElement {
   }
   _createFolderElement(node) {
     let classNames = this._classNames;
-    let closedIconElement = this._renderer._closedIconElement;
     let getScrollLeft = this._scrollHandler._getScrollLeft.bind(this._scrollHandler);
-    let openedIconElement = this._renderer._openedIconElement;
     let tabIndex = this._options.tabIndex;
     let treeElement = this._htmlElement;
     let triggerEvent = this._triggerEvent.bind(this);
@@ -4117,11 +4237,10 @@ class TreeElement {
     };
     return new FolderElement({
       _classNames: classNames,
-      _closedIconElement: closedIconElement,
       _getScrollLeft: getScrollLeft,
+      _icons: this._renderer._icons,
       _multiSelect: this._options.multiSelect,
       _node: node,
-      _openedIconElement: openedIconElement,
       _renderChildren: renderChildren,
       _tabIndex: tabIndex,
       _treeElement: treeElement,
@@ -4217,14 +4336,8 @@ class TreeElement {
   _getFocusedNode() {
     let activeElement = document.activeElement;
 
-    /* istanbul ignore if */
-    if (!activeElement) {
-      return null;
-    }
-
-    // The keyboard must still work for input elements.
-    let tagName = activeElement.tagName;
-    if (tagName !== "A" && tagName !== "LI" && tagName !== "SPAN") {
+    // An active element must exist and the keyboard must still work for input elements.
+    if (!activeElement || !["A", "LI", "SPAN"].includes(activeElement.tagName)) {
       return null;
     }
     let node = this.getNode(activeElement);
@@ -4273,26 +4386,23 @@ class TreeElement {
       this._isInitialized = true;
       this._triggerEvent("tree.init");
     };
+
+    // Before the tree is replaced: then the focused node is no longer in it
+    let focusedNode = this._getFocusedNode();
     this._tree = new this._options.nodeClass(null, true, this._options.nodeClass);
     this._selectNodeHandler._clear();
     this._tree.loadFromData(data);
     let mustLoadOnDemand = this._setInitialState();
     this._refreshElements(null);
+    if (focusedNode) {
+      this._restoreFocus(focusedNode);
+    }
     if (mustLoadOnDemand) {
       // Load data on demand and then init the tree
       void this._setInitialStateOnDemand().then(doInit);
     } else {
       doInit();
     }
-  }
-
-  // Does an HTML element of the tree have the focus?
-  _isFocusOnTree() {
-    return this._getFocusedNode() !== null;
-  }
-  _isSelectedNodeInSubtree(subtree) {
-    let selectedNode = this.getSelectedNode();
-    return selectedNode ? subtree === selectedNode || subtree.isParentOf(selectedNode) : false;
   }
   async _loadFolderOnDemand(node, slide) {
     node.is_loading = true;
@@ -4334,10 +4444,10 @@ class TreeElement {
   _mouseStop(positionInfo) {
     /* istanbul ignore if */
     if (!this._options.dragAndDrop) {
-      return false;
+      return;
     }
     this._scrollHandler._stopScrolling();
-    return this._dndHandler._mouseStop(positionInfo);
+    this._dndHandler._mouseStop(positionInfo);
   }
   _openParents(node) {
     let parent = node.parent;
@@ -4351,25 +4461,32 @@ class TreeElement {
     from_node: redraw this subtree
   */
   _refreshElements(fromNode) {
-    let mustSetFocus = this._isFocusOnTree();
-    let mustSelect = fromNode ? this._isSelectedNodeInSubtree(fromNode) : false;
+    let focusedNode = this._getFocusedNode();
+
+    // The renderer marks the selected nodes, so only the focus needs restoring
     this._renderer._render(fromNode);
-    if (mustSelect) {
-      this._selectCurrentNode(mustSetFocus);
+    if (focusedNode) {
+      this._restoreFocus(focusedNode);
     }
     this._updateTabStop();
     this._triggerEvent("tree.refresh");
   }
-  _saveState() {
-    this._saveStateHandler._saveState();
-  }
-  _selectCurrentNode(mustSetFocus) {
-    let node = this.getSelectedNode();
-    if (!node) {
+
+  // Rendering replaces the elements of the nodes, so a focused element can be
+  // gone. Then move the focus to the new element of the same node. After
+  // loadData the nodes are new objects, so look the node up by its id.
+  _restoreFocus(focusedNode) {
+    if (this._htmlElement.contains(document.activeElement)) {
       return;
     }
-    let nodeElement = this._getNodeElementForNode(node);
-    nodeElement._select(mustSetFocus);
+    let node = (focusedNode.id == null ? null : this.getNodeById(focusedNode.id)) ?? focusedNode;
+    let element = node.element;
+    if (element && this._htmlElement.contains(element)) {
+      element.focus();
+    }
+  }
+  _saveState() {
+    this._saveStateHandler._saveState();
   }
 
   // Set initial state, either by restoring the state or auto-opening nodes
@@ -4422,6 +4539,25 @@ class TreeElement {
     } else {
       await this._autoOpenNodesOnDemand();
     }
+  }
+
+  /* Change multiSelect after construction. The attributes of the nodes
+   * depend on it, so the tree is rendered again. The selection is kept: a
+   * tree without multiSelect can also have several selected nodes, see
+   * addToSelection.
+   */
+  _setMultiSelect(multiSelect) {
+    let focusedNode = this._getFocusedNode();
+    this._keyHandler._setMultiSelect(multiSelect);
+    this._renderer._setMultiSelect(multiSelect);
+    if (multiSelect) {
+      this._htmlElement.addEventListener("focusin", this._handleFocusIn);
+    } else {
+      this._htmlElement.removeEventListener("focusin", this._handleFocusIn);
+    }
+    this._activeNode = multiSelect ? focusedNode : null;
+    this._fallbackTabStop = null;
+    this._refreshElements(null);
   }
 
   // Set this HTML element to this node in the node map.
