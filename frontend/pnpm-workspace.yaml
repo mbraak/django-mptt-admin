@@ -3,12 +3,14 @@ allowBuilds:
     msw: true
     unrs-resolver: true
 minimumReleaseAgeExclude:
-  - stylelint-config-recommended-scss@18.0.0
-  - stylelint-config-standard-scss@18.0.0
-  - stylelint-scss@7.5.0
+    - stylelint-config-recommended-scss@18.0.0
+    - stylelint-config-standard-scss@18.0.0
+    - stylelint-scss@7.5.0
+    - tree-element@0.4.1
 overrides:
     "@istanbuljs/load-nyc-config>js-yaml": ^4.1.0
     "babel-plugin-istanbul>test-exclude": ^8.0.0
     "glob@>=9.0.0 <=14.0.1": ^14.0.2
     "minimatch@<11.0.1": ^11.0.1
     "eslint-plugin-import-x>minimatch": ^10.2.6
+    "tree-element": ^0.4.1
